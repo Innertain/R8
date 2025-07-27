@@ -762,22 +762,34 @@ export default function VolunteerPortal() {
         </div>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dashboard" className="flex flex-col items-center gap-1 px-2 py-3">
-              <UserCheck className="h-5 w-5" />
-              <span className="text-xs hidden sm:block">My Shifts</span>
+          <TabsList className="grid w-full grid-cols-4 h-auto">
+            <TabsTrigger 
+              value="dashboard" 
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 py-3 sm:py-2 min-h-[60px] sm:min-h-[40px] transition-all duration-200 hover:bg-blue-50 hover:scale-105 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+            >
+              <UserCheck className="h-5 w-5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">My Shifts</span>
             </TabsTrigger>
-            <TabsTrigger value="browse" className="flex flex-col items-center gap-1 px-2 py-3">
-              <List className="h-5 w-5" />
-              <span className="text-xs hidden sm:block">Browse</span>
+            <TabsTrigger 
+              value="browse" 
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 py-3 sm:py-2 min-h-[60px] sm:min-h-[40px] transition-all duration-200 hover:bg-blue-50 hover:scale-105 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+            >
+              <List className="h-5 w-5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">Browse</span>
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex flex-col items-center gap-1 px-2 py-3">
-              <Calendar className="h-5 w-5" />
-              <span className="text-xs hidden sm:block">Calendar</span>
+            <TabsTrigger 
+              value="calendar" 
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 py-3 sm:py-2 min-h-[60px] sm:min-h-[40px] transition-all duration-200 hover:bg-blue-50 hover:scale-105 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+            >
+              <Calendar className="h-5 w-5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">Calendar</span>
             </TabsTrigger>
-            <TabsTrigger value="profile" className="flex flex-col items-center gap-1 px-2 py-3">
-              <Settings className="h-5 w-5" />
-              <span className="text-xs hidden sm:block">Profile</span>
+            <TabsTrigger 
+              value="profile" 
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 py-3 sm:py-2 min-h-[60px] sm:min-h-[40px] transition-all duration-200 hover:bg-blue-50 hover:scale-105 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+            >
+              <Settings className="h-5 w-5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">Profile</span>
             </TabsTrigger>
           </TabsList>
           
