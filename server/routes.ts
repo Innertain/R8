@@ -445,16 +445,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (assignmentData.volunteerId !== 'demo-volunteer-123') {
         console.log('✓ Volunteer ID is not demo, proceeding with Airtable creation');
         const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-        // Create payload without Status field since Airtable only has 'cancelled' option
-        const fields = {
-          'Volunteer': [assignmentData.volunteerId],
-          'Shift ID': assignmentData.shiftId,
-          'Assigned Date': new Date().toISOString(),
-          'Notes': assignmentData.notes || ''
-        };
-        
+        // Shift name will be populated via lookup fields in Airtable automatically
+
+        // Create assignment payload - exclude fields that cause Airtable errors
         const assignmentPayload = {
-          records: [{ fields }]
+          records: [{
+            fields: {
+              'Volunteer': [assignmentData.volunteerId],
+              'Shift ID': assignmentData.shiftId,
+              'Assigned Date': new Date().toISOString(),
+              'Notes': assignmentData.notes || ''
+            }
+          }]
         };
         
         console.log('Creating assignment in Airtable with payload:', JSON.stringify(assignmentPayload, null, 2));
@@ -529,11 +531,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Filtered to ${volunteerAssignments.length} assignments for this volunteer`);
         
         if (volunteerAssignments.length > 0) {
+          // Fetch shift names for assignments that don't have them
+          const shiftsResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shifts`, {
+            headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+          });
+          
+          let shiftsData = {};
+          if (shiftsResponse.ok) {
+            const shifts = await shiftsResponse.json();
+            shiftsData = shifts.records.reduce((acc: any, shift: any) => {
+              acc[shift.id] = shift.fields?.Name?.[0] || shift.fields?.activityName || '';
+              return acc;
+            }, {});
+          }
+
           const assignments = volunteerAssignments.map((record: any) => ({
             id: record.id,
             volunteerId: volunteerId,
             shiftId: record.fields['Shift ID'] || '',
-            shiftName: record.fields['Name (from Shift Name)']?.[0] || '',
+            shiftName: record.fields['Shift Name'] || record.fields['Name (from Shift Name)']?.[0] || shiftsData[record.fields['Shift ID']] || '',
             status: record.fields['Status ']?.trim() || 'confirmed',
             assignedDate: new Date(record.fields['Assigned Date'] || record.createdTime),
             notes: record.fields['Notes'] || ''
