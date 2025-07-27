@@ -1,21 +1,10 @@
 import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-interface Shift {
-  id: number;
-  activityName: string;
-  dateTime: string;
-  location: string;
-  volunteersNeeded: number;
-  volunteersSignedUp: number;
-  status: "active" | "urgent" | "remote" | "full";
-  category: string;
-  icon: string;
-}
+import { type AirtableShift } from "@/lib/api";
 
 interface ShiftCardProps {
-  shift: Shift;
+  shift: AirtableShift;
 }
 
 const iconMap = {

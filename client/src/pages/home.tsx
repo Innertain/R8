@@ -2,92 +2,22 @@ import { useState } from "react";
 import { Search, Bell, Calendar, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
 import ShiftCard from "@/components/ShiftCard";
+import { fetchShiftsFromAirtable, type AirtableShift } from "@/lib/api";
 
-interface Shift {
-  id: number;
-  activityName: string;
-  dateTime: string;
-  location: string;
-  volunteersNeeded: number;
-  volunteersSignedUp: number;
-  status: "active" | "urgent" | "remote" | "full";
-  category: string;
-  icon: string;
-}
-
-const shifts: Shift[] = [
-  {
-    id: 1,
-    activityName: "Deliver Food",
-    dateTime: "Monday, Dec 18 • 10:00 AM - 2:00 PM",
-    location: "Downtown Community Center",
-    volunteersNeeded: 12,
-    volunteersSignedUp: 8,
-    status: "active",
-    category: "food-service",
-    icon: "utensils"
-  },
-  {
-    id: 2,
-    activityName: "Community Cleanup",
-    dateTime: "Saturday, Dec 23 • 9:00 AM - 1:00 PM",
-    location: "Riverside Park",
-    volunteersNeeded: 20,
-    volunteersSignedUp: 15,
-    status: "active",
-    category: "environment",
-    icon: "users"
-  },
-  {
-    id: 3,
-    activityName: "Reading Tutor",
-    dateTime: "Tuesday, Dec 19 • 3:00 PM - 5:00 PM",
-    location: "Lincoln Elementary School",
-    volunteersNeeded: 8,
-    volunteersSignedUp: 3,
-    status: "urgent",
-    category: "education",
-    icon: "book"
-  },
-  {
-    id: 4,
-    activityName: "Gift Wrapping",
-    dateTime: "Friday, Dec 22 • 6:00 PM - 9:00 PM",
-    location: "Community Mall",
-    volunteersNeeded: 6,
-    volunteersSignedUp: 6,
-    status: "full",
-    category: "community",
-    icon: "gift"
-  },
-  {
-    id: 5,
-    activityName: "Tech Support",
-    dateTime: "Thursday, Dec 21 • 7:00 PM - 9:00 PM",
-    location: "Remote (Online)",
-    volunteersNeeded: 5,
-    volunteersSignedUp: 2,
-    status: "remote",
-    category: "technology",
-    icon: "laptop"
-  },
-  {
-    id: 6,
-    activityName: "Senior Care",
-    dateTime: "Sunday, Dec 24 • 1:00 PM - 4:00 PM",
-    location: "Sunset Senior Center",
-    volunteersNeeded: 15,
-    volunteersSignedUp: 9,
-    status: "active",
-    category: "healthcare",
-    icon: "heart"
-  }
-];
+// Use AirtableShift type from API module
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
+
+  // Fetch shifts from Airtable using React Query
+  const { data: shifts = [], isLoading, error } = useQuery({
+    queryKey: ['/api/shifts'],
+    queryFn: fetchShiftsFromAirtable,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const filteredShifts = shifts.filter(shift => {
     const matchesSearch = shift.activityName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -154,8 +84,19 @@ export default function Home() {
           </Select>
         </div>
 
-        {/* Shift Cards Grid */}
-        {filteredShifts.length > 0 ? (
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading volunteer shifts...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <Calendar className="mx-auto text-gray-400 text-4xl mb-4 w-16 h-16" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Unable to load shifts</h3>
+            <p className="text-gray-500 mb-6">Please check your connection and try again.</p>
+          </div>
+        ) : filteredShifts.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredShifts.map((shift) => (
               <ShiftCard key={shift.id} shift={shift} />

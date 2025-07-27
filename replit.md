@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack volunteer management application built with React/TypeScript frontend and Express.js backend. The platform appears to be designed for managing volunteer shifts and activities, with a focus on community service coordination.
+This is a full-stack volunteer management application built with React/TypeScript frontend and Express.js backend. The platform manages volunteer shifts and activities with Airtable integration for real-time data synchronization. Features include shift browsing, filtering, search functionality, and volunteer signup tracking.
 
 ## User Preferences
 
@@ -62,10 +62,14 @@ Preferred communication style: Simple, everyday language.
 
 ### Core Framework Dependencies
 - **@neondatabase/serverless**: Neon PostgreSQL integration
-- **@tanstack/react-query**: Server state management
+- **@tanstack/react-query**: Server state management and data fetching
 - **@radix-ui/***: Headless UI component primitives
 - **drizzle-orm**: Type-safe database ORM
 - **wouter**: Lightweight React routing
+
+### Data Integration
+- **Airtable API**: Real-time volunteer shift data synchronization
+- **Environment Variables**: VITE_AIRTABLE_TOKEN, VITE_BASE_ID
 
 ### Development Dependencies
 - **@replit/vite-plugin-runtime-error-modal**: Enhanced error reporting
@@ -96,5 +100,33 @@ Preferred communication style: Simple, everyday language.
 - **Schema**: Managed through Drizzle migrations in ./migrations
 - **Environment**: Requires DATABASE_URL for PostgreSQL connection
 - **Development**: In-memory storage fallback for rapid prototyping
+
+## Airtable Setup Instructions
+
+To connect your volunteer shift data from Airtable:
+
+1. **Get your Airtable Personal Access Token:**
+   - Go to https://airtable.com/create/tokens
+   - Create a new token with access to your base
+   - Add the token to Replit Secrets as `AIRTABLE_TOKEN`
+
+2. **Find your Base ID:**
+   - Open your Airtable base
+   - Go to Help > API documentation
+   - Your Base ID starts with "app" (e.g., appXXXXXXXXXXXXXX)
+   - Add this to Replit Secrets as `VITE_BASE_ID`
+
+3. **Required Airtable Table Structure:**
+   Your "Shifts" table should have these columns:
+   - `activityName` (Single line text)
+   - `dateTime` (Single line text)
+   - `location` (Single line text) 
+   - `volunteersNeeded` (Number)
+   - `volunteersSignedUp` (Number)
+   - `status` (Single select: active, urgent, remote, full)
+   - `category` (Single line text)
+   - `icon` (Single line text: utensils, users, book, gift, laptop, heart)
+
+The application will automatically fall back to sample data if Airtable credentials are not configured, ensuring the app works out of the box for development and testing.
 
 The application follows a modern full-stack architecture with strong type safety, component-based UI design, and a clear separation between data access, business logic, and presentation layers.
