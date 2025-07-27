@@ -447,12 +447,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
         // Shift name will be populated via lookup fields in Airtable automatically
 
-        // Create assignment payload - exclude fields that cause Airtable errors
+        // Create assignment payload - Shift ID needs to be array for linked field
         const assignmentPayload = {
           records: [{
             fields: {
               'Volunteer': [assignmentData.volunteerId],
-              'Shift ID': assignmentData.shiftId,
+              'Shift ID': [assignmentData.shiftId], // Array format for linked field
               'Assigned Date': new Date().toISOString(),
               'Notes': assignmentData.notes || ''
             }
