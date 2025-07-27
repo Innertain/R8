@@ -1,17 +1,58 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Link, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Calendar, Home as HomeIcon } from "lucide-react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
+import VolunteerPortal from "@/pages/volunteer-portal";
+
+function Navigation() {
+  const [location] = useLocation();
+  
+  return (
+    <nav className="bg-white border-b border-gray-200 px-4 py-3">
+      <div className="container mx-auto flex items-center justify-between">
+        <h1 className="text-xl font-bold">Volunteer Management</h1>
+        <div className="flex gap-2">
+          <Link href="/">
+            <Button 
+              variant={location === "/" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <HomeIcon className="h-4 w-4" />
+              Shifts
+            </Button>
+          </Link>
+          <Link href="/volunteer">
+            <Button 
+              variant={location === "/volunteer" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Calendar className="h-4 w-4" />
+              Volunteer Portal
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/volunteer" component={VolunteerPortal} />
+        <Route component={NotFound} />
+      </Switch>
+    </div>
   );
 }
 

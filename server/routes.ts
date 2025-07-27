@@ -94,6 +94,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Volunteer API routes
+  app.post("/api/volunteers", async (req, res) => {
+    try {
+      const { insertVolunteerSchema } = await import("@shared/schema");
+      const volunteerData = insertVolunteerSchema.parse(req.body);
+      const volunteer = await storage.createVolunteer(volunteerData);
+      res.json(volunteer);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/volunteers", async (req, res) => {
+    try {
+      const volunteers = await storage.getAllVolunteers();
+      res.json(volunteers);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/volunteers/phone/:phoneNumber", async (req, res) => {
+    try {
+      const volunteer = await storage.getVolunteerByPhone(req.params.phoneNumber);
+      if (!volunteer) {
+        return res.status(404).json({ error: "Volunteer not found" });
+      }
+      res.json(volunteer);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Availability API routes
+  app.post("/api/availability", async (req, res) => {
+    try {
+      const { insertAvailabilitySchema } = await import("@shared/schema");
+      const availabilityData = insertAvailabilitySchema.parse(req.body);
+      const availability = await storage.createAvailability(availabilityData);
+      res.json(availability);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/availability/:volunteerId", async (req, res) => {
+    try {
+      const availability = await storage.getVolunteerAvailability(req.params.volunteerId);
+      res.json(availability);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/availability", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      if (startDate && endDate) {
+        const availability = await storage.getAvailabilityByDateRange(
+          new Date(startDate as string),
+          new Date(endDate as string)
+        );
+        res.json(availability);
+      } else {
+        res.status(400).json({ error: "startDate and endDate are required" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/availability/:id", async (req, res) => {
+    try {
+      await storage.deleteAvailability(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Shift assignment API routes
+  app.post("/api/assignments", async (req, res) => {
+    try {
+      const { insertShiftAssignmentSchema } = await import("@shared/schema");
+      const assignmentData = insertShiftAssignmentSchema.parse(req.body);
+      const assignment = await storage.createShiftAssignment(assignmentData);
+      res.json(assignment);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/assignments/volunteer/:volunteerId", async (req, res) => {
+    try {
+      const assignments = await storage.getVolunteerAssignments(req.params.volunteerId);
+      res.json(assignments);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/assignments/shift/:shiftId", async (req, res) => {
+    try {
+      const assignments = await storage.getShiftAssignments(req.params.shiftId);
+      res.json(assignments);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
