@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
@@ -763,21 +763,21 @@ export default function VolunteerPortal() {
 
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4" />
-              My Shifts
+            <TabsTrigger value="dashboard" className="flex flex-col items-center gap-1 px-2 py-3">
+              <UserCheck className="h-5 w-5" />
+              <span className="text-xs hidden sm:block">My Shifts</span>
             </TabsTrigger>
-            <TabsTrigger value="browse" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Browse Shifts
+            <TabsTrigger value="browse" className="flex flex-col items-center gap-1 px-2 py-3">
+              <List className="h-5 w-5" />
+              <span className="text-xs hidden sm:block">Browse</span>
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Availability
+            <TabsTrigger value="calendar" className="flex flex-col items-center gap-1 px-2 py-3">
+              <Calendar className="h-5 w-5" />
+              <span className="text-xs hidden sm:block">Calendar</span>
             </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Profile
+            <TabsTrigger value="profile" className="flex flex-col items-center gap-1 px-2 py-3">
+              <Settings className="h-5 w-5" />
+              <span className="text-xs hidden sm:block">Profile</span>
             </TabsTrigger>
           </TabsList>
           
