@@ -438,21 +438,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { insertShiftAssignmentSchema } = await import("@shared/schema");
       const assignmentData = insertShiftAssignmentSchema.parse(req.body);
       
+      console.log('Assignment request received:', assignmentData);
+      console.log('Volunteer ID:', assignmentData.volunteerId);
+      
       // Create assignment in Airtable if volunteer exists in Airtable
       if (assignmentData.volunteerId !== 'demo-volunteer-123') {
+        console.log('✓ Volunteer ID is not demo, proceeding with Airtable creation');
         const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-        const assignmentPayload = {
-          records: [{
-            fields: {
-              'Name': `Shift Assignment - ${new Date().toLocaleDateString()}`,
-              'Volunteer': [assignmentData.volunteerId], // Link to volunteer record
-              'Shift ID': assignmentData.shiftId,
-              'Status ': 'confirmed', // Use the exact option from Airtable
-              'Assigned Date': new Date().toISOString(),
-              'Notes': assignmentData.notes || ''
-            }
-          }]
+        // Create payload without Status field since Airtable only has 'cancelled' option
+        const fields = {
+          'Volunteer': [assignmentData.volunteerId],
+          'Shift ID': assignmentData.shiftId,
+          'Assigned Date': new Date().toISOString(),
+          'Notes': assignmentData.notes || ''
         };
+        
+        const assignmentPayload = {
+          records: [{ fields }]
+        };
+        
+        console.log('Creating assignment in Airtable with payload:', JSON.stringify(assignmentPayload, null, 2));
         
         const airtableResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment`, {
           method: 'POST',
@@ -463,25 +468,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
           body: JSON.stringify(assignmentPayload)
         });
         
+        console.log('Airtable response status:', airtableResponse.status);
+        const responseText = await airtableResponse.text();
+        console.log('Airtable response body:', responseText);
+        
         if (airtableResponse.ok) {
-          const airtableData = await airtableResponse.json();
+          const airtableData = JSON.parse(responseText);
           const record = airtableData.records[0];
           
           const assignment = {
             id: record.id,
             volunteerId: assignmentData.volunteerId,
             shiftId: assignmentData.shiftId,
-            status: record.fields['Status'] || 'confirmed',
+            status: record.fields['Status ']?.trim() || 'confirmed',
             assignedDate: new Date(record.createdTime),
             notes: record.fields['Notes'] || ''
           };
           
           console.log('✅ Assignment created in Airtable:', assignment);
           return res.json(assignment);
+        } else {
+          console.log('❌ Airtable creation failed, falling back to storage');
         }
+      } else {
+        console.log('Using demo volunteer, skipping Airtable');
       }
       
-      // Fallback to storage for demo users
+      // Fallback to storage for demo users or failed Airtable requests
+      console.log('Creating assignment in local storage as fallback');
       const assignment = await storage.createShiftAssignment(assignmentData);
       res.json(assignment);
     } catch (error: any) {
