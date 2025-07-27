@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
@@ -32,6 +32,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
     hasTransportation: volunteer.hasTransportation || false,
     maxHoursPerWeek: volunteer.maxHoursPerWeek || '',
     preferredShiftTypes: volunteer.preferredShiftTypes || [],
+    status: volunteer.status || 'active', // active, inactive
     notifications: volunteer.notifications || {
       email: true,
       sms: false,
@@ -443,6 +444,127 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
                 disabled={!isEditing}
               />
               <Label htmlFor="notify-new-shifts">New shift opportunities</Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account Status Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Account Status
+            </CardTitle>
+            <CardDescription>
+              Manage your volunteer account status and data
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Current Status Display */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Current Status:</span>
+              <Badge className={
+                volunteer.status === 'active' ? 'bg-green-100 text-green-800' :
+                volunteer.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' :
+                'bg-gray-100 text-gray-800'
+              }>
+                {volunteer.status === 'active' ? '✓ Active Volunteer' :
+                 volunteer.status === 'inactive' ? '⏸ Taking a Break' :
+                 'Active Volunteer'}
+              </Badge>
+            </div>
+
+            {/* Status Options */}
+            {isEditing && (
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Change Status:</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="status-active"
+                      checked={profileForm.status === 'active'}
+                      onCheckedChange={() => setProfileForm(prev => ({...prev, status: 'active'}))}
+                    />
+                    <Label htmlFor="status-active" className="flex items-center gap-2">
+                      <UserCheck className="h-4 w-4 text-green-600" />
+                      <div>
+                        <div className="font-medium">Active Volunteer</div>
+                        <div className="text-xs text-gray-500">Ready to take on shifts and receive notifications</div>
+                      </div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="status-inactive"
+                      checked={profileForm.status === 'inactive'}
+                      onCheckedChange={() => setProfileForm(prev => ({...prev, status: 'inactive'}))}
+                    />
+                    <Label htmlFor="status-inactive" className="flex items-center gap-2">
+                      <Pause className="h-4 w-4 text-yellow-600" />
+                      <div>
+                        <div className="font-medium">Taking a Break</div>
+                        <div className="text-xs text-gray-500">Keep my profile but don't assign new shifts</div>
+                      </div>
+                    </Label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Delete Account Section */}
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex items-start gap-3">
+                <UserX className="h-5 w-5 text-red-500 mt-0.5" />
+                <div className="space-y-2">
+                  <div>
+                    <div className="font-medium text-red-700">Remove My Data</div>
+                    <p className="text-sm text-gray-600">
+                      Permanently delete your volunteer account and all associated data. This action cannot be undone.
+                    </p>
+                  </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                        Remove My Data
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                          <UserX className="h-5 w-5 text-red-500" />
+                          Remove Volunteer Data
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete your volunteer account including:
+                          <ul className="list-disc list-inside mt-2 space-y-1">
+                            <li>Your profile information and preferences</li>
+                            <li>Shift history and assignments</li>
+                            <li>Availability calendar data</li>
+                            <li>All associated records</li>
+                          </ul>
+                          <strong className="block mt-2 text-red-600">This action cannot be undone.</strong>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Keep My Account</AlertDialogCancel>
+                        <AlertDialogAction 
+                          className="bg-red-600 hover:bg-red-700"
+                          onClick={() => {
+                            // TODO: Implement delete account functionality
+                            toast({
+                              title: "Account Deletion",
+                              description: "Account deletion feature will be implemented soon. Please contact support for assistance.",
+                            });
+                          }}
+                        >
+                          Yes, Remove My Data
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

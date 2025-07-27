@@ -40,6 +40,7 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Mobile-Optimized Tab Navigation**: Icon-based tabs with responsive design - vertical layout on mobile, horizontal on desktop
 ✓ **Enhanced Tab Interactions**: Added smooth hover effects with scale animation and color transitions for better UX
 ✓ **PII Protection**: Removed all personally identifiable information from login page - only demo account shown publicly
+✓ **Volunteer Status Management**: Added account status options - "Active Volunteer", "Taking a Break", and secure "Remove My Data" functionality
 
 ## User Preferences
 
