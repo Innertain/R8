@@ -432,24 +432,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Shift assignment API routes
+  // Shift assignment API routes - integrate with Airtable
   app.post("/api/assignments", async (req, res) => {
     try {
       const { insertShiftAssignmentSchema } = await import("@shared/schema");
       const assignmentData = insertShiftAssignmentSchema.parse(req.body);
+      
+      // Create assignment in Airtable if volunteer exists in Airtable
+      if (assignmentData.volunteerId !== 'demo-volunteer-123') {
+        const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+        const assignmentPayload = {
+          records: [{
+            fields: {
+              'Volunteer': [assignmentData.volunteerId], // Link to volunteer record
+              'Shift ID': assignmentData.shiftId,
+              'Status': assignmentData.status || 'confirmed',
+              'Notes': assignmentData.notes || ''
+            }
+          }]
+        };
+        
+        const airtableResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment`, {
+          method: 'POST',
+          headers: { 
+            'Authorization': `Bearer ${process.env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(assignmentPayload)
+        });
+        
+        if (airtableResponse.ok) {
+          const airtableData = await airtableResponse.json();
+          const record = airtableData.records[0];
+          
+          const assignment = {
+            id: record.id,
+            volunteerId: assignmentData.volunteerId,
+            shiftId: assignmentData.shiftId,
+            status: record.fields['Status'] || 'confirmed',
+            assignedDate: new Date(record.createdTime),
+            notes: record.fields['Notes'] || ''
+          };
+          
+          console.log('✅ Assignment created in Airtable:', assignment);
+          return res.json(assignment);
+        }
+      }
+      
+      // Fallback to storage for demo users
       const assignment = await storage.createShiftAssignment(assignmentData);
       res.json(assignment);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    } catch (error: any) {
+      console.error('Error creating assignment:', error);
+      res.status(400).json({ error: error.message || 'Server error' });
     }
   });
 
   app.get("/api/assignments/volunteer/:volunteerId", async (req, res) => {
     try {
-      const assignments = await storage.getVolunteerAssignments(req.params.volunteerId);
+      const volunteerId = req.params.volunteerId;
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      
+      // Get real assignments from Airtable first
+      const assignmentResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment?filterByFormula=OR(SEARCH("${volunteerId}",ARRAYJOIN({Volunteer})),{Volunteer}="${volunteerId}")`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      
+      if (assignmentResponse.ok) {
+        const assignmentData = await assignmentResponse.json();
+        
+        if (assignmentData.records.length > 0) {
+          const assignments = assignmentData.records.map((record: any) => ({
+            id: record.id,
+            volunteerId: volunteerId,
+            shiftId: record.fields['Shift ID'] || '',
+            shiftName: record.fields['Shift Name'] || '',
+            status: record.fields['Status'] || 'confirmed',
+            assignedDate: new Date(record.createdTime),
+            notes: record.fields['Notes'] || ''
+          }));
+          
+          return res.json(assignments);
+        }
+      }
+      
+      // Fallback to storage
+      const assignments = await storage.getVolunteerAssignments(volunteerId);
       res.json(assignments);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: any) {
+      console.error('Error fetching assignments:', error);
+      res.status(500).json({ error: error.message || 'Server error' });
     }
   });
 
