@@ -125,29 +125,40 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     .filter((assignment: any) => assignment.status !== 'cancelled')
     .map((assignment: any) => {
       // Find the corresponding shift details
-      console.log('Available shifts:', shifts.map((s: any) => ({ id: s.id, name: s.activityName })));
-      console.log(`Looking for shiftId: ${assignment.shiftId}`);
-      const shift = shifts.find((s: any) => s.id === assignment.shiftId);
+      console.log(`Looking for shiftId: ${assignment.shiftId} in ${shifts.length} shifts`);
+      const shift = shifts.find((s: any) => {
+        const matches = s.id === assignment.shiftId;
+        console.log(`Comparing shift ${s.id} with assignment ${assignment.shiftId}: ${matches}`);
+        return matches;
+      });
+      
       if (!shift) {
         console.log(`No shift found for assignment ${assignment.id} with shiftId ${assignment.shiftId}`);
-        console.log('Available shift IDs:', shifts.map((s: any) => s.id));
-        return null;
+        console.log('Available shifts:', shifts.map((s: any) => ({ id: s.id, name: s.activityName })));
       }
+
+      // Use real shift data or placeholder if not found
+      const shiftToUse = shift || {
+        id: assignment.shiftId,
+        activityName: `Assigned Shift (${assignment.shiftName || 'Loading...'})`,
+        dateTime: null,
+        location: 'Location TBD'
+      };
 
       // Parse the shift date/time - handle different formats
       let shiftDate: Date;
-      if (shift.dateTime) {
-        shiftDate = new Date(shift.dateTime);
+      if (shiftToUse.dateTime) {
+        shiftDate = new Date(shiftToUse.dateTime);
         // If invalid date, try parsing different formats
         if (isNaN(shiftDate.getTime())) {
-          console.log(`Invalid date format for shift ${shift.id}: ${shift.dateTime}`);
+          console.log(`Invalid date format for shift ${shiftToUse.id}: ${shiftToUse.dateTime}`);
           // Use a placeholder date for now - next week at 9 AM
           shiftDate = new Date();
           shiftDate.setDate(shiftDate.getDate() + 7);
           shiftDate.setHours(9, 0, 0, 0);
         }
       } else {
-        console.log(`No dateTime for shift ${shift.id}, using placeholder`);
+        console.log(`No dateTime for shift ${shiftToUse.id}, using placeholder`);
         // Use a placeholder date - next week at 9 AM
         shiftDate = new Date();
         shiftDate.setDate(shiftDate.getDate() + 7);
@@ -159,12 +170,12 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       return {
         id: `shift-${assignment.id}`,
-        title: `🎯 ${shift.activityName}`,
+        title: `🎯 ${shiftToUse.activityName}`,
         start: shiftDate,
         end: endDate,
         resource: { 
           ...assignment, 
-          shift, 
+          shift: shiftToUse, 
           type: 'shift',
           status: assignment.status 
         },
