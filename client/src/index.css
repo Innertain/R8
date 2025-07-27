@@ -210,11 +210,27 @@
 
 .rbc-time-gutter .rbc-time-slot {
   text-align: center;
-  padding: 1px 2px;
-  white-space: pre-line;
+  padding: 2px 1px;
   font-size: 0.8rem;
-  line-height: 1.1;
+  line-height: 1.2;
   min-width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style for times with military format separated by | */
+.rbc-time-gutter .rbc-time-slot {
+  font-family: inherit;
+}
+
+.rbc-time-gutter .rbc-time-slot::after {
+  content: "";
+  font-size: 0.65rem;
+  color: #6b7280;
+  line-height: 1;
+  margin-top: 1px;
 }
 
 /* Mobile responsive improvements */
@@ -222,7 +238,15 @@
   .rbc-time-gutter .rbc-time-slot {
     font-size: 0.7rem;
     padding: 1px;
-    min-width: 35px;
+    min-width: 40px;
+  }
+  
+  .rbc-time-gutter .rbc-time-slot .text-sm {
+    font-size: 0.7rem;
+  }
+  
+  .rbc-time-gutter .rbc-time-slot .text-xs {
+    font-size: 0.6rem;
   }
   
   .rbc-calendar {
@@ -241,14 +265,6 @@
     margin: 0 1px;
   }
   
-  .rbc-time-view {
-    overflow-x: auto;
-  }
-  
-  .rbc-time-header {
-    min-width: 100%;
-  }
-  
   .rbc-header {
     padding: 0.25rem;
     font-size: 0.875rem;
@@ -257,6 +273,15 @@
   .rbc-event {
     font-size: 0.75rem;
     padding: 1px 3px;
+  }
+  
+  /* Ensure no horizontal scrolling on calendar */
+  .rbc-time-view {
+    min-width: 100%;
+  }
+  
+  .rbc-time-header-content {
+    overflow: visible;
   }
 }
 

@@ -181,12 +181,18 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               })}
               formats={{
                 timeGutterFormat: (date, culture, localizer) => {
-                  const mainTime = format(date, 'ha');
-                  const militaryTime = format(date, 'HH:mm');
-                  return `${mainTime}\n${militaryTime}`;
+                  return format(date, 'ha');
                 },
                 dayHeaderFormat: (date, culture, localizer) =>
                   format(date, 'eeee M/d'),
+              }}
+              components={{
+                timeSlotWrapper: ({ children, value }) => (
+                  <div className="flex flex-col items-center text-center py-1">
+                    <div className="text-sm leading-tight">{format(value, 'ha')}</div>
+                    <div className="text-xs text-gray-500 leading-tight">{format(value, 'HH:mm')}</div>
+                  </div>
+                ),
               }}
               messages={{
                 allDay: 'All Day',
