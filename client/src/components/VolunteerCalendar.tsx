@@ -60,7 +60,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
   // Create availability mutation
   const createAvailabilityMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/availability', 'POST', data),
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/availability', data);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/availability', volunteerId] });
       setDialogOpen(false);
@@ -82,7 +85,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
   // Delete availability mutation
   const deleteAvailabilityMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/availability/${id}`, 'DELETE'),
+    mutationFn: async (id: string) => {
+      const response = await apiRequest('DELETE', `/api/availability/${id}`);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/availability', volunteerId] });
       toast({

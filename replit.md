@@ -2,7 +2,16 @@
 
 ## Overview
 
-This is a full-stack volunteer management application built with React/TypeScript frontend and Express.js backend. The platform manages volunteer shifts and activities with Airtable integration for real-time data synchronization. Features include shift browsing, filtering, search functionality, and volunteer signup tracking.
+This is a full-stack volunteer management application built with React/TypeScript frontend and Express.js backend. The platform manages volunteer shifts and activities with Airtable integration for real-time data synchronization. Features include shift browsing, filtering, search functionality, volunteer signup tracking, and a comprehensive volunteer availability calendar system.
+
+## Recent Changes (July 27, 2025)
+
+✓ **Volunteer Availability Calendar System**: Built complete calendar interface using react-big-calendar
+✓ **Volunteer Registration & Login**: Phone number-based authentication system  
+✓ **Database Schema**: Added volunteers, availability, and shift assignment tables
+✓ **Demo Account**: Created demo volunteer (555-DEMO) for testing
+✓ **API Integration**: Full CRUD operations for volunteers and availability
+✓ **Navigation**: Added volunteer portal with clean navigation between shift browsing and calendar management
 
 ## User Preferences
 

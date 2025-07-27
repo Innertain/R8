@@ -50,7 +50,10 @@ export default function VolunteerPortal() {
 
   // Register volunteer mutation
   const registerMutation = useMutation({
-    mutationFn: (data: typeof registerForm) => apiRequest('/api/volunteers', 'POST', data),
+    mutationFn: async (data: typeof registerForm) => {
+      const response = await apiRequest('POST', '/api/volunteers', data);
+      return response.json();
+    },
     onSuccess: (volunteer) => {
       setCurrentVolunteer(volunteer);
       setShowRegister(false);

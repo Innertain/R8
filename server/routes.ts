@@ -131,7 +131,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/availability", async (req, res) => {
     try {
       const { insertAvailabilitySchema } = await import("@shared/schema");
-      const availabilityData = insertAvailabilitySchema.parse(req.body);
+      
+      // Convert date strings to Date objects
+      const requestData = {
+        ...req.body,
+        startTime: new Date(req.body.startTime),
+        endTime: new Date(req.body.endTime)
+      };
+      
+      const availabilityData = insertAvailabilitySchema.parse(requestData);
       const availability = await storage.createAvailability(availabilityData);
       res.json(availability);
     } catch (error) {
