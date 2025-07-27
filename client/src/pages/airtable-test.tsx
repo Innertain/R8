@@ -134,14 +134,43 @@ export default function AirtableTest() {
                 )}
               </div>
             ) : (
-              <div className="text-red-600">
-                <p><strong>Error:</strong> {result.error}</p>
-                {result.status && <p><strong>Status:</strong> {result.status}</p>}
+              <div className="space-y-3">
+                <div className="text-red-600">
+                  <p><strong>Error:</strong> {result.error}</p>
+                  {result.status && <p><strong>Status:</strong> {result.status}</p>}
+                </div>
+                {result.status === 404 && (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <h4 className="font-medium text-yellow-800">🔐 Token Permissions Issue</h4>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      This table exists but your API token can't access it.
+                    </p>
+                    <div className="text-sm text-yellow-700 mt-2">
+                      <p><strong>Fix steps:</strong></p>
+                      <ol className="list-decimal list-inside mt-1 space-y-1">
+                        <li>Go to <a href="https://airtable.com/create/tokens" className="underline font-medium" target="_blank">airtable.com/create/tokens</a></li>
+                        <li>Edit your token → check all tables in your base</li>
+                        <li>Ensure "data.records:read" permission is enabled</li>
+                        <li>Update AIRTABLE_TOKEN in Replit Secrets</li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
       ))}
+      
+      {results.length === 0 && !loading && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-blue-800 mb-2">Ready to Test</h3>
+          <p className="text-blue-700">
+            Click the button above to test connectivity to your Airtable tables. 
+            This will help us integrate your Drivers and Volunteer Applications tables.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
