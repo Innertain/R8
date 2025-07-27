@@ -8,7 +8,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
@@ -26,6 +27,53 @@ export default function VolunteerPortal() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Cancel assignment mutation
+  const cancelAssignmentMutation = useMutation({
+    mutationFn: async (assignmentId: string) => {
+      const response = await fetch(`/api/assignments/${assignmentId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to cancel assignment');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/assignments/volunteer', currentVolunteer?.id] });
+      toast({
+        title: "Assignment Cancelled",
+        description: "Your shift assignment has been cancelled successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Cancellation Failed",
+        description: "Unable to cancel assignment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Google Calendar integration helper
+  const addToGoogleCalendar = (assignment: any, shift: any) => {
+    const title = encodeURIComponent(shift?.activityName || 'Volunteer Shift');
+    const details = encodeURIComponent(`Volunteer assignment: ${assignment.notes || 'No additional notes'}`);
+    const location = encodeURIComponent(shift?.location || 'Location TBD');
+    
+    // For demo purposes, use a placeholder date/time
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 7); // Next week
+    startDate.setHours(9, 0, 0, 0); // 9 AM
+    
+    const endDate = new Date(startDate);
+    endDate.setHours(12, 0, 0, 0); // 12 PM (3 hours)
+    
+    const startTime = startDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const endTime = endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${details}&location=${location}`;
+    
+    window.open(googleCalendarUrl, '_blank');
+  };
 
   // Login volunteer mutation
   const loginMutation = useMutation({
@@ -124,7 +172,7 @@ export default function VolunteerPortal() {
   const { data: shifts = [] } = useQuery({
     queryKey: ['/api/shifts'],
     enabled: !!currentVolunteer,
-  });
+  }) as { data: any[] };
 
   // If logged in, show the dashboard with tabs
   if (currentVolunteer) {
@@ -242,10 +290,54 @@ export default function VolunteerPortal() {
                                   </div>
                                 </div>
                                 
-                                <div className="text-right">
+                                <div className="flex flex-col gap-2">
                                   <Badge variant="outline" className="text-xs">
                                     ID: {assignment.id.slice(-8)}
                                   </Badge>
+                                  
+                                  <div className="flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => addToGoogleCalendar(assignment, matchedShift)}
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      <CalendarPlus className="h-3 w-3" />
+                                      Add to Calendar
+                                    </Button>
+                                    
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700"
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                          Cancel
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Cancel Volunteer Assignment</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to cancel your assignment for "{matchedShift?.activityName || 'River Clean up'}"? 
+                                            This action cannot be undone and may affect the volunteer coordination.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Keep Assignment</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            onClick={() => cancelAssignmentMutation.mutate(assignment.id)}
+                                            className="bg-red-600 hover:bg-red-700"
+                                            disabled={cancelAssignmentMutation.isPending}
+                                          >
+                                            {cancelAssignmentMutation.isPending ? 'Cancelling...' : 'Cancel Assignment'}
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </div>
                                 </div>
                               </div>
                             </CardContent>

@@ -546,6 +546,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete assignment (cancel)
+  app.delete("/api/assignments/:assignmentId", async (req, res) => {
+    try {
+      const assignmentId = req.params.assignmentId;
+      
+      // Try to delete from Airtable first if it's a real assignment
+      if (assignmentId.startsWith('rec')) {
+        const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+        const deleteResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment/${assignmentId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+        });
+        
+        if (deleteResponse.ok) {
+          console.log(`✅ Assignment ${assignmentId} deleted from Airtable`);
+          return res.json({ success: true, message: 'Assignment cancelled successfully' });
+        }
+      }
+      
+      // Fallback to storage for demo assignments
+      await storage.deleteShiftAssignment(assignmentId);
+      res.json({ success: true, message: 'Assignment cancelled successfully' });
+    } catch (error: any) {
+      console.error('Error deleting assignment:', error);
+      res.status(500).json({ error: error.message || 'Failed to cancel assignment' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
