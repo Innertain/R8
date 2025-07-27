@@ -20,7 +20,7 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Live Assignment Creation**: Shift signups now create records directly in Airtable with correct status options
 ✓ **Personal Account Integration**: Alex Mengel's account working with flexible phone number search (formatted and digits-only)
 ✓ **Volunteer Dashboard**: Added "My Shifts" dashboard tab showing assigned shifts with status indicators
-✓ **Assignment Management**: Cancel shift assignments with confirmation dialog, removes from Airtable
+✓ **Assignment Management**: Cancel shift assignments with confirmation dialog, updates status to "cancelled" in Airtable
 ✓ **Google Calendar Integration**: Add to Calendar button generates Google Calendar events with shift details
 
 ## User Preferences

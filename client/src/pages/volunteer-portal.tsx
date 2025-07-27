@@ -246,15 +246,22 @@ export default function VolunteerPortal() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold">
-                        {assignments.length} Active Assignment{assignments.length !== 1 ? 's' : ''}
+                        {assignments.filter((a: any) => a.status !== 'cancelled').length} Active Assignment{assignments.filter((a: any) => a.status !== 'cancelled').length !== 1 ? 's' : ''}
                       </h3>
-                      <Badge variant="secondary" className="text-green-700 bg-green-50">
-                        {assignments.filter((a: any) => a.status === 'confirmed').length} Confirmed
-                      </Badge>
+                      <div className="flex gap-2">
+                        <Badge variant="secondary" className="text-green-700 bg-green-50">
+                          {assignments.filter((a: any) => a.status === 'confirmed').length} Confirmed
+                        </Badge>
+                        {assignments.filter((a: any) => a.status === 'cancelled').length > 0 && (
+                          <Badge variant="secondary" className="text-red-700 bg-red-50">
+                            {assignments.filter((a: any) => a.status === 'cancelled').length} Cancelled
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="grid gap-4">
-                      {assignments.map((assignment: any) => {
+                      {assignments.filter((a: any) => a.status !== 'cancelled').map((assignment: any) => {
                         const matchedShift = shifts.find((s: any) => s.id === assignment.shiftId);
                         const statusIcon = assignment.status === 'confirmed' ? CheckCircle : 
                                          assignment.status === 'pending' ? Clock : XCircle;

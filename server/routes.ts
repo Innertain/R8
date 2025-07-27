@@ -546,30 +546,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete assignment (cancel)
+  // Cancel assignment (update status to cancelled)
   app.delete("/api/assignments/:assignmentId", async (req, res) => {
     try {
       const assignmentId = req.params.assignmentId;
       
-      // Try to delete from Airtable first if it's a real assignment
+      // Try to update status in Airtable first if it's a real assignment
       if (assignmentId.startsWith('rec')) {
         const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-        const deleteResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment/${assignmentId}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+        const updatePayload = {
+          fields: {
+            'Status ': 'cancelled', // Update to cancelled status
+            'Notes': 'Assignment cancelled by volunteer'
+          }
+        };
+        
+        const updateResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment/${assignmentId}`, {
+          method: 'PATCH',
+          headers: { 
+            'Authorization': `Bearer ${process.env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatePayload)
         });
         
-        if (deleteResponse.ok) {
-          console.log(`✅ Assignment ${assignmentId} deleted from Airtable`);
+        if (updateResponse.ok) {
+          const updatedRecord = await updateResponse.json();
+          console.log(`✅ Assignment ${assignmentId} status updated to cancelled in Airtable`);
+          console.log('Updated record:', updatedRecord);
           return res.json({ success: true, message: 'Assignment cancelled successfully' });
+        } else {
+          const errorData = await updateResponse.json();
+          console.error('Airtable update failed:', errorData);
+          console.log('Update payload was:', JSON.stringify(updatePayload, null, 2));
         }
       }
       
       // Fallback to storage for demo assignments
-      await storage.deleteShiftAssignment(assignmentId);
+      await storage.updateShiftAssignment(assignmentId, { status: 'cancelled' });
       res.json({ success: true, message: 'Assignment cancelled successfully' });
     } catch (error: any) {
-      console.error('Error deleting assignment:', error);
+      console.error('Error cancelling assignment:', error);
       res.status(500).json({ error: error.message || 'Failed to cancel assignment' });
     }
   });
