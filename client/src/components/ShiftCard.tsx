@@ -195,7 +195,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
           <Button 
             variant="outline" 
             className="w-full"
-            onClick={() => window.location.href = '/volunteer-portal'}
+            onClick={() => window.location.href = '/volunteer'}
           >
             Go to Volunteer Portal
           </Button>
