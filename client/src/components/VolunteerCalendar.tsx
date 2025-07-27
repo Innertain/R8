@@ -125,9 +125,12 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     .filter((assignment: any) => assignment.status !== 'cancelled')
     .map((assignment: any) => {
       // Find the corresponding shift details
+      console.log('Available shifts:', shifts.map((s: any) => ({ id: s.id, name: s.activityName })));
+      console.log(`Looking for shiftId: ${assignment.shiftId}`);
       const shift = shifts.find((s: any) => s.id === assignment.shiftId);
       if (!shift) {
         console.log(`No shift found for assignment ${assignment.id} with shiftId ${assignment.shiftId}`);
+        console.log('Available shift IDs:', shifts.map((s: any) => s.id));
         return null;
       }
 

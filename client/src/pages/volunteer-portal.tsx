@@ -759,6 +759,11 @@ export default function VolunteerPortal() {
 
   // Authenticated shift card with proper volunteer ID
   const AuthenticatedShiftCard = ({ shift, volunteerId }: { shift: any; volunteerId: string }) => {
+    const { data: assignments = [] } = useQuery({
+      queryKey: ['/api/assignments/volunteer', volunteerId],
+      queryFn: () => fetch(`/api/assignments/volunteer/${volunteerId}`).then(res => res.json()),
+    });
+
     const signUpMutation = useMutation({
       mutationFn: async (shiftId: string) => {
         const response = await fetch('/api/assignments', {
@@ -793,7 +798,7 @@ export default function VolunteerPortal() {
       },
     });
 
-    // Check if user is already signed up for this shift
+    // Check if user is already signed up for this shift using component's own assignments data
     const isSignedUp = assignments?.some((assignment: any) => 
       assignment.shiftId === shift.id && assignment.status !== 'cancelled'
     );
