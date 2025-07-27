@@ -101,7 +101,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Token exists:', !!process.env.AIRTABLE_TOKEN);
       console.log('Token starts with:', process.env.AIRTABLE_TOKEN?.substring(0, 8) + '...');
       
-      const metaResponse = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.VITE_BASE_ID}/tables`, {
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period
+      const metaResponse = await fetch(`https://api.airtable.com/v0/meta/bases/${baseId}/tables`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
       
@@ -127,14 +128,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     for (const tableName of possibleNames) {
       try {
-        const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
+        console.log(`Trying drivers table: "${tableName}"`);
+        const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+        const response = await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?maxRecords=1`, {
           headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
         });
+        console.log(`Drivers "${tableName}" response:`, response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log(`✓ Drivers success: ${data.records?.length || 0} records`);
           return res.json({ success: true, tableName, records: data.records?.length || 0, data: data.records });
+        } else {
+          const errorText = await response.text();
+          console.log(`Drivers "${tableName}" error:`, errorText);
         }
       } catch (error) {
+        console.log(`Drivers "${tableName}" exception:`, error.message);
         continue;
       }
     }
@@ -204,7 +214,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tableName = decodeURIComponent(req.params.tableName);
       console.log(`Testing direct access to table: "${tableName}"`);
       
-      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period
+      const response = await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
       
