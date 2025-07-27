@@ -210,43 +210,37 @@
 
 .rbc-time-gutter .rbc-time-slot {
   text-align: center;
-  padding: 2px 1px;
-  font-size: 0.8rem;
-  line-height: 1.2;
-  min-width: 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Style for times with military format separated by | */
-.rbc-time-gutter .rbc-time-slot {
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  line-height: 1.1;
+  min-width: 60px;
+  white-space: pre-line;
   font-family: inherit;
+  border-right: 1px solid #e5e7eb;
 }
 
-.rbc-time-gutter .rbc-time-slot::after {
-  content: "";
-  font-size: 0.65rem;
-  color: #6b7280;
-  line-height: 1;
-  margin-top: 1px;
+/* Style the time gutter specifically */
+.rbc-time-gutter {
+  background-color: #f9fafb;
+  border-right: 2px solid #e5e7eb;
+}
+
+/* Remove time display from individual time slots in the grid */
+.rbc-time-slot-text {
+  display: none;
 }
 
 /* Mobile responsive improvements */
 @media (max-width: 768px) {
   .rbc-time-gutter .rbc-time-slot {
-    font-size: 0.7rem;
-    padding: 1px;
-    min-width: 40px;
+    font-size: 0.65rem;
+    padding: 2px 4px;
+    min-width: 50px;
+    line-height: 1;
   }
   
-  .rbc-time-gutter .rbc-time-slot .text-sm {
-    font-size: 0.7rem;
-  }
-  
-  .rbc-time-gutter .rbc-time-slot .text-xs {
-    font-size: 0.6rem;
+  .rbc-time-gutter {
+    min-width: 50px;
   }
   
   .rbc-calendar {
@@ -275,13 +269,17 @@
     padding: 1px 3px;
   }
   
-  /* Ensure no horizontal scrolling on calendar */
-  .rbc-time-view {
-    min-width: 100%;
+  /* Google Calendar Sync card responsive */
+  .space-y-6 > .border-dashed {
+    flex-direction: column;
+    gap: 3;
+    text-align: center;
   }
   
-  .rbc-time-header-content {
-    overflow: visible;
+  .space-y-6 > .border-dashed .flex.items-center.justify-between {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
   }
 }
 

@@ -146,6 +146,36 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
   return (
     <div className="space-y-6">
+      {/* Google Calendar Sync Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="h-5 w-5" />
+            Calendar Sync
+          </CardTitle>
+          <CardDescription>
+            Connect your Google Calendar to automatically sync your availability
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between p-4 border border-dashed border-gray-300 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <CalendarIcon className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Google Calendar</p>
+                <p className="text-sm text-gray-500">Sync your availability automatically</p>
+              </div>
+            </div>
+            <Button variant="outline" disabled>
+              <Plus className="h-4 w-4 mr-2" />
+              Connect (Coming Soon)
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -181,16 +211,17 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               })}
               formats={{
                 timeGutterFormat: (date, culture, localizer) => {
-                  return format(date, 'ha');
+                  const mainTime = format(date, 'ha');
+                  const militaryTime = format(date, 'HH:mm');
+                  return `${mainTime}\n${militaryTime}`;
                 },
                 dayHeaderFormat: (date, culture, localizer) =>
                   format(date, 'eeee M/d'),
               }}
               components={{
-                timeSlotWrapper: ({ children, value }) => (
-                  <div className="flex flex-col items-center text-center py-1">
-                    <div className="text-sm leading-tight">{format(value, 'ha')}</div>
-                    <div className="text-xs text-gray-500 leading-tight">{format(value, 'HH:mm')}</div>
+                timeGutterHeader: () => (
+                  <div className="text-center py-2 text-sm font-medium text-gray-700">
+                    Time
                   </div>
                 ),
               }}
