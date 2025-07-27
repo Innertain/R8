@@ -42,6 +42,15 @@ function Navigation() {
               Volunteer Portal
             </Button>
           </Link>
+          <Link href="/airtable-test">
+            <Button 
+              variant={location === "/airtable-test" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              🔍 Airtable Test
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -85,6 +94,16 @@ function Navigation() {
               >
                 <Calendar className="h-4 w-4" />
                 Volunteer Portal
+              </Button>
+            </Link>
+            <Link href="/airtable-test">
+              <Button 
+                variant={location === "/airtable-test" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                🔍 Airtable Test
               </Button>
             </Link>
           </div>
