@@ -151,26 +151,75 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       // Parse the shift date/time - handle different formats
       let shiftDate: Date;
+      let endDate: Date;
+      
       if (shiftToUse.dateTime) {
-        shiftDate = new Date(shiftToUse.dateTime);
-        // If invalid date, try parsing different formats
+        const dateTimeStr = shiftToUse.dateTime;
+        
+        // First try normal Date parsing
+        shiftDate = new Date(dateTimeStr);
+        
         if (isNaN(shiftDate.getTime())) {
-          console.log(`Invalid date format for shift ${shiftToUse.id}: ${shiftToUse.dateTime}`);
-          // Use a placeholder date for now - next week at 9 AM
-          shiftDate = new Date();
-          shiftDate.setDate(shiftDate.getDate() + 7);
-          shiftDate.setHours(9, 0, 0, 0);
+          console.log(`Trying to parse custom format: ${dateTimeStr}`);
+          
+          // Parse format like "Wednesday, Jul 30 • 7:00 PM - 10:00 PM"
+          // Use a simpler regex pattern to avoid parsing issues
+          const dateMatch = dateTimeStr.match(/(\w+)\s+(\d+)/);
+          const timeMatch = dateTimeStr.match(/(\d+):(\d+)\s+(AM|PM)/);
+          
+          if (dateMatch && timeMatch) {
+            const [, month, day] = dateMatch;
+            const [, hour, minute, period] = timeMatch;
+            
+            // Get current year and construct date
+            const currentYear = new Date().getFullYear();
+            const monthMap: Record<string, number> = {
+              'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+              'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+            };
+            
+            const monthNum = monthMap[month] ?? 6; // Default to July if not found
+            const dayNum = parseInt(day);
+            
+            // Convert 12-hour to 24-hour format
+            let hour24 = parseInt(hour);
+            if (period === 'PM' && hour24 !== 12) hour24 += 12;
+            if (period === 'AM' && hour24 === 12) hour24 = 0;
+            
+            shiftDate = new Date(currentYear, monthNum, dayNum, hour24, parseInt(minute));
+            endDate = new Date(shiftDate);
+            endDate.setHours(endDate.getHours() + 3); // Default 3-hour duration
+            
+            // If the date is in the past, assume it's next year
+            if (shiftDate < new Date()) {
+              shiftDate.setFullYear(currentYear + 1);
+              endDate.setFullYear(currentYear + 1);
+            }
+            
+            console.log(`Parsed date successfully: ${shiftDate} to ${endDate}`);
+          } else {
+            console.log(`Could not parse date format: ${dateTimeStr}`);
+            // Use current date + 7 days as fallback
+            shiftDate = new Date();
+            shiftDate.setDate(shiftDate.getDate() + 7);
+            shiftDate.setHours(9, 0, 0, 0);
+            endDate = new Date(shiftDate);
+            endDate.setHours(12, 0, 0, 0);
+          }
+        } else {
+          // Standard date parsing worked
+          endDate = new Date(shiftDate);
+          endDate.setHours(endDate.getHours() + 3);
         }
       } else {
         console.log(`No dateTime for shift ${shiftToUse.id}, using placeholder`);
-        // Use a placeholder date - next week at 9 AM
+        // Use current date + 7 days as fallback
         shiftDate = new Date();
         shiftDate.setDate(shiftDate.getDate() + 7);
         shiftDate.setHours(9, 0, 0, 0);
+        endDate = new Date(shiftDate);
+        endDate.setHours(12, 0, 0, 0);
       }
-
-      const endDate = new Date(shiftDate);
-      endDate.setHours(endDate.getHours() + 3); // Assume 3-hour shifts
 
       return {
         id: `shift-${assignment.id}`,
