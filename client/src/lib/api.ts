@@ -1,8 +1,4 @@
-// API service for fetching volunteer shifts from Airtable
-
-const AIRTABLE_TOKEN = import.meta.env.VITE_AIRTABLE_TOKEN;
-const BASE_ID = import.meta.env.VITE_BASE_ID || 'appXXXXXXXXXXXXXX'; // Default placeholder
-const TABLE_NAME = 'Shifts';
+// API service for fetching volunteer shifts from Airtable via server
 
 export interface AirtableShift {
   id: string;
@@ -17,43 +13,20 @@ export interface AirtableShift {
 }
 
 export async function fetchShiftsFromAirtable(): Promise<AirtableShift[]> {
-  // Return mock data if no Airtable credentials are provided
-  if (!AIRTABLE_TOKEN || !BASE_ID || BASE_ID === 'appXXXXXXXXXXXXXX') {
-    console.log('No Airtable credentials found, using mock data');
-    return getMockShifts();
-  }
-
   try {
-    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
-
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${AIRTABLE_TOKEN}`
-      }
+    const response = await fetch('/api/shifts', {
+      credentials: 'include'
     });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch shifts: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-
-    // Convert Airtable format to our application format
-    return data.records.map((record: any) => ({
-      id: record.id,
-      activityName: record.fields.activityName || record.fields['Activity Name'] || 'Unknown Activity',
-      dateTime: record.fields.dateTime || record.fields['Date Time'] || 'TBD',
-      location: record.fields.location || record.fields['Location'] || 'TBD',
-      volunteersNeeded: record.fields.volunteersNeeded || record.fields['Volunteers Needed'] || 0,
-      volunteersSignedUp: record.fields.volunteersSignedUp || record.fields['Volunteers Signed Up'] || 0,
-      status: record.fields.status || record.fields['Status'] || 'active',
-      category: record.fields.category || record.fields['Category'] || 'general',
-      icon: record.fields.icon || record.fields['Icon'] || 'users'
-    }));
+    const shifts = await response.json();
+    return shifts;
   } catch (error) {
-    console.error('Error fetching from Airtable:', error);
-    // Fallback to mock data on error
-    return getMockShifts();
+    console.error('Error fetching shifts:', error);
+    throw error;
   }
 }
 
