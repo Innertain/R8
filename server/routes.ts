@@ -627,14 +627,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const profileData = req.body;
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
 
       console.log(`Updating profile for volunteer: ${id}`, profileData);
+
+      // Try to update in Airtable first if it's a real volunteer ID
+      if (id.startsWith('rec') && baseId) {
+        try {
+          // Find volunteer in Airtable Volunteer Applications table
+          const volunteerResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications/${id}`, {
+            headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+          });
+
+          if (volunteerResponse.ok) {
+          // Update profile data in Airtable (if supported fields exist)
+          const updatePayload = {
+            fields: {
+              // Map profile data to Airtable fields if they exist
+              ...(profileData.bio && { 'Bio': profileData.bio }),
+              ...(profileData.emergencyContact && { 'Emergency Contact': profileData.emergencyContact }),
+              ...(profileData.emergencyPhone && { 'Emergency Phone': profileData.emergencyPhone }),
+              ...(profileData.dietaryRestrictions && { 'Dietary Restrictions': profileData.dietaryRestrictions }),
+            }
+          };
+
+          if (Object.keys(updatePayload.fields).length > 0) {
+            const updateResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications/${id}`, {
+              method: 'PATCH',
+              headers: { 
+                'Authorization': `Bearer ${process.env.AIRTABLE_TOKEN}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(updatePayload)
+            });
+
+            if (updateResponse.ok) {
+              console.log('✅ Profile updated in Airtable');
+            }
+          }
+
+          // Return the updated volunteer data (combining Airtable + local profile data)
+          const volunteerData = await volunteerResponse.json();
+          const updatedVolunteer = {
+            id: volunteerData.id,
+            name: volunteerData.fields.Name || '',
+            email: volunteerData.fields.Email || '',
+            phoneNumber: volunteerData.fields.Phone || '',
+            isDriver: volunteerData.fields['Is Driver'] || false,
+            ...profileData // Include all profile updates
+          };
+          
+          return res.json(updatedVolunteer);
+        } else {
+          console.log(`Volunteer ${id} not found in Airtable, status: ${volunteerResponse.status}`);
+        }
+        } catch (airtableError) {
+          console.log('Airtable lookup failed:', airtableError);
+        }
+      }
       
+      // Fallback to local storage for demo volunteers
       const updatedVolunteer = await storage.updateVolunteerProfile(id, profileData);
       res.json(updatedVolunteer);
     } catch (error: any) {
       console.error('Profile update error:', error);
       res.status(500).json({ error: 'Failed to update profile' });
+    }
+  });
+
+  // Get volunteer skills/tags from Airtable
+  app.get('/api/volunteer-skills', async (req, res) => {
+    try {
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      
+      if (baseId) {
+        const response = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications`, {
+          headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Extract all unique skills/tags from volunteer records
+          const allSkills = new Set<string>();
+          const allInterests = new Set<string>();
+          
+          data.records.forEach((record: any) => {
+            const fields = record.fields;
+            
+            // Look for skill-related fields
+            if (fields.Skills && Array.isArray(fields.Skills)) {
+              fields.Skills.forEach((skill: string) => allSkills.add(skill.trim()));
+            }
+            if (fields.Tags && Array.isArray(fields.Tags)) {
+              fields.Tags.forEach((tag: string) => allSkills.add(tag.trim()));
+            }
+            if (fields['Volunteer Skills'] && Array.isArray(fields['Volunteer Skills'])) {
+              fields['Volunteer Skills'].forEach((skill: string) => allSkills.add(skill.trim()));
+            }
+            
+            // Look for interest-related fields
+            if (fields.Interests && Array.isArray(fields.Interests)) {
+              fields.Interests.forEach((interest: string) => allInterests.add(interest.trim()));
+            }
+            if (fields['Areas of Interest'] && Array.isArray(fields['Areas of Interest'])) {
+              fields['Areas of Interest'].forEach((interest: string) => allInterests.add(interest.trim()));
+            }
+          });
+
+          return res.json({
+            skills: Array.from(allSkills).sort(),
+            interests: Array.from(allInterests).sort()
+          });
+        }
+      }
+
+      // Fallback to default options
+      res.json({
+        skills: [
+          'Event Planning', 'Teaching', 'Technology', 'Writing', 'Photography',
+          'Marketing', 'Fundraising', 'Customer Service', 'Manual Labor', 'Cooking',
+          'Childcare', 'Elder Care', 'Medical/Healthcare', 'Construction', 'Driving',
+          'Languages', 'Administrative', 'Social Media', 'Graphic Design', 'Legal'
+        ],
+        interests: [
+          'Environmental', 'Education', 'Health & Wellness', 'Community Development',
+          'Animal Welfare', 'Arts & Culture', 'Sports & Recreation', 'Senior Services',
+          'Youth Programs', 'Food Security', 'Homelessness', 'Disaster Relief',
+          'Advocacy', 'Research', 'Faith-Based', 'International'
+        ]
+      });
+    } catch (error: any) {
+      console.error('Error fetching volunteer skills:', error);
+      res.status(500).json({ error: 'Failed to fetch skills' });
     }
   });
 

@@ -43,6 +43,13 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch skills and interests from Airtable
+  const { data: skillsData } = useQuery({
+    queryKey: ['/api/volunteer-skills'],
+    queryFn: () => fetch('/api/volunteer-skills').then(res => res.json()),
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: async (profileData: any) => {
       const response = await fetch(`/api/volunteers/${volunteer.id}/profile`, {
@@ -70,14 +77,15 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
     },
   });
 
-  const skillOptions = [
+  // Use skills and interests from your Airtable data
+  const skillOptions = skillsData?.skills || [
     'Event Planning', 'Teaching', 'Technology', 'Writing', 'Photography',
     'Marketing', 'Fundraising', 'Customer Service', 'Manual Labor', 'Cooking',
     'Childcare', 'Elder Care', 'Medical/Healthcare', 'Construction', 'Driving',
     'Languages', 'Administrative', 'Social Media', 'Graphic Design', 'Legal'
   ];
 
-  const interestOptions = [
+  const interestOptions = skillsData?.interests || [
     'Environmental', 'Education', 'Health & Wellness', 'Community Development',
     'Animal Welfare', 'Arts & Culture', 'Sports & Recreation', 'Senior Services',
     'Youth Programs', 'Food Security', 'Homelessness', 'Disaster Relief',
