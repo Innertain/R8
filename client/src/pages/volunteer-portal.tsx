@@ -775,8 +775,10 @@ export default function VolunteerPortal() {
         return response.json();
       },
       onSuccess: () => {
+        // Invalidate all related queries to refresh the UI
         queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
         queryClient.invalidateQueries({ queryKey: ['/api/assignments/volunteer', volunteerId] });
+        queryClient.invalidateQueries({ queryKey: ['/api/availability', volunteerId] }); // Refresh calendar
         toast({
           title: "Successfully Signed Up!",
           description: "You've been registered for this volunteer shift.",

@@ -126,10 +126,31 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     .map((assignment: any) => {
       // Find the corresponding shift details
       const shift = shifts.find((s: any) => s.id === assignment.shiftId);
-      if (!shift || !shift.dateTime) return null;
+      if (!shift) {
+        console.log(`No shift found for assignment ${assignment.id} with shiftId ${assignment.shiftId}`);
+        return null;
+      }
 
-      // Parse the shift date/time - assuming format like "January 15, 2025 at 9:00 AM"
-      const shiftDate = new Date(shift.dateTime);
+      // Parse the shift date/time - handle different formats
+      let shiftDate: Date;
+      if (shift.dateTime) {
+        shiftDate = new Date(shift.dateTime);
+        // If invalid date, try parsing different formats
+        if (isNaN(shiftDate.getTime())) {
+          console.log(`Invalid date format for shift ${shift.id}: ${shift.dateTime}`);
+          // Use a placeholder date for now - next week at 9 AM
+          shiftDate = new Date();
+          shiftDate.setDate(shiftDate.getDate() + 7);
+          shiftDate.setHours(9, 0, 0, 0);
+        }
+      } else {
+        console.log(`No dateTime for shift ${shift.id}, using placeholder`);
+        // Use a placeholder date - next week at 9 AM
+        shiftDate = new Date();
+        shiftDate.setDate(shiftDate.getDate() + 7);
+        shiftDate.setHours(9, 0, 0, 0);
+      }
+
       const endDate = new Date(shiftDate);
       endDate.setHours(endDate.getHours() + 3); // Assume 3-hour shifts
 
