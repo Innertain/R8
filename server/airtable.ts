@@ -48,24 +48,58 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         const data = await response.json();
         console.log(`Found ${data.records?.length || 0} records`);
         
-        // Debug: Log the first record's field names to understand the structure
-        if (data.records && data.records.length > 0) {
-          console.log('Available field names in first record:', Object.keys(data.records[0].fields));
-          console.log('First record fields:', data.records[0].fields);
-        }
+        // Successfully connected to Airtable with proper field mapping
 
-        // Convert Airtable format to our application format
-        return data.records.map((record: any) => ({
-          id: record.id,
-          activityName: record.fields.activityName || record.fields['Activity Name'] || 'Unknown Activity',
-          dateTime: record.fields.dateTime || record.fields['Date Time'] || 'TBD',
-          location: record.fields.location || record.fields['Location'] || 'TBD',
-          volunteersNeeded: record.fields.volunteersNeeded || record.fields['Volunteers Needed'] || 0,
-          volunteersSignedUp: record.fields.volunteersSignedUp || record.fields['Volunteers Signed Up'] || 0,
-          status: record.fields.status || record.fields['Status'] || 'active',
-          category: record.fields.category || record.fields['Category'] || 'general',
-          icon: record.fields.icon || record.fields['Icon'] || 'users'
-        }));
+        // Convert Airtable format to our application format using your actual field names
+        return data.records.map((record: any) => {
+          const fields = record.fields;
+          
+          // Extract activity name from Name or Name (from Activity)
+          const activityName = fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
+          
+          // Extract location from Site Name (from Location)
+          const location = fields['Site Name (from Location )']?.[0] || 'TBD';
+          
+          // Format date/time from Start Time and End Time
+          let dateTime = 'TBD';
+          if (fields['Start Time'] && fields['End Time']) {
+            const startDate = new Date(fields['Start Time']);
+            const endDate = new Date(fields['End Time']);
+            const formatOptions: Intl.DateTimeFormatOptions = { 
+              weekday: 'long', 
+              month: 'short', 
+              day: 'numeric' 
+            };
+            const startTime = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            const endTime = endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            dateTime = `${startDate.toLocaleDateString('en-US', formatOptions)} • ${startTime} - ${endTime}`;
+          }
+          
+          // Determine icon based on activity name
+          let icon = 'users';
+          const activityLower = activityName.toLowerCase();
+          if (activityLower.includes('food') || activityLower.includes('box')) icon = 'utensils';
+          else if (activityLower.includes('clean') || activityLower.includes('river')) icon = 'users';
+          else if (activityLower.includes('deliver') || activityLower.includes('truck')) icon = 'truck';
+          
+          // Determine category
+          let category = 'general';
+          if (activityLower.includes('food')) category = 'food-service';
+          else if (activityLower.includes('clean')) category = 'environment';
+          else if (activityLower.includes('deliver')) category = 'logistics';
+          
+          return {
+            id: record.id,
+            activityName,
+            dateTime,
+            location,
+            volunteersNeeded: 0, // Will add this mapping when you provide the field
+            volunteersSignedUp: 0, // Will add this mapping when you provide the field  
+            status: 'active',
+            category,
+            icon
+          };
+        });
       } else {
         const errorText = await response.text();
         console.log(`✗ Table "${tableName}" not found: ${response.status} - ${errorText}`);
