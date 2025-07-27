@@ -47,6 +47,12 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         console.log(`✓ Successfully connected to table: "${tableName}"`);
         const data = await response.json();
         console.log(`Found ${data.records?.length || 0} records`);
+        
+        // Debug: Log the first record's field names to understand the structure
+        if (data.records && data.records.length > 0) {
+          console.log('Available field names in first record:', Object.keys(data.records[0].fields));
+          console.log('First record fields:', data.records[0].fields);
+        }
 
         // Convert Airtable format to our application format
         return data.records.map((record: any) => ({
