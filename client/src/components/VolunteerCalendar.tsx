@@ -58,6 +58,19 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     queryFn: () => fetch(`/api/availability/${volunteerId}`).then(res => res.json()),
   });
 
+  // Fetch volunteer assignments (shifts they signed up for)
+  const { data: assignments = [], isLoading: assignmentsLoading } = useQuery({
+    queryKey: ['/api/assignments/volunteer', volunteerId],
+    queryFn: () => fetch(`/api/assignments/volunteer/${volunteerId}`).then(res => res.json()),
+  });
+
+  // Fetch shifts data to get shift details
+  const { data: shifts = [] } = useQuery({
+    queryKey: ['/api/shifts'],
+    queryFn: () => fetch('/api/shifts').then(res => res.json()),
+    staleTime: 0,
+  });
+
   // Create availability mutation
   const createAvailabilityMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -99,13 +112,44 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   });
 
   // Convert availability data to calendar events
-  const events: CalendarEvent[] = availability.map((avail: any) => ({
-    id: avail.id,
+  const availabilityEvents: CalendarEvent[] = availability.map((avail: any) => ({
+    id: `avail-${avail.id}`,
     title: avail.isRecurring ? `Available (${avail.recurringPattern})` : 'Available',
     start: new Date(avail.startTime),
     end: new Date(avail.endTime),
-    resource: avail,
+    resource: { ...avail, type: 'availability' },
   }));
+
+  // Convert shift assignments to calendar events
+  const shiftEvents: CalendarEvent[] = assignments
+    .filter((assignment: any) => assignment.status !== 'cancelled')
+    .map((assignment: any) => {
+      // Find the corresponding shift details
+      const shift = shifts.find((s: any) => s.id === assignment.shiftId);
+      if (!shift || !shift.dateTime) return null;
+
+      // Parse the shift date/time - assuming format like "January 15, 2025 at 9:00 AM"
+      const shiftDate = new Date(shift.dateTime);
+      const endDate = new Date(shiftDate);
+      endDate.setHours(endDate.getHours() + 3); // Assume 3-hour shifts
+
+      return {
+        id: `shift-${assignment.id}`,
+        title: `🎯 ${shift.activityName}`,
+        start: shiftDate,
+        end: endDate,
+        resource: { 
+          ...assignment, 
+          shift, 
+          type: 'shift',
+          status: assignment.status 
+        },
+      };
+    })
+    .filter(Boolean) as CalendarEvent[];
+
+  // Combine both availability and shift events
+  const events: CalendarEvent[] = [...availabilityEvents, ...shiftEvents];
 
   const handleSelectSlot = useCallback(({ start, end }: { start: Date; end: Date }) => {
     setSelectedSlot({ start, end });
@@ -113,8 +157,14 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   }, []);
 
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
-    if (confirm('Do you want to remove this availability?')) {
-      deleteAvailabilityMutation.mutate(event.id);
+    if (event.resource.type === 'availability') {
+      if (confirm('Do you want to remove this availability?')) {
+        deleteAvailabilityMutation.mutate(event.id.replace('avail-', ''));
+      }
+    } else if (event.resource.type === 'shift') {
+      // Show shift details or navigate to shift management
+      const shift = event.resource.shift;
+      alert(`Shift: ${shift.activityName}\nDate: ${shift.dateTime}\nLocation: ${shift.location}\nStatus: ${event.resource.status}\n\nTo cancel this shift, go to the "My Shifts" tab.`);
     }
   }, [deleteAvailabilityMutation]);
 
@@ -131,7 +181,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     });
   };
 
-  if (isLoading) {
+  if (isLoading || assignmentsLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -183,10 +233,25 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
             {volunteerName}'s Availability Calendar
           </CardTitle>
           <CardDescription>
-            Click and drag on the calendar to add your available time slots. Click existing slots to remove them.
+            Click and drag to add availability (blue). View your committed shifts (green with 🎯). Click events for details.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Legend */}
+          <div className="mb-4 flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-blue-500 rounded"></div>
+              <span>Available Time</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500 rounded"></div>
+              <span>Confirmed Shifts</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-amber-500 rounded"></div>
+              <span>Pending Shifts</span>
+            </div>
+          </div>
           <div className="h-[600px] md:h-[600px] sm:h-[500px]">
             <Calendar
               localizer={localizer}
@@ -203,12 +268,29 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               max={new Date(1970, 1, 1, 23, 0, 0)}
               step={30}
               timeslots={2}
-              eventPropGetter={(event) => ({
-                style: {
-                  backgroundColor: event.resource?.isRecurring ? '#10b981' : '#3b82f6',
-                  borderColor: event.resource?.isRecurring ? '#059669' : '#2563eb',
-                },
-              })}
+              eventPropGetter={(event) => {
+                if (event.resource?.type === 'shift') {
+                  // Green for confirmed shifts, yellow for pending
+                  const isConfirmed = event.resource.status === 'confirmed';
+                  return {
+                    style: {
+                      backgroundColor: isConfirmed ? '#10b981' : '#f59e0b',
+                      borderColor: isConfirmed ? '#059669' : '#d97706',
+                      color: 'white',
+                      fontWeight: 'bold',
+                    },
+                  };
+                } else {
+                  // Blue for availability
+                  return {
+                    style: {
+                      backgroundColor: event.resource?.isRecurring ? '#3b82f6' : '#60a5fa',
+                      borderColor: event.resource?.isRecurring ? '#2563eb' : '#3b82f6',
+                      color: 'white',
+                    },
+                  };
+                }
+              }}
               formats={{
                 timeGutterFormat: (date, culture, localizer) => {
                   const mainTime = format(date, 'ha');
