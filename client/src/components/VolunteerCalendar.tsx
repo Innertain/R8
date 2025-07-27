@@ -157,7 +157,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[600px]">
+          <div className="h-[600px] md:h-[600px] sm:h-[500px]">
             <Calendar
               localizer={localizer}
               events={events}
@@ -181,7 +181,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               })}
               formats={{
                 timeGutterFormat: (date, culture, localizer) => {
-                  const mainTime = format(date, 'h:mm a');
+                  const mainTime = format(date, 'ha');
                   const militaryTime = format(date, 'HH:mm');
                   return `${mainTime}\n${militaryTime}`;
                 },

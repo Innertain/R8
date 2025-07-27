@@ -210,15 +210,54 @@
 
 .rbc-time-gutter .rbc-time-slot {
   text-align: center;
-  padding: 2px 4px;
+  padding: 1px 2px;
   white-space: pre-line;
-  font-size: 0.875rem;
-  line-height: 1.2;
+  font-size: 0.8rem;
+  line-height: 1.1;
+  min-width: 50px;
 }
 
-.rbc-time-gutter .rbc-time-slot:last-child {
-  color: #6b7280;
-  font-size: 0.75rem;
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .rbc-time-gutter .rbc-time-slot {
+    font-size: 0.7rem;
+    padding: 1px;
+    min-width: 35px;
+  }
+  
+  .rbc-calendar {
+    font-size: 0.875rem;
+  }
+  
+  .rbc-toolbar {
+    padding: 8px 10px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .rbc-toolbar button {
+    padding: 4px 8px;
+    font-size: 0.875rem;
+    margin: 0 1px;
+  }
+  
+  .rbc-time-view {
+    overflow-x: auto;
+  }
+  
+  .rbc-time-header {
+    min-width: 100%;
+  }
+  
+  .rbc-header {
+    padding: 0.25rem;
+    font-size: 0.875rem;
+  }
+  
+  .rbc-event {
+    font-size: 0.75rem;
+    padding: 1px 3px;
+  }
 }
 
 /* Ensure calendar header styling */
