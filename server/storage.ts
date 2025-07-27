@@ -43,6 +43,45 @@ export class MemStorage implements IStorage {
     this.volunteers = new Map();
     this.availability = new Map();
     this.shiftAssignments = new Map();
+    
+    // Create demo volunteer for testing
+    this.createDemoVolunteer();
+  }
+  
+  private createDemoVolunteer() {
+    const demoId = "demo-volunteer-123";
+    const demoVolunteer: Volunteer = {
+      id: demoId,
+      airtableId: null,
+      name: "Demo Volunteer",
+      phoneNumber: "555-DEMO",
+      email: "demo@volunteer.org",
+      isDriver: true,
+      isActive: true,
+      createdAt: new Date()
+    };
+    this.volunteers.set(demoId, demoVolunteer);
+    
+    // Add some demo availability for the current week
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(9, 0, 0, 0);
+    
+    const tomorrowEnd = new Date(tomorrow);
+    tomorrowEnd.setHours(17, 0, 0, 0);
+    
+    const demoAvailability: Availability = {
+      id: "demo-availability-1",
+      volunteerId: demoId,
+      startTime: tomorrow,
+      endTime: tomorrowEnd,
+      isRecurring: false,
+      recurringPattern: null,
+      notes: "Demo availability - available all day tomorrow",
+      createdAt: new Date()
+    };
+    this.availability.set("demo-availability-1", demoAvailability);
   }
 
   // User methods

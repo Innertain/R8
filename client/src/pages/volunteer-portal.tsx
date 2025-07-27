@@ -166,11 +166,14 @@ export default function VolunteerPortal() {
               <Input
                 id="phone"
                 type="tel"
-                placeholder="(555) 123-4567"
+                placeholder="(555) 123-4567 or 555-DEMO"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
               />
+              <p className="text-xs text-gray-500">
+                For testing: Use <strong>555-DEMO</strong> to access the demo volunteer account
+              </p>
             </div>
             <Button 
               onClick={handleLogin} 
@@ -178,6 +181,17 @@ export default function VolunteerPortal() {
               className="w-full"
             >
               {loginMutation.isPending ? 'Checking...' : 'Access Portal'}
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setPhoneNumber('555-DEMO');
+                loginMutation.mutate('555-DEMO');
+              }}
+              disabled={loginMutation.isPending}
+              className="w-full"
+            >
+              Quick Demo Access
             </Button>
           </CardContent>
         </Card>
