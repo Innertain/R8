@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Calendar as CalendarIcon, Clock, User, CheckCircle, XCircle, MapPin, ExternalLink, Trash2 } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, Clock, User, UserPlus, CheckCircle, XCircle, MapPin, ExternalLink, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -122,9 +122,8 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     resource: { ...avail, type: 'availability' },
   }));
 
-  // Convert shift assignments to calendar events
+  // Convert shift assignments to calendar events (show all assignments with different styling)
   const shiftEvents: CalendarEvent[] = assignments
-    .filter((assignment: any) => assignment.status !== 'cancelled')
     .map((assignment: any) => {
       // Find the corresponding shift details
       console.log(`Looking for shiftId: ${assignment.shiftId} in ${shifts.length} shifts`);
@@ -175,7 +174,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       return {
         id: `shift-${assignment.id}`,
-        title: `🎯 ${shiftToUse.activityName}`,
+        title: assignment.status === 'cancelled' 
+          ? `❌ ${shiftToUse.activityName} (Cancelled)` 
+          : `🎯 ${shiftToUse.activityName}`,
         start: shiftDate,
         end: endDate,
         resource: { 
@@ -287,6 +288,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               <div className="w-4 h-4 bg-amber-500 rounded"></div>
               <span>Pending Shifts</span>
             </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded opacity-70"></div>
+              <span>Cancelled Shifts</span>
+            </div>
           </div>
           <div className="h-[600px] md:h-[600px] sm:h-[500px]">
             <Calendar
@@ -306,16 +311,39 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               timeslots={2}
               eventPropGetter={(event) => {
                 if (event.resource?.type === 'shift') {
-                  // Green for confirmed shifts, yellow for pending
-                  const isConfirmed = event.resource.status === 'confirmed';
-                  return {
-                    style: {
-                      backgroundColor: isConfirmed ? '#10b981' : '#f59e0b',
-                      borderColor: isConfirmed ? '#059669' : '#d97706',
-                      color: 'white',
-                      fontWeight: 'bold',
-                    },
-                  };
+                  // Different colors based on shift status
+                  const status = event.resource.status;
+                  if (status === 'cancelled') {
+                    return {
+                      style: {
+                        backgroundColor: '#ef4444',
+                        borderColor: '#dc2626',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        opacity: 0.7,
+                        textDecoration: 'line-through',
+                      },
+                    };
+                  } else if (status === 'confirmed') {
+                    return {
+                      style: {
+                        backgroundColor: '#10b981',
+                        borderColor: '#059669',
+                        color: 'white',
+                        fontWeight: 'bold',
+                      },
+                    };
+                  } else {
+                    // Pending or other status
+                    return {
+                      style: {
+                        backgroundColor: '#f59e0b',
+                        borderColor: '#d97706',
+                        color: 'white',
+                        fontWeight: 'bold',
+                      },
+                    };
+                  }
                 } else {
                   // Blue for availability
                   return {
@@ -493,31 +521,49 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               {selectedEvent.resource?.type === 'shift' ? (
                 // Shift Details Modal
                 <div className="space-y-4">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className={`border rounded-lg p-4 ${
+                    selectedEvent.resource.status === 'cancelled' 
+                      ? 'bg-red-50 border-red-200' 
+                      : 'bg-green-50 border-green-200'
+                  }`}>
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-green-900">
+                      <h3 className={`font-semibold ${
+                        selectedEvent.resource.status === 'cancelled' 
+                          ? 'text-red-900' 
+                          : 'text-green-900'
+                      }`}>
                         {selectedEvent.resource.shift?.activityName || 'Shift'}
                       </h3>
-                      <Badge className="bg-green-100 text-green-800 border-green-200">
+                      <Badge className={
+                        selectedEvent.resource.status === 'cancelled'
+                          ? 'bg-red-100 text-red-800 border-red-200'
+                          : 'bg-green-100 text-green-800 border-green-200'
+                      }>
                         {selectedEvent.resource.status || 'Confirmed'}
                       </Badge>
                     </div>
                     
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <CalendarIcon className="h-4 w-4 text-green-600" />
+                        <CalendarIcon className={`h-4 w-4 ${
+                          selectedEvent.resource.status === 'cancelled' ? 'text-red-600' : 'text-green-600'
+                        }`} />
                         <span>{selectedEvent.resource.shift?.dateTime || selectedEvent.start.toLocaleString()}</span>
                       </div>
                       
                       {selectedEvent.resource.shift?.location && (
                         <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-green-600" />
+                          <MapPin className={`h-4 w-4 ${
+                            selectedEvent.resource.status === 'cancelled' ? 'text-red-600' : 'text-green-600'
+                          }`} />
                           <span>{selectedEvent.resource.shift.location}</span>
                         </div>
                       )}
                       
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-green-600" />
+                        <Clock className={`h-4 w-4 ${
+                          selectedEvent.resource.status === 'cancelled' ? 'text-red-600' : 'text-green-600'
+                        }`} />
                         <span>
                           {selectedEvent.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
                           {selectedEvent.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -526,45 +572,85 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     </div>
 
                     {selectedEvent.resource.notes && (
-                      <div className="mt-3 pt-3 border-t border-green-200">
-                        <p className="text-xs text-green-700">
+                      <div className={`mt-3 pt-3 border-t ${
+                        selectedEvent.resource.status === 'cancelled' ? 'border-red-200' : 'border-green-200'
+                      }`}>
+                        <p className={`text-xs ${
+                          selectedEvent.resource.status === 'cancelled' ? 'text-red-700' : 'text-green-700'
+                        }`}>
                           <strong>Notes:</strong> {selectedEvent.resource.notes}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {selectedEvent.resource.status === 'cancelled' && (
+                      <div className="mt-3 pt-3 border-t border-red-200">
+                        <p className="text-xs text-red-700 font-medium">
+                          ⚠️ This shift has been cancelled. You can sign up for it again from the "Browse Shifts" tab if needed.
                         </p>
                       </div>
                     )}
                   </div>
 
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        const shift = selectedEvent.resource.shift;
-                        const startTime = new Date(selectedEvent.start);
-                        const endTime = new Date(selectedEvent.end);
+                    {selectedEvent.resource.status !== 'cancelled' ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            const shift = selectedEvent.resource.shift;
+                            const startTime = new Date(selectedEvent.start);
+                            const endTime = new Date(selectedEvent.end);
+                            
+                            const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(shift?.activityName || 'Volunteer Shift')}&dates=${startTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(`Location: ${shift?.location || 'TBD'}\nStatus: ${selectedEvent.resource.status}\n\nManage this shift in your Volunteer Portal.`)}&location=${encodeURIComponent(shift?.location || '')}`;
+                            
+                            window.open(googleCalendarUrl, '_blank');
+                          }}
+                        >
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Add to Calendar
+                        </Button>
                         
-                        const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(shift?.activityName || 'Volunteer Shift')}&dates=${startTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(`Location: ${shift?.location || 'TBD'}\nStatus: ${selectedEvent.resource.status}\n\nManage this shift in your Volunteer Portal.`)}&location=${encodeURIComponent(shift?.location || '')}`;
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            setShowEventModal(false);
+                            // Navigate to My Shifts tab for cancellation
+                          }}
+                        >
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Manage
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setShowEventModal(false)}
+                        >
+                          Close
+                        </Button>
                         
-                        window.open(googleCalendarUrl, '_blank');
-                      }}
-                    >
-                      <ExternalLink className="h-3 w-3 mr-1" />
-                      Add to Calendar
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
-                      onClick={() => {
-                        setShowEventModal(false);
-                        // Navigate to My Shifts tab for cancellation
-                      }}
-                    >
-                      <XCircle className="h-3 w-3 mr-1" />
-                      Manage
-                    </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
+                          onClick={() => {
+                            setShowEventModal(false);
+                            // Could navigate to Browse Shifts tab to re-signup
+                          }}
+                        >
+                          <UserPlus className="h-3 w-3 mr-1" />
+                          Sign Up Again
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               ) : (

@@ -838,12 +838,18 @@ export default function VolunteerPortal() {
         return response.json();
       },
       onSuccess: () => {
+        // Invalidate and force refetch all related queries to refresh the UI immediately
         queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
         queryClient.invalidateQueries({ queryKey: ['/api/assignments/volunteer', volunteerId] });
         queryClient.invalidateQueries({ queryKey: ['/api/availability', volunteerId] });
+        
+        // Force immediate refetch to ensure UI updates right away
+        queryClient.refetchQueries({ queryKey: ['/api/shifts'] });
+        queryClient.refetchQueries({ queryKey: ['/api/assignments/volunteer', volunteerId] });
+        
         toast({
           title: "Assignment Cancelled",
-          description: "You've been removed from this volunteer shift.",
+          description: "You've been removed from this volunteer shift. You can sign up again if needed.",
         });
       },
       onError: () => {
