@@ -198,3 +198,46 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Calendar styling for military time display */
+.rbc-time-slot {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rbc-time-gutter .rbc-timeslot-group {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rbc-time-gutter .rbc-time-slot {
+  text-align: center;
+  padding: 2px 4px;
+  white-space: pre-line;
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+.rbc-time-gutter .rbc-time-slot:last-child {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+/* Ensure calendar header styling */
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  padding: 0.5rem;
+  font-weight: 500;
+}
+
+.rbc-event {
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 0.875rem;
+}
+
+.rbc-event.rbc-selected {
+  background-color: #1d4ed8 !important;
+  border-color: #1e40af !important;
+}

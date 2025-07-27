@@ -169,12 +169,25 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               selectable
               views={['month', 'week', 'day']}
               defaultView="week"
+              min={new Date(1970, 1, 1, 6, 0, 0)}
+              max={new Date(1970, 1, 1, 23, 0, 0)}
+              step={30}
+              timeslots={2}
               eventPropGetter={(event) => ({
                 style: {
                   backgroundColor: event.resource?.isRecurring ? '#10b981' : '#3b82f6',
                   borderColor: event.resource?.isRecurring ? '#059669' : '#2563eb',
                 },
               })}
+              formats={{
+                timeGutterFormat: (date, culture, localizer) => {
+                  const mainTime = format(date, 'h:mm a');
+                  const militaryTime = format(date, 'HH:mm');
+                  return `${mainTime}\n${militaryTime}`;
+                },
+                dayHeaderFormat: (date, culture, localizer) =>
+                  format(date, 'eeee M/d'),
+              }}
               messages={{
                 allDay: 'All Day',
                 previous: 'Previous',
