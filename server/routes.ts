@@ -4,6 +4,46 @@ import { storage } from "./storage";
 import { fetchShiftsFromAirtableServer } from "./airtable";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // API route to check Airtable base structure
+  app.get("/api/airtable-debug", async (req, res) => {
+    const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+    const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period if present
+    
+    if (!AIRTABLE_TOKEN || !BASE_ID) {
+      return res.json({ error: 'Missing credentials' });
+    }
+
+    try {
+      // Get base metadata
+      const metaUrl = `https://api.airtable.com/v0/meta/bases/${BASE_ID}/tables`;
+      const metaResponse = await fetch(metaUrl, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+      });
+
+      if (metaResponse.ok) {
+        const metaData = await metaResponse.json();
+        res.json({
+          success: true,
+          baseId: BASE_ID,
+          tables: metaData.tables?.map((t: any) => ({
+            name: t.name,
+            id: t.id,
+            fields: t.fields?.map((f: any) => ({ name: f.name, type: f.type }))
+          })) || []
+        });
+      } else {
+        const error = await metaResponse.text();
+        res.json({ 
+          success: false, 
+          error: `Base metadata error: ${metaResponse.status} - ${error}`,
+          baseId: BASE_ID
+        });
+      }
+    } catch (error) {
+      res.json({ success: false, error: error.message });
+    }
+  });
+
   // API route to fetch shifts from Airtable
   app.get("/api/shifts", async (req, res) => {
     console.log('API route /api/shifts called');
