@@ -27,7 +27,7 @@ export default function AirtableTest() {
         error: data.error,
         status: data.status
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         tableName,
         success: false,
@@ -49,7 +49,7 @@ export default function AirtableTest() {
         console.log('Available tables:', metaData.tables);
         
         // Filter for our target tables
-        const targetTables = metaData.tables.filter(table => 
+        const targetTables = metaData.tables.filter((table: any) => 
           ['Drivers', 'Volunteer Applications', 'V Availability', 'V Shift Assignment'].includes(table.name)
         );
         
@@ -95,7 +95,7 @@ export default function AirtableTest() {
         error: data.error,
         status: data.status
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         tableName,
         success: false,
