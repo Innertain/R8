@@ -94,63 +94,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test endpoints for new Airtable tables
-  app.get('/api/test/drivers', async (req, res) => {
+  // Get all table metadata
+  app.get('/api/test/tables', async (req, res) => {
     try {
-      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/Drivers`, {
+      const metaResponse = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.VITE_BASE_ID}/tables`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      if (response.ok) {
-        const data = await response.json();
-        res.json({ success: true, records: data.records?.length || 0, data: data.records });
+      
+      if (metaResponse.ok) {
+        const metaData = await metaResponse.json();
+        res.json({ success: true, tables: metaData.tables });
       } else {
-        res.json({ success: false, status: response.status, error: await response.text() });
+        res.json({ success: false, error: await metaResponse.text() });
       }
     } catch (error) {
       res.json({ success: false, error: error.message });
     }
+  });
+
+  // Test endpoints for new Airtable tables with dynamic table detection
+  app.get('/api/test/drivers', async (req, res) => {
+    const possibleNames = ['Drivers', 'Driver', 'drivers'];
+    
+    for (const tableName of possibleNames) {
+      try {
+        const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
+          headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return res.json({ success: true, tableName, records: data.records?.length || 0, data: data.records });
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+    res.json({ success: false, error: "No drivers table found with any expected name" });
   });
 
   app.get('/api/test/volunteers', async (req, res) => {
-    try {
-      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/Volunteer%20Applications`, {
-        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        res.json({ success: true, records: data.records?.length || 0, data: data.records });
-      } else {
-        res.json({ success: false, status: response.status, error: await response.text() });
+    const possibleNames = ['Volunteer Applications', 'Volunteers', 'volunteers', 'Volunteer_Applications'];
+    
+    for (const tableName of possibleNames) {
+      try {
+        const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
+          headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return res.json({ success: true, tableName, records: data.records?.length || 0, data: data.records });
+        }
+      } catch (error) {
+        continue;
       }
-    } catch (error) {
-      res.json({ success: false, error: error.message });
     }
+    res.json({ success: false, error: "No volunteers table found with any expected name" });
   });
 
   app.get('/api/test/availability', async (req, res) => {
-    try {
-      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/V%20Availability`, {
-        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        res.json({ success: true, records: data.records?.length || 0, data: data.records });
-      } else {
-        res.json({ success: false, status: response.status, error: await response.text() });
+    const possibleNames = ['V Availability', 'Availability', 'V_Availability', 'availability'];
+    
+    for (const tableName of possibleNames) {
+      try {
+        const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
+          headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return res.json({ success: true, tableName, records: data.records?.length || 0, data: data.records });
+        }
+      } catch (error) {
+        continue;
       }
-    } catch (error) {
-      res.json({ success: false, error: error.message });
     }
+    res.json({ success: false, error: "No availability table found with any expected name" });
   });
 
   app.get('/api/test/assignments', async (req, res) => {
+    const possibleNames = ['V Shift Assignment', 'Shift Assignment', 'V_Shift_Assignment', 'assignments'];
+    
+    for (const tableName of possibleNames) {
+      try {
+        const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
+          headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return res.json({ success: true, tableName, records: data.records?.length || 0, data: data.records });
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+    res.json({ success: false, error: "No assignments table found with any expected name" });
+  });
+
+  // Direct table test endpoint
+  app.get('/api/test/direct/:tableName', async (req, res) => {
     try {
-      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/V%20Shift%20Assignment`, {
+      const tableName = decodeURIComponent(req.params.tableName);
+      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
+      
       if (response.ok) {
         const data = await response.json();
-        res.json({ success: true, records: data.records?.length || 0, data: data.records });
+        res.json({ success: true, tableName, records: data.records?.length || 0, data: data.records });
       } else {
         res.json({ success: false, status: response.status, error: await response.text() });
       }

@@ -20,7 +20,7 @@ export default function AirtableTest() {
       const data = await response.json();
       
       return {
-        tableName,
+        tableName: data.tableName || tableName,
         success: data.success,
         records: data.records,
         data: data.data,
@@ -40,21 +40,68 @@ export default function AirtableTest() {
     setLoading(true);
     setResults([]);
     
-    const tests = [
-      { name: 'Drivers', endpoint: 'drivers' },
-      { name: 'Volunteer Applications', endpoint: 'volunteers' },
-      { name: 'V Availability', endpoint: 'availability' },
-      { name: 'V Shift Assignment', endpoint: 'assignments' }
-    ];
-    
-    const testResults = [];
-    for (const test of tests) {
-      const result = await testTable(test.name, test.endpoint);
-      testResults.push(result);
-      setResults([...testResults]);
+    // First get table metadata
+    try {
+      const metaResponse = await fetch('/api/test/tables');
+      const metaData = await metaResponse.json();
+      
+      if (metaData.success) {
+        console.log('Available tables:', metaData.tables);
+        
+        // Filter for our target tables
+        const targetTables = metaData.tables.filter(table => 
+          ['Drivers', 'Volunteer Applications', 'V Availability', 'V Shift Assignment'].includes(table.name)
+        );
+        
+        const testResults = [];
+        for (const table of targetTables) {
+          const result = await testDirectTable(table.name, table.id);
+          testResults.push(result);
+          setResults([...testResults]);
+        }
+      } else {
+        // Fallback to original method
+        const tests = [
+          { name: 'Drivers', endpoint: 'drivers' },
+          { name: 'Volunteer Applications', endpoint: 'volunteers' },
+          { name: 'V Availability', endpoint: 'availability' },
+          { name: 'V Shift Assignment', endpoint: 'assignments' }
+        ];
+        
+        const testResults = [];
+        for (const test of tests) {
+          const result = await testTable(test.name, test.endpoint);
+          testResults.push(result);
+          setResults([...testResults]);
+        }
+      }
+    } catch (error) {
+      console.error('Error getting table metadata:', error);
     }
     
     setLoading(false);
+  };
+
+  const testDirectTable = async (tableName: string, tableId: string) => {
+    try {
+      const response = await fetch(`/api/test/direct/${encodeURIComponent(tableName)}`);
+      const data = await response.json();
+      
+      return {
+        tableName,
+        success: data.success,
+        records: data.records,
+        data: data.data,
+        error: data.error,
+        status: data.status
+      };
+    } catch (error) {
+      return {
+        tableName,
+        success: false,
+        error: error.message
+      };
+    }
   };
 
   return (
