@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Phone, User, Calendar, UserPlus, LogIn } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
@@ -111,14 +113,27 @@ export default function VolunteerPortal() {
     });
   };
 
-  // If logged in, show the calendar
+  // Fetch volunteer assignments
+  const { data: assignments = [], isLoading: assignmentsLoading } = useQuery({
+    queryKey: ['/api/assignments/volunteer', currentVolunteer?.id],
+    queryFn: () => fetch(`/api/assignments/volunteer/${currentVolunteer?.id}`).then(res => res.json()),
+    enabled: !!currentVolunteer,
+  });
+
+  // Fetch shifts data to match with assignments
+  const { data: shifts = [] } = useQuery({
+    queryKey: ['/api/shifts'],
+    enabled: !!currentVolunteer,
+  });
+
+  // If logged in, show the dashboard with tabs
   if (currentVolunteer) {
     return (
       <div className="container mx-auto p-4 space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Volunteer Portal</h1>
-            <p className="text-gray-600">Manage your availability and shifts</p>
+            <p className="text-gray-600">Welcome back, {currentVolunteer.name}</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
@@ -136,10 +151,121 @@ export default function VolunteerPortal() {
           </div>
         </div>
 
-        <VolunteerCalendar 
-          volunteerId={currentVolunteer.id} 
-          volunteerName={currentVolunteer.name} 
-        />
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" />
+              My Shifts
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Availability
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="dashboard" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="h-5 w-5" />
+                  My Volunteer Shifts
+                </CardTitle>
+                <CardDescription>
+                  View and manage your upcoming volunteer commitments
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {assignmentsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <Clock className="h-8 w-8 animate-spin mx-auto mb-2 text-gray-400" />
+                      <p className="text-gray-500">Loading your shifts...</p>
+                    </div>
+                  </div>
+                ) : assignments.length === 0 ? (
+                  <div className="text-center py-8">
+                    <CalendarDays className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-medium mb-2">No shifts assigned yet</h3>
+                    <p className="text-gray-500 mb-4">
+                      You haven't signed up for any volunteer shifts yet. 
+                      Check the main shifts page to find opportunities!
+                    </p>
+                    <Button onClick={() => window.location.href = '/'}>
+                      Browse Available Shifts
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">
+                        {assignments.length} Active Assignment{assignments.length !== 1 ? 's' : ''}
+                      </h3>
+                      <Badge variant="secondary" className="text-green-700 bg-green-50">
+                        {assignments.filter((a: any) => a.status === 'confirmed').length} Confirmed
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid gap-4">
+                      {assignments.map((assignment: any) => {
+                        const matchedShift = shifts.find((s: any) => s.id === assignment.shiftId);
+                        const statusIcon = assignment.status === 'confirmed' ? CheckCircle : 
+                                         assignment.status === 'pending' ? Clock : XCircle;
+                        const statusColor = assignment.status === 'confirmed' ? 'text-green-600' : 
+                                          assignment.status === 'pending' ? 'text-yellow-600' : 'text-red-600';
+                        const StatusIcon = statusIcon;
+                        
+                        return (
+                          <Card key={assignment.id} className="border-l-4 border-l-blue-500">
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-semibold">
+                                      {matchedShift?.activityName || 'River Clean up'}
+                                    </h4>
+                                    <Badge 
+                                      variant={assignment.status === 'confirmed' ? 'default' : 'secondary'}
+                                      className={`flex items-center gap-1 ${statusColor}`}
+                                    >
+                                      <StatusIcon className="h-3 w-3" />
+                                      {assignment.status}
+                                    </Badge>
+                                  </div>
+                                  
+                                  <div className="space-y-1 text-sm text-gray-600">
+                                    <p><strong>Date:</strong> {matchedShift?.dateTime || 'To be determined'}</p>
+                                    <p><strong>Location:</strong> {matchedShift?.location || 'Local area'}</p>
+                                    <p><strong>Assigned:</strong> {new Date(assignment.assignedDate || assignment.assignedAt).toLocaleDateString()}</p>
+                                    {assignment.notes && (
+                                      <p><strong>Notes:</strong> {assignment.notes}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                <div className="text-right">
+                                  <Badge variant="outline" className="text-xs">
+                                    ID: {assignment.id.slice(-8)}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="calendar">
+            <VolunteerCalendar 
+              volunteerId={currentVolunteer.id} 
+              volunteerName={currentVolunteer.name} 
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     );
   }
