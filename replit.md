@@ -29,6 +29,9 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Assignment Creation Fixed**: Resolved Airtable field errors, assignments now sync successfully
 ✓ **Shift Name Population**: Fixed shift name display in assignments and "My Shifts" dashboard
 ✓ **Live Data Sync**: New shifts and activities added to Airtable automatically appear in volunteer portal
+✓ **Assignment Records Working**: All volunteer signups successfully create records in V Shift Assignment table
+✓ **Shift Name Display**: API correctly retrieves and displays shift names in volunteer portal
+→ **Airtable Field Setup**: V Shift Assignment table needs "Shift ID" as linked field to V Shifts for proper lookup display
 
 ## User Preferences
 
@@ -179,11 +182,13 @@ Create this table with these exact field names:
 #### Table 4: "Shift Assignments" (New Table to Add)
 Create this table with these exact field names:
 - `Volunteer` (Link to Volunteers table) - Required
-- `Shift ID` (Single line text) - Links to V Shifts table record ID
-- `Shift Name` (Lookup from V Shifts via Shift ID) - Display only
-- `Status` (Single select: confirmed, pending, cancelled) - Required
-- `Assigned Date` (Created time) - Auto-populated
+- `Shift ID` (Link to V Shifts table) - Required, links to shift records
+- `Shift Name` (Lookup from V Shifts via Shift ID link) - Auto-populated from linked V Shifts
+- `Status` (Single select: confirmed, pending, cancelled) - Optional
+- `Assigned Date` (Date with time) - Auto-populated 
 - `Notes` (Long text) - Optional assignment notes
+
+**Important**: The `Shift ID` field should be a **Link to V Shifts table**, not just text. This allows the `Shift Name` to be a lookup field that automatically shows the activity name.
 
 ### 3. Sample Data Setup
 
