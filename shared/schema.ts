@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -18,6 +18,27 @@ export const volunteers = pgTable("volunteers", {
   email: text("email"),
   isDriver: boolean("is_driver").default(false),
   isActive: boolean("is_active").default(true),
+  // Profile and preferences
+  bio: text("bio"),
+  skills: json("skills").$type<string[]>().default([]),
+  interests: json("interests").$type<string[]>().default([]),
+  emergencyContact: text("emergency_contact"),
+  emergencyPhone: text("emergency_phone"),
+  dietaryRestrictions: text("dietary_restrictions"),
+  hasTransportation: boolean("has_transportation").default(false),
+  maxHoursPerWeek: integer("max_hours_per_week"),
+  preferredShiftTypes: json("preferred_shift_types").$type<string[]>().default([]),
+  notifications: json("notifications").$type<{
+    email: boolean;
+    sms: boolean;
+    reminders: boolean;
+    newShifts: boolean;
+  }>().default({
+    email: true,
+    sms: false,
+    reminders: true,
+    newShifts: true
+  }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

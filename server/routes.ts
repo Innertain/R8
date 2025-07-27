@@ -622,6 +622,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update volunteer profile
+  app.put('/api/volunteers/:id/profile', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const profileData = req.body;
+
+      console.log(`Updating profile for volunteer: ${id}`, profileData);
+      
+      const updatedVolunteer = await storage.updateVolunteerProfile(id, profileData);
+      res.json(updatedVolunteer);
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

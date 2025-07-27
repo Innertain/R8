@@ -9,13 +9,460 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
 import ShiftCard from '@/components/ShiftCard';
 
 
+
+// Volunteer Profile Component
+function VolunteerProfile({ volunteer }: { volunteer: any }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: volunteer.name || '',
+    email: volunteer.email || '',
+    bio: volunteer.bio || '',
+    skills: volunteer.skills || [],
+    interests: volunteer.interests || [],
+    emergencyContact: volunteer.emergencyContact || '',
+    emergencyPhone: volunteer.emergencyPhone || '',
+    dietaryRestrictions: volunteer.dietaryRestrictions || '',
+    hasTransportation: volunteer.hasTransportation || false,
+    maxHoursPerWeek: volunteer.maxHoursPerWeek || '',
+    preferredShiftTypes: volunteer.preferredShiftTypes || [],
+    notifications: volunteer.notifications || {
+      email: true,
+      sms: false,
+      reminders: true,
+      newShifts: true
+    }
+  });
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (profileData: any) => {
+      const response = await fetch(`/api/volunteers/${volunteer.id}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData)
+      });
+      if (!response.ok) throw new Error('Failed to update profile');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/volunteers/${volunteer.id}`] });
+      setIsEditing(false);
+      toast({
+        title: "Profile Updated",
+        description: "Your volunteer profile has been updated successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Unable to update your profile. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const skillOptions = [
+    'Event Planning', 'Teaching', 'Technology', 'Writing', 'Photography',
+    'Marketing', 'Fundraising', 'Customer Service', 'Manual Labor', 'Cooking',
+    'Childcare', 'Elder Care', 'Medical/Healthcare', 'Construction', 'Driving',
+    'Languages', 'Administrative', 'Social Media', 'Graphic Design', 'Legal'
+  ];
+
+  const interestOptions = [
+    'Environmental', 'Education', 'Health & Wellness', 'Community Development',
+    'Animal Welfare', 'Arts & Culture', 'Sports & Recreation', 'Senior Services',
+    'Youth Programs', 'Food Security', 'Homelessness', 'Disaster Relief',
+    'Advocacy', 'Research', 'Faith-Based', 'International'
+  ];
+
+  const shiftTypeOptions = [
+    'Morning Shifts', 'Evening Shifts', 'Weekend', 'Weekday', 'One-time Events',
+    'Recurring Commitments', 'Remote Work', 'Physical Labor', 'Office Work',
+    'Outdoor Activities', 'Client-Facing', 'Behind-the-Scenes'
+  ];
+
+  const toggleArrayItem = (array: string[], item: string) => {
+    return array.includes(item) 
+      ? array.filter(i => i !== item)
+      : [...array, item];
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Volunteer Profile</h2>
+          <p className="text-gray-600">Manage your personal information and preferences</p>
+        </div>
+        <Button
+          onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
+          variant={isEditing ? "outline" : "default"}
+        >
+          {isEditing ? (
+            <>Cancel</>
+          ) : (
+            <>
+              <Settings className="w-4 h-4 mr-2" />
+              Edit Profile
+            </>
+          )}
+        </Button>
+      </div>
+
+      <div className="grid gap-6">
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Basic Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Full Name</Label>
+                {isEditing ? (
+                  <Input
+                    id="name"
+                    value={profileForm.name}
+                    onChange={(e) => setProfileForm(prev => ({...prev, name: e.target.value}))}
+                  />
+                ) : (
+                  <p className="text-sm mt-1 p-2 bg-gray-50 rounded">{volunteer.name}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                {isEditing ? (
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profileForm.email}
+                    onChange={(e) => setProfileForm(prev => ({...prev, email: e.target.value}))}
+                  />
+                ) : (
+                  <p className="text-sm mt-1 p-2 bg-gray-50 rounded">{volunteer.email || 'Not provided'}</p>
+                )}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="bio">Bio</Label>
+              {isEditing ? (
+                <textarea
+                  id="bio"
+                  className="w-full p-2 border rounded-md"
+                  rows={3}
+                  value={profileForm.bio}
+                  onChange={(e) => setProfileForm(prev => ({...prev, bio: e.target.value}))}
+                  placeholder="Tell us about yourself and why you volunteer..."
+                />
+              ) : (
+                <p className="text-sm mt-1 p-2 bg-gray-50 rounded">{volunteer.bio || 'No bio provided'}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Skills & Interests */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="h-5 w-5" />
+              Skills & Interests
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Skills</Label>
+              {isEditing ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  {skillOptions.map(skill => (
+                    <div key={skill} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`skill-${skill}`}
+                        checked={profileForm.skills.includes(skill)}
+                        onCheckedChange={() => 
+                          setProfileForm(prev => ({
+                            ...prev, 
+                            skills: toggleArrayItem(prev.skills, skill)
+                          }))
+                        }
+                      />
+                      <Label htmlFor={`skill-${skill}`} className="text-sm">{skill}</Label>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(volunteer.skills || []).map((skill: string) => (
+                    <Badge key={skill} variant="secondary">{skill}</Badge>
+                  ))}
+                  {(!volunteer.skills || volunteer.skills.length === 0) && (
+                    <p className="text-sm text-gray-500">No skills listed</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label>Areas of Interest</Label>
+              {isEditing ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  {interestOptions.map(interest => (
+                    <div key={interest} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`interest-${interest}`}
+                        checked={profileForm.interests.includes(interest)}
+                        onCheckedChange={() => 
+                          setProfileForm(prev => ({
+                            ...prev, 
+                            interests: toggleArrayItem(prev.interests, interest)
+                          }))
+                        }
+                      />
+                      <Label htmlFor={`interest-${interest}`} className="text-sm">{interest}</Label>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(volunteer.interests || []).map((interest: string) => (
+                    <Badge key={interest} variant="outline">{interest}</Badge>
+                  ))}
+                  {(!volunteer.interests || volunteer.interests.length === 0) && (
+                    <p className="text-sm text-gray-500">No interests listed</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Emergency Contact & Preferences */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5" />
+              Emergency Contact & Preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="emergency-contact">Emergency Contact Name</Label>
+                {isEditing ? (
+                  <Input
+                    id="emergency-contact"
+                    value={profileForm.emergencyContact}
+                    onChange={(e) => setProfileForm(prev => ({...prev, emergencyContact: e.target.value}))}
+                  />
+                ) : (
+                  <p className="text-sm mt-1 p-2 bg-gray-50 rounded">{volunteer.emergencyContact || 'Not provided'}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="emergency-phone">Emergency Phone</Label>
+                {isEditing ? (
+                  <Input
+                    id="emergency-phone"
+                    type="tel"
+                    value={profileForm.emergencyPhone}
+                    onChange={(e) => setProfileForm(prev => ({...prev, emergencyPhone: e.target.value}))}
+                  />
+                ) : (
+                  <p className="text-sm mt-1 p-2 bg-gray-50 rounded">{volunteer.emergencyPhone || 'Not provided'}</p>
+                )}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="dietary">Dietary Restrictions / Allergies</Label>
+              {isEditing ? (
+                <Input
+                  id="dietary"
+                  value={profileForm.dietaryRestrictions}
+                  onChange={(e) => setProfileForm(prev => ({...prev, dietaryRestrictions: e.target.value}))}
+                  placeholder="e.g., Vegetarian, Nut allergy, None"
+                />
+              ) : (
+                <p className="text-sm mt-1 p-2 bg-gray-50 rounded">{volunteer.dietaryRestrictions || 'None specified'}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Volunteer Preferences */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Volunteer Preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="has-transportation"
+                  checked={isEditing ? profileForm.hasTransportation : volunteer.hasTransportation}
+                  onCheckedChange={(checked) => 
+                    isEditing && setProfileForm(prev => ({...prev, hasTransportation: checked as boolean}))
+                  }
+                  disabled={!isEditing}
+                />
+                <Label htmlFor="has-transportation">I have reliable transportation</Label>
+              </div>
+              <div>
+                <Label htmlFor="max-hours">Max Hours Per Week</Label>
+                {isEditing ? (
+                  <Input
+                    id="max-hours"
+                    type="number"
+                    value={profileForm.maxHoursPerWeek}
+                    onChange={(e) => setProfileForm(prev => ({...prev, maxHoursPerWeek: e.target.value}))}
+                    placeholder="e.g., 10"
+                  />
+                ) : (
+                  <p className="text-sm mt-1 p-2 bg-gray-50 rounded">{volunteer.maxHoursPerWeek || 'No limit set'}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label>Preferred Shift Types</Label>
+              {isEditing ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  {shiftTypeOptions.map(shiftType => (
+                    <div key={shiftType} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`shift-${shiftType}`}
+                        checked={profileForm.preferredShiftTypes.includes(shiftType)}
+                        onCheckedChange={() => 
+                          setProfileForm(prev => ({
+                            ...prev, 
+                            preferredShiftTypes: toggleArrayItem(prev.preferredShiftTypes, shiftType)
+                          }))
+                        }
+                      />
+                      <Label htmlFor={`shift-${shiftType}`} className="text-sm">{shiftType}</Label>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(volunteer.preferredShiftTypes || []).map((type: string) => (
+                    <Badge key={type} className="bg-blue-100 text-blue-800">{type}</Badge>
+                  ))}
+                  {(!volunteer.preferredShiftTypes || volunteer.preferredShiftTypes.length === 0) && (
+                    <p className="text-sm text-gray-500">No preferences set</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Notification Preferences */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notification Preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="notify-email"
+                checked={isEditing ? profileForm.notifications.email : volunteer.notifications?.email}
+                onCheckedChange={(checked) => 
+                  isEditing && setProfileForm(prev => ({
+                    ...prev, 
+                    notifications: {...prev.notifications, email: checked as boolean}
+                  }))
+                }
+                disabled={!isEditing}
+              />
+              <Label htmlFor="notify-email">Email notifications</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="notify-sms"
+                checked={isEditing ? profileForm.notifications.sms : volunteer.notifications?.sms}
+                onCheckedChange={(checked) => 
+                  isEditing && setProfileForm(prev => ({
+                    ...prev, 
+                    notifications: {...prev.notifications, sms: checked as boolean}
+                  }))
+                }
+                disabled={!isEditing}
+              />
+              <Label htmlFor="notify-sms">SMS notifications</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="notify-reminders"
+                checked={isEditing ? profileForm.notifications.reminders : volunteer.notifications?.reminders}
+                onCheckedChange={(checked) => 
+                  isEditing && setProfileForm(prev => ({
+                    ...prev, 
+                    notifications: {...prev.notifications, reminders: checked as boolean}
+                  }))
+                }
+                disabled={!isEditing}
+              />
+              <Label htmlFor="notify-reminders">Shift reminders</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="notify-new-shifts"
+                checked={isEditing ? profileForm.notifications.newShifts : volunteer.notifications?.newShifts}
+                onCheckedChange={(checked) => 
+                  isEditing && setProfileForm(prev => ({
+                    ...prev, 
+                    notifications: {...prev.notifications, newShifts: checked as boolean}
+                  }))
+                }
+                disabled={!isEditing}
+              />
+              <Label htmlFor="notify-new-shifts">New shift opportunities</Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {isEditing && (
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsEditing(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => updateProfileMutation.mutate(profileForm)}
+              disabled={updateProfileMutation.isPending}
+            >
+              {updateProfileMutation.isPending ? (
+                <>Saving...</>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Profile
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function VolunteerPortal() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -307,7 +754,7 @@ export default function VolunteerPortal() {
         </div>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4" />
               My Shifts
@@ -319,6 +766,10 @@ export default function VolunteerPortal() {
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Availability
+            </TabsTrigger>
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Profile
             </TabsTrigger>
           </TabsList>
           
@@ -499,6 +950,10 @@ export default function VolunteerPortal() {
               volunteerId={currentVolunteer.id} 
               volunteerName={currentVolunteer.name} 
             />
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-6">
+            <VolunteerProfile volunteer={currentVolunteer} />
           </TabsContent>
         </Tabs>
       </div>

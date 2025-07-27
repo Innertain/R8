@@ -16,6 +16,7 @@ export interface IStorage {
   getVolunteerById(id: string): Promise<Volunteer | null>;
   getAllVolunteers(): Promise<Volunteer[]>;
   updateVolunteer(id: string, updates: Partial<InsertVolunteer>): Promise<Volunteer>;
+  updateVolunteerProfile(id: string, profileData: any): Promise<Volunteer>;
 
   // Availability management
   createAvailability(availability: InsertAvailability): Promise<Availability>;
@@ -58,6 +59,21 @@ export class MemStorage implements IStorage {
       email: "demo@volunteer.org",
       isDriver: true,
       isActive: true,
+      bio: null,
+      skills: [],
+      interests: [],
+      emergencyContact: null,
+      emergencyPhone: null,
+      dietaryRestrictions: null,
+      hasTransportation: false,
+      maxHoursPerWeek: null,
+      preferredShiftTypes: [],
+      notifications: {
+        email: true,
+        sms: false,
+        reminders: true,
+        newShifts: true
+      },
       createdAt: new Date()
     };
     this.volunteers.set(demoId, demoVolunteer);
@@ -134,6 +150,15 @@ export class MemStorage implements IStorage {
     if (!volunteer) throw new Error('Volunteer not found');
     
     const updated = { ...volunteer, ...updates };
+    this.volunteers.set(id, updated);
+    return updated;
+  }
+
+  async updateVolunteerProfile(id: string, profileData: any): Promise<Volunteer> {
+    const volunteer = this.volunteers.get(id);
+    if (!volunteer) throw new Error('Volunteer not found');
+    
+    const updated = { ...volunteer, ...profileData };
     this.volunteers.set(id, updated);
     return updated;
   }
