@@ -13,6 +13,9 @@ import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, Ca
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
+import ShiftCard from '@/components/ShiftCard';
+
+
 
 export default function VolunteerPortal() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -174,6 +177,78 @@ export default function VolunteerPortal() {
     enabled: !!currentVolunteer,
   }) as { data: any[] };
 
+  // Authenticated shift card with proper volunteer ID
+  const AuthenticatedShiftCard = ({ shift, volunteerId }: { shift: any; volunteerId: string }) => {
+    const signUpMutation = useMutation({
+      mutationFn: async (shiftId: string) => {
+        const response = await fetch('/api/assignments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            volunteerId: volunteerId,
+            shiftId: shiftId,
+            status: 'confirmed',
+            notes: `Signed up via volunteer portal - ${new Date().toLocaleDateString()}`
+          })
+        });
+        if (!response.ok) throw new Error('Failed to sign up');
+        return response.json();
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/assignments/volunteer', volunteerId] });
+        toast({
+          title: "Successfully Signed Up!",
+          description: "You've been registered for this volunteer shift.",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Sign Up Failed",
+          description: "There was an error signing up for this shift. Please try again.",
+          variant: "destructive",
+        });
+      },
+    });
+
+    const isFull = shift.status === "full";
+    
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h3 className="font-semibold text-lg">{shift.activityName}</h3>
+            <p className="text-sm text-gray-600">{shift.dateTime}</p>
+            <p className="text-sm text-gray-600">{shift.location}</p>
+          </div>
+          <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}>
+            {shift.status}
+          </Badge>
+        </div>
+        
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm text-gray-600">
+            {shift.volunteersSignedUp} / {shift.volunteersNeeded} volunteers
+          </span>
+          <div className="w-24 bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-blue-500 h-2 rounded-full" 
+              style={{ width: `${Math.min((shift.volunteersSignedUp / shift.volunteersNeeded) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
+        
+        <Button
+          className={`w-full ${isFull ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+          onClick={() => signUpMutation.mutate(shift.id)}
+          disabled={isFull || signUpMutation.isPending}
+        >
+          {isFull ? 'Full' : signUpMutation.isPending ? 'Signing Up...' : 'Sign Up for Shift'}
+        </Button>
+      </div>
+    );
+  };
+
   // If logged in, show the dashboard with tabs
   if (currentVolunteer) {
     return (
@@ -200,10 +275,14 @@ export default function VolunteerPortal() {
         </div>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4" />
               My Shifts
+            </TabsTrigger>
+            <TabsTrigger value="browse" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Browse Shifts
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
@@ -354,6 +433,31 @@ export default function VolunteerPortal() {
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="browse" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Available Volunteer Shifts
+                </CardTitle>
+                <CardDescription>
+                  Sign up for shifts that match your availability and skills
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  {shifts.map((shift: any) => (
+                    <AuthenticatedShiftCard 
+                      key={shift.id} 
+                      shift={shift} 
+                      volunteerId={currentVolunteer.id} 
+                    />
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
