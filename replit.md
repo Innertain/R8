@@ -112,29 +112,79 @@ Preferred communication style: Simple, everyday language.
 
 ## Airtable Setup Instructions
 
-To connect your volunteer shift data from Airtable:
+To connect your volunteer management system to Airtable:
 
-1. **Get your Airtable Personal Access Token:**
-   - Go to https://airtable.com/create/tokens
-   - Create a new token with access to your base
-   - Add the token to Replit Secrets as `AIRTABLE_TOKEN`
+### 1. Authentication Setup
+- **Get your Airtable Personal Access Token:**
+  - Go to https://airtable.com/create/tokens
+  - Create a new token with access to your base
+  - Add the token to Replit Secrets as `AIRTABLE_TOKEN`
 
-2. **Find your Base ID:**
-   - Open your Airtable base
-   - Go to Help > API documentation
-   - Your Base ID starts with "app" (e.g., appXXXXXXXXXXXXXX)
-   - Add this to Replit Secrets as `VITE_BASE_ID`
+- **Find your Base ID:**
+  - Open your Airtable base
+  - Go to Help > API documentation
+  - Your Base ID starts with "app" (e.g., appXXXXXXXXXXXXXX)
+  - Add this to Replit Secrets as `VITE_BASE_ID`
 
-3. **Required Airtable Table Structure:**
-   Your "Shifts" table should have these columns:
-   - `activityName` (Single line text)
-   - `dateTime` (Single line text)
-   - `location` (Single line text) 
-   - `volunteersNeeded` (Number)
-   - `volunteersSignedUp` (Number)
-   - `status` (Single select: active, urgent, remote, full)
-   - `category` (Single line text)
-   - `icon` (Single line text: utensils, users, book, gift, laptop, heart)
+### 2. Required Airtable Tables
+
+#### Table 1: "V Shifts" (Already Working)
+Your existing shifts table with these columns:
+- `activityName` (Single line text)
+- `dateTime` (Single line text)
+- `location` (Single line text) 
+- `volunteersNeeded` (Number)
+- `volunteersSignedUp` (Number)
+- `status` (Single select: active, urgent, remote, full)
+- `category` (Single line text)
+- `icon` (Single line text: utensils, users, book, gift, laptop, heart)
+
+#### Table 2: "Volunteers" (New Table to Add)
+Create this table with these exact field names:
+- `Name` (Single line text) - Required
+- `Phone` (Phone number) - Required, unique identifier
+- `Email` (Email) - Optional
+- `Is Driver` (Checkbox) - Whether volunteer can drive
+- `Is Active` (Checkbox) - Whether volunteer is currently active
+- `Airtable ID` (Formula: RECORD_ID()) - Auto-generated unique ID
+- `Created Date` (Created time) - Auto-populated
+
+#### Table 3: "Volunteer Availability" (New Table to Add)
+Create this table with these exact field names:
+- `Volunteer` (Link to Volunteers table) - Required
+- `Start Time` (Date with time) - Required
+- `End Time` (Date with time) - Required  
+- `Is Recurring` (Checkbox) - Whether this is a recurring availability
+- `Recurring Pattern` (Single select: Weekly, Bi-weekly, Monthly) - If recurring
+- `Notes` (Long text) - Optional volunteer notes
+- `Created Date` (Created time) - Auto-populated
+
+#### Table 4: "Shift Assignments" (New Table to Add)
+Create this table with these exact field names:
+- `Volunteer` (Link to Volunteers table) - Required
+- `Shift ID` (Single line text) - Links to V Shifts table record ID
+- `Shift Name` (Lookup from V Shifts via Shift ID) - Display only
+- `Status` (Single select: confirmed, pending, cancelled) - Required
+- `Assigned Date` (Created time) - Auto-populated
+- `Notes` (Long text) - Optional assignment notes
+
+### 3. Sample Data Setup
+
+#### Add Sample Volunteers:
+1. Demo Volunteer (Phone: 555-DEMO, Name: Demo User, Is Driver: Yes, Is Active: Yes)
+2. Add 2-3 more test volunteers with different phone numbers
+
+#### Add Sample Availability:
+1. Create availability slots for your demo volunteer
+2. Use current week dates with various time ranges
+3. Mix regular and recurring patterns
+
+### 4. Testing Your Setup
+After creating these tables:
+1. Use phone number "555-DEMO" to log into the volunteer portal
+2. Test shift signup functionality
+3. Check availability calendar management
+4. Verify data sync between app and Airtable
 
 The application will automatically fall back to sample data if Airtable credentials are not configured, ensuring the app works out of the box for development and testing.
 
