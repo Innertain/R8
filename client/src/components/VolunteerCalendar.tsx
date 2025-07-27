@@ -116,10 +116,14 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   // Convert availability data to calendar events
   const availabilityEvents: CalendarEvent[] = availability.map((avail: any) => ({
     id: `avail-${avail.id}`,
-    title: avail.isRecurring ? `Available (${avail.recurringPattern})` : 'Available',
+    title: '', // Remove text from calendar display
     start: new Date(avail.startTime),
     end: new Date(avail.endTime),
-    resource: { ...avail, type: 'availability' },
+    resource: { 
+      ...avail, 
+      type: 'availability',
+      displayTitle: avail.isRecurring ? `Available (${avail.recurringPattern})` : 'Available'
+    },
   }));
 
   // Convert shift assignments to calendar events (show all assignments with different styling)
@@ -223,16 +227,17 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       return {
         id: `shift-${assignment.id}`,
-        title: assignment.status === 'cancelled' 
-          ? `❌ ${shiftToUse.activityName} (Cancelled)` 
-          : `🎯 ${shiftToUse.activityName}`,
+        title: '', // Remove text from calendar display
         start: shiftDate,
         end: endDate,
         resource: { 
           ...assignment, 
           shift: shiftToUse, 
           type: 'shift',
-          status: assignment.status 
+          status: assignment.status,
+          displayTitle: assignment.status === 'cancelled' 
+            ? `${shiftToUse.activityName} (Cancelled)` 
+            : shiftToUse.activityName // Store title for tooltips/modals
         },
       };
     })
@@ -360,17 +365,18 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               timeslots={2}
               eventPropGetter={(event) => {
                 if (event.resource?.type === 'shift') {
-                  // Different colors based on shift status
+                  // Different colors based on shift status - clean solid colors
                   const status = event.resource.status;
                   if (status === 'cancelled') {
                     return {
                       style: {
                         backgroundColor: '#ef4444',
                         borderColor: '#dc2626',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        opacity: 0.7,
-                        textDecoration: 'line-through',
+                        border: '2px solid #dc2626',
+                        color: 'transparent', // Hide any text
+                        cursor: 'pointer',
+                        opacity: 0.8,
+                        borderRadius: '4px',
                       },
                     };
                   } else if (status === 'confirmed') {
@@ -378,8 +384,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                       style: {
                         backgroundColor: '#10b981',
                         borderColor: '#059669',
-                        color: 'white',
-                        fontWeight: 'bold',
+                        border: '2px solid #059669',
+                        color: 'transparent', // Hide any text
+                        cursor: 'pointer',
+                        borderRadius: '4px',
                       },
                     };
                   } else {
@@ -388,18 +396,23 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                       style: {
                         backgroundColor: '#f59e0b',
                         borderColor: '#d97706',
-                        color: 'white',
-                        fontWeight: 'bold',
+                        border: '2px solid #d97706',
+                        color: 'transparent', // Hide any text
+                        cursor: 'pointer',
+                        borderRadius: '4px',
                       },
                     };
                   }
                 } else {
-                  // Blue for availability
+                  // Blue for availability - clean solid colors
                   return {
                     style: {
                       backgroundColor: event.resource?.isRecurring ? '#3b82f6' : '#60a5fa',
                       borderColor: event.resource?.isRecurring ? '#2563eb' : '#3b82f6',
-                      color: 'white',
+                      border: event.resource?.isRecurring ? '2px solid #2563eb' : '2px solid #3b82f6',
+                      color: 'transparent', // Hide any text
+                      cursor: 'pointer',
+                      borderRadius: '4px',
                     },
                   };
                 }
@@ -581,7 +594,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                           ? 'text-red-900' 
                           : 'text-green-900'
                       }`}>
-                        {selectedEvent.resource.shift?.activityName || 'Shift'}
+                        {selectedEvent.resource.displayTitle || selectedEvent.resource.shift?.activityName || 'Shift'}
                       </h3>
                       <Badge className={
                         selectedEvent.resource.status === 'cancelled'
@@ -707,7 +720,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 <div className="space-y-4">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <h3 className="font-semibold text-blue-900 mb-3">
-                      {selectedEvent.title}
+                      {selectedEvent.resource.displayTitle || 'Available Time'}
                     </h3>
                     
                     <div className="space-y-2 text-sm">
