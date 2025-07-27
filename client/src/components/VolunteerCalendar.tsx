@@ -10,7 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Calendar as CalendarIcon, Clock, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Calendar as CalendarIcon, Clock, User, CheckCircle, XCircle, MapPin, ExternalLink, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -194,17 +196,13 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     setDialogOpen(true);
   }, []);
 
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showEventModal, setShowEventModal] = useState(false);
+
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
-    if (event.resource.type === 'availability') {
-      if (confirm('Do you want to remove this availability?')) {
-        deleteAvailabilityMutation.mutate(event.id.replace('avail-', ''));
-      }
-    } else if (event.resource.type === 'shift') {
-      // Show shift details or navigate to shift management
-      const shift = event.resource.shift;
-      alert(`Shift: ${shift.activityName}\nDate: ${shift.dateTime}\nLocation: ${shift.location}\nStatus: ${event.resource.status}\n\nTo cancel this shift, go to the "My Shifts" tab.`);
-    }
-  }, [deleteAvailabilityMutation]);
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  }, []);
 
   const handleSubmitAvailability = () => {
     if (!selectedSlot) return;
@@ -470,6 +468,175 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
           </div>
         </CardContent>
       </Card>
+
+      {/* Enhanced Event Details Modal */}
+      <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
+        <DialogContent className="max-w-md">
+          {selectedEvent && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  {selectedEvent.resource?.type === 'shift' ? (
+                    <>
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      Volunteer Shift
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="h-5 w-5 text-blue-600" />
+                      Availability
+                    </>
+                  )}
+                </DialogTitle>
+              </DialogHeader>
+
+              {selectedEvent.resource?.type === 'shift' ? (
+                // Shift Details Modal
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-green-900">
+                        {selectedEvent.resource.shift?.activityName || 'Shift'}
+                      </h3>
+                      <Badge className="bg-green-100 text-green-800 border-green-200">
+                        {selectedEvent.resource.status || 'Confirmed'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-green-600" />
+                        <span>{selectedEvent.resource.shift?.dateTime || selectedEvent.start.toLocaleString()}</span>
+                      </div>
+                      
+                      {selectedEvent.resource.shift?.location && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-green-600" />
+                          <span>{selectedEvent.resource.shift.location}</span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-green-600" />
+                        <span>
+                          {selectedEvent.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                          {selectedEvent.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </div>
+
+                    {selectedEvent.resource.notes && (
+                      <div className="mt-3 pt-3 border-t border-green-200">
+                        <p className="text-xs text-green-700">
+                          <strong>Notes:</strong> {selectedEvent.resource.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        const shift = selectedEvent.resource.shift;
+                        const startTime = new Date(selectedEvent.start);
+                        const endTime = new Date(selectedEvent.end);
+                        
+                        const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(shift?.activityName || 'Volunteer Shift')}&dates=${startTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(`Location: ${shift?.location || 'TBD'}\nStatus: ${selectedEvent.resource.status}\n\nManage this shift in your Volunteer Portal.`)}&location=${encodeURIComponent(shift?.location || '')}`;
+                        
+                        window.open(googleCalendarUrl, '_blank');
+                      }}
+                    >
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      Add to Calendar
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                      onClick={() => {
+                        setShowEventModal(false);
+                        // Navigate to My Shifts tab for cancellation
+                      }}
+                    >
+                      <XCircle className="h-3 w-3 mr-1" />
+                      Manage
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                // Availability Details Modal
+                <div className="space-y-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-blue-900 mb-3">
+                      {selectedEvent.title}
+                    </h3>
+                    
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-blue-600" />
+                        <span>{selectedEvent.start.toLocaleDateString()}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-blue-600" />
+                        <span>
+                          {selectedEvent.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                          {selectedEvent.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      
+                      {selectedEvent.resource?.isRecurring && (
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-blue-600" />
+                          <span>Recurring: {selectedEvent.resource.recurringPattern}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {selectedEvent.resource?.notes && (
+                      <div className="mt-3 pt-3 border-t border-blue-200">
+                        <p className="text-xs text-blue-700">
+                          <strong>Notes:</strong> {selectedEvent.resource.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => setShowEventModal(false)}
+                    >
+                      Close
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                      onClick={() => {
+                        if (confirm('Are you sure you want to remove this availability?')) {
+                          deleteAvailabilityMutation.mutate(selectedEvent.id.replace('avail-', ''));
+                          setShowEventModal(false);
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
