@@ -1,6 +1,9 @@
 import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { type AirtableShift } from "@/lib/api";
 
 interface ShiftCardProps {
@@ -71,10 +74,40 @@ export default function ShiftCard({ shift }: ShiftCardProps) {
   const { Icon, bgColor, iconColor } = getIconConfig(shift.icon, shift.status);
   const progressPercentage = (shift.volunteersSignedUp / shift.volunteersNeeded) * 100;
   const isFull = shift.status === "full";
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Create shift assignment mutation
+  const signUpMutation = useMutation({
+    mutationFn: async (shiftId: string) => {
+      // For now, we'll create a dummy volunteer ID - in real implementation this would come from authentication
+      const demoVolunteerId = "demo-volunteer-123";
+      const response = await apiRequest('POST', '/api/assignments', {
+        volunteerId: demoVolunteerId,
+        shiftId: shiftId,
+        status: 'confirmed'
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
+      toast({
+        title: "Successfully Signed Up!",
+        description: "You've been registered for this volunteer shift.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Sign Up Failed",
+        description: "There was an error signing up for this shift. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleSignUp = () => {
-    // TODO: Implement signup functionality
     console.log(`Signing up for shift: ${shift.id}`);
+    signUpMutation.mutate(shift.id);
   };
 
   return (
@@ -133,12 +166,17 @@ export default function ShiftCard({ shift }: ShiftCardProps) {
             : 'bg-blue-500 hover:bg-blue-600 text-white'
         }`}
         onClick={handleSignUp}
-        disabled={isFull}
+        disabled={isFull || signUpMutation.isPending}
       >
         {isFull ? (
           <>
             <Check className="w-4 h-4 mr-2" />
             Full
+          </>
+        ) : signUpMutation.isPending ? (
+          <>
+            <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            Signing Up...
           </>
         ) : (
           <>
