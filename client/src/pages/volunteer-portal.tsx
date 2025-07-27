@@ -171,10 +171,13 @@ export default function VolunteerPortal() {
     enabled: !!currentVolunteer,
   });
 
-  // Fetch shifts data to match with assignments
+  // Fetch shifts data to match with assignments - force fresh data from Airtable
   const { data: shifts = [] } = useQuery({
     queryKey: ['/api/shifts'],
+    queryFn: () => fetch('/api/shifts').then(res => res.json()),
     enabled: !!currentVolunteer,
+    staleTime: 0, // Always fetch fresh data
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   }) as { data: any[] };
 
   // Authenticated shift card with proper volunteer ID

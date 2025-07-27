@@ -7,7 +7,7 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ## Recent Changes (July 27, 2025)
 
 ✓ **Airtable Integration Complete**: Successfully connected to all production tables
-✓ **Real Data Access**: Connected Drivers (100 records), Volunteer Applications (67 records), V Availability (4 records), V Shift Assignment (4+ records), V Shifts (3 records)  
+✓ **Real Data Access**: Connected Drivers (100 records), Volunteer Applications (67 records), V Availability (4 records), V Shift Assignment (9+ records), V Shifts (6 records)  
 ✓ **Token Permissions Fixed**: Resolved authentication issues with proper scopes and base ID formatting
 ✓ **Table Schema Discovery**: Identified field structures for volunteer scheduling integration
 ✓ **Volunteer Availability Calendar System**: Built complete calendar interface using react-big-calendar
@@ -26,6 +26,9 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Route Configuration**: Fixed volunteer portal routing from /volunteer-portal to /volunteer
 ✓ **Browse Shifts Tab**: Added authenticated shift browsing with signup status indicators
 ✓ **Signup Status Tracking**: Visual indicators show when volunteers are already registered for shifts
+✓ **Assignment Creation Fixed**: Resolved Airtable field errors, assignments now sync successfully
+✓ **Shift Name Population**: Fixed shift name display in assignments and "My Shifts" dashboard
+✓ **Live Data Sync**: New shifts and activities added to Airtable automatically appear in volunteer portal
 
 ## User Preferences
 
