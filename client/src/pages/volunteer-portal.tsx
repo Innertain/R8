@@ -123,7 +123,7 @@ export default function VolunteerPortal() {
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="font-medium">{currentVolunteer.name}</p>
-              <p className="text-sm text-gray-500">{currentVolunteer.phoneNumber}</p>
+              <p className="text-sm text-gray-500">{currentVolunteer.phone || currentVolunteer.phoneNumber}</p>
               {currentVolunteer.isDriver && (
                 <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                   Driver
@@ -174,27 +174,45 @@ export default function VolunteerPortal() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
               />
-              <p className="text-xs text-gray-500">
-                For testing: Use <strong>555-DEMO</strong> to access the demo volunteer account
-              </p>
             </div>
+            
+            {/* Real data demo buttons */}
+            <div className="bg-blue-50 p-3 rounded-lg space-y-2">
+              <p className="text-sm text-blue-800 font-medium">Try with real data from your Airtable:</p>
+              <div className="flex flex-col gap-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setPhoneNumber("(562) 480-4473")}
+                  className="text-xs justify-start"
+                >
+                  📋 Volunteer: (562) 480-4473 - Muralidharan Vasudevan
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setPhoneNumber("(202) 246-7810")}
+                  className="text-xs justify-start"
+                >
+                  🚚 Driver: (202) 246-7810 - Grassroots Aid Partnership
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setPhoneNumber("555-DEMO")}
+                  className="text-xs justify-start"
+                >
+                  🎯 Demo: 555-DEMO - Test Account
+                </Button>
+              </div>
+            </div>
+            
             <Button 
               onClick={handleLogin} 
               disabled={loginMutation.isPending}
               className="w-full"
             >
               {loginMutation.isPending ? 'Checking...' : 'Access Portal'}
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => {
-                setPhoneNumber('555-DEMO');
-                loginMutation.mutate('555-DEMO');
-              }}
-              disabled={loginMutation.isPending}
-              className="w-full"
-            >
-              Quick Demo Access
             </Button>
           </CardContent>
         </Card>

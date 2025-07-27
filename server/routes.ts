@@ -259,13 +259,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/volunteers/phone/:phoneNumber", async (req, res) => {
     try {
-      const volunteer = await storage.getVolunteerByPhone(req.params.phoneNumber);
-      if (!volunteer) {
-        return res.status(404).json({ error: "Volunteer not found" });
+      const phone = req.params.phoneNumber;
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      
+      // Search in Volunteer Applications table first
+      const volunteerResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications?filterByFormula=SEARCH("${phone}",{Phone})`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      
+      if (volunteerResponse.ok) {
+        const volunteerData = await volunteerResponse.json();
+        
+        if (volunteerData.records.length > 0) {
+          const record = volunteerData.records[0];
+          const fields = record.fields;
+          
+          return res.json({
+            id: record.id,
+            name: `${fields['First Name'] || ''} ${fields['Last Name'] || ''}`.trim(),
+            phone: fields['Phone'] || phone,
+            email: fields['Email '] || fields['Email'] || '',
+            skills: fields['Skills'] || [],
+            isActive: true,
+            source: 'volunteer_applications'
+          });
+        }
       }
-      res.json(volunteer);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+      
+      // Also search in Drivers table
+      const driverResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Drivers?filterByFormula=SEARCH("${phone}",{Phone})`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      
+      if (driverResponse.ok) {
+        const driverData = await driverResponse.json();
+        
+        if (driverData.records.length > 0) {
+          const record = driverData.records[0];
+          const fields = record.fields;
+          
+          return res.json({
+            id: record.id,
+            name: `${fields['First Name'] || ''} ${fields['Last Name'] || ''}`.trim(),
+            phone: fields['Phone'] || phone,
+            email: fields['Email'] || '',
+            vehicleType: fields['Vehicle Type '] || [],
+            licenseType: fields['License Type '] || '',
+            availability: fields['Availability'] || '',
+            isDriver: true,
+            isActive: true,
+            source: 'drivers'
+          });
+        }
+      }
+      
+      // Fallback to storage (includes demo account)
+      const volunteer = await storage.getVolunteerByPhone(phone);
+      if (volunteer) {
+        return res.json(volunteer);
+      }
+      
+      res.status(404).json({ error: "Volunteer not found" });
+      
+    } catch (error: any) {
+      console.error('Error looking up volunteer:', error);
+      res.status(500).json({ error: error.message || 'Server error' });
     }
   });
 
@@ -291,10 +349,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/availability/:volunteerId", async (req, res) => {
     try {
-      const availability = await storage.getVolunteerAvailability(req.params.volunteerId);
+      const volunteerId = req.params.volunteerId;
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      
+      // Get real availability from Airtable
+      const availabilityResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Availability?filterByFormula=OR(SEARCH("${volunteerId}",ARRAYJOIN({Volunteer})),{Volunteer}="${volunteerId}")`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      
+      if (availabilityResponse.ok) {
+        const availabilityData = await availabilityResponse.json();
+        
+        if (availabilityData.records.length > 0) {
+          const availability = availabilityData.records.map((record: any) => ({
+            id: record.id,
+            volunteerId: volunteerId,
+            startTime: new Date(record.fields['Start time']),
+            endTime: new Date(record.fields['End Time']),
+            isRecurring: record.fields['Is Recurring'] || false,
+            recurringPattern: record.fields['Recurring Pattern '] || '',
+            notes: record.fields['Notes'] || '',
+            createdAt: new Date(record.fields['Created Date'])
+          }));
+          
+          return res.json(availability);
+        }
+      }
+      
+      // Fallback to storage for demo user
+      const availability = await storage.getVolunteerAvailability(volunteerId);
       res.json(availability);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: any) {
+      console.error('Error fetching availability:', error);
+      res.status(500).json({ error: error.message || 'Server error' });
     }
   });
 
