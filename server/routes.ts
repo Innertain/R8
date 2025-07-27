@@ -444,9 +444,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const assignmentPayload = {
           records: [{
             fields: {
+              'Name': `Shift Assignment - ${new Date().toLocaleDateString()}`,
               'Volunteer': [assignmentData.volunteerId], // Link to volunteer record
               'Shift ID': assignmentData.shiftId,
-              'Status': assignmentData.status || 'confirmed',
+              'Status ': 'confirmed ', // Use the exact option from Airtable (with trailing space)
+              'Assigned Date': new Date().toISOString(),
               'Notes': assignmentData.notes || ''
             }
           }]
@@ -493,22 +495,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const volunteerId = req.params.volunteerId;
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
       
-      // Get real assignments from Airtable first
-      const assignmentResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment?filterByFormula=OR(SEARCH("${volunteerId}",ARRAYJOIN({Volunteer})),{Volunteer}="${volunteerId}")`, {
+      // Get real assignments from Airtable first with simplified search
+      console.log(`Searching for assignments for volunteer: ${volunteerId}`);
+      const assignmentResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
       
       if (assignmentResponse.ok) {
         const assignmentData = await assignmentResponse.json();
+        console.log(`Found ${assignmentData.records.length} total assignments`);
         
-        if (assignmentData.records.length > 0) {
-          const assignments = assignmentData.records.map((record: any) => ({
+        // Filter assignments for this volunteer manually since formula search is complex
+        const volunteerAssignments = assignmentData.records.filter((record: any) => {
+          const volunteerField = record.fields['Volunteer'];
+          return volunteerField && volunteerField.includes(volunteerId);
+        });
+        
+        console.log(`Filtered to ${volunteerAssignments.length} assignments for this volunteer`);
+        
+        if (volunteerAssignments.length > 0) {
+          const assignments = volunteerAssignments.map((record: any) => ({
             id: record.id,
             volunteerId: volunteerId,
             shiftId: record.fields['Shift ID'] || '',
-            shiftName: record.fields['Shift Name'] || '',
-            status: record.fields['Status'] || 'confirmed',
-            assignedDate: new Date(record.createdTime),
+            shiftName: record.fields['Name (from Shift Name)']?.[0] || '',
+            status: record.fields['Status ']?.trim() || 'confirmed',
+            assignedDate: new Date(record.fields['Assigned Date'] || record.createdTime),
             notes: record.fields['Notes'] || ''
           }));
           
