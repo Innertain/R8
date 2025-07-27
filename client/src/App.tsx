@@ -9,6 +9,7 @@ import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
+import AirtableTest from "@/pages/airtable-test";
 
 function Navigation() {
   const [location] = useLocation();
@@ -100,6 +101,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/volunteer" component={VolunteerPortal} />
+        <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />
       </Switch>
     </div>

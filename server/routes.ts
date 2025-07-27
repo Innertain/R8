@@ -94,6 +94,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test endpoints for new Airtable tables
+  app.get('/api/test/drivers', async (req, res) => {
+    try {
+      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/Drivers`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        res.json({ success: true, records: data.records?.length || 0, data: data.records });
+      } else {
+        res.json({ success: false, status: response.status, error: await response.text() });
+      }
+    } catch (error) {
+      res.json({ success: false, error: error.message });
+    }
+  });
+
+  app.get('/api/test/volunteers', async (req, res) => {
+    try {
+      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/Volunteer%20Applications`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        res.json({ success: true, records: data.records?.length || 0, data: data.records });
+      } else {
+        res.json({ success: false, status: response.status, error: await response.text() });
+      }
+    } catch (error) {
+      res.json({ success: false, error: error.message });
+    }
+  });
+
+  app.get('/api/test/availability', async (req, res) => {
+    try {
+      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/V%20Availability`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        res.json({ success: true, records: data.records?.length || 0, data: data.records });
+      } else {
+        res.json({ success: false, status: response.status, error: await response.text() });
+      }
+    } catch (error) {
+      res.json({ success: false, error: error.message });
+    }
+  });
+
+  app.get('/api/test/assignments', async (req, res) => {
+    try {
+      const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/V%20Shift%20Assignment`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        res.json({ success: true, records: data.records?.length || 0, data: data.records });
+      } else {
+        res.json({ success: false, status: response.status, error: await response.text() });
+      }
+    } catch (error) {
+      res.json({ success: false, error: error.message });
+    }
+  });
+
   // Volunteer API routes
   app.post("/api/volunteers", async (req, res) => {
     try {
