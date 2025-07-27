@@ -183,6 +183,14 @@ export default function VolunteerPortal() {
                 <Button 
                   variant="outline" 
                   size="sm" 
+                  onClick={() => setPhoneNumber("(919) 434-0129")}
+                  className="text-xs justify-start"
+                >
+                  🎯 Your Account: (919) 434-0129 - Alex Mengel
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   onClick={() => setPhoneNumber("(562) 480-4473")}
                   className="text-xs justify-start"
                 >
@@ -205,6 +213,7 @@ export default function VolunteerPortal() {
                   🎯 Demo: 555-DEMO - Test Account
                 </Button>
               </div>
+              <p className="text-xs text-gray-600">You can also type just the digits: 9194340129</p>
             </div>
             
             <Button 

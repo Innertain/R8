@@ -262,13 +262,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const phone = req.params.phoneNumber;
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
       
+      // Helper function to normalize phone numbers for comparison
+      const normalizePhone = (phoneStr: string) => phoneStr.replace(/\D/g, '');
+      const normalizedSearchPhone = normalizePhone(phone);
+      
+      console.log(`Searching for phone: "${phone}" (normalized: "${normalizedSearchPhone}")`);
+      
+      // Create flexible search formula that handles different phone formats
+      const phoneSearchFormula = `OR(
+        SEARCH("${phone}",{Phone}),
+        SEARCH("${normalizedSearchPhone}",REGEX_REPLACE({Phone},"[^0-9]","","g")),
+        {Phone}="${phone}",
+        REGEX_REPLACE({Phone},"[^0-9]","","g")="${normalizedSearchPhone}",
+        FIND("${normalizedSearchPhone}",REGEX_REPLACE({Phone},"[^0-9]","","g"))>0
+      )`;
+      
       // Search in Volunteer Applications table first
-      const volunteerResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications?filterByFormula=SEARCH("${phone}",{Phone})`, {
+      const volunteerResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications?filterByFormula=${encodeURIComponent(phoneSearchFormula)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
       
+      console.log('Volunteer Applications search status:', volunteerResponse.status);
+      
       if (volunteerResponse.ok) {
         const volunteerData = await volunteerResponse.json();
+        console.log(`Found ${volunteerData.records.length} volunteer records`);
         
         if (volunteerData.records.length > 0) {
           const record = volunteerData.records[0];
@@ -286,13 +304,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Also search in Drivers table
-      const driverResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Drivers?filterByFormula=SEARCH("${phone}",{Phone})`, {
+      // Also search in Drivers table with same flexible formula
+      const driverResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Drivers?filterByFormula=${encodeURIComponent(phoneSearchFormula)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
       
+      console.log('Drivers search status:', driverResponse.status);
+      
       if (driverResponse.ok) {
         const driverData = await driverResponse.json();
+        console.log(`Found ${driverData.records.length} driver records`);
         
         if (driverData.records.length > 0) {
           const record = driverData.records[0];
