@@ -211,6 +211,10 @@ export default function VolunteerPortal() {
       },
     });
 
+    // Check if user is already signed up for this shift
+    const isSignedUp = assignments?.some((assignment: any) => 
+      assignment.shiftId === shift.id && assignment.status !== 'cancelled'
+    );
     const isFull = shift.status === "full";
     
     return (
@@ -221,9 +225,17 @@ export default function VolunteerPortal() {
             <p className="text-sm text-gray-600">{shift.dateTime}</p>
             <p className="text-sm text-gray-600">{shift.location}</p>
           </div>
-          <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}>
-            {shift.status}
-          </Badge>
+          <div className="flex flex-col items-end gap-1">
+            <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}>
+              {shift.status}
+            </Badge>
+            {isSignedUp && (
+              <Badge className="bg-blue-100 text-blue-800 text-xs">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                Signed Up
+              </Badge>
+            )}
+          </div>
         </div>
         
         <div className="flex items-center justify-between mb-3">
@@ -239,11 +251,28 @@ export default function VolunteerPortal() {
         </div>
         
         <Button
-          className={`w-full ${isFull ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
-          onClick={() => signUpMutation.mutate(shift.id)}
-          disabled={isFull || signUpMutation.isPending}
+          className={`w-full ${
+            isSignedUp 
+              ? 'bg-green-500 hover:bg-green-600 text-white' 
+              : isFull 
+                ? 'bg-gray-400 text-white' 
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+          }`}
+          onClick={() => !isSignedUp && signUpMutation.mutate(shift.id)}
+          disabled={isFull || signUpMutation.isPending || isSignedUp}
         >
-          {isFull ? 'Full' : signUpMutation.isPending ? 'Signing Up...' : 'Sign Up for Shift'}
+          {isSignedUp ? (
+            <>
+              <CheckCircle className="w-4 h-4 mr-2" />
+              You're Signed Up
+            </>
+          ) : isFull ? (
+            'Full'
+          ) : signUpMutation.isPending ? (
+            'Signing Up...'
+          ) : (
+            'Sign Up for Shift'
+          )}
         </Button>
       </div>
     );

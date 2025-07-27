@@ -24,6 +24,8 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Google Calendar Integration**: Add to Calendar button generates Google Calendar events with shift details
 ✓ **Authentication Required**: Home page shows read-only shifts, signup requires login through volunteer portal
 ✓ **Route Configuration**: Fixed volunteer portal routing from /volunteer-portal to /volunteer
+✓ **Browse Shifts Tab**: Added authenticated shift browsing with signup status indicators
+✓ **Signup Status Tracking**: Visual indicators show when volunteers are already registered for shifts
 
 ## User Preferences
 
