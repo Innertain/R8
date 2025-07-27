@@ -766,18 +766,35 @@ export default function VolunteerPortal() {
 
     const signUpMutation = useMutation({
       mutationFn: async (shiftId: string) => {
-        const response = await fetch('/api/assignments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            volunteerId: volunteerId,
-            shiftId: shiftId,
-            status: 'confirmed',
-            notes: `Signed up via volunteer portal - ${new Date().toLocaleDateString()}`
-          })
-        });
-        if (!response.ok) throw new Error('Failed to sign up');
-        return response.json();
+        // If assignment exists and is cancelled, update it instead of creating new one
+        if (existingAssignment && existingAssignment.status === 'cancelled') {
+          const response = await fetch(`/api/assignments/${existingAssignment.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              status: 'confirmed',
+              notes: `Re-signed up via volunteer portal - ${new Date().toLocaleDateString()}`
+            })
+          });
+          if (!response.ok) throw new Error('Failed to re-sign up');
+          return response.json();
+        } else if (!existingAssignment) {
+          // Create new assignment only if none exists
+          const response = await fetch('/api/assignments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              volunteerId: volunteerId,
+              shiftId: shiftId,
+              status: 'confirmed',
+              notes: `Signed up via volunteer portal - ${new Date().toLocaleDateString()}`
+            })
+          });
+          if (!response.ok) throw new Error('Failed to sign up');
+          return response.json();
+        } else {
+          throw new Error('Already signed up for this shift');
+        }
       },
       onSuccess: () => {
         // Invalidate all related queries to refresh the UI
@@ -798,10 +815,44 @@ export default function VolunteerPortal() {
       },
     });
 
+    const cancelMutation = useMutation({
+      mutationFn: async () => {
+        const response = await fetch(`/api/assignments/${existingAssignment.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'cancelled',
+            notes: `Cancelled via volunteer portal - ${new Date().toLocaleDateString()}`
+          })
+        });
+        if (!response.ok) throw new Error('Failed to cancel');
+        return response.json();
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/assignments/volunteer', volunteerId] });
+        queryClient.invalidateQueries({ queryKey: ['/api/availability', volunteerId] });
+        toast({
+          title: "Assignment Cancelled",
+          description: "You've been removed from this volunteer shift.",
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Cancel Failed",
+          description: "There was an error cancelling this shift. Please try again.",
+          variant: "destructive",
+        });
+      },
+    });
+
     // Check if user is already signed up for this shift using component's own assignments data
-    const isSignedUp = assignments?.some((assignment: any) => 
-      assignment.shiftId === shift.id && assignment.status !== 'cancelled'
+    const existingAssignment = assignments?.find((assignment: any) => 
+      String(assignment.shiftId).trim() === String(shift.id).trim()
     );
+    
+    const isSignedUp = existingAssignment && existingAssignment.status !== 'cancelled';
+    const isCancelled = existingAssignment && existingAssignment.status === 'cancelled';
     const isFull = shift.status === "full";
     
     return (
@@ -837,30 +888,62 @@ export default function VolunteerPortal() {
           </div>
         </div>
         
-        <Button
-          className={`w-full ${
-            isSignedUp 
-              ? 'bg-green-500 hover:bg-green-600 text-white' 
-              : isFull 
-                ? 'bg-gray-400 text-white' 
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-          }`}
-          onClick={() => !isSignedUp && signUpMutation.mutate(shift.id)}
-          disabled={isFull || signUpMutation.isPending || isSignedUp}
-        >
+        <div className="space-y-2">
           {isSignedUp ? (
-            <>
-              <CheckCircle className="w-4 h-4 mr-2" />
-              You're Signed Up
-            </>
-          ) : isFull ? (
-            'Full'
-          ) : signUpMutation.isPending ? (
-            'Signing Up...'
+            <div className="space-y-2">
+              <Button
+                className="w-full bg-green-500 hover:bg-green-600 text-white"
+                disabled
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                You're Signed Up
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full border-red-200 text-red-600 hover:bg-red-50"
+                onClick={() => cancelMutation.mutate()}
+                disabled={cancelMutation.isPending}
+              >
+                {cancelMutation.isPending ? (
+                  <>
+                    <Clock className="w-4 h-4 mr-2 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Cancel Assignment
+                  </>
+                )}
+              </Button>
+            </div>
           ) : (
-            'Sign Up for Shift'
+            <Button
+              className={`w-full ${
+                isFull 
+                  ? 'bg-gray-400 text-white' 
+                  : isCancelled
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+              onClick={() => signUpMutation.mutate(shift.id)}
+              disabled={isFull || signUpMutation.isPending}
+            >
+              {isFull ? (
+                'Full'
+              ) : signUpMutation.isPending ? (
+                <>
+                  <Clock className="w-4 h-4 mr-2 animate-spin" />
+                  {isCancelled ? 'Re-signing Up...' : 'Signing Up...'}
+                </>
+              ) : isCancelled ? (
+                'Sign Up Again'
+              ) : (
+                'Sign Up for Shift'
+              )}
+            </Button>
           )}
-        </Button>
+        </div>
       </div>
     );
   };

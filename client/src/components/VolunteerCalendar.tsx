@@ -127,8 +127,11 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
       // Find the corresponding shift details
       console.log(`Looking for shiftId: ${assignment.shiftId} in ${shifts.length} shifts`);
       const shift = shifts.find((s: any) => {
-        const matches = s.id === assignment.shiftId;
-        console.log(`Comparing shift ${s.id} with assignment ${assignment.shiftId}: ${matches}`);
+        // Convert both to strings and trim to ensure clean comparison
+        const shiftId = String(s.id).trim();
+        const assignmentShiftId = String(assignment.shiftId).trim();
+        const matches = shiftId === assignmentShiftId;
+        console.log(`Comparing shift "${shiftId}" with assignment "${assignmentShiftId}": ${matches}`);
         return matches;
       });
       

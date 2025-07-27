@@ -506,6 +506,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update assignment (for cancellation or re-activation)
+  app.put("/api/assignments/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+      const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      
+      if (!AIRTABLE_TOKEN || !BASE_ID) {
+        return res.status(500).json({ error: 'Missing Airtable credentials' });
+      }
+
+      const response = await fetch(`https://api.airtable.com/v0/${BASE_ID}/V%20Shift%20Assignment/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fields: {
+            Status: updateData.status,
+            Notes: updateData.notes,
+            'Assigned Date': new Date().toISOString()
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Airtable update error:', errorText);
+        return res.status(response.status).json({ error: errorText });
+      }
+
+      const result = await response.json();
+      const assignment = {
+        id: result.id,
+        volunteerId: result.fields.Volunteer?.[0],
+        shiftId: result.fields['Shift ID']?.[0],
+        status: result.fields.Status || updateData.status,
+        assignedDate: new Date(result.createdTime),
+        notes: result.fields.Notes
+      };
+
+      console.log(`✅ Assignment ${id} updated to status: ${updateData.status}`);
+      res.json(assignment);
+    } catch (error) {
+      console.error('Error updating assignment:', error);
+      res.status(500).json({ error: 'Failed to update assignment' });
+    }
+  });
+
   app.get("/api/assignments/volunteer/:volunteerId", async (req, res) => {
     try {
       const volunteerId = req.params.volunteerId;
