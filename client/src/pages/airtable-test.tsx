@@ -108,9 +108,14 @@ export default function AirtableTest() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="bg-white rounded-lg border p-6">
         <h2 className="text-xl font-semibold mb-4">Airtable Schema Test</h2>
-        <Button onClick={runAllTests} disabled={loading}>
-          {loading ? 'Testing...' : 'Test All Airtable Tables'}
-        </Button>
+        <div className="space-y-3">
+          <Button onClick={runAllTests} disabled={loading}>
+            {loading ? 'Testing...' : 'Test All Airtable Tables'}
+          </Button>
+          <div className="text-sm text-gray-600">
+            <p><strong>Important:</strong> Make sure you've updated your AIRTABLE_TOKEN in Replit Secrets with your new token that has permissions to all tables.</p>
+          </div>
+        </div>
       </div>
 
       {results.map((result, index) => (

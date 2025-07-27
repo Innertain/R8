@@ -94,20 +94,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all table metadata
+  // Get all table metadata with debugging
   app.get('/api/test/tables', async (req, res) => {
     try {
+      console.log('Testing token access to metadata endpoint...');
+      console.log('Token exists:', !!process.env.AIRTABLE_TOKEN);
+      console.log('Token starts with:', process.env.AIRTABLE_TOKEN?.substring(0, 8) + '...');
+      
       const metaResponse = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.VITE_BASE_ID}/tables`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
+      
+      console.log('Metadata response status:', metaResponse.status);
       
       if (metaResponse.ok) {
         const metaData = await metaResponse.json();
         res.json({ success: true, tables: metaData.tables });
       } else {
-        res.json({ success: false, error: await metaResponse.text() });
+        const errorText = await metaResponse.text();
+        console.log('Metadata error:', errorText);
+        res.json({ success: false, status: metaResponse.status, error: errorText });
       }
     } catch (error) {
+      console.log('Metadata exception:', error.message);
       res.json({ success: false, error: error.message });
     }
   });
@@ -189,21 +198,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: false, error: "No assignments table found with any expected name" });
   });
 
-  // Direct table test endpoint
+  // Direct table test endpoint with debugging
   app.get('/api/test/direct/:tableName', async (req, res) => {
     try {
       const tableName = decodeURIComponent(req.params.tableName);
+      console.log(`Testing direct access to table: "${tableName}"`);
+      
       const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
       
+      console.log(`Response for "${tableName}":`, response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log(`✓ Success for "${tableName}": ${data.records?.length || 0} records`);
         res.json({ success: true, tableName, records: data.records?.length || 0, data: data.records });
       } else {
-        res.json({ success: false, status: response.status, error: await response.text() });
+        const errorText = await response.text();
+        console.log(`✗ Failed for "${tableName}":`, errorText);
+        res.json({ success: false, status: response.status, error: errorText });
       }
     } catch (error) {
+      console.log(`Exception for "${tableName}":`, error.message);
       res.json({ success: false, error: error.message });
     }
   });
