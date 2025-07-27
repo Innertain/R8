@@ -447,7 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               'Name': `Shift Assignment - ${new Date().toLocaleDateString()}`,
               'Volunteer': [assignmentData.volunteerId], // Link to volunteer record
               'Shift ID': assignmentData.shiftId,
-              'Status ': 'confirmed ', // Use the exact option from Airtable (with trailing space)
+              'Status ': 'confirmed', // Use the exact option from Airtable
               'Assigned Date': new Date().toISOString(),
               'Notes': assignmentData.notes || ''
             }
@@ -508,7 +508,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Filter assignments for this volunteer manually since formula search is complex
         const volunteerAssignments = assignmentData.records.filter((record: any) => {
           const volunteerField = record.fields['Volunteer'];
-          return volunteerField && volunteerField.includes(volunteerId);
+          console.log(`Record ${record.id}: volunteer field =`, volunteerField, 'target:', volunteerId);
+          return volunteerField && Array.isArray(volunteerField) && volunteerField.includes(volunteerId);
         });
         
         console.log(`Filtered to ${volunteerAssignments.length} assignments for this volunteer`);

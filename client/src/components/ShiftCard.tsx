@@ -8,6 +8,7 @@ import { type AirtableShift } from "@/lib/api";
 
 interface ShiftCardProps {
   shift: AirtableShift;
+  showSignup?: boolean;
 }
 
 const iconMap = {
@@ -69,7 +70,7 @@ const getIconConfig = (icon: string, status: string) => {
   }
 };
 
-export default function ShiftCard({ shift }: ShiftCardProps) {
+export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) {
   const statusConfig = getStatusConfig(shift.status);
   const { Icon, bgColor, iconColor } = getIconConfig(shift.icon, shift.status);
   const progressPercentage = (shift.volunteersSignedUp / shift.volunteersNeeded) * 100;
@@ -159,32 +160,47 @@ export default function ShiftCard({ shift }: ShiftCardProps) {
       </div>
 
       {/* Action Button */}
-      <Button 
-        className={`w-full font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center ${
-          isFull 
-            ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
-            : 'bg-blue-500 hover:bg-blue-600 text-white'
-        }`}
-        onClick={handleSignUp}
-        disabled={isFull || signUpMutation.isPending}
-      >
-        {isFull ? (
-          <>
-            <Check className="w-4 h-4 mr-2" />
-            Full
-          </>
-        ) : signUpMutation.isPending ? (
-          <>
-            <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            Signing Up...
-          </>
-        ) : (
-          <>
-            <Plus className="w-4 h-4 mr-2" />
-            Sign Up
-          </>
-        )}
-      </Button>
+      {showSignup ? (
+        <Button 
+          className={`w-full font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center ${
+            isFull 
+              ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
+              : 'bg-blue-500 hover:bg-blue-600 text-white'
+          }`}
+          onClick={handleSignUp}
+          disabled={isFull || signUpMutation.isPending}
+        >
+          {isFull ? (
+            <>
+              <Check className="w-4 h-4 mr-2" />
+              Full
+            </>
+          ) : signUpMutation.isPending ? (
+            <>
+              <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Signing Up...
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4 mr-2" />
+              Sign Up
+            </>
+          )}
+        </Button>
+      ) : (
+        <div className="text-center py-2">
+          <p className="text-sm text-gray-600 mb-2">
+            {isFull ? "This shift is full" : "Login to volunteer portal to sign up"}
+          </p>
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => window.location.href = '/volunteer-portal'}
+          >
+            Go to Volunteer Portal
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

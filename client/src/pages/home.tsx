@@ -99,7 +99,7 @@ export default function Home() {
         ) : filteredShifts.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredShifts.map((shift) => (
-              <ShiftCard key={shift.id} shift={shift} />
+              <ShiftCard key={shift.id} shift={shift} showSignup={false} />
             ))}
           </div>
         ) : (
