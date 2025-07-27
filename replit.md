@@ -39,6 +39,7 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Airtable Profile Persistence**: Profile updates can sync back to Airtable fields when available (Bio, Emergency contacts, etc.)
 ✓ **Mobile-Optimized Tab Navigation**: Icon-based tabs with responsive design - vertical layout on mobile, horizontal on desktop
 ✓ **Enhanced Tab Interactions**: Added smooth hover effects with scale animation and color transitions for better UX
+✓ **PII Protection**: Removed all personally identifiable information from login page - only demo account shown publicly
 
 ## User Preferences
 

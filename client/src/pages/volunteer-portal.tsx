@@ -1012,44 +1012,20 @@ export default function VolunteerPortal() {
               />
             </div>
             
-            {/* Real data demo buttons */}
+            {/* Demo account only */}
             <div className="bg-blue-50 p-3 rounded-lg space-y-2">
-              <p className="text-sm text-blue-800 font-medium">Try with real data from your Airtable:</p>
-              <div className="flex flex-col gap-1">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setPhoneNumber("(919) 434-0129")}
-                  className="text-xs justify-start"
-                >
-                  🎯 Your Account: (919) 434-0129 - Alex Mengel
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setPhoneNumber("(562) 480-4473")}
-                  className="text-xs justify-start"
-                >
-                  📋 Volunteer: (562) 480-4473 - Muralidharan Vasudevan
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setPhoneNumber("(202) 246-7810")}
-                  className="text-xs justify-start"
-                >
-                  🚚 Driver: (202) 246-7810 - Grassroots Aid Partnership
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setPhoneNumber("555-DEMO")}
-                  className="text-xs justify-start"
-                >
-                  🎯 Demo: 555-DEMO - Test Account
-                </Button>
-              </div>
-              <p className="text-xs text-gray-600">You can also type just the digits: 9194340129</p>
+              <p className="text-sm text-blue-800 font-medium">Demo Account Available:</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setPhoneNumber("555-DEMO")}
+                className="text-xs justify-start"
+              >
+                🎭 Demo: 555-DEMO - Test Account
+              </Button>
+              <p className="text-xs text-blue-600 mt-2">
+                Use the demo account to explore volunteer portal features
+              </p>
             </div>
             
             <Button 
