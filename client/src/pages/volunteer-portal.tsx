@@ -793,18 +793,27 @@ export default function VolunteerPortal() {
           if (!response.ok) throw new Error('Failed to sign up');
           return response.json();
         } else {
-          throw new Error('Already signed up for this shift');
+          // User is already signed up - don't throw error, just return success
+          return { message: 'Already signed up', existingAssignment };
         }
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         // Invalidate all related queries to refresh the UI
         queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
         queryClient.invalidateQueries({ queryKey: ['/api/assignments/volunteer', volunteerId] });
         queryClient.invalidateQueries({ queryKey: ['/api/availability', volunteerId] }); // Refresh calendar
-        toast({
-          title: "Successfully Signed Up!",
-          description: "You've been registered for this volunteer shift.",
-        });
+        
+        if (data.message === 'Already signed up') {
+          toast({
+            title: "Already Registered",
+            description: "You're already signed up for this shift. Check the 'My Shifts' tab to manage it.",
+          });
+        } else {
+          toast({
+            title: "Successfully Signed Up!",
+            description: "You've been registered for this volunteer shift.",
+          });
+        }
       },
       onError: (error) => {
         toast({
@@ -891,57 +900,96 @@ export default function VolunteerPortal() {
         <div className="space-y-2">
           {isSignedUp ? (
             <div className="space-y-2">
-              <Button
-                className="w-full bg-green-500 hover:bg-green-600 text-white"
-                disabled
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                You're Signed Up
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full border-red-200 text-red-600 hover:bg-red-50"
-                onClick={() => cancelMutation.mutate()}
-                disabled={cancelMutation.isPending}
-              >
-                {cancelMutation.isPending ? (
-                  <>
-                    <Clock className="w-4 h-4 mr-2 animate-spin" />
-                    Cancelling...
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Cancel Assignment
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                  <div>
+                    <p className="text-sm font-medium text-green-800">You're Registered</p>
+                    <p className="text-xs text-green-600">Status: {existingAssignment?.status || 'Confirmed'}</p>
+                  </div>
+                </div>
+                <Badge className="bg-green-100 text-green-800 border-green-200">
+                  Confirmed
+                </Badge>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                  onClick={() => cancelMutation.mutate()}
+                  disabled={cancelMutation.isPending}
+                >
+                  {cancelMutation.isPending ? (
+                    <>
+                      <Clock className="w-3 h-3 mr-1 animate-spin" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-3 h-3 mr-1" />
+                      Cancel
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
+                  onClick={() => {
+                    // Navigate to My Shifts tab - assuming there's a way to trigger tab change
+                    toast({
+                      title: "View in My Shifts",
+                      description: "Check the 'My Shifts' tab to see all your registered shifts.",
+                    });
+                  }}
+                >
+                  <Calendar className="w-3 h-3 mr-1" />
+                  My Shifts
+                </Button>
+              </div>
             </div>
           ) : (
             <Button
               className={`w-full ${
                 isFull 
-                  ? 'bg-gray-400 text-white' 
+                  ? 'bg-gray-400 text-white cursor-not-allowed' 
                   : isCancelled
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
                     : 'bg-blue-500 hover:bg-blue-600 text-white'
               }`}
               onClick={() => signUpMutation.mutate(shift.id)}
               disabled={isFull || signUpMutation.isPending}
             >
               {isFull ? (
-                'Full'
+                <>
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Shift Full
+                </>
               ) : signUpMutation.isPending ? (
                 <>
                   <Clock className="w-4 h-4 mr-2 animate-spin" />
-                  {isCancelled ? 'Re-signing Up...' : 'Signing Up...'}
+                  {isCancelled ? 'Re-registering...' : 'Registering...'}
                 </>
               ) : isCancelled ? (
-                'Sign Up Again'
+                <>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Register Again
+                </>
               ) : (
-                'Sign Up for Shift'
+                <>
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Register for Shift
+                </>
               )}
             </Button>
+          )}
+          
+          {isCancelled && !isSignedUp && (
+            <div className="flex items-center justify-center p-2 bg-orange-50 border border-orange-200 rounded-lg">
+              <Pause className="w-4 h-4 text-orange-600 mr-2" />
+              <p className="text-xs text-orange-700">Previously cancelled - you can register again</p>
+            </div>
           )}
         </div>
       </div>
