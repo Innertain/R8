@@ -20,7 +20,6 @@
 }
 
 .btn-hover-effect:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
@@ -33,7 +32,6 @@
 }
 
 .card-hover-effect:hover {
-  transform: translateY(-4px);
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
   border-color: #2563eb;
   border-width: 2px;
@@ -42,12 +40,10 @@
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
   .card-hover-effect:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
   
   .btn-hover-effect:hover {
-    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   .shift-card-content .flex.gap-2 {
