@@ -959,7 +959,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       {/* Add Availability Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md mx-4 max-h-[90vh] overflow-y-auto sm:mx-auto fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -1066,7 +1066,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       {/* Enhanced Event Details Modal */}
       <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto mx-4"  onClick={(e) => e.stopPropagation()}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"  onClick={(e) => e.stopPropagation()}>
           {selectedEvent && (
             <>
               <DialogHeader>

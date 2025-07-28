@@ -142,6 +142,20 @@
   }
 }
 
+/* Mobile Dialog Centering */
+@media (max-width: 768px) {
+  [data-radix-dialog-content] {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 28rem !important;
+    max-height: 90vh !important;
+  }
+}
+
 /* React Big Calendar CSS Overrides */
 .rbc-calendar {
   background-color: white;
