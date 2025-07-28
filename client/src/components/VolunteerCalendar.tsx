@@ -620,7 +620,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               resizable
               views={['month', 'week', 'day']}
               defaultView="week"
-              step={30}
+              step={60}
               timeslots={1}
               showAllEvents={true}
               culture="en-US"
@@ -629,8 +629,8 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               showMultiDayTimes={true}
               popup={false}
               longPressThreshold={100}
-              min={new Date(2025, 0, 1, 0, 0, 0)}
-              max={new Date(2025, 0, 1, 23, 59, 59)}
+              min={new Date(2025, 0, 1, 6, 0, 0)}
+              max={new Date(2025, 0, 2, 5, 59, 59)}
               eventPropGetter={(event: any) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
@@ -695,10 +695,11 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                   const hour = date.getHours();
                   const minutes = date.getMinutes();
                   
-                  // Show every 30 minutes for better granularity
-                  if (minutes !== 0 && minutes !== 30) return '';
+                  // Show only on the hour
+                  if (minutes !== 0) return '';
                   
-                  // 24-hour format
+                  // For 24-hour display with 6 AM offset
+                  const displayHour = hour < 6 ? hour + 24 : hour;
                   const militaryTime = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
                   
                   // 12-hour format
