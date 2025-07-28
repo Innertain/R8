@@ -980,11 +980,11 @@ export default function VolunteerPortal() {
           </div>
         </div>
         
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-4">
           <span className="text-sm text-gray-600">
             {shift.volunteersSignedUp} / {shift.volunteersNeeded} volunteers
           </span>
-          <div className="w-24 bg-gray-200 rounded-full h-2">
+          <div className="w-20 bg-gray-200 rounded-full h-2 flex-shrink-0">
             <div 
               className="bg-blue-500 h-2 rounded-full" 
               style={{ width: `${Math.min((shift.volunteersSignedUp / shift.volunteersNeeded) * 100, 100)}%` }}
@@ -996,14 +996,14 @@ export default function VolunteerPortal() {
           {isSignedUp ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-                  <div>
-                    <p className="text-sm font-medium text-green-800">You're Registered</p>
-                    <p className="text-xs text-green-600">Status: {existingAssignment?.status || 'Confirmed'}</p>
+                <div className="flex items-center min-w-0 flex-1">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-green-800 truncate">You're Registered</p>
+                    <p className="text-xs text-green-600">Status: {existingAssignment?.status || 'confirmed'}</p>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-900 border border-green-300">
+                <Badge className="bg-green-100 text-green-900 border border-green-300 text-xs ml-2 flex-shrink-0">
                   Confirmed
                 </Badge>
               </div>
@@ -1011,7 +1011,7 @@ export default function VolunteerPortal() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                  className="flex-1 border-red-200 text-red-600 hover:bg-red-50 text-xs"
                   onClick={() => cancelMutation.mutate()}
                   disabled={cancelMutation.isPending}
                 >
@@ -1030,7 +1030,7 @@ export default function VolunteerPortal() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
+                  className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 text-xs"
                   onClick={() => {
                     // Trigger the dashboard tab (My Shifts) programmatically
                     const dashboardTab = document.querySelector('[data-state="inactive"][value="dashboard"]') as HTMLElement;
