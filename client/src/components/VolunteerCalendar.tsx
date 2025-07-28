@@ -175,8 +175,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     },
   }));
 
-  // Convert shift assignments to calendar events (show all assignments with different styling)
+  // Convert shift assignments to calendar events (exclude cancelled shifts)
   const shiftEvents: CalendarEvent[] = assignments
+    .filter((assignment: any) => assignment.status !== 'cancelled')
     .map((assignment: any) => {
       // Find the corresponding shift details
       console.log(`Looking for shiftId: ${assignment.shiftId} in ${shifts.length} shifts`);
@@ -665,7 +666,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded"></div>
-              <span>Recurring availability: {events.filter(e => e.resource?.isRecurring).length}</span>
+              <span>Assigned shifts: {events.filter(e => e.resource?.type === 'shift').length}</span>
             </div>
             <div className="flex items-center gap-2">
               <User className="h-4 w-4" />
