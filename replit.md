@@ -51,6 +51,8 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Enhanced Error Handling**: Improved frontend error messages for duplicate signups with clear user guidance to "My Shifts" tab
 ✓ **Calendar Event Hover Effects**: Added smooth hover highlighting for calendar events with scale animation, brightness effects, and colored shadows for better visual feedback
 ✓ **Calendar Hover Tooltips**: Implemented detailed tooltips that appear on calendar event hover showing shift names, locations, times, status badges, and notes with professional styling
+✓ **Evening Availability Workaround**: Added manual "Add Evening Hours (8-11 PM)" button to bypass React Big Calendar limitations with late evening time slot selection
+✓ **Calendar Time Range Fixed**: Restored full day calendar view (6 AM - 11:59 PM) with proper 30-minute time slots for better usability
 
 ## User Preferences
 

@@ -586,6 +586,27 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               <span>Cancelled Shifts</span>
             </div>
           </div>
+          
+          {/* Manual Evening Hours Button */}
+          <div className="mb-4">
+            <Button 
+              variant="outline"
+              onClick={() => {
+                // Set evening availability (8 PM - 11 PM)
+                const start = new Date();
+                start.setHours(20, 0, 0, 0); // 8 PM
+                const end = new Date(start);
+                end.setHours(23, 0, 0, 0); // 11 PM
+                setSelectedSlot({ start, end });
+                setDialogOpen(true);
+              }}
+              className="w-full sm:w-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Evening Hours (8-11 PM)
+            </Button>
+          </div>
+          
           <div className="h-[800px] md:h-[800px] sm:h-[700px] overflow-auto">
             <DragAndDropCalendar
               localizer={localizer}
@@ -608,8 +629,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               views={['month', 'week', 'day']}
               defaultView="week"
               min={new Date(1970, 1, 1, 6, 0, 0)}
-              step={15}
-              timeslots={4}
+              max={new Date(1970, 1, 1, 23, 59, 59)}
+              step={30}
+              timeslots={2}
               scrollToTime={new Date(1970, 1, 1, 8, 0, 0)}
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
