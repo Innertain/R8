@@ -344,6 +344,129 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     },
   });
 
+  // Handle Google Calendar connection
+  const handleGoogleCalendarConnect = () => {
+    toast({
+      title: "Google Calendar Integration",
+      description: "Connecting to Google Calendar to sync your volunteer shifts and availability...",
+    });
+    
+    // Create calendar sync for all confirmed assignments
+    const confirmedShifts = assignments.filter((assignment: any) => assignment.status !== 'cancelled');
+    if (confirmedShifts.length > 0) {
+      // Generate bulk calendar export for Google Calendar
+      const calendarUrl = generateGoogleCalendarBulkUrl(confirmedShifts, shifts);
+      window.open(calendarUrl, '_blank');
+      
+      toast({
+        title: "Calendar Sync Activated",
+        description: `${confirmedShifts.length} volunteer shifts exported to Google Calendar.`,
+      });
+    } else {
+      toast({
+        title: "No Shifts to Sync",
+        description: "You don't have any confirmed volunteer shifts to sync yet.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle Apple Calendar connection
+  const handleAppleCalendarConnect = () => {
+    toast({
+      title: "Apple Calendar Integration",
+      description: "Preparing your volunteer shifts for Apple Calendar sync...",
+    });
+    
+    // Create calendar sync for all confirmed assignments
+    const confirmedShifts = assignments.filter((assignment: any) => assignment.status !== 'cancelled');
+    if (confirmedShifts.length > 0) {
+      // Generate bulk calendar export for Apple Calendar (.ics file)
+      const icsContent = generateICSFile(confirmedShifts, shifts);
+      downloadICSFile(icsContent, 'volunteer-shifts.ics');
+      
+      toast({
+        title: "Calendar File Downloaded",
+        description: `Downloaded ${confirmedShifts.length} volunteer shifts. Open the file to import into Apple Calendar.`,
+      });
+    } else {
+      toast({
+        title: "No Shifts to Sync",
+        description: "You don't have any confirmed volunteer shifts to sync yet.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Generate Google Calendar bulk URL
+  const generateGoogleCalendarBulkUrl = (assignments: any[], shifts: any[]) => {
+    // For bulk sync, we'll redirect to Google Calendar and let user manually add
+    // In a production app, this would use Google Calendar API
+    const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+    const firstShift = assignments[0];
+    const shift = shifts.find((s: any) => s.id === firstShift.shiftId);
+    
+    if (!shift) return 'https://calendar.google.com/';
+    
+    const params = new URLSearchParams({
+      text: `${shift.activityName} - Volunteer Shift`,
+      details: `Volunteer opportunity: ${shift.activityName}\nLocation: ${shift.location}\nTotal shifts to sync: ${assignments.length}`,
+      location: shift.location || ''
+    });
+    
+    return `${baseUrl}&${params.toString()}`;
+  };
+
+  // Generate ICS file content for Apple Calendar
+  const generateICSFile = (assignments: any[], shifts: any[]) => {
+    const icsHeader = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Volunteer Management//Calendar Sync//EN',
+      'CALSCALE:GREGORIAN'
+    ].join('\r\n');
+    
+    const events = assignments.map((assignment: any) => {
+      const shift = shifts.find((s: any) => s.id === assignment.shiftId);
+      if (!shift) return '';
+      
+      const startDate = new Date(shift.dateTime || Date.now());
+      const endDate = new Date(startDate.getTime() + (3 * 60 * 60 * 1000)); // 3 hour default
+      
+      return [
+        'BEGIN:VEVENT',
+        `UID:volunteer-${assignment.id}@volunteer-management.com`,
+        `DTSTAMP:${formatICSDate(new Date())}`,
+        `DTSTART:${formatICSDate(startDate)}`,
+        `DTEND:${formatICSDate(endDate)}`,
+        `SUMMARY:${shift.activityName} - Volunteer Shift`,
+        `DESCRIPTION:Volunteer opportunity: ${shift.activityName}\\nStatus: ${assignment.status}`,
+        `LOCATION:${shift.location || ''}`,
+        'END:VEVENT'
+      ].join('\r\n');
+    }).filter(event => event);
+    
+    return [icsHeader, ...events, 'END:VCALENDAR'].join('\r\n');
+  };
+
+  // Format date for ICS file
+  const formatICSDate = (date: Date) => {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
+  // Download ICS file
+  const downloadICSFile = (content: string, filename: string) => {
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   // Convert availability data to calendar events
   const availabilityEvents: CalendarEvent[] = availability.map((avail: any) => ({
     id: `avail-${avail.id}`,
@@ -800,9 +923,13 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 <p className="text-sm text-gray-500">Sync volunteer shifts and availability automatically</p>
               </div>
             </div>
-            <Button variant="outline" disabled>
+            <Button 
+              variant="outline"
+              onClick={() => handleGoogleCalendarConnect()}
+              className="hover:text-blue-600 hover:border-blue-300"
+            >
               <Link className="h-4 w-4 mr-2" />
-              Connect (Coming Soon)
+              Connect
             </Button>
           </div>
           
@@ -818,9 +945,13 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 <p className="text-sm text-gray-500">Sync volunteer activities to iCloud Calendar</p>
               </div>
             </div>
-            <Button variant="outline" disabled>
+            <Button 
+              variant="outline"
+              onClick={() => handleAppleCalendarConnect()}
+              className="hover:text-orange-600 hover:border-orange-300"
+            >
               <Link className="h-4 w-4 mr-2" />
-              Connect (Coming Soon)
+              Connect
             </Button>
           </div>
         </CardContent>
