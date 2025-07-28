@@ -113,6 +113,50 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
     },
   });
 
+  // Cancel assignment mutation
+  const cancelAssignmentMutation = useMutation({
+    mutationFn: (assignmentId: string) => apiRequest('PATCH', `/api/assignments/${assignmentId}`, { status: 'cancelled' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/assignments/volunteer/${volunteerId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
+      toast({
+        title: "Assignment Cancelled",
+        description: "Your shift assignment has been cancelled successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Cancellation Failed",
+        description: "Unable to cancel assignment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Sign up mutation for re-signup
+  const signUpMutation = useMutation({
+    mutationFn: (shiftId: string) => apiRequest('POST', '/api/assignments', {
+      volunteerId: volunteerId,
+      shiftId: shiftId,
+      status: 'confirmed'
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/assignments/volunteer/${volunteerId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
+      toast({
+        title: "Successfully Signed Up!",
+        description: "You've been registered for this volunteer shift.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Sign Up Failed",
+        description: "There was an error signing up for this shift. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Convert availability data to calendar events
   const availabilityEvents: CalendarEvent[] = availability.map((avail: any) => ({
     id: `avail-${avail.id}`,
@@ -678,14 +722,26 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                         <Button
                           variant="outline"
                           size="sm"
+                          className="flex-1"
+                          onClick={() => setShowEventModal(false)}
+                        >
+                          Close
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
                           onClick={() => {
-                            setShowEventModal(false);
-                            // Navigate to My Shifts tab for cancellation
+                            if (confirm(`Are you sure you want to cancel your assignment for "${selectedEvent.resource.shift?.activityName || 'this shift'}"?`)) {
+                              // Call the cancel assignment mutation
+                              cancelAssignmentMutation.mutate(selectedEvent.resource.id);
+                              setShowEventModal(false);
+                            }
                           }}
                         >
                           <XCircle className="h-3 w-3 mr-1" />
-                          Manage
+                          Cancel Assignment
                         </Button>
                       </>
                     ) : (
@@ -702,10 +758,11 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
+                          className="flex-1 border-green-200 text-green-600 hover:bg-green-50"
                           onClick={() => {
+                            // Call the signup mutation to re-signup for this shift
+                            signUpMutation.mutate(selectedEvent.resource.shift?.id || selectedEvent.resource.shiftId);
                             setShowEventModal(false);
-                            // Could navigate to Browse Shifts tab to re-signup
                           }}
                         >
                           <UserPlus className="h-3 w-3 mr-1" />
