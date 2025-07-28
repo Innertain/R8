@@ -996,14 +996,9 @@ export default function VolunteerPortal() {
           {isSignedUp ? (
             <div className="space-y-2">
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
-                    <p className="text-sm font-medium text-green-800">You're Registered</p>
-                  </div>
-                  <Badge className="bg-green-100 text-green-900 border border-green-300 text-xs ml-2 flex-shrink-0">
-                    {existingAssignment?.status === 'pending' ? 'Pending' : 'Confirmed'}
-                  </Badge>
+                <div className="flex items-center">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+                  <p className="text-sm font-medium text-green-800">You're Registered</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
