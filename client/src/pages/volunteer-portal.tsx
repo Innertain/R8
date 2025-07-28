@@ -1344,7 +1344,7 @@ export default function VolunteerPortal() {
                       <p className="text-gray-500">Loading your shifts...</p>
                     </div>
                   </div>
-                ) : assignments.length === 0 ? (
+                ) : assignments.filter((a: any) => a.status !== 'cancelled').length === 0 ? (
                   <div className="text-center py-8">
                     <CalendarDays className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                     <h3 className="text-lg font-medium mb-2">No shifts assigned yet</h3>
@@ -1366,11 +1366,6 @@ export default function VolunteerPortal() {
                         <Badge variant="secondary" className="text-green-900 bg-green-100 border border-green-300">
                           {assignments.filter((a: any) => a.status === 'confirmed').length} Confirmed
                         </Badge>
-                        {assignments.filter((a: any) => a.status === 'cancelled').length > 0 && (
-                          <Badge variant="secondary" className="text-red-900 bg-red-100 border border-red-300">
-                            {assignments.filter((a: any) => a.status === 'cancelled').length} Cancelled
-                          </Badge>
-                        )}
                       </div>
                     </div>
                     
