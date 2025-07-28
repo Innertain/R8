@@ -960,14 +960,14 @@ export default function VolunteerPortal() {
     const isFull = shift.status === "full";
     
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-4 card-hover-effect">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h3 className="font-semibold text-lg">{shift.activityName}</h3>
-            <p className="text-sm text-gray-600">{shift.dateTime}</p>
+      <div className="bg-white rounded-lg border border-gray-200 p-6 card-hover-effect w-full">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-lg text-gray-900 mb-1">{shift.activityName}</h3>
+            <p className="text-sm text-gray-600 mb-1">{shift.dateTime}</p>
             <p className="text-sm text-gray-600">{shift.location}</p>
           </div>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-4">
             <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-green-100 text-green-900 border border-green-300'}>
               {shift.status}
             </Badge>
@@ -1478,7 +1478,7 @@ export default function VolunteerPortal() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4">
+                <div className="space-y-4">
                   {shifts.map((shift: any) => (
                     <AuthenticatedShiftCard 
                       key={shift.id} 
