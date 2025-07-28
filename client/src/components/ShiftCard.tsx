@@ -123,7 +123,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 p-6 card-hover-effect">
       {/* Activity Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
@@ -200,7 +200,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
           className={`w-full font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center ${
             isFull 
               ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
+              : 'bg-blue-500 hover:bg-blue-600 text-white btn-hover-effect'
           }`}
           onClick={handleSignUp}
           disabled={isFull || signUpMutation.isPending}
@@ -229,7 +229,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
           </p>
           <Button 
             variant="outline" 
-            className="w-full"
+            className="w-full btn-hover-effect"
             onClick={() => window.location.href = '/volunteer'}
           >
             Go to Volunteer Portal

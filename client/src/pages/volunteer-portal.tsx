@@ -1110,7 +1110,7 @@ export default function VolunteerPortal() {
             {/* Notification Settings */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700">
+                <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700 settings-hover-effect">
                   <Settings className="w-5 h-5" />
                 </Button>
               </DialogTrigger>
@@ -1352,7 +1352,7 @@ export default function VolunteerPortal() {
                       You haven't signed up for any volunteer shifts yet. 
                       Check the main shifts page to find opportunities!
                     </p>
-                    <Button onClick={() => window.location.href = '/'}>
+                    <Button onClick={() => window.location.href = '/'} className="btn-hover-effect">
                       Browse Available Shifts
                     </Button>
                   </div>

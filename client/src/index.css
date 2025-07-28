@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Enhanced hover effects with contrasting borders */
+.hover-border-effect {
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
+}
+
+.hover-border-effect:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Button hover effects */
+.btn-hover-effect {
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.btn-hover-effect:hover {
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Card hover effects */
+.card-hover-effect {
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
+}
+
+.card-hover-effect:hover {
+  border-color: #6366f1;
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
+  transform: translateY(-3px);
+}
+
+/* Settings icon hover effect */
+.settings-hover-effect {
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
+  border-radius: 8px;
+}
+
+.settings-hover-effect:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
 /* React Big Calendar CSS Overrides */
 .rbc-calendar {
   background-color: white;

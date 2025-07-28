@@ -90,7 +90,7 @@ export default function Home() {
               {/* Notification Settings */}
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700">
+                  <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700 settings-hover-effect">
                     <Settings className="w-5 h-5" />
                   </Button>
                 </DialogTrigger>
