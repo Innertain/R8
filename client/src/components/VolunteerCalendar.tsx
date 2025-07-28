@@ -178,21 +178,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Scroll to 6 AM when calendar loads
-  useEffect(() => {
-    const scrollTo6AM = () => {
-      const calendarEl = document.querySelector('.rbc-time-view .rbc-time-content');
-      if (calendarEl) {
-        // Calculate 6 AM position (6 hours * 60px per hour = 360px)
-        const sixAMPosition = 6 * 60;
-        calendarEl.scrollTop = sixAMPosition;
-      }
-    };
-
-    // Small delay to ensure calendar is rendered
-    const timer = setTimeout(scrollTo6AM, 200);
-    return () => clearTimeout(timer);
-  }, []);
+  // No need for scroll effect since grid starts at 6 AM
 
   // Fetch volunteer availability
   const { data: availability = [], isLoading } = useQuery({
@@ -642,6 +628,8 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               culture="en-US"
               scrollToTime={new Date(2025, 0, 1, 6, 0, 0)}
               getNow={() => new Date()}
+              min={new Date(2025, 0, 1, 6, 0, 0)}
+              max={new Date(2025, 0, 2, 5, 59, 59)}
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
               popup={false}
