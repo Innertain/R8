@@ -123,7 +123,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 p-6 card-hover-effect">
+    <div className="rounded-xl p-6 card-hover-effect">
       {/* Activity Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
