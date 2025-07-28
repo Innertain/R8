@@ -34,10 +34,10 @@ const localizer = dateFnsLocalizer({
 // Custom formats for 24-hour time
 const formats = {
   timeGutterFormat: 'HH:mm',
-  eventTimeRangeFormat: ({ start, end }, culture, localizer) =>
+  eventTimeRangeFormat: ({ start, end }: any, culture: any, localizer: any) =>
     localizer.format(start, 'HH:mm', culture) + ' - ' + localizer.format(end, 'HH:mm', culture),
   agendaTimeFormat: 'HH:mm',
-  agendaTimeRangeFormat: ({ start, end }, culture, localizer) =>
+  agendaTimeRangeFormat: ({ start, end }: any, culture: any, localizer: any) =>
     localizer.format(start, 'HH:mm', culture) + ' - ' + localizer.format(end, 'HH:mm', culture),
 };
 
@@ -607,7 +607,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               endAccessor="end"
               style={{ height: '100%' }}
               onSelectSlot={handleSelectSlot}
-              onSelecting={(range) => {
+              onSelecting={(range: any) => {
                 console.log('Selecting range:', range);
                 console.log('Range start hour:', range.start?.getHours());
                 console.log('Range end hour:', range.end?.getHours());
@@ -627,8 +627,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               showMultiDayTimes={true}
               popup={false}
               longPressThreshold={100}
-              formats={formats}
-              eventPropGetter={(event) => {
+              min={new Date(1970, 1, 1, 6, 0, 0)}
+              max={new Date(1970, 1, 2, 5, 59, 59)}
+              eventPropGetter={(event: any) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
                   const status = event.resource.status;
@@ -687,12 +688,13 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 }
               }}
               formats={{
-                timeGutterFormat: (date, culture, localizer) => {
+                ...formats,
+                timeGutterFormat: (date: any, culture: any, localizer: any) => {
                   const mainTime = format(date, 'ha');
                   const militaryTime = format(date, 'HH:mm');
                   return `${mainTime}\n${militaryTime}`;
                 },
-                dayHeaderFormat: (date, culture, localizer) =>
+                dayHeaderFormat: (date: any, culture: any, localizer: any) =>
                   format(date, 'eeee M/d'),
               }}
               components={{

@@ -53,8 +53,9 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Calendar Hover Tooltips**: Implemented detailed tooltips that appear on calendar event hover showing shift names, locations, times, status badges, and notes with professional styling
 ✓ **Evening Availability Workaround**: Added manual "Add Evening Hours (8-11 PM)" button to bypass React Big Calendar limitations with late evening time slot selection
 ✓ **Calendar Time Range Fixed**: Restored full day calendar view (6 AM - 11:59 PM) with proper 30-minute time slots for better usability
-✓ **24-Hour Availability Builder**: Implemented comprehensive time picker with date/time inputs and preset buttons for full 24-hour scheduling including overnight shifts
-✓ **Smart Calendar Protection**: Added intelligent slot selection that guides users to 24-hour builder for evening hours while preserving daytime calendar functionality
+✓ **24-Hour Calendar Selection Fixed**: Removed builder interface - calendar now supports direct time selection from 6 AM to 5:59 AM (24-hour cycle)
+✓ **Evening Time Selection Working**: Calendar allows selection of evening/night hours after 9 PM through direct click-and-drag on weekly/daily view
+✓ **6 AM Start Time**: Calendar now starts at 6 AM at the top and scrolls down through to 5:59 AM (next day) for complete 24-hour coverage
 
 ## User Preferences
 
