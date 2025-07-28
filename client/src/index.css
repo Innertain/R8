@@ -14,15 +14,15 @@
   transform: translateY(-1px);
 }
 
-/* Enhanced Button hover effects with high contrast */
+/* Enhanced Button hover effects with dark backgrounds */
 .btn-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #d1d5db;
+  border: 1px solid #4b5563;
   position: relative;
   overflow: hidden;
-  background: #ffffff;
-  color: #374151;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+  color: #e5e7eb;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
 .btn-hover-effect::before {
@@ -32,15 +32,15 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   transition: left 0.5s;
 }
 
 .btn-hover-effect:hover {
   border: 2px solid #2563eb;
   box-shadow: 
-    0 8px 15px rgba(0, 0, 0, 0.12),
-    0 4px 6px rgba(0, 0, 0, 0.08),
+    0 8px 15px rgba(0, 0, 0, 0.2),
+    0 4px 6px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(37, 99, 235, 0.2);
   transform: translateY(-2px) scale(1.02);
   background: #ffffff;
@@ -51,15 +51,15 @@
   left: 100%;
 }
 
-/* Enhanced Card hover effects with high contrast readability */
+/* Enhanced Card hover effects with dark backgrounds */
 .card-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #374151;
   position: relative;
   overflow: hidden;
-  background: #ffffff;
-  color: #374151;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  color: #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .card-hover-effect::before {
@@ -79,8 +79,8 @@
 .card-hover-effect:hover {
   transform: translateY(-6px);
   box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.12),
-    0 10px 10px -5px rgba(0, 0, 0, 0.06),
+    0 20px 25px -5px rgba(0, 0, 0, 0.25),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1),
     0 0 0 2px rgba(37, 99, 235, 0.8);
   background: #ffffff;
   color: #111827;
@@ -96,7 +96,7 @@
   .card-hover-effect:hover {
     transform: translateY(-4px);
     box-shadow: 
-      0 12px 20px rgba(0, 0, 0, 0.08),
+      0 12px 20px rgba(0, 0, 0, 0.15),
       0 0 0 2px rgba(37, 99, 235, 0.6);
     background: #ffffff;
     color: #111827;
@@ -106,7 +106,7 @@
   .btn-hover-effect:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 
-      0 6px 12px rgba(0, 0, 0, 0.1),
+      0 6px 12px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(37, 99, 235, 0.2);
     background: #ffffff;
     color: #111827;
@@ -145,11 +145,20 @@
   
   /* Ensure all text is readable on hover */
   .card-hover-effect:hover * {
-    color: inherit !important;
+    color: #111827 !important;
   }
   
   .card-hover-effect:hover .text-gray-600 {
     color: #4b5563 !important;
+  }
+  
+  /* Dark theme text colors for better contrast */
+  .card-hover-effect .text-gray-600 {
+    color: #9ca3af !important;
+  }
+  
+  .card-hover-effect .text-gray-500 {
+    color: #6b7280 !important;
   }
   
   /* Fix mobile layout issues */
