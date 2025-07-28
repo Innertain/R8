@@ -596,6 +596,8 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               onSelectSlot={handleSelectSlot}
               onSelecting={(range) => {
                 console.log('Selecting range:', range);
+                console.log('Range start hour:', range.start?.getHours());
+                console.log('Range end hour:', range.end?.getHours());
                 return true; // Allow all selections
               }}
               onSelectEvent={handleSelectEvent}
@@ -606,9 +608,8 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               views={['month', 'week', 'day']}
               defaultView="week"
               min={new Date(1970, 1, 1, 6, 0, 0)}
-              max={new Date(1970, 1, 1, 23, 30, 0)}
-              step={30}
-              timeslots={2}
+              step={15}
+              timeslots={4}
               scrollToTime={new Date(1970, 1, 1, 8, 0, 0)}
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
