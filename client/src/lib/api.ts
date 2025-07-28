@@ -10,6 +10,11 @@ export interface AirtableShift {
   status: "active" | "urgent" | "remote" | "full";
   category: string;
   icon: string;
+  host?: {
+    id: string;
+    name: string;
+    logo?: string;
+  } | null;
 }
 
 export async function fetchShiftsFromAirtable(): Promise<AirtableShift[]> {

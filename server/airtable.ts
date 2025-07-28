@@ -5,6 +5,49 @@ const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period if present
 const TABLE_NAME = 'Shifts'; // Common alternatives: 'shifts', 'Volunteer Shifts', 'VolunteerShifts'
 
+// Cache for mutual aid partners to avoid repeated API calls
+let partnersCache: { [key: string]: { name: string; logo?: string } } | null = null;
+let cacheExpiry: number = 0;
+
+async function fetchMutualAidPartners(): Promise<{ [key: string]: { name: string; logo?: string } }> {
+  // Return cached data if still valid (5 minutes)
+  if (partnersCache && Date.now() < cacheExpiry) {
+    return partnersCache;
+  }
+
+  const url = `https://api.airtable.com/v0/${BASE_ID}/Mutual%20Aid%20Partners`;
+  console.log(`Fetching Mutual Aid Partners for host data: ${url}`);
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(`✓ Fetched ${data.records?.length || 0} mutual aid partners for host mapping`);
+      
+      // Create lookup map by record ID
+      partnersCache = {};
+      data.records.forEach((record: any) => {
+        partnersCache![record.id] = {
+          name: record.fields.Name || 'Unknown Partner',
+          logo: record.fields.Logo?.[0]?.url || null
+        };
+      });
+      
+      cacheExpiry = Date.now() + (5 * 60 * 1000); // Cache for 5 minutes
+      return partnersCache;
+    }
+  } catch (error) {
+    console.log('Could not fetch Mutual Aid Partners:', error);
+  }
+
+  return {};
+}
+
 export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> {
   if (!AIRTABLE_TOKEN || !BASE_ID) {
     throw new Error('Missing Airtable credentials');
@@ -28,6 +71,9 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
   } catch (metaError) {
     console.log('Could not fetch table metadata:', metaError);
   }
+
+  // Fetch host data for lookup
+  const hostsLookup = await fetchMutualAidPartners();
 
   // Try multiple common table names including the ones found in your base
   const possibleTableNames = ['V Shifts', 'V Activities', 'Shifts', 'shifts', 'Volunteer Shifts', 'VolunteerShifts', 'Table 1'];
@@ -59,6 +105,10 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           
           // Extract location from Site Name (from Location)
           const location = fields['Site Name (from Location )']?.[0] || 'TBD';
+          
+          // Extract host information from Host field (linked to Mutual Aid Partners)
+          const hostId = fields['Host']?.[0] || null; // Linked record ID
+          const hostData = hostId && hostsLookup[hostId] ? hostsLookup[hostId] : null;
           
           // Format date/time from Start Time and End Time
           let dateTime = 'TBD';
@@ -97,7 +147,12 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
             volunteersSignedUp: 0, // Will add this mapping when you provide the field  
             status: 'active',
             category,
-            icon
+            icon,
+            host: hostData ? {
+              id: hostId,
+              name: hostData.name,
+              logo: hostData.logo
+            } : null
           };
         });
       } else {

@@ -135,10 +135,34 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
       </div>
 
       {/* Location */}
-      <div className="flex items-center mb-4 text-gray-600">
+      <div className="flex items-center mb-3 text-gray-600">
         <MapPin className="w-4 h-4 mr-3 text-gray-400" />
         <span className="text-sm">{shift.location}</span>
       </div>
+
+      {/* Host Information */}
+      {shift.host && (
+        <div className="flex items-center mb-4 text-gray-600">
+          <div className="w-4 h-4 mr-3 flex items-center justify-center">
+            {shift.host.logo ? (
+              <img 
+                src={shift.host.logo} 
+                alt={`${shift.host.name} logo`}
+                className="w-4 h-4 object-contain"
+              />
+            ) : (
+              <div className="w-4 h-4 bg-blue-500 rounded-sm flex items-center justify-center">
+                <span className="text-white text-xs font-bold">
+                  {shift.host.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+          <span className="text-sm">
+            Hosted by <span className="font-medium text-gray-700">{shift.host.name}</span>
+          </span>
+        </div>
+      )}
 
       {/* Volunteer Status */}
       <div className="mb-4">
