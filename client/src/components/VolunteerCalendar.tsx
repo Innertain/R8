@@ -805,8 +805,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
           
           <div className="flex items-center justify-between p-4 border border-dashed border-gray-300 rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                <Smartphone className="h-4 w-4 text-gray-600" />
+              <div className="w-8 h-8 bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 rounded-lg flex items-center justify-center">
+                <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                </svg>
               </div>
               <div>
                 <p className="font-medium text-gray-900">Apple Calendar</p>
