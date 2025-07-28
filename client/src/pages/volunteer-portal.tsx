@@ -815,12 +815,23 @@ export default function VolunteerPortal() {
           });
         }
       },
-      onError: (error) => {
-        toast({
-          title: "Sign Up Failed",
-          description: "There was an error signing up for this shift. Please try again.",
-          variant: "destructive",
-        });
+      onError: (error: any) => {
+        console.error('Sign up error:', error);
+        
+        // Check if it's a duplicate assignment error
+        if (error.status === 409 || (error.message && error.message.includes('already signed up'))) {
+          toast({
+            title: "Already Signed Up",
+            description: "You're already registered for this shift. Check the 'My Shifts' tab to manage your assignments.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Sign Up Failed",
+            description: "There was an error signing up for this shift. Please try again.",
+            variant: "destructive",
+          });
+        }
       },
     });
 

@@ -496,10 +496,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Assignment request received:', assignmentData);
       console.log('Volunteer ID:', assignmentData.volunteerId);
       
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      
+      // Check for existing active assignments for this volunteer and shift
+      console.log('🔍 Checking for existing active assignments...');
+      const existingAssignmentsResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment?filterByFormula=AND(SEARCH("${assignmentData.volunteerId}",ARRAYJOIN({Volunteer})),SEARCH("${assignmentData.shiftId}",ARRAYJOIN({Shift ID})),{Status}!="cancelled")`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+      
+      if (existingAssignmentsResponse.ok) {
+        const existingData = await existingAssignmentsResponse.json();
+        if (existingData.records && existingData.records.length > 0) {
+          console.log(`❌ Found ${existingData.records.length} existing active assignments for this volunteer and shift`);
+          return res.status(409).json({ 
+            error: 'You are already signed up for this shift',
+            details: 'Only one active assignment per shift is allowed' 
+          });
+        }
+      }
+      
+      console.log('✅ No existing active assignments found, proceeding with creation');
+      
       // Create assignment in Airtable if volunteer exists in Airtable
       if (assignmentData.volunteerId !== 'demo-volunteer-123') {
         console.log('✓ Volunteer ID is not demo, proceeding with Airtable creation');
-        const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
         // Shift name will be populated via lookup fields in Airtable automatically
 
         // Create assignment payload - Shift ID needs to be array for linked field
@@ -508,6 +528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             fields: {
               'Volunteer': [assignmentData.volunteerId],
               'Shift ID': [assignmentData.shiftId], // Array format for linked field
+              'Status': 'confirmed', // Set default status
               'Assigned Date': new Date().toISOString(),
               'Notes': assignmentData.notes || ''
             }
