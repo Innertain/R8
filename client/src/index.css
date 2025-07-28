@@ -22,6 +22,36 @@
   padding: 2px 6px;
   font-size: 12px;
   font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover effects for calendar events */
+.rbc-event:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  position: relative;
+}
+
+/* Specific hover effects for different event types */
+.rbc-event.calendar-availability:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.rbc-event.calendar-shift-confirmed:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.3);
+}
+
+.rbc-event.calendar-shift-pending:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+}
+
+.rbc-event.calendar-shift-cancelled:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .rbc-time-view .rbc-time-header {

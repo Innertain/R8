@@ -47,6 +47,9 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Host Visual Display**: Shift cards show host logos and names with fallback initial badges for partners without logos
 ✓ **Real Host Data**: Connected to 48+ mutual aid partners including FREEHOTMEALS.ORG, Impact LA Inc, WNCRR, Grassroots AID Partnership with actual logos
 ✓ **Host API Endpoint**: Added /api/mutual-aid-partners endpoint for accessing partner data with proper caching system
+✓ **Duplicate Assignment Prevention**: Added backend validation to prevent multiple active assignments per volunteer per event with 409 error responses
+✓ **Enhanced Error Handling**: Improved frontend error messages for duplicate signups with clear user guidance to "My Shifts" tab
+✓ **Calendar Event Hover Effects**: Added smooth hover highlighting for calendar events with scale animation, brightness effects, and colored shadows for better visual feedback
 
 ## User Preferences
 

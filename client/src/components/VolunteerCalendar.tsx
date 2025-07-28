@@ -493,10 +493,11 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               timeslots={2}
               eventPropGetter={(event) => {
                 if (event.resource?.type === 'shift') {
-                  // Different colors based on shift status - clean solid colors
+                  // Different colors based on shift status - clean solid colors with hover classes
                   const status = event.resource.status;
                   if (status === 'cancelled') {
                     return {
+                      className: 'calendar-shift-cancelled',
                       style: {
                         backgroundColor: '#ef4444',
                         borderColor: '#dc2626',
@@ -509,6 +510,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     };
                   } else if (status === 'confirmed') {
                     return {
+                      className: 'calendar-shift-confirmed',
                       style: {
                         backgroundColor: '#047857',
                         borderColor: '#065f46',
@@ -521,6 +523,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                   } else {
                     // Pending or other status
                     return {
+                      className: 'calendar-shift-pending',
                       style: {
                         backgroundColor: '#b45309',
                         borderColor: '#92400e',
@@ -534,6 +537,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 } else {
                   // Blue for availability - darker colors for better contrast
                   return {
+                    className: 'calendar-availability',
                     style: {
                       backgroundColor: event.resource?.isRecurring ? '#1d4ed8' : '#2563eb',
                       borderColor: event.resource?.isRecurring ? '#1e40af' : '#1d4ed8',
