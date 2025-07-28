@@ -599,7 +599,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
           
 
           
-          <div className="h-[800px] md:h-[800px] sm:h-[700px] overflow-auto">
+          <div className="h-[900px] md:h-[900px] sm:h-[800px] overflow-auto">
             <DragAndDropCalendar
               localizer={localizer}
               events={events}
@@ -622,13 +622,13 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               defaultView="week"
               step={30}
               timeslots={2}
+              showAllEvents={true}
               scrollToTime={new Date(1970, 1, 1, 6, 0, 0)}
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
               popup={false}
               longPressThreshold={100}
-              min={new Date(1970, 1, 1, 6, 0, 0)}
-              max={new Date(1970, 1, 2, 5, 59, 59)}
+
               eventPropGetter={(event: any) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
@@ -690,9 +690,18 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               formats={{
                 ...formats,
                 timeGutterFormat: (date: any, culture: any, localizer: any) => {
-                  const mainTime = format(date, 'ha');
-                  const militaryTime = format(date, 'HH:mm');
-                  return `${mainTime}\n${militaryTime}`;
+                  const hour = date.getHours();
+                  const minutes = date.getMinutes();
+                  
+                  // 24-hour format
+                  const militaryTime = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                  
+                  // 12-hour format
+                  const ampm = hour >= 12 ? 'PM' : 'AM';
+                  const twelveHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                  const standardTime = `${twelveHour}${ampm}`;
+                  
+                  return `${standardTime}\n${militaryTime}`;
                 },
                 dayHeaderFormat: (date: any, culture: any, localizer: any) =>
                   format(date, 'eeee M/d'),
