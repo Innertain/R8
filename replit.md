@@ -57,6 +57,7 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Evening Time Selection Working**: Calendar allows selection of evening/night hours after 8 PM through direct click-and-drag on weekly/daily view  
 ✓ **6 AM Scroll Position**: Calendar automatically scrolls to 6 AM on load but shows full 24-hour grid for complete availability management
 ✓ **Complete Overnight Coverage**: Calendar grid displays full 24-hour cycle including early morning hours (1 AM, 2 AM, 3 AM, etc.) for night shift scheduling
+✓ **6 AM Grid Start**: Calendar grid properly starts at 6 AM at the top and extends through to 5:59 AM for complete overnight shift coverage
 
 ## User Preferences
 
