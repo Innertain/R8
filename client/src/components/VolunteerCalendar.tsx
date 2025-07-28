@@ -581,7 +581,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               <span>Cancelled Shifts</span>
             </div>
           </div>
-          <div className="h-[600px] md:h-[600px] sm:h-[500px]">
+          <div className="h-[700px] md:h-[700px] sm:h-[600px]">
             <DragAndDropCalendar
               localizer={localizer}
               events={events}
@@ -600,6 +600,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               max={new Date(1970, 1, 1, 23, 59, 59)}
               step={30}
               timeslots={2}
+              scrollToTime={new Date(1970, 1, 1, 8, 0, 0)}
               eventPropGetter={(event) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
