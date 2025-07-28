@@ -2,7 +2,7 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -177,6 +177,22 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Scroll to 6 AM when calendar loads
+  useEffect(() => {
+    const scrollTo6AM = () => {
+      const calendarEl = document.querySelector('.rbc-time-view .rbc-time-content');
+      if (calendarEl) {
+        // Calculate 6 AM position (6 hours * 60px per hour = 360px)
+        const sixAMPosition = 6 * 60;
+        calendarEl.scrollTop = sixAMPosition;
+      }
+    };
+
+    // Small delay to ensure calendar is rendered
+    const timer = setTimeout(scrollTo6AM, 200);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Fetch volunteer availability
   const { data: availability = [], isLoading } = useQuery({
@@ -624,7 +640,8 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               timeslots={1}
               showAllEvents={true}
               culture="en-US"
-              scrollToTime={new Date(1970, 0, 1, 6, 0, 0)}
+              scrollToTime={new Date(2025, 0, 1, 6, 0, 0)}
+              getNow={() => new Date()}
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
               popup={false}
