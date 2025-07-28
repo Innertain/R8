@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Bell, Calendar, MapPin, RefreshCw, Settings, User, LogOut, BellRing, Volume2, VolumeX, MessageSquare, Sparkles, Timer, AlertTriangle } from "lucide-react";
+import { Search, Bell, Calendar, MapPin, RefreshCw, Settings, User, LogOut, BellRing, Volume2, VolumeX, MessageSquare, Sparkles, Timer, AlertTriangle, Mail, Smartphone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -166,7 +166,10 @@ export default function Home() {
                       
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <label className="text-sm font-medium">Email Notifications</label>
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            Email Notifications
+                          </label>
                           <p className="text-xs text-muted-foreground">Receive notifications via email</p>
                         </div>
                         <Switch
@@ -195,7 +198,10 @@ export default function Home() {
                       
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <label className="text-sm font-medium">Push Notifications</label>
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <Smartphone className="w-4 h-4" />
+                            Push Notifications
+                          </label>
                           <p className="text-xs text-muted-foreground">Browser and device notifications</p>
                         </div>
                         <Switch

@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle, Smartphone } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -1186,7 +1186,10 @@ export default function VolunteerPortal() {
                     
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <label className="text-sm font-medium">Email Notifications</label>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Email Notifications
+                        </label>
                         <p className="text-xs text-muted-foreground">Receive notifications via email</p>
                       </div>
                       <Switch
@@ -1215,7 +1218,10 @@ export default function VolunteerPortal() {
                     
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <label className="text-sm font-medium">Push Notifications</label>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Smartphone className="w-4 h-4" />
+                          Push Notifications
+                        </label>
                         <p className="text-xs text-muted-foreground">Browser and device notifications</p>
                       </div>
                       <Switch
