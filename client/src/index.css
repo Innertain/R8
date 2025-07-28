@@ -50,15 +50,15 @@
   left: 100%;
 }
 
-/* Enhanced Card hover effects with readable dark default state */
+/* Enhanced Card hover effects with good readability */
 .card-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #d1d5db;
+  border: 1px solid #e5e7eb;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  color: #f9fafb;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  background: #f1f5f9;
+  color: #1f2937;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .card-hover-effect::before {
@@ -80,7 +80,7 @@
   box-shadow: 
     0 10px 15px -3px rgba(0, 0, 0, 0.15),
     0 4px 6px -2px rgba(0, 0, 0, 0.1),
-    0 0 0 2px rgba(37, 99, 235, 0.5);
+    0 0 0 2px rgba(37, 99, 235, 0.6);
   background: #ffffff;
   color: #000000;
   border: 2px solid #3b82f6;
@@ -141,7 +141,7 @@
     color: #111827 !important;
   }
   
-  /* Ensure all text is readable on hover - maximum contrast */
+  /* Hover state - maximum readability */
   .card-hover-effect:hover * {
     color: #000000 !important;
   }
@@ -162,30 +162,25 @@
     color: #374151 !important;
   }
   
-  /* Dark state text color adjustments - high contrast */
+  /* Default state text colors - readable but not maximum contrast */
   .card-hover-effect .text-gray-600 {
-    color: #d1d5db !important;
+    color: #4b5563 !important;
   }
   
   .card-hover-effect .text-gray-500 {
-    color: #e5e7eb !important;
+    color: #6b7280 !important;
   }
   
   .card-hover-effect .text-gray-400 {
-    color: #d1d5db !important;
+    color: #9ca3af !important;
   }
   
   .card-hover-effect .text-gray-900 {
-    color: #ffffff !important;
+    color: #111827 !important;
   }
   
   .card-hover-effect .text-gray-700 {
-    color: #f3f4f6 !important;
-  }
-  
-  /* Ensure all icons are visible in dark mode */
-  .card-hover-effect svg {
-    color: #d1d5db !important;
+    color: #374151 !important;
   }
   
   /* Fix mobile layout issues */
