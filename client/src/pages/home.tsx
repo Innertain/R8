@@ -1,12 +1,31 @@
 import { useState } from "react";
-import { Search, Bell, Calendar, MapPin, RefreshCw } from "lucide-react";
+import { Search, Bell, Calendar, MapPin, RefreshCw, Settings, User, LogOut, BellRing, Volume2, VolumeX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ShiftCard from "@/components/ShiftCard";
 import { fetchShiftsFromAirtable, type AirtableShift } from "@/lib/api";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // Use AirtableShift type from API module
 
@@ -14,7 +33,17 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentUser, setCurrentUser] = useState({ name: "John Doe", initials: "JD", email: "john.doe@example.com" });
+  const [notificationSettings, setNotificationSettings] = useState({
+    newShifts: true,
+    shiftReminders: true,
+    shiftUpdates: true,
+    emailNotifications: false,
+    pushNotifications: true,
+  });
+  const [unreadNotifications, setUnreadNotifications] = useState(3);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Fetch shifts from Airtable using React Query
   const { data: shifts = [], isLoading, error } = useQuery({
@@ -57,12 +86,160 @@ export default function Home() {
               <h1 className="text-xl font-semibold text-gray-900">VolunteerShift</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="text-gray-500 hover:text-gray-700 transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                JD
-              </div>
+              {/* Notification Bell */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700">
+                    <Bell className="w-5 h-5" />
+                    {unreadNotifications > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs"
+                      >
+                        {unreadNotifications}
+                      </Badge>
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <BellRing className="w-5 h-5" />
+                      Notification Settings
+                    </DialogTitle>
+                    <DialogDescription>
+                      Manage how you receive updates about volunteer opportunities and shifts.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="space-y-6">
+                    {/* Notification Preferences */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-medium">New Shifts Available</label>
+                          <p className="text-xs text-muted-foreground">Get notified when new volunteer opportunities match your preferences</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.newShifts}
+                          onCheckedChange={(checked) => 
+                            setNotificationSettings(prev => ({ ...prev, newShifts: checked }))
+                          }
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-medium">Shift Reminders</label>
+                          <p className="text-xs text-muted-foreground">Reminders before your upcoming volunteer shifts</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.shiftReminders}
+                          onCheckedChange={(checked) => 
+                            setNotificationSettings(prev => ({ ...prev, shiftReminders: checked }))
+                          }
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-medium">Shift Updates</label>
+                          <p className="text-xs text-muted-foreground">Changes to shifts you're signed up for</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.shiftUpdates}
+                          onCheckedChange={(checked) => 
+                            setNotificationSettings(prev => ({ ...prev, shiftUpdates: checked }))
+                          }
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-medium">Email Notifications</label>
+                          <p className="text-xs text-muted-foreground">Receive notifications via email</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.emailNotifications}
+                          onCheckedChange={(checked) => 
+                            setNotificationSettings(prev => ({ ...prev, emailNotifications: checked }))
+                          }
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-medium">Push Notifications</label>
+                          <p className="text-xs text-muted-foreground">Browser and device notifications</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.pushNotifications}
+                          onCheckedChange={(checked) => 
+                            setNotificationSettings(prev => ({ ...prev, pushNotifications: checked }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t">
+                      <Button 
+                        onClick={() => {
+                          toast({
+                            title: "Settings Saved",
+                            description: "Your notification preferences have been updated.",
+                          });
+                        }}
+                        className="w-full"
+                      >
+                        Save Preferences
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* User Profile Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white">
+                    {currentUser.initials}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{currentUser.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {currentUser.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => window.location.href = '/volunteer'}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Volunteer Portal</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    toast({
+                      title: "Settings",
+                      description: "Account settings will be available soon.",
+                    });
+                  }}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Account Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => {
+                    toast({
+                      title: "Signed Out",
+                      description: "You have been signed out successfully.",
+                    });
+                  }}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
