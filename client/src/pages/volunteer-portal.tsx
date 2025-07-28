@@ -369,7 +369,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
               ) : (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(volunteer.preferredShiftTypes || []).map((type: string) => (
-                    <Badge key={type} className="bg-blue-100 text-blue-800">{type}</Badge>
+                    <Badge key={type} className="bg-blue-100 text-blue-900 border border-blue-300">{type}</Badge>
                   ))}
                   {(!volunteer.preferredShiftTypes || volunteer.preferredShiftTypes.length === 0) && (
                     <p className="text-sm text-gray-500">No preferences set</p>
@@ -879,11 +879,11 @@ export default function VolunteerPortal() {
             <p className="text-sm text-gray-600">{shift.location}</p>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}>
+            <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-green-100 text-green-900 border border-green-300'}>
               {shift.status}
             </Badge>
             {isSignedUp && (
-              <Badge className="bg-blue-100 text-blue-800 text-xs">
+              <Badge className="bg-blue-100 text-blue-900 border border-blue-300 text-xs">
                 <CheckCircle className="w-3 h-3 mr-1" />
                 Signed Up
               </Badge>
@@ -1097,11 +1097,11 @@ export default function VolunteerPortal() {
                         {assignments.filter((a: any) => a.status !== 'cancelled').length} Active Assignment{assignments.filter((a: any) => a.status !== 'cancelled').length !== 1 ? 's' : ''}
                       </h3>
                       <div className="flex gap-2">
-                        <Badge variant="secondary" className="text-green-700 bg-green-50">
+                        <Badge variant="secondary" className="text-green-900 bg-green-100 border border-green-300">
                           {assignments.filter((a: any) => a.status === 'confirmed').length} Confirmed
                         </Badge>
                         {assignments.filter((a: any) => a.status === 'cancelled').length > 0 && (
-                          <Badge variant="secondary" className="text-red-700 bg-red-50">
+                          <Badge variant="secondary" className="text-red-900 bg-red-100 border border-red-300">
                             {assignments.filter((a: any) => a.status === 'cancelled').length} Cancelled
                           </Badge>
                         )}

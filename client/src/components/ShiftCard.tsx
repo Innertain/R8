@@ -25,25 +25,25 @@ const getStatusConfig = (status: string) => {
     case "urgent":
       return {
         label: "Urgent",
-        className: "bg-amber-100 text-amber-800",
+        className: "bg-amber-100 text-amber-900 border border-amber-300",
         progressColor: "bg-amber-500"
       };
     case "remote":
       return {
         label: "Remote",
-        className: "bg-blue-100 text-blue-800",
+        className: "bg-blue-100 text-blue-900 border border-blue-300",
         progressColor: "bg-blue-500"
       };
     case "full":
       return {
         label: "Full",
-        className: "bg-gray-100 text-gray-800",
+        className: "bg-gray-100 text-gray-900 border border-gray-300",
         progressColor: "bg-emerald-500"
       };
     default:
       return {
         label: "Active",
-        className: "bg-emerald-100 text-emerald-800",
+        className: "bg-emerald-100 text-emerald-900 border border-emerald-300",
         progressColor: "bg-blue-500"
       };
   }
@@ -145,7 +145,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">Volunteers</span>
           <span className="text-sm text-gray-600">
-            <span className={`font-semibold ${isFull ? 'text-emerald-600' : shift.status === 'urgent' ? 'text-amber-600' : 'text-blue-600'}`}>
+            <span className={`font-semibold ${isFull ? 'text-emerald-700' : shift.status === 'urgent' ? 'text-amber-700' : 'text-blue-900'}`}>
               {shift.volunteersSignedUp}
             </span> / {shift.volunteersNeeded} signed up
           </span>

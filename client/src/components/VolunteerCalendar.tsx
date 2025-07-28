@@ -382,9 +382,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                   } else if (status === 'confirmed') {
                     return {
                       style: {
-                        backgroundColor: '#10b981',
-                        borderColor: '#059669',
-                        border: '2px solid #059669',
+                        backgroundColor: '#047857',
+                        borderColor: '#065f46',
+                        border: '2px solid #065f46',
                         color: 'transparent', // Hide any text
                         cursor: 'pointer',
                         borderRadius: '4px',
@@ -394,9 +394,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     // Pending or other status
                     return {
                       style: {
-                        backgroundColor: '#f59e0b',
-                        borderColor: '#d97706',
-                        border: '2px solid #d97706',
+                        backgroundColor: '#b45309',
+                        borderColor: '#92400e',
+                        border: '2px solid #92400e',
                         color: 'transparent', // Hide any text
                         cursor: 'pointer',
                         borderRadius: '4px',
@@ -404,12 +404,12 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     };
                   }
                 } else {
-                  // Blue for availability - clean solid colors
+                  // Blue for availability - darker colors for better contrast
                   return {
                     style: {
-                      backgroundColor: event.resource?.isRecurring ? '#3b82f6' : '#60a5fa',
-                      borderColor: event.resource?.isRecurring ? '#2563eb' : '#3b82f6',
-                      border: event.resource?.isRecurring ? '2px solid #2563eb' : '2px solid #3b82f6',
+                      backgroundColor: event.resource?.isRecurring ? '#1d4ed8' : '#2563eb',
+                      borderColor: event.resource?.isRecurring ? '#1e40af' : '#1d4ed8',
+                      border: event.resource?.isRecurring ? '2px solid #1e40af' : '2px solid #1d4ed8',
                       color: 'transparent', // Hide any text
                       cursor: 'pointer',
                       borderRadius: '4px',
@@ -730,7 +730,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-blue-600" />
+                        <Clock className="h-4 w-4 text-blue-900" />
                         <span>
                           {selectedEvent.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
                           {selectedEvent.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
