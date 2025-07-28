@@ -20,6 +20,7 @@ export interface IStorage {
 
   // Availability management
   createAvailability(availability: InsertAvailability): Promise<Availability>;
+  getAvailabilityById(id: string): Promise<Availability | null>;
   getVolunteerAvailability(volunteerId: string): Promise<Availability[]>;
   getAvailabilityByDateRange(startDate: Date, endDate: Date): Promise<Availability[]>;
   updateAvailability(id: string, updates: Partial<InsertAvailability>): Promise<Availability>;
@@ -173,6 +174,10 @@ export class MemStorage implements IStorage {
     };
     this.availability.set(id, availability);
     return availability;
+  }
+
+  async getAvailabilityById(id: string): Promise<Availability | null> {
+    return this.availability.get(id) || null;
   }
 
   async getVolunteerAvailability(volunteerId: string): Promise<Availability[]> {

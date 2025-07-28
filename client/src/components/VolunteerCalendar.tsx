@@ -1,4 +1,5 @@
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useState, useCallback } from 'react';
@@ -16,6 +17,7 @@ import { Plus, Calendar as CalendarIcon, Clock, User, UserPlus, CheckCircle, XCi
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 
 const locales = {
   'en-US': enUS,
@@ -28,6 +30,9 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
+
+// Create drag and drop enabled calendar
+const DragAndDropCalendar = withDragAndDrop(Calendar);
 
 interface CalendarEvent {
   id: string;
@@ -298,6 +303,70 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showEventModal, setShowEventModal] = useState(false);
 
+  // Mutation to update availability when dragged/resized
+  const updateAvailabilityMutation = useMutation({
+    mutationFn: async ({ id, start, end }: { id: string; start: Date; end: Date }) => {
+      return apiRequest('PUT', `/api/availability/${id}`, {
+        startTime: start.toISOString(),
+        endTime: end.toISOString()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/availability', volunteerId] });
+      toast({
+        title: "Availability updated",
+        description: "Your availability has been successfully updated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update availability. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle event drag (move)
+  const handleEventDrop = useCallback(({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+    // Only allow dragging availability events, not shift assignments
+    if (event.resource?.type === 'shift') {
+      toast({
+        title: "Cannot move shifts",
+        description: "Assigned shifts cannot be moved. Please contact the coordinator if changes are needed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Update the availability
+    updateAvailabilityMutation.mutate({
+      id: event.resource.id,
+      start,
+      end
+    });
+  }, [updateAvailabilityMutation, toast]);
+
+  // Handle event resize
+  const handleEventResize = useCallback(({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+    // Only allow resizing availability events, not shift assignments
+    if (event.resource?.type === 'shift') {
+      toast({
+        title: "Cannot resize shifts",
+        description: "Assigned shifts cannot be resized. Please contact the coordinator if changes are needed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Update the availability
+    updateAvailabilityMutation.mutate({
+      id: event.resource.id,
+      start,
+      end
+    });
+  }, [updateAvailabilityMutation, toast]);
+
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
     setSelectedEvent(event);
     setShowEventModal(true);
@@ -368,7 +437,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
             {volunteerName}'s Availability Calendar
           </CardTitle>
           <CardDescription>
-            Click and drag to add availability (blue). View your committed shifts (green with 🎯). Click events for details.
+            Click and drag to add availability (blue). Drag blue blocks to move them or resize with handles. View committed shifts (green). Click events for details.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -376,7 +445,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
           <div className="mb-4 flex flex-wrap gap-4 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-blue-500 rounded"></div>
-              <span>Available Time</span>
+              <span>Available Time (Draggable)</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-green-500 rounded"></div>
@@ -392,7 +461,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
             </div>
           </div>
           <div className="h-[600px] md:h-[600px] sm:h-[500px]">
-            <Calendar
+            <DragAndDropCalendar
               localizer={localizer}
               events={events}
               startAccessor="start"
@@ -400,7 +469,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               style={{ height: '100%' }}
               onSelectSlot={handleSelectSlot}
               onSelectEvent={handleSelectEvent}
+              onEventDrop={handleEventDrop}
+              onEventResize={handleEventResize}
               selectable
+              resizable
               views={['month', 'week', 'day']}
               defaultView="week"
               min={new Date(1970, 1, 1, 6, 0, 0)}

@@ -380,6 +380,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update availability (for drag and drop)
+  app.put("/api/availability/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { startTime, endTime } = req.body;
+      
+      if (!startTime || !endTime) {
+        return res.status(400).json({ error: 'Start time and end time are required' });
+      }
+
+      // Find the availability record by ID
+      const availability = await storage.getAvailabilityById(id);
+      
+      if (!availability) {
+        return res.status(404).json({ error: 'Availability not found' });
+      }
+
+      const updatedAvailability = {
+        ...availability,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime)
+      };
+
+      await storage.updateAvailability(id, updatedAvailability);
+      res.json(updatedAvailability);
+    } catch (error: any) {
+      console.error('Error updating availability:', error);
+      res.status(500).json({ error: 'Failed to update availability' });
+    }
+  });
+
+  // Delete availability
+  app.delete("/api/availability/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteAvailability(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error deleting availability:', error);
+      res.status(500).json({ error: 'Failed to delete availability' });
+    }
+  });
+
   app.get("/api/availability/:volunteerId", async (req, res) => {
     try {
       const volunteerId = req.params.volunteerId;
