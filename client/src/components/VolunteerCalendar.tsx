@@ -586,7 +586,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               <span>Cancelled Shifts</span>
             </div>
           </div>
-          <div className="h-[700px] md:h-[700px] sm:h-[600px]">
+          <div className="h-[800px] md:h-[800px] sm:h-[700px] overflow-auto">
             <DragAndDropCalendar
               localizer={localizer}
               events={events}
@@ -594,6 +594,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               endAccessor="end"
               style={{ height: '100%' }}
               onSelectSlot={handleSelectSlot}
+              onSelecting={(range) => {
+                console.log('Selecting range:', range);
+                return true; // Allow all selections
+              }}
               onSelectEvent={handleSelectEvent}
               onEventDrop={handleEventDrop}
               onEventResize={handleEventResize}
@@ -607,6 +611,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               timeslots={2}
               scrollToTime={new Date(1970, 1, 1, 8, 0, 0)}
               dayLayoutAlgorithm="no-overlap"
+              showMultiDayTimes={true}
+              popup={false}
+              longPressThreshold={100}
               eventPropGetter={(event) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
