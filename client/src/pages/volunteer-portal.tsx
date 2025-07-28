@@ -598,6 +598,7 @@ export default function VolunteerPortal() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [currentVolunteer, setCurrentVolunteer] = useState<any>(null);
   const [showRegister, setShowRegister] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [registerForm, setRegisterForm] = useState({
     name: '',
     phoneNumber: '',
@@ -954,11 +955,17 @@ export default function VolunteerPortal() {
                   size="sm"
                   className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
                   onClick={() => {
-                    // Navigate to My Shifts tab - assuming there's a way to trigger tab change
-                    toast({
-                      title: "View in My Shifts",
-                      description: "Check the 'My Shifts' tab to see all your registered shifts.",
-                    });
+                    // Trigger the dashboard tab (My Shifts) programmatically
+                    const dashboardTab = document.querySelector('[data-state="inactive"][value="dashboard"]') as HTMLElement;
+                    if (dashboardTab) {
+                      dashboardTab.click();
+                    } else {
+                      // Already on dashboard tab
+                      toast({
+                        title: "Already Viewing My Shifts",
+                        description: "You're already on the My Shifts tab. Your assignments are displayed above.",
+                      });
+                    }
                   }}
                 >
                   <Calendar className="w-3 h-3 mr-1" />
