@@ -50,14 +50,14 @@
   left: 100%;
 }
 
-/* Enhanced Card hover effects with dark default state */
+/* Enhanced Card hover effects with readable dark default state */
 .card-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #4b5563;
+  border: 1px solid #d1d5db;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
-  color: #e5e7eb;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  color: #f9fafb;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -78,12 +78,12 @@
 .card-hover-effect:hover {
   transform: translateY(-3px);
   box-shadow: 
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05),
-    0 0 0 1px rgba(37, 99, 235, 0.3);
+    0 10px 15px -3px rgba(0, 0, 0, 0.15),
+    0 4px 6px -2px rgba(0, 0, 0, 0.1),
+    0 0 0 2px rgba(37, 99, 235, 0.5);
   background: #ffffff;
-  color: #111827;
-  border: 1px solid #3b82f6;
+  color: #000000;
+  border: 2px solid #3b82f6;
 }
 
 .card-hover-effect:hover::before {
@@ -141,34 +141,51 @@
     color: #111827 !important;
   }
   
-  /* Ensure all text is readable on hover */
+  /* Ensure all text is readable on hover - maximum contrast */
   .card-hover-effect:hover * {
-    color: #111827 !important;
+    color: #000000 !important;
   }
   
   .card-hover-effect:hover .text-gray-600 {
+    color: #374151 !important;
+  }
+  
+  .card-hover-effect:hover .text-gray-500 {
     color: #4b5563 !important;
   }
   
-  /* Dark state text color adjustments */
-  .card-hover-effect .text-gray-600 {
-    color: #9ca3af !important;
+  .card-hover-effect:hover .text-gray-400 {
+    color: #6b7280 !important;
   }
   
-  .card-hover-effect .text-gray-500 {
+  .card-hover-effect:hover svg {
+    color: #374151 !important;
+  }
+  
+  /* Dark state text color adjustments - high contrast */
+  .card-hover-effect .text-gray-600 {
     color: #d1d5db !important;
   }
   
+  .card-hover-effect .text-gray-500 {
+    color: #e5e7eb !important;
+  }
+  
   .card-hover-effect .text-gray-400 {
-    color: #9ca3af !important;
+    color: #d1d5db !important;
   }
   
   .card-hover-effect .text-gray-900 {
-    color: #f3f4f6 !important;
+    color: #ffffff !important;
   }
   
   .card-hover-effect .text-gray-700 {
-    color: #e5e7eb !important;
+    color: #f3f4f6 !important;
+  }
+  
+  /* Ensure all icons are visible in dark mode */
+  .card-hover-effect svg {
+    color: #d1d5db !important;
   }
   
   /* Fix mobile layout issues */
