@@ -588,36 +588,6 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
   return (
     <div className="space-y-6">
-      {/* Google Calendar Sync Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5" />
-            Calendar Sync
-          </CardTitle>
-          <CardDescription>
-            Connect your Google Calendar to automatically sync your availability
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between p-4 border border-dashed border-gray-300 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <CalendarIcon className="h-4 w-4 text-blue-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Google Calendar</p>
-                <p className="text-sm text-gray-500">Sync your availability automatically</p>
-              </div>
-            </div>
-            <Button variant="outline" disabled>
-              <Plus className="h-4 w-4 mr-2" />
-              Connect (Coming Soon)
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -796,6 +766,52 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 noEventsInRange: 'No availability set for this time period.',
               }}
             />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Calendar Sync Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="h-5 w-5" />
+            Calendar Sync
+          </CardTitle>
+          <CardDescription>
+            Connect your calendar apps to automatically sync your availability
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 border border-dashed border-gray-300 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <CalendarIcon className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Google Calendar</p>
+                <p className="text-sm text-gray-500">Sync your availability automatically</p>
+              </div>
+            </div>
+            <Button variant="outline" disabled>
+              <Plus className="h-4 w-4 mr-2" />
+              Connect (Coming Soon)
+            </Button>
+          </div>
+          
+          <div className="flex items-center justify-between p-4 border border-dashed border-gray-300 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <CalendarIcon className="h-4 w-4 text-gray-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Apple Calendar</p>
+                <p className="text-sm text-gray-500">Sync with iCloud Calendar</p>
+              </div>
+            </div>
+            <Button variant="outline" disabled>
+              <Plus className="h-4 w-4 mr-2" />
+              Connect (Coming Soon)
+            </Button>
           </div>
         </CardContent>
       </Card>
