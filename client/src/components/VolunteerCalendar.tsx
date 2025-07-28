@@ -626,10 +626,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               timeslots={1}
               showAllEvents={true}
               culture="en-US"
-              scrollToTime={new Date(2025, 0, 1, 6, 0, 0)}
+              scrollToTime={new Date(1970, 0, 1, 6, 0, 0)}
               getNow={() => new Date()}
-              min={new Date(2025, 0, 1, 6, 0, 0)}
-              max={new Date(2025, 0, 2, 5, 59, 59)}
+
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
               popup={false}
