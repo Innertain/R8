@@ -9,6 +9,13 @@ const TABLE_NAME = 'Shifts'; // Common alternatives: 'shifts', 'Volunteer Shifts
 let partnersCache: { [key: string]: { name: string; logo?: string } } | null = null;
 let cacheExpiry: number = 0;
 
+// Clear cache function for development/debugging
+export function clearAirtableCache() {
+  partnersCache = null;
+  cacheExpiry = 0;
+  console.log('🔄 Airtable cache cleared');
+}
+
 async function fetchMutualAidPartners(): Promise<{ [key: string]: { name: string; logo?: string } }> {
   // Return cached data if still valid (5 minutes)
   if (partnersCache && Date.now() < cacheExpiry) {

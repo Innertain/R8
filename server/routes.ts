@@ -44,6 +44,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API route to clear cache and force refresh
+  app.post("/api/refresh-cache", async (req, res) => {
+    try {
+      const { clearAirtableCache } = await import('./airtable');
+      clearAirtableCache();
+      res.json({ success: true, message: 'Cache cleared successfully' });
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      res.status(500).json({ error: 'Failed to clear cache' });
+    }
+  });
+
   // API route to fetch shifts from Airtable
   app.get("/api/shifts", async (req, res) => {
     console.log('API route /api/shifts called');

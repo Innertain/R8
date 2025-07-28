@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { Search, Bell, Calendar, MapPin } from "lucide-react";
+import { Search, Bell, Calendar, MapPin, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ShiftCard from "@/components/ShiftCard";
 import { fetchShiftsFromAirtable, type AirtableShift } from "@/lib/api";
+import { apiRequest } from "@/lib/queryClient";
 
 // Use AirtableShift type from API module
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
 
   // Fetch shifts from Airtable using React Query
   const { data: shifts = [], isLoading, error } = useQuery({
@@ -18,6 +22,19 @@ export default function Home() {
     queryFn: fetchShiftsFromAirtable,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Clear cache on server and refresh data
+      await apiRequest('POST', '/api/refresh-cache');
+      await queryClient.invalidateQueries({ queryKey: ['/api/shifts'] });
+    } catch (error) {
+      console.error('Failed to refresh:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const filteredShifts = shifts.filter(shift => {
     const matchesSearch = shift.activityName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -54,9 +71,21 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Available Shifts</h2>
-          <p className="text-gray-600">Find and sign up for volunteer opportunities in your area</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Available Shifts</h2>
+            <p className="text-gray-600">Find and sign up for volunteer opportunities in your area</p>
+          </div>
+          <Button 
+            onClick={handleRefresh} 
+            disabled={isRefreshing}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
         </div>
 
         {/* Filter/Search Bar */}
