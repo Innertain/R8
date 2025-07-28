@@ -204,7 +204,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
               <Label>Skills</Label>
               {isEditing ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {skillOptions.map(skill => (
+                  {skillOptions.map((skill: string) => (
                     <div key={skill} className="flex items-center space-x-2">
                       <Checkbox
                         id={`skill-${skill}`}
@@ -236,7 +236,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
               <Label>Areas of Interest</Label>
               {isEditing ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {interestOptions.map(interest => (
+                  {interestOptions.map((interest: string) => (
                     <div key={interest} className="flex items-center space-x-2">
                       <Checkbox
                         id={`interest-${interest}`}
@@ -1386,15 +1386,15 @@ export default function VolunteerPortal() {
                         return (
                           <Card key={assignment.id} className="border-l-4 border-l-blue-500 card-hover-effect">
                             <CardContent className="p-4 shift-card-content">
-                              <div className="flex items-start justify-between">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                                 <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                                     <h4 className="font-semibold">
                                       {matchedShift?.activityName || 'River Clean up'}
                                     </h4>
                                     <Badge 
                                       variant="outline"
-                                      className={`flex items-center gap-1 ${statusColor} status-badge transition-all duration-300`}
+                                      className={`flex items-center gap-1 ${statusColor} status-badge transition-all duration-300 w-fit`}
                                     >
                                       <StatusIcon className="h-3 w-3 activity-icon" />
                                       {assignment.status}
@@ -1411,17 +1411,12 @@ export default function VolunteerPortal() {
                                   </div>
                                 </div>
                                 
-                                <div className="flex flex-col gap-2">
-                                  <Badge variant="outline" className="text-xs">
-                                    ID: {assignment.id.slice(-8)}
-                                  </Badge>
-                                  
-                                  <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => addToGoogleCalendar(assignment, matchedShift)}
-                                      className="flex items-center gap-1 text-xs btn-hover-effect"
+                                      className="flex items-center gap-1 text-xs btn-hover-effect w-full sm:w-auto"
                                     >
                                       <CalendarPlus className="h-3 w-3 activity-icon" />
                                       Add to Calendar
@@ -1432,7 +1427,7 @@ export default function VolunteerPortal() {
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 btn-hover-effect"
+                                          className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 btn-hover-effect w-full sm:w-auto"
                                         >
                                           <Trash2 className="h-3 w-3 activity-icon" />
                                           Cancel
@@ -1458,7 +1453,6 @@ export default function VolunteerPortal() {
                                         </AlertDialogFooter>
                                       </AlertDialogContent>
                                     </AlertDialog>
-                                  </div>
                                 </div>
                               </div>
                             </CardContent>

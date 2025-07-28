@@ -124,6 +124,29 @@
     background: #f3f4f6;
     color: #111827;
   }
+  
+  /* Fix mobile layout issues */
+  .shift-card-content {
+    padding: 12px !important;
+  }
+  
+  /* Prevent text overflow on mobile */
+  .shift-card-content h4 {
+    word-break: break-word;
+    hyphens: auto;
+  }
+  
+  /* Better button spacing on mobile */
+  .shift-card-content .flex.gap-2 {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  /* Status badges responsive */
+  .status-badge {
+    font-size: 12px;
+    white-space: nowrap;
+  }
 }
 
 .card-hover-effect:hover::before {
