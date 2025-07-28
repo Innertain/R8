@@ -9,7 +9,16 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
@@ -599,6 +608,15 @@ export default function VolunteerPortal() {
   const [currentVolunteer, setCurrentVolunteer] = useState<any>(null);
   const [showRegister, setShowRegister] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [notificationSettings, setNotificationSettings] = useState({
+    newShifts: true,
+    shiftReminders: true,
+    shiftUpdates: true,
+    emailNotifications: false,
+    smsNotifications: false,
+    pushNotifications: true,
+  });
+  const [unreadNotifications, setUnreadNotifications] = useState(2);
   const [registerForm, setRegisterForm] = useState({
     name: '',
     phoneNumber: '',
@@ -1089,18 +1107,182 @@ export default function VolunteerPortal() {
             <p className="text-gray-600">Welcome back, {currentVolunteer.name}</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="font-medium">{currentVolunteer.name}</p>
-              <p className="text-sm text-gray-500">{currentVolunteer.phone || currentVolunteer.phoneNumber}</p>
-              {currentVolunteer.isDriver && (
-                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                  Driver
-                </span>
-              )}
-            </div>
-            <Button variant="outline" onClick={handleLogout}>
-              Log Out
-            </Button>
+            {/* Notification Bell */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700">
+                  <Bell className="w-5 h-5" />
+                  {unreadNotifications > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs"
+                    >
+                      {unreadNotifications}
+                    </Badge>
+                  )}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <BellRing className="w-5 h-5" />
+                    Notification Settings
+                  </DialogTitle>
+                  <DialogDescription>
+                    Manage how you receive updates about volunteer opportunities and shifts.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-6">
+                  {/* Notification Preferences */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">New Shifts Available</label>
+                        <p className="text-xs text-muted-foreground">Get notified when new volunteer opportunities match your preferences</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.newShifts}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, newShifts: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">Shift Reminders</label>
+                        <p className="text-xs text-muted-foreground">Reminders before your upcoming volunteer shifts</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.shiftReminders}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, shiftReminders: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">Shift Updates</label>
+                        <p className="text-xs text-muted-foreground">Changes to shifts you're signed up for</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.shiftUpdates}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, shiftUpdates: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">Email Notifications</label>
+                        <p className="text-xs text-muted-foreground">Receive notifications via email</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.emailNotifications}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, emailNotifications: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4" />
+                          SMS Notifications
+                        </label>
+                        <p className="text-xs text-muted-foreground">Text message alerts to your phone</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.smsNotifications}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, smsNotifications: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">Push Notifications</label>
+                        <p className="text-xs text-muted-foreground">Browser and device notifications</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.pushNotifications}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, pushNotifications: checked }))
+                        }
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t">
+                    <Button 
+                      onClick={() => {
+                        toast({
+                          title: "Settings Saved",
+                          description: "Your notification preferences have been updated.",
+                        });
+                      }}
+                      className="w-full"
+                    >
+                      Save Preferences
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* User Profile Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100">
+                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
+                    {currentVolunteer.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'V'}
+                  </div>
+                  <div className="text-left hidden sm:block">
+                    <p className="font-medium text-sm">{currentVolunteer.name}</p>
+                    <p className="text-xs text-gray-500">{currentVolunteer.phone || currentVolunteer.phoneNumber}</p>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{currentVolunteer.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {currentVolunteer.phone || currentVolunteer.phoneNumber}
+                    </p>
+                    {currentVolunteer.isDriver && (
+                      <Badge variant="secondary" className="w-fit text-xs">
+                        Driver
+                      </Badge>
+                    )}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => window.location.href = '/'}>
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <span>Browse All Shifts</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  toast({
+                    title: "Account Settings",
+                    description: "Advanced account settings will be available soon.",
+                  });
+                }}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Account Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
