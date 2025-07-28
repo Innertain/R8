@@ -417,6 +417,11 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   const events: CalendarEvent[] = [...availabilityEvents, ...shiftEvents];
 
   const handleSelectSlot = useCallback(({ start, end }: { start: Date; end: Date }) => {
+    console.log('Slot selected - Start:', start);
+    console.log('Slot selected - End:', end);
+    console.log('Start hour:', start.getHours());
+    console.log('End hour:', end.getHours());
+    
     setSelectedSlot({ start, end });
     setDialogOpen(true);
   }, []);
@@ -597,10 +602,11 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               views={['month', 'week', 'day']}
               defaultView="week"
               min={new Date(1970, 1, 1, 6, 0, 0)}
-              max={new Date(1970, 1, 1, 23, 59, 59)}
+              max={new Date(1970, 1, 1, 23, 30, 0)}
               step={30}
               timeslots={2}
               scrollToTime={new Date(1970, 1, 1, 8, 0, 0)}
+              dayLayoutAlgorithm="no-overlap"
               eventPropGetter={(event) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
