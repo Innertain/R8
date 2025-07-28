@@ -14,15 +14,15 @@
   transform: translateY(-1px);
 }
 
-/* Enhanced Button hover effects with dark backgrounds */
+/* Enhanced Button hover effects with subtle backgrounds */
 .btn-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #4b5563;
+  border: 1px solid #d1d5db;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
-  color: #e5e7eb;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  background: #f9fafb;
+  color: #374151;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-hover-effect::before {
@@ -37,12 +37,11 @@
 }
 
 .btn-hover-effect:hover {
-  border: 2px solid #2563eb;
+  border: 1px solid #3b82f6;
   box-shadow: 
-    0 8px 15px rgba(0, 0, 0, 0.2),
-    0 4px 6px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(37, 99, 235, 0.2);
-  transform: translateY(-2px) scale(1.02);
+    0 4px 6px rgba(0, 0, 0, 0.07),
+    0 2px 4px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px) scale(1.01);
   background: #ffffff;
   color: #111827;
 }
@@ -51,15 +50,15 @@
   left: 100%;
 }
 
-/* Enhanced Card hover effects with dark backgrounds */
+/* Enhanced Card hover effects with subtle backgrounds */
 .card-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #374151;
+  border: 1px solid #e5e7eb;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  color: #e5e7eb;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background: #f8fafc;
+  color: #4b5563;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .card-hover-effect::before {
@@ -77,14 +76,14 @@
 }
 
 .card-hover-effect:hover {
-  transform: translateY(-6px);
+  transform: translateY(-3px);
   box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.25),
-    0 10px 10px -5px rgba(0, 0, 0, 0.1),
-    0 0 0 2px rgba(37, 99, 235, 0.8);
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(37, 99, 235, 0.3);
   background: #ffffff;
   color: #111827;
-  border: 2px solid #2563eb;
+  border: 1px solid #3b82f6;
 }
 
 .card-hover-effect:hover::before {
@@ -94,23 +93,22 @@
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
   .card-hover-effect:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     box-shadow: 
-      0 12px 20px rgba(0, 0, 0, 0.15),
-      0 0 0 2px rgba(37, 99, 235, 0.6);
+      0 6px 10px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(37, 99, 235, 0.3);
     background: #ffffff;
     color: #111827;
-    border: 2px solid #2563eb;
+    border: 1px solid #3b82f6;
   }
   
   .btn-hover-effect:hover {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-1px) scale(1.01);
     box-shadow: 
-      0 6px 12px rgba(0, 0, 0, 0.15),
-      0 0 0 1px rgba(37, 99, 235, 0.2);
+      0 3px 6px rgba(0, 0, 0, 0.1);
     background: #ffffff;
     color: #111827;
-    border: 2px solid #2563eb;
+    border: 1px solid #3b82f6;
   }
   
   /* Improve touch targets for mobile */
@@ -152,13 +150,13 @@
     color: #4b5563 !important;
   }
   
-  /* Dark theme text colors for better contrast */
+  /* Subtle text color adjustments */
   .card-hover-effect .text-gray-600 {
-    color: #9ca3af !important;
+    color: #6b7280 !important;
   }
   
   .card-hover-effect .text-gray-500 {
-    color: #6b7280 !important;
+    color: #9ca3af !important;
   }
   
   /* Fix mobile layout issues */

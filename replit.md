@@ -92,9 +92,10 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Mobile Layout Fixes**: Fixed breaking mobile UI with responsive flex layouts, proper button sizing, and improved text wrapping
 ✓ **ID Badge Cleanup**: Removed confusing ID badges from shift cards to simplify user interface and reduce visual clutter
 ✓ **Force Text Readability**: Added CSS rules to ensure all text remains dark and readable on white hover backgrounds across all components
-✓ **Dark Theme Implementation**: Changed default backgrounds to dark gradients (gray-800 to gray-900) with light text for better visual contrast
-✓ **Rollover Contrast**: Maintained white background with black text on hover for optimal readability as requested
-✓ **Enhanced Dark Styling**: Improved button and card styling with dark backgrounds, light borders, and proper text color hierarchy
+✓ **Subtle Color Scheme**: Replaced dark theme with subtle light gray backgrounds (slate-50) for gentle visual distinction
+✓ **Refined Hover Effects**: Reduced lift distance and shadow intensity for more professional, less dramatic interactions
+✓ **Improved Readability Balance**: Cards transition from light gray to white on hover with darker text for optimal contrast
+✓ **Gentle Visual Feedback**: Maintained blue border highlights but with reduced opacity (30%) for subtle selection indication
 
 ## Future Enhancements (To Revisit)
 
