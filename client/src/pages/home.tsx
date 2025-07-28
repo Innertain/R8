@@ -42,7 +42,7 @@ export default function Home() {
     smsNotifications: false,
     pushNotifications: true,
   });
-  const [unreadNotifications, setUnreadNotifications] = useState(3);
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -87,19 +87,11 @@ export default function Home() {
               <h1 className="text-xl font-semibold text-gray-900">VolunteerShift</h1>
             </div>
             <div className="flex items-center space-x-4">
-              {/* Notification Bell */}
+              {/* Notification Settings */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700">
-                    <Bell className="w-5 h-5" />
-                    {unreadNotifications > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs"
-                      >
-                        {unreadNotifications}
-                      </Badge>
-                    )}
+                    <Settings className="w-5 h-5" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
