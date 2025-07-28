@@ -14,14 +14,15 @@
   transform: translateY(-1px);
 }
 
-/* Enhanced Button hover effects */
+/* Enhanced Button hover effects with high contrast */
 .btn-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid #d1d5db;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  background: #ffffff;
   color: #374151;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-hover-effect::before {
@@ -31,17 +32,18 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
   transition: left 0.5s;
 }
 
 .btn-hover-effect:hover {
-  border-color: #3b82f6;
+  border: 2px solid #2563eb;
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(59, 130, 246, 0.15);
-  transform: translateY(-1px) scale(1.01);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    0 8px 15px rgba(0, 0, 0, 0.12),
+    0 4px 6px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(37, 99, 235, 0.2);
+  transform: translateY(-2px) scale(1.02);
+  background: #ffffff;
   color: #111827;
 }
 
@@ -49,14 +51,15 @@
   left: 100%;
 }
 
-/* Enhanced Card hover effects with softer colors */
+/* Enhanced Card hover effects with high contrast readability */
 .card-hover-effect {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e5e7eb;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: #ffffff;
   color: #374151;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .card-hover-effect::before {
@@ -66,7 +69,7 @@
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
+  background: linear-gradient(45deg, #2563eb, #3b82f6, #1d4ed8, #1e40af);
   border-radius: inherit;
   opacity: 0;
   z-index: -1;
@@ -74,25 +77,40 @@
 }
 
 .card-hover-effect:hover {
-  transform: translateY(-2px);
+  transform: translateY(-6px);
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(59, 130, 246, 0.15);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    0 20px 25px -5px rgba(0, 0, 0, 0.12),
+    0 10px 10px -5px rgba(0, 0, 0, 0.06),
+    0 0 0 2px rgba(37, 99, 235, 0.8);
+  background: #ffffff;
   color: #111827;
-  border-color: #3b82f6;
+  border: 2px solid #2563eb;
+}
+
+.card-hover-effect:hover::before {
+  opacity: 0.1;
 }
 
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
   .card-hover-effect:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px);
+    box-shadow: 
+      0 12px 20px rgba(0, 0, 0, 0.08),
+      0 0 0 2px rgba(37, 99, 235, 0.6);
+    background: #ffffff;
+    color: #111827;
+    border: 2px solid #2563eb;
   }
   
   .btn-hover-effect:hover {
-    transform: translateY(-1px) scale(1.01);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+      0 6px 12px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(37, 99, 235, 0.2);
+    background: #ffffff;
+    color: #111827;
+    border: 2px solid #2563eb;
   }
   
   /* Improve touch targets for mobile */
@@ -121,8 +139,17 @@
   }
   
   .card-hover-effect:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+  
+  /* Ensure all text is readable on hover */
+  .card-hover-effect:hover * {
+    color: inherit !important;
+  }
+  
+  .card-hover-effect:hover .text-gray-600 {
+    color: #4b5563 !important;
   }
   
   /* Fix mobile layout issues */
