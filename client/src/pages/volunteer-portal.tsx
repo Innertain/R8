@@ -996,16 +996,18 @@ export default function VolunteerPortal() {
           {isSignedUp ? (
             <div className="space-y-2">
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center min-w-0 flex-1">
-                    <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
-                    <p className="text-sm font-medium text-green-800 truncate">You're Registered</p>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+                      <p className="text-sm font-medium text-green-800">You're Registered</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-900 border border-green-300 text-xs ml-2 flex-shrink-0">
+                      Confirmed
+                    </Badge>
                   </div>
-                  <Badge className="bg-green-100 text-green-900 border border-green-300 text-xs ml-2 flex-shrink-0">
-                    Confirmed
-                  </Badge>
+                  <p className="text-xs text-green-600 ml-6">Status: {existingAssignment?.status || 'confirmed'}</p>
                 </div>
-                <p className="text-xs text-green-600 ml-6">Status: {existingAssignment?.status || 'confirmed'}</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <Button
