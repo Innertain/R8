@@ -570,21 +570,21 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       {/* Add Availability Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
               Add Availability
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="break-words">
               {selectedSlot && (
                 <>
                   Set your availability from{' '}
-                  <strong>
+                  <strong className="block sm:inline">
                     {format(selectedSlot.start, 'MMM dd, yyyy h:mm a')}
                   </strong>{' '}
                   to{' '}
-                  <strong>
+                  <strong className="block sm:inline">
                     {format(selectedSlot.end, 'MMM dd, yyyy h:mm a')}
                   </strong>
                 </>
@@ -677,7 +677,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       {/* Enhanced Event Details Modal */}
       <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto mx-4"  onClick={(e) => e.stopPropagation()}>
           {selectedEvent && (
             <>
               <DialogHeader>
@@ -722,19 +722,19 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     </div>
                     
                     <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <CalendarIcon className={`h-4 w-4 ${
+                      <div className="flex items-start gap-2">
+                        <CalendarIcon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
                           selectedEvent.resource.status === 'cancelled' ? 'text-red-600' : 'text-green-600'
                         }`} />
-                        <span>{selectedEvent.resource.shift?.dateTime || selectedEvent.start.toLocaleString()}</span>
+                        <span className="break-words">{selectedEvent.resource.shift?.dateTime || selectedEvent.start.toLocaleString()}</span>
                       </div>
                       
                       {selectedEvent.resource.shift?.location && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className={`h-4 w-4 ${
+                        <div className="flex items-start gap-2">
+                          <MapPin className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
                             selectedEvent.resource.status === 'cancelled' ? 'text-red-600' : 'text-green-600'
                           }`} />
-                          <span>{selectedEvent.resource.shift.location}</span>
+                          <span className="break-words">{selectedEvent.resource.shift.location}</span>
                         </div>
                       )}
                       
@@ -753,7 +753,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                       <div className={`mt-3 pt-3 border-t ${
                         selectedEvent.resource.status === 'cancelled' ? 'border-red-200' : 'border-green-200'
                       }`}>
-                        <p className={`text-xs ${
+                        <p className={`text-xs break-words ${
                           selectedEvent.resource.status === 'cancelled' ? 'text-red-700' : 'text-green-700'
                         }`}>
                           <strong>Notes:</strong> {selectedEvent.resource.notes}
@@ -770,40 +770,42 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     )}
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex flex-col gap-2">
                     {selectedEvent.resource.status !== 'cancelled' ? (
                       <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => {
-                            const shift = selectedEvent.resource.shift;
-                            const startTime = new Date(selectedEvent.start);
-                            const endTime = new Date(selectedEvent.end);
-                            
-                            const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(shift?.activityName || 'Volunteer Shift')}&dates=${startTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(`Location: ${shift?.location || 'TBD'}\nStatus: ${selectedEvent.resource.status}\n\nManage this shift in your Volunteer Portal.`)}&location=${encodeURIComponent(shift?.location || '')}`;
-                            
-                            window.open(googleCalendarUrl, '_blank');
-                          }}
-                        >
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          Add to Calendar
-                        </Button>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              const shift = selectedEvent.resource.shift;
+                              const startTime = new Date(selectedEvent.start);
+                              const endTime = new Date(selectedEvent.end);
+                              
+                              const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(shift?.activityName || 'Volunteer Shift')}&dates=${startTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${endTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(`Location: ${shift?.location || 'TBD'}\nStatus: ${selectedEvent.resource.status}\n\nManage this shift in your Volunteer Portal.`)}&location=${encodeURIComponent(shift?.location || '')}`;
+                              
+                              window.open(googleCalendarUrl, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Add to Calendar
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setShowEventModal(false)}
+                          >
+                            Close
+                          </Button>
+                        </div>
                         
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1"
-                          onClick={() => setShowEventModal(false)}
-                        >
-                          Close
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                          className="w-full border-red-200 text-red-600 hover:bg-red-50"
                           onClick={() => {
                             if (confirm(`Are you sure you want to cancel your assignment for "${selectedEvent.resource.shift?.activityName || 'this shift'}"?`)) {
                               // Call the cancel assignment mutation
@@ -817,7 +819,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                         </Button>
                       </>
                     ) : (
-                      <>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -840,7 +842,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                           <UserPlus className="h-3 w-3 mr-1" />
                           Sign Up Again
                         </Button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -854,13 +856,13 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <CalendarIcon className="h-4 w-4 text-blue-600" />
-                        <span>{selectedEvent.start.toLocaleDateString()}</span>
+                        <CalendarIcon className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <span className="break-words">{selectedEvent.start.toLocaleDateString()}</span>
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-blue-900" />
-                        <span>
+                        <Clock className="h-4 w-4 text-blue-900 flex-shrink-0" />
+                        <span className="break-words">
                           {selectedEvent.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
                           {selectedEvent.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
@@ -868,15 +870,15 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                       
                       {selectedEvent.resource?.isRecurring && (
                         <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-blue-600" />
-                          <span>Recurring: {selectedEvent.resource.recurringPattern}</span>
+                          <User className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                          <span className="break-words">Recurring: {selectedEvent.resource.recurringPattern}</span>
                         </div>
                       )}
                     </div>
 
                     {selectedEvent.resource?.notes && (
                       <div className="mt-3 pt-3 border-t border-blue-200">
-                        <p className="text-xs text-blue-700">
+                        <p className="text-xs text-blue-700 break-words">
                           <strong>Notes:</strong> {selectedEvent.resource.notes}
                         </p>
                       </div>
