@@ -637,16 +637,75 @@ export default function VolunteerPortal() {
   // Google Calendar integration helper
   const addToGoogleCalendar = (assignment: any, shift: any) => {
     const title = encodeURIComponent(shift?.activityName || 'Volunteer Shift');
-    const details = encodeURIComponent(`Volunteer assignment: ${assignment.notes || 'No additional notes'}`);
+    const details = encodeURIComponent(`Volunteer assignment: ${assignment.notes || 'No additional notes'}\n\nLocation: ${shift?.location || 'TBD'}\nStatus: ${assignment.status}`);
     const location = encodeURIComponent(shift?.location || 'Location TBD');
     
-    // For demo purposes, use a placeholder date/time
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() + 7); // Next week
-    startDate.setHours(9, 0, 0, 0); // 9 AM
+    // Parse actual shift date/time data
+    let startDate: Date;
+    let endDate: Date;
     
-    const endDate = new Date(startDate);
-    endDate.setHours(12, 0, 0, 0); // 12 PM (3 hours)
+    if (shift?.dateTime) {
+      // Parse the dateTime format from Airtable (e.g., "Wednesday, Jul 30 • 7:00 PM - 10:00 PM")
+      const dateTimeStr = shift.dateTime;
+      
+      try {
+        // Extract components from the date string
+        const dateMatch = dateTimeStr.match(/(\w+),\s+(\w+)\s+(\d+)/);
+        const timeMatch = dateTimeStr.match(/(\d+):(\d+)\s+(AM|PM)\s*-\s*(\d+):(\d+)\s+(AM|PM)/);
+        
+        if (dateMatch && timeMatch) {
+          const [, , month, day] = dateMatch;
+          const [, startHour, startMin, startPeriod, endHour, endMin, endPeriod] = timeMatch;
+          
+          // Get current year and construct date
+          const currentYear = new Date().getFullYear();
+          const monthMap: Record<string, number> = {
+            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+          };
+          
+          const monthNum = monthMap[month] ?? 6; // Default to July if not found
+          const dayNum = parseInt(day);
+          
+          // Convert 12-hour to 24-hour format for start time
+          let startHour24 = parseInt(startHour);
+          if (startPeriod === 'PM' && startHour24 !== 12) startHour24 += 12;
+          if (startPeriod === 'AM' && startHour24 === 12) startHour24 = 0;
+          
+          // Convert 12-hour to 24-hour format for end time
+          let endHour24 = parseInt(endHour);
+          if (endPeriod === 'PM' && endHour24 !== 12) endHour24 += 12;
+          if (endPeriod === 'AM' && endHour24 === 12) endHour24 = 0;
+          
+          startDate = new Date(currentYear, monthNum, dayNum, startHour24, parseInt(startMin));
+          endDate = new Date(currentYear, monthNum, dayNum, endHour24, parseInt(endMin));
+          
+          // Handle case where end time is next day (e.g., 11 PM to 2 AM)
+          if (endDate < startDate) {
+            endDate.setDate(endDate.getDate() + 1);
+          }
+        } else {
+          throw new Error('Unable to parse date/time format');
+        }
+      } catch (error) {
+        console.log('Could not parse shift dateTime, using default:', error);
+        // Fallback to default times
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() + 1); // Tomorrow
+        startDate.setHours(9, 0, 0, 0); // 9 AM
+        
+        endDate = new Date(startDate);
+        endDate.setHours(12, 0, 0, 0); // 12 PM (3 hours)
+      }
+    } else {
+      // No dateTime provided, use defaults
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() + 1); // Tomorrow
+      startDate.setHours(9, 0, 0, 0); // 9 AM
+      
+      endDate = new Date(startDate);
+      endDate.setHours(12, 0, 0, 0); // 12 PM (3 hours)
+    }
     
     const startTime = startDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
     const endTime = endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
