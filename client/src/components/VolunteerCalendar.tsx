@@ -599,7 +599,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
           
 
           
-          <div className="h-[900px] md:h-[900px] sm:h-[800px] overflow-auto">
+          <div className="h-[1200px] md:h-[1200px] sm:h-[1000px] overflow-auto">
             <DragAndDropCalendar
               localizer={localizer}
               events={events}
@@ -621,14 +621,16 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               views={['month', 'week', 'day']}
               defaultView="week"
               step={30}
-              timeslots={2}
+              timeslots={1}
               showAllEvents={true}
-              scrollToTime={new Date(1970, 1, 1, 6, 0, 0)}
+              culture="en-US"
+              scrollToTime={new Date(2025, 0, 1, 6, 0, 0)}
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
               popup={false}
               longPressThreshold={100}
-
+              min={new Date(2025, 0, 1, 0, 0, 0)}
+              max={new Date(2025, 0, 1, 23, 59, 59)}
               eventPropGetter={(event: any) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
@@ -692,6 +694,9 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 timeGutterFormat: (date: any, culture: any, localizer: any) => {
                   const hour = date.getHours();
                   const minutes = date.getMinutes();
+                  
+                  // Show every 30 minutes for better granularity
+                  if (minutes !== 0 && minutes !== 30) return '';
                   
                   // 24-hour format
                   const militaryTime = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
