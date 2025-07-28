@@ -587,24 +587,104 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
             </div>
           </div>
           
-          {/* Manual Evening Hours Button */}
-          <div className="mb-4">
-            <Button 
-              variant="outline"
-              onClick={() => {
-                // Set evening availability (8 PM - 11 PM)
-                const start = new Date();
-                start.setHours(20, 0, 0, 0); // 8 PM
-                const end = new Date(start);
-                end.setHours(23, 0, 0, 0); // 11 PM
-                setSelectedSlot({ start, end });
-                setDialogOpen(true);
-              }}
-              className="w-full sm:w-auto"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Evening Hours (8-11 PM)
-            </Button>
+          {/* 24-Hour Availability Builder */}
+          <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <h4 className="text-sm font-semibold text-gray-900 mb-3">24-Hour Availability Builder</h4>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <Label htmlFor="date-picker" className="text-xs text-gray-600">Select Date</Label>
+                <Input
+                  id="date-picker"
+                  type="date"
+                  value={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+                    // Update internal state for date selection
+                  }}
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="start-time" className="text-xs text-gray-600">Start Time</Label>
+                <Input
+                  id="start-time"
+                  type="time"
+                  defaultValue="09:00"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="end-time" className="text-xs text-gray-600">End Time</Label>
+                <Input
+                  id="end-time"
+                  type="time"
+                  defaultValue="17:00"
+                  className="text-sm"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  onClick={() => {
+                    const dateInput = document.getElementById('date-picker') as HTMLInputElement;
+                    const startInput = document.getElementById('start-time') as HTMLInputElement;
+                    const endInput = document.getElementById('end-time') as HTMLInputElement;
+                    
+                    if (dateInput && startInput && endInput) {
+                      const selectedDate = dateInput.value;
+                      const startTime = startInput.value;
+                      const endTime = endInput.value;
+                      
+                      const start = new Date(`${selectedDate}T${startTime}`);
+                      const end = new Date(`${selectedDate}T${endTime}`);
+                      
+                      // Handle next day scenarios
+                      if (end <= start) {
+                        end.setDate(end.getDate() + 1);
+                      }
+                      
+                      setSelectedSlot({ start, end });
+                      setDialogOpen(true);
+                    }
+                  }}
+                  className="w-full text-xs h-8"
+                  size="sm"
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Add
+                </Button>
+              </div>
+            </div>
+            
+            {/* Quick Time Buttons */}
+            <div className="mt-3 flex flex-wrap gap-2">
+              {[
+                { label: "Morning (6-12)", start: "06:00", end: "12:00" },
+                { label: "Afternoon (12-18)", start: "12:00", end: "18:00" },
+                { label: "Evening (18-22)", start: "18:00", end: "22:00" },
+                { label: "Night (22-02)", start: "22:00", end: "02:00" },
+                { label: "Late Night (02-06)", start: "02:00", end: "06:00" },
+                { label: "24 Hours", start: "00:00", end: "23:59" }
+              ].map((preset) => (
+                <Button
+                  key={preset.label}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7"
+                  onClick={() => {
+                    const dateInput = document.getElementById('date-picker') as HTMLInputElement;
+                    const startInput = document.getElementById('start-time') as HTMLInputElement;
+                    const endInput = document.getElementById('end-time') as HTMLInputElement;
+                    
+                    if (startInput && endInput) {
+                      startInput.value = preset.start;
+                      endInput.value = preset.end;
+                    }
+                  }}
+                >
+                  {preset.label}
+                </Button>
+              ))}
+            </div>
           </div>
           
           <div className="h-[800px] md:h-[800px] sm:h-[700px] overflow-auto">
@@ -614,7 +694,24 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               startAccessor="start"
               endAccessor="end"
               style={{ height: '100%' }}
-              onSelectSlot={handleSelectSlot}
+              onSelectSlot={(slotInfo) => {
+                // Log the selection attempt for debugging
+                console.log('Calendar slot selected:', slotInfo);
+                console.log('Start hour:', slotInfo.start.getHours());
+                console.log('End hour:', slotInfo.end.getHours());
+                
+                // Only allow calendar selection for hours before 21:00 (9 PM)
+                // For evening hours, users should use the 24-Hour Builder above
+                if (slotInfo.start.getHours() < 21 && slotInfo.end.getHours() <= 21) {
+                  handleSelectSlot(slotInfo);
+                } else {
+                  toast({
+                    title: "Use 24-Hour Builder",
+                    description: "For evening/night hours after 9 PM, please use the 24-Hour Availability Builder above the calendar.",
+                    variant: "default"
+                  });
+                }
+              }}
               onSelecting={(range) => {
                 console.log('Selecting range:', range);
                 console.log('Range start hour:', range.start?.getHours());

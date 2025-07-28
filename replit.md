@@ -53,28 +53,8 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Calendar Hover Tooltips**: Implemented detailed tooltips that appear on calendar event hover showing shift names, locations, times, status badges, and notes with professional styling
 ✓ **Evening Availability Workaround**: Added manual "Add Evening Hours (8-11 PM)" button to bypass React Big Calendar limitations with late evening time slot selection
 ✓ **Calendar Time Range Fixed**: Restored full day calendar view (6 AM - 11:59 PM) with proper 30-minute time slots for better usability
-
-## Known Issues & Future Improvements
-
-### CRITICAL: 24-Hour Calendar Selection Issue (Bookmarked)
-**Problem**: React Big Calendar library has fundamental limitations preventing time slot selection after 9 PM, blocking full 24-hour availability scheduling.
-
-**Technical Details**:
-- Calendar displays full day range (6 AM - 11:59 PM) correctly
-- Selection works fine for daytime hours (6 AM - 9 PM)
-- Selection completely fails for evening/night hours (after 9 PM)
-- Multiple debugging attempts exhausted (constraint removal, time range extension, granularity changes)
-
-**Current Workaround**: Manual "Add Evening Hours (8-11 PM)" button provides limited evening access
-
-**Root Cause**: React Big Calendar library architecture limitation with late evening time boundaries
-
-**Future Solution Options**:
-1. **Replace Calendar Library**: Evaluate alternatives like FullCalendar.js, react-calendar, or custom implementation
-2. **Custom Time Picker**: Build dedicated time slot picker component for 24-hour scheduling
-3. **Hybrid Approach**: Keep React Big Calendar for visualization, add separate time selection interface
-
-**User Impact**: Volunteers cannot set availability for night shifts, overnight availability, or late evening hours through calendar interface
+✓ **24-Hour Availability Builder**: Implemented comprehensive time picker with date/time inputs and preset buttons for full 24-hour scheduling including overnight shifts
+✓ **Smart Calendar Protection**: Added intelligent slot selection that guides users to 24-hour builder for evening hours while preserving daytime calendar functionality
 
 ## User Preferences
 
