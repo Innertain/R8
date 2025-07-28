@@ -76,7 +76,7 @@ const CustomEventWrapper = ({ event, children }: { event: any; children: React.R
       const status = event.resource.status;
       
       return (
-        <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-sm max-w-xs">
+        <div className="calendar-tooltip">
           <div className="font-semibold text-gray-900 mb-2">
             {shift?.activityName || 'Volunteer Shift'}
           </div>
@@ -110,7 +110,7 @@ const CustomEventWrapper = ({ event, children }: { event: any; children: React.R
     } else {
       // Availability event
       return (
-        <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-sm max-w-xs">
+        <div className="calendar-tooltip">
           <div className="font-semibold text-blue-900 mb-2">
             {event.resource.isRecurring ? `Available (${event.resource.recurringPattern})` : 'Available Time'}
           </div>
@@ -558,7 +558,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
             {volunteerName}'s Availability Calendar
           </CardTitle>
           <CardDescription>
-            Click and drag to add availability (blue). Drag blue blocks to move them or resize with handles. View committed shifts (green). Click events for details.
+            Click and drag to add availability (blue). Drag blue blocks to move them or resize with handles. View committed shifts (green). Hover over events for details.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -597,7 +597,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               views={['month', 'week', 'day']}
               defaultView="week"
               min={new Date(1970, 1, 1, 6, 0, 0)}
-              max={new Date(1970, 1, 1, 23, 0, 0)}
+              max={new Date(1970, 1, 1, 23, 59, 59)}
               step={30}
               timeslots={2}
               eventPropGetter={(event) => {
@@ -673,11 +673,15 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     Time
                   </div>
                 ),
-                event: ({ event, ...props }: any) => (
-                  <CustomEventWrapper event={event}>
-                    <div {...props} className="h-full w-full" />
-                  </CustomEventWrapper>
-                ),
+                event: ({ event, ...props }: any) => {
+                  // Filter out React Big Calendar specific props that shouldn't go to DOM
+                  const { continuesAfter, continuesPrior, slotStart, slotEnd, isAllDay, ...domProps } = props;
+                  return (
+                    <CustomEventWrapper event={event}>
+                      <div {...domProps} className="h-full w-full" />
+                    </CustomEventWrapper>
+                  );
+                },
               }}
               messages={{
                 allDay: 'All Day',
