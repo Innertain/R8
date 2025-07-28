@@ -47,6 +47,115 @@ interface VolunteerCalendarProps {
   volunteerName: string;
 }
 
+// Custom Event Component with Tooltip
+const CustomEventWrapper = ({ event, children }: { event: any; children: React.ReactNode }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    
+    setTooltipPosition({
+      x: rect.left + scrollX + rect.width / 2,
+      y: rect.top + scrollY - 10
+    });
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
+  const getTooltipContent = () => {
+    if (!event.resource) return null;
+    
+    if (event.resource.type === 'shift') {
+      const shift = event.resource.shift;
+      const status = event.resource.status;
+      
+      return (
+        <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-sm max-w-xs">
+          <div className="font-semibold text-gray-900 mb-2">
+            {shift?.activityName || 'Volunteer Shift'}
+          </div>
+          <div className="space-y-1 text-gray-600">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-3 w-3" />
+              <span>{shift?.location || 'Location TBD'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-3 w-3" />
+              <span>{format(event.start, 'MMM d, h:mm a')} - {format(event.end, 'h:mm a')}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className={`text-xs px-2 py-1 ${
+                status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                status === 'pending' ? 'bg-orange-100 text-orange-800' :
+                status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                'bg-gray-100 text-gray-800'
+              }`}>
+                {status || 'Confirmed'}
+              </Badge>
+            </div>
+            {event.resource.notes && (
+              <div className="mt-2 pt-2 border-t border-gray-100">
+                <span className="text-xs text-gray-500">{event.resource.notes}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    } else {
+      // Availability event
+      return (
+        <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-sm max-w-xs">
+          <div className="font-semibold text-blue-900 mb-2">
+            {event.resource.isRecurring ? `Available (${event.resource.recurringPattern})` : 'Available Time'}
+          </div>
+          <div className="space-y-1 text-gray-600">
+            <div className="flex items-center gap-2">
+              <Clock className="h-3 w-3" />
+              <span>{format(event.start, 'MMM d, h:mm a')} - {format(event.end, 'h:mm a')}</span>
+            </div>
+            {event.resource.notes && (
+              <div className="mt-2 pt-2 border-t border-gray-100">
+                <span className="text-xs text-gray-500">{event.resource.notes}</span>
+              </div>
+            )}
+            <div className="mt-2 pt-2 border-t border-gray-100">
+              <span className="text-xs text-blue-600">Click and drag to move or resize</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div 
+      className="relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+      {showTooltip && (
+        <div 
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: tooltipPosition.x,
+            top: tooltipPosition.y,
+            transform: 'translateX(-50%) translateY(-100%)'
+          }}
+        >
+          {getTooltipContent()}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function VolunteerCalendar({ volunteerId, volunteerName }: VolunteerCalendarProps) {
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -563,6 +672,11 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                   <div className="text-center py-2 text-sm font-medium text-gray-700">
                     Time
                   </div>
+                ),
+                event: ({ event, ...props }: any) => (
+                  <CustomEventWrapper event={event}>
+                    <div {...props} className="h-full w-full" />
+                  </CustomEventWrapper>
                 ),
               }}
               messages={{
