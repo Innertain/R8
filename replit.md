@@ -63,7 +63,8 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Active Notification System**: Bell icon now functional with comprehensive notification settings dialog for volunteer preferences
 ✓ **User Profile Management**: JD profile dropdown with account access, volunteer portal navigation, and settings menu
 ✓ **Notification Badge Counter**: Visual unread notification indicator with red badge showing count
-✓ **Notification Preferences**: Toggle controls for new shifts, reminders, updates, email and push notifications
+✓ **Notification Preferences**: Toggle controls for new shifts, reminders, updates, email, SMS, and push notifications
+✓ **SMS Notification Placeholder**: Added SMS text message notification option with MessageSquare icon for future Twilio integration
 ✓ **User Authentication Display**: Dynamic user initials and profile information with professional dropdown interface
 
 ## Future Enhancements (To Revisit)

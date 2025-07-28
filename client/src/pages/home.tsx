@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Bell, Calendar, MapPin, RefreshCw, Settings, User, LogOut, BellRing, Volume2, VolumeX } from "lucide-react";
+import { Search, Bell, Calendar, MapPin, RefreshCw, Settings, User, LogOut, BellRing, Volume2, VolumeX, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -39,6 +39,7 @@ export default function Home() {
     shiftReminders: true,
     shiftUpdates: true,
     emailNotifications: false,
+    smsNotifications: false,
     pushNotifications: true,
   });
   const [unreadNotifications, setUnreadNotifications] = useState(3);
@@ -163,6 +164,22 @@ export default function Home() {
                           checked={notificationSettings.emailNotifications}
                           onCheckedChange={(checked) => 
                             setNotificationSettings(prev => ({ ...prev, emailNotifications: checked }))
+                          }
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <MessageSquare className="w-4 h-4" />
+                            SMS Notifications
+                          </label>
+                          <p className="text-xs text-muted-foreground">Text message alerts to your phone</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.smsNotifications}
+                          onCheckedChange={(checked) => 
+                            setNotificationSettings(prev => ({ ...prev, smsNotifications: checked }))
                           }
                         />
                       </div>
