@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -611,6 +611,7 @@ export default function VolunteerPortal() {
   const [notificationSettings, setNotificationSettings] = useState({
     newShifts: true,
     shiftReminders: true,
+    emergencyAlerts: true,
     emailNotifications: false,
     smsNotifications: false,
     pushNotifications: true,
@@ -1128,7 +1129,7 @@ export default function VolunteerPortal() {
                     Notification Settings
                   </DialogTitle>
                   <DialogDescription>
-                    Manage how you receive updates about volunteer opportunities and shifts.
+                    Manage how you receive updates about volunteer opportunities, shifts, and emergency alerts.
                   </DialogDescription>
                 </DialogHeader>
                 
@@ -1163,6 +1164,22 @@ export default function VolunteerPortal() {
                         checked={notificationSettings.shiftReminders}
                         onCheckedChange={(checked) => 
                           setNotificationSettings(prev => ({ ...prev, shiftReminders: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          Emergency Alerts
+                        </label>
+                        <p className="text-xs text-muted-foreground">Critical alerts for urgent volunteer needs and emergency situations</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.emergencyAlerts}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, emergencyAlerts: checked }))
                         }
                       />
                     </div>

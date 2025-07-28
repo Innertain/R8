@@ -71,7 +71,9 @@ This is a full-stack volunteer management application built with React/TypeScrip
 ✓ **Consistent UX Across Platform**: Bell and user profile functionality now available in both home page and volunteer portal
 ✓ **Dynamic User Initials**: Profile avatars show actual volunteer initials extracted from their names
 ✓ **Notification Settings Enhanced**: Added Sparkles and Timer icons to notification preferences, removed "Shift Updates" option
-✓ **Streamlined Notification Categories**: Simplified to New Shifts, Shift Reminders, Email, SMS, and Push notifications with visual icons
+✓ **Emergency Alerts Added**: Added AlertTriangle-icon emergency alerts for critical volunteer needs and urgent situations
+✓ **Streamlined Notification Categories**: Simplified to New Shifts, Shift Reminders, Emergency Alerts, Email, SMS, and Push notifications with visual icons
+✓ **Updated Context Description**: Dialog descriptions now include emergency alerts alongside volunteer opportunities and shifts
 
 ## Future Enhancements (To Revisit)
 
