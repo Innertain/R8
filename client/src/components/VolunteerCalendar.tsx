@@ -178,20 +178,56 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Scroll to 6 AM when calendar loads - shows FULL 24-hour grid but positions view at 6 AM
+  // Force calendar to start at 6 AM using aggressive scroll approach
   useEffect(() => {
     const scrollTo6AM = () => {
-      const calendarEl = document.querySelector('.rbc-time-view .rbc-time-content');
-      if (calendarEl) {
-        // Calculate 6 AM position in full 24-hour grid (6 hours * 60px per hour = 360px)
-        const sixAMPosition = 6 * 60;
-        calendarEl.scrollTop = sixAMPosition;
+      // Multiple selectors to ensure we find the scrollable element
+      const selectors = [
+        '.rbc-time-view .rbc-time-content',
+        '.rbc-time-view .rbc-time-column .rbc-timeslot-group',
+        '.rbc-time-view',
+        '.rbc-time-column'
+      ];
+      
+      let scrolled = false;
+      for (const selector of selectors) {
+        const element = document.querySelector(selector) as HTMLElement;
+        if (element && element.scrollHeight > element.clientHeight) {
+          // Force scroll to 6 AM (6 hours * 60px per hour = 360px)
+          const sixAMPosition = 6 * 60;
+          element.scrollTo({
+            top: sixAMPosition,
+            behavior: 'instant'
+          });
+          console.log(`Force scrolled ${selector} to 6 AM position: ${sixAMPosition}px`);
+          scrolled = true;
+          break;
+        }
+      }
+      
+      // If normal scroll didn't work, try CSS transform approach
+      if (!scrolled) {
+        const timeView = document.querySelector('.rbc-time-view') as HTMLElement;
+        if (timeView) {
+          const timeContent = timeView.querySelector('.rbc-time-content') as HTMLElement;
+          if (timeContent) {
+            timeContent.style.transform = 'translateY(-360px)';
+            console.log('Applied CSS transform to position at 6 AM');
+          }
+        }
       }
     };
 
-    // Small delay to ensure calendar is rendered
-    const timer = setTimeout(scrollTo6AM, 300);
-    return () => clearTimeout(timer);
+    // Aggressive retry pattern with multiple approaches
+    const timers = [
+      setTimeout(scrollTo6AM, 50),   // Immediate
+      setTimeout(scrollTo6AM, 200),  // Quick retry
+      setTimeout(scrollTo6AM, 500),  // Medium delay
+      setTimeout(scrollTo6AM, 1000), // Long delay
+      setTimeout(scrollTo6AM, 2000)  // Final attempt
+    ];
+
+    return () => timers.forEach(timer => clearTimeout(timer));
   }, []);
 
   // Fetch volunteer availability
@@ -641,6 +677,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               showAllEvents={true}
               culture="en-US"
               scrollToTime={new Date(1970, 0, 1, 6, 0, 0)}
+              defaultDate={new Date()}
               getNow={() => new Date()}
 
               dayLayoutAlgorithm="no-overlap"
