@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -611,7 +611,6 @@ export default function VolunteerPortal() {
   const [notificationSettings, setNotificationSettings] = useState({
     newShifts: true,
     shiftReminders: true,
-    shiftUpdates: true,
     emailNotifications: false,
     smsNotifications: false,
     pushNotifications: true,
@@ -1138,7 +1137,10 @@ export default function VolunteerPortal() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <label className="text-sm font-medium">New Shifts Available</label>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Sparkles className="w-4 h-4" />
+                          New Shifts Available
+                        </label>
                         <p className="text-xs text-muted-foreground">Get notified when new volunteer opportunities match your preferences</p>
                       </div>
                       <Switch
@@ -1151,26 +1153,16 @@ export default function VolunteerPortal() {
                     
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <label className="text-sm font-medium">Shift Reminders</label>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Timer className="w-4 h-4" />
+                          Shift Reminders
+                        </label>
                         <p className="text-xs text-muted-foreground">Reminders before your upcoming volunteer shifts</p>
                       </div>
                       <Switch
                         checked={notificationSettings.shiftReminders}
                         onCheckedChange={(checked) => 
                           setNotificationSettings(prev => ({ ...prev, shiftReminders: checked }))
-                        }
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <label className="text-sm font-medium">Shift Updates</label>
-                        <p className="text-xs text-muted-foreground">Changes to shifts you're signed up for</p>
-                      </div>
-                      <Switch
-                        checked={notificationSettings.shiftUpdates}
-                        onCheckedChange={(checked) => 
-                          setNotificationSettings(prev => ({ ...prev, shiftUpdates: checked }))
                         }
                       />
                     </div>
