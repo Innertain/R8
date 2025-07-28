@@ -605,7 +605,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       {/* Enhanced Event Details Modal */}
       <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
           {selectedEvent && (
             <>
               <DialogHeader>
@@ -698,7 +698,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     {selectedEvent.resource.status !== 'cancelled' ? (
                       <>
                         <Button
@@ -811,7 +811,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
                       variant="outline"
                       size="sm"
