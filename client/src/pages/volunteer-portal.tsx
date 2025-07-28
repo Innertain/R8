@@ -965,7 +965,7 @@ export default function VolunteerPortal() {
           <h3 className="font-semibold text-lg text-gray-900 mb-2">{shift.activityName}</h3>
           <div className="flex flex-wrap gap-2 mb-3">
             <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-green-100 text-green-900 border border-green-300'}>
-              {shift.status}
+              {shift.status === 'urgent' ? 'Urgent - Need Volunteers' : shift.status === 'active' ? 'Open for Volunteers' : shift.status}
             </Badge>
             {isSignedUp && (
               <Badge className="bg-blue-100 text-blue-900 border border-blue-300 text-xs">

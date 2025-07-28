@@ -24,7 +24,7 @@ const getStatusConfig = (status: string) => {
   switch (status) {
     case "urgent":
       return {
-        label: "Urgent",
+        label: "Urgent - Need Volunteers",
         className: "bg-amber-100 text-amber-900 border border-amber-300",
         progressColor: "bg-amber-500"
       };
@@ -42,7 +42,7 @@ const getStatusConfig = (status: string) => {
       };
     default:
       return {
-        label: "Active",
+        label: "Open for Volunteers",
         className: "bg-emerald-100 text-emerald-900 border border-emerald-300",
         progressColor: "bg-blue-500"
       };
