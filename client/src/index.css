@@ -14,40 +14,41 @@
   transform: translateY(-1px);
 }
 
-/* Clean Button hover effects */
+/* Enhanced Button hover effects */
 .btn-hover-effect {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-hover-effect:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Clean Card hover effects */
+/* Enhanced Card hover effects with better contrast */
 .card-hover-effect {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid #e5e7eb;
   background: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .card-hover-effect:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  border-color: #3b82f6;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+  border-color: #2563eb;
+  border-width: 2px;
 }
 
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
   .card-hover-effect:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
   
   .btn-hover-effect:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   .shift-card-content .flex.gap-2 {
     flex-direction: column;
