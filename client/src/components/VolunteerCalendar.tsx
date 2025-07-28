@@ -599,7 +599,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
           
 
           
-          <div className="h-[1200px] md:h-[1200px] sm:h-[1000px] overflow-auto">
+          <div className="h-[800px] md:h-[800px] sm:h-[700px] overflow-auto">
             <DragAndDropCalendar
               localizer={localizer}
               events={events}
@@ -624,13 +624,12 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               timeslots={1}
               showAllEvents={true}
               culture="en-US"
-              scrollToTime={new Date(2025, 0, 1, 6, 0, 0)}
+              scrollToTime={new Date(1970, 0, 1, 6, 0, 0)}
               dayLayoutAlgorithm="no-overlap"
               showMultiDayTimes={true}
               popup={false}
               longPressThreshold={100}
-              min={new Date(2025, 0, 1, 6, 0, 0)}
-              max={new Date(2025, 0, 2, 5, 59, 59)}
+
               eventPropGetter={(event: any) => {
                 if (event.resource?.type === 'shift') {
                   // Different colors based on shift status - clean solid colors with hover classes
@@ -698,8 +697,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                   // Show only on the hour
                   if (minutes !== 0) return '';
                   
-                  // For 24-hour display with 6 AM offset
-                  const displayHour = hour < 6 ? hour + 24 : hour;
+                  // 24-hour format
                   const militaryTime = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
                   
                   // 12-hour format
