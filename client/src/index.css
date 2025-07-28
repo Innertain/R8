@@ -14,42 +14,145 @@
   transform: translateY(-1px);
 }
 
-/* Button hover effects */
+/* Enhanced Button hover effects */
 .btn-hover-effect {
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
   position: relative;
+  overflow: hidden;
+}
+
+.btn-hover-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
 .btn-hover-effect:hover {
   border-color: #1d4ed8;
-  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
-  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(29, 78, 216, 0.4),
+    0 0 0 1px rgba(29, 78, 216, 0.1);
+  transform: translateY(-3px) scale(1.05);
 }
 
-/* Card hover effects */
+.btn-hover-effect:hover::before {
+  left: 100%;
+}
+
+/* Enhanced Card hover effects with outer stroke */
 .card-hover-effect {
-  transition: all 0.3s ease-in-out;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-hover-effect::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
+  border-radius: inherit;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease-in-out;
 }
 
 .card-hover-effect:hover {
-  border-color: #6366f1;
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
-  transform: translateY(-3px);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(59, 130, 246, 0.3),
+    0 0 0 1px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 }
 
-/* Settings icon hover effect */
+.card-hover-effect:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced Settings icon hover effect */
 .settings-hover-effect {
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
   border-radius: 8px;
+  position: relative;
+}
+
+.settings-hover-effect::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #f59e0b, #eab308, #f97316);
+  border-radius: inherit;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .settings-hover-effect:hover {
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  transform: translateY(-2px) rotate(180deg) scale(1.1);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
   background-color: rgba(245, 158, 11, 0.05);
+}
+
+.settings-hover-effect:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced shift card specific effects */
+.shift-card-content {
+  transition: all 0.3s ease-in-out;
+}
+
+.card-hover-effect:hover .shift-card-content {
+  color: #1e293b;
+}
+
+.card-hover-effect:hover .progress-bar {
+  animation: progressGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes progressGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+  }
+}
+
+/* Badge hover enhancement */
+.card-hover-effect:hover .status-badge {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon glow effect on hover */
+.card-hover-effect:hover .activity-icon {
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* React Big Calendar CSS Overrides */

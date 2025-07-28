@@ -128,11 +128,11 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
           <div className={`w-10 h-10 ${bgColor} rounded-lg flex items-center justify-center mr-3`}>
-            <Icon className={`${iconColor} w-5 h-5`} />
+            <Icon className={`${iconColor} w-5 h-5 activity-icon transition-all duration-300`} />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900 text-lg">{shift.activityName}</h3>
-            <Badge className={`${statusConfig.className} text-xs mt-1`}>
+            <Badge className={`${statusConfig.className} text-xs mt-1 status-badge transition-all duration-300`}>
               {statusConfig.label}
             </Badge>
           </div>
@@ -140,29 +140,29 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
       </div>
 
       {/* Date & Time */}
-      <div className="flex items-center mb-3 text-gray-600">
+      <div className="flex items-center mb-3 text-gray-600 shift-card-content">
         <Calendar className="w-4 h-4 mr-3 text-gray-400" />
         <span className="text-sm">{shift.dateTime}</span>
       </div>
 
       {/* Location */}
-      <div className="flex items-center mb-3 text-gray-600">
+      <div className="flex items-center mb-3 text-gray-600 shift-card-content">
         <MapPin className="w-4 h-4 mr-3 text-gray-400" />
         <span className="text-sm">{shift.location}</span>
       </div>
 
       {/* Host Information */}
       {shift.host && (
-        <div className="flex items-center mb-4 text-gray-600">
+        <div className="flex items-center mb-4 text-gray-600 shift-card-content">
           <div className="w-4 h-4 mr-3 flex items-center justify-center">
             {shift.host.logo ? (
               <img 
                 src={shift.host.logo} 
                 alt={`${shift.host.name} logo`}
-                className="w-4 h-4 object-contain"
+                className="w-4 h-4 object-contain activity-icon transition-all duration-300"
               />
             ) : (
-              <div className="w-4 h-4 bg-blue-500 rounded-sm flex items-center justify-center">
+              <div className="w-4 h-4 bg-blue-500 rounded-sm flex items-center justify-center activity-icon transition-all duration-300">
                 <span className="text-white text-xs font-bold">
                   {shift.host.name.charAt(0).toUpperCase()}
                 </span>
@@ -188,7 +188,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
         {/* Progress Bar */}
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
-            className={`${statusConfig.progressColor} h-2 rounded-full transition-all duration-300`}
+            className={`${statusConfig.progressColor} h-2 rounded-full transition-all duration-300 progress-bar`}
             style={{ width: `${Math.min(progressPercentage, 100)}%` }}
           />
         </div>
