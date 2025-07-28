@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Calendar as CalendarIcon, Clock, User, UserPlus, CheckCircle, XCircle, MapPin, ExternalLink, Trash2, Link, Smartphone } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, Clock, User, UserPlus, CheckCircle, XCircle, MapPin, ExternalLink, Trash2, Link, Smartphone, RefreshCw, ArrowLeftRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -774,7 +774,10 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Link className="h-5 w-5" />
+            <div className="relative">
+              <CalendarIcon className="h-5 w-5" />
+              <ArrowLeftRight className="h-3 w-3 absolute -top-1 -right-1 text-blue-600" />
+            </div>
             Calendar Sync
           </CardTitle>
           <CardDescription>
