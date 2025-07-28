@@ -1326,10 +1326,10 @@ export default function VolunteerPortal() {
           </TabsList>
           
           <TabsContent value="dashboard" className="space-y-6">
-            <Card>
+            <Card className="card-hover-effect">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CalendarDays className="h-5 w-5" />
+                  <CalendarDays className="h-5 w-5 activity-icon" />
                   My Volunteer Shifts
                 </CardTitle>
                 <CardDescription>
@@ -1384,8 +1384,8 @@ export default function VolunteerPortal() {
                         const StatusIcon = statusIcon;
                         
                         return (
-                          <Card key={assignment.id} className="border-l-4 border-l-blue-500">
-                            <CardContent className="p-4">
+                          <Card key={assignment.id} className="border-l-4 border-l-blue-500 card-hover-effect">
+                            <CardContent className="p-4 shift-card-content">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
@@ -1394,9 +1394,9 @@ export default function VolunteerPortal() {
                                     </h4>
                                     <Badge 
                                       variant="outline"
-                                      className={`flex items-center gap-1 ${statusColor}`}
+                                      className={`flex items-center gap-1 ${statusColor} status-badge transition-all duration-300`}
                                     >
-                                      <StatusIcon className="h-3 w-3" />
+                                      <StatusIcon className="h-3 w-3 activity-icon" />
                                       {assignment.status}
                                     </Badge>
                                   </div>
@@ -1421,9 +1421,9 @@ export default function VolunteerPortal() {
                                       size="sm"
                                       variant="outline"
                                       onClick={() => addToGoogleCalendar(assignment, matchedShift)}
-                                      className="flex items-center gap-1 text-xs"
+                                      className="flex items-center gap-1 text-xs btn-hover-effect"
                                     >
-                                      <CalendarPlus className="h-3 w-3" />
+                                      <CalendarPlus className="h-3 w-3 activity-icon" />
                                       Add to Calendar
                                     </Button>
                                     
@@ -1432,9 +1432,9 @@ export default function VolunteerPortal() {
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700"
+                                          className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 btn-hover-effect"
                                         >
-                                          <Trash2 className="h-3 w-3" />
+                                          <Trash2 className="h-3 w-3 activity-icon" />
                                           Cancel
                                         </Button>
                                       </AlertDialogTrigger>
@@ -1473,10 +1473,10 @@ export default function VolunteerPortal() {
           </TabsContent>
           
           <TabsContent value="browse" className="space-y-6">
-            <Card>
+            <Card className="card-hover-effect">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5 activity-icon" />
                   Available Volunteer Shifts
                 </CardTitle>
                 <CardDescription>
@@ -1521,10 +1521,10 @@ export default function VolunteerPortal() {
           <p className="text-gray-600">Set your availability and manage your volunteer schedule</p>
         </div>
 
-        <Card>
+        <Card className="card-hover-effect">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <LogIn className="h-5 w-5" />
+              <LogIn className="h-5 w-5 activity-icon" />
               Volunteer Access
             </CardTitle>
             <CardDescription>
@@ -1551,7 +1551,7 @@ export default function VolunteerPortal() {
                 variant="outline" 
                 size="sm" 
                 onClick={() => setPhoneNumber("555-DEMO")}
-                className="text-xs justify-start"
+                className="text-xs justify-start btn-hover-effect"
               >
                 🎭 Demo: 555-DEMO - Test Account
               </Button>
@@ -1563,7 +1563,7 @@ export default function VolunteerPortal() {
             <Button 
               onClick={handleLogin} 
               disabled={loginMutation.isPending}
-              className="w-full"
+              className="w-full btn-hover-effect"
             >
               {loginMutation.isPending ? 'Checking...' : 'Access Portal'}
             </Button>
@@ -1648,12 +1648,13 @@ export default function VolunteerPortal() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowRegister(false)}>
+              <Button variant="outline" onClick={() => setShowRegister(false)} className="btn-hover-effect">
                 Cancel
               </Button>
               <Button 
                 onClick={handleRegister}
                 disabled={registerMutation.isPending}
+                className="btn-hover-effect"
               >
                 {registerMutation.isPending ? 'Registering...' : 'Register'}
               </Button>
