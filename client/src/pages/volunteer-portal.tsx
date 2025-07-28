@@ -962,19 +962,17 @@ export default function VolunteerPortal() {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6 card-hover-effect w-full">
         <div className="mb-4">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-lg text-gray-900 flex-1 min-w-0 pr-2">{shift.activityName}</h3>
-            <div className="flex flex-col gap-1 flex-shrink-0">
-              <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-green-100 text-green-900 border border-green-300'}>
-                {shift.status}
+          <h3 className="font-semibold text-lg text-gray-900 mb-2">{shift.activityName}</h3>
+          <div className="flex flex-wrap gap-2 mb-3">
+            <Badge className={shift.status === 'urgent' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-green-100 text-green-900 border border-green-300'}>
+              {shift.status}
+            </Badge>
+            {isSignedUp && (
+              <Badge className="bg-blue-100 text-blue-900 border border-blue-300 text-xs">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                Signed Up
               </Badge>
-              {isSignedUp && (
-                <Badge className="bg-blue-100 text-blue-900 border border-blue-300 text-xs">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  Signed Up
-                </Badge>
-              )}
-            </div>
+            )}
           </div>
           <div className="space-y-1">
             <p className="text-sm text-gray-600">{shift.dateTime}</p>
