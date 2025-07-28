@@ -914,7 +914,7 @@ export default function VolunteerPortal() {
                     <p className="text-xs text-green-600">Status: {existingAssignment?.status || 'Confirmed'}</p>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-800 border-green-200">
+                <Badge className="bg-green-100 text-green-900 border border-green-300">
                   Confirmed
                 </Badge>
               </div>
@@ -1113,8 +1113,8 @@ export default function VolunteerPortal() {
                         const matchedShift = shifts.find((s: any) => s.id === assignment.shiftId);
                         const statusIcon = assignment.status === 'confirmed' ? CheckCircle : 
                                          assignment.status === 'pending' ? Clock : XCircle;
-                        const statusColor = assignment.status === 'confirmed' ? 'text-green-600' : 
-                                          assignment.status === 'pending' ? 'text-yellow-600' : 'text-red-600';
+                        const statusColor = assignment.status === 'confirmed' ? 'text-green-900 bg-green-100 border border-green-300' : 
+                                          assignment.status === 'pending' ? 'text-yellow-900 bg-yellow-100 border border-yellow-300' : 'text-red-900 bg-red-100 border border-red-300';
                         const StatusIcon = statusIcon;
                         
                         return (
@@ -1127,7 +1127,7 @@ export default function VolunteerPortal() {
                                       {matchedShift?.activityName || 'River Clean up'}
                                     </h4>
                                     <Badge 
-                                      variant={assignment.status === 'confirmed' ? 'default' : 'secondary'}
+                                      variant="outline"
                                       className={`flex items-center gap-1 ${statusColor}`}
                                     >
                                       <StatusIcon className="h-3 w-3" />
