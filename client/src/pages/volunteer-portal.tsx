@@ -960,7 +960,7 @@ export default function VolunteerPortal() {
     const isFull = shift.status === "full";
     
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 card-hover-effect">
         <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="font-semibold text-lg">{shift.activityName}</h3>
@@ -1111,7 +1111,7 @@ export default function VolunteerPortal() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700 settings-hover-effect">
-                  <Settings className="w-5 h-5" />
+                  <Bell className="w-5 h-5" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
