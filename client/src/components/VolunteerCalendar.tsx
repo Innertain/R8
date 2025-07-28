@@ -781,7 +781,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
             Calendar Sync
           </CardTitle>
           <CardDescription>
-            Connect your calendar apps to automatically sync your availability
+            Connect your calendar apps to automatically sync your volunteer availability and shift commitments
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -797,7 +797,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               </div>
               <div>
                 <p className="font-medium text-gray-900">Google Calendar</p>
-                <p className="text-sm text-gray-500">Sync your availability automatically</p>
+                <p className="text-sm text-gray-500">Sync volunteer shifts and availability automatically</p>
               </div>
             </div>
             <Button variant="outline" disabled>
@@ -815,7 +815,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               </div>
               <div>
                 <p className="font-medium text-gray-900">Apple Calendar</p>
-                <p className="text-sm text-gray-500">Sync with iCloud Calendar</p>
+                <p className="text-sm text-gray-500">Sync volunteer activities to iCloud Calendar</p>
               </div>
             </div>
             <Button variant="outline" disabled>
