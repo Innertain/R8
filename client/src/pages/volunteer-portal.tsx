@@ -1101,15 +1101,6 @@ export default function VolunteerPortal() {
             <p className="text-gray-600">Welcome back, {currentVolunteer.name}</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Powered by</span>
-              <img 
-                src="/src/assets/r8-logo.png"
-                alt="R8 Logo" 
-                className="w-8 h-8"
-              />
-              <span className="text-sm font-medium text-gray-900">R8</span>
-            </div>
             {/* Notification Settings */}
             <Dialog>
               <DialogTrigger asChild>

@@ -18,7 +18,14 @@ function Navigation() {
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="container mx-auto flex items-center justify-between">
-        <h1 className="text-xl font-bold">Volunteer Management</h1>
+        <div className="flex items-center space-x-2">
+          <h1 className="text-xl font-bold">Volunteer Management</h1>
+          <img 
+            src="/src/assets/r8-logo.png"
+            alt="R8 Logo" 
+            className="w-8 h-8"
+          />
+        </div>
         
         {/* Desktop Navigation */}
         <div className="hidden sm:flex gap-2">
