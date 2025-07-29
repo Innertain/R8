@@ -346,12 +346,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Special handling for demo account
+      if (phone === "555-DEMO" || normalizedSearchPhone === "555DEMO") {
+        console.log('Providing demo account fallback');
+        return res.json({
+          id: 'demo-volunteer-id',
+          name: 'Demo Volunteer',
+          phone: '555-DEMO',
+          email: 'demo@example.com',
+          skills: ['Food Distribution', 'Community Support', 'Event Setup'],
+          isActive: true,
+          isDriver: true,
+          source: 'demo'
+        });
+      }
+      
       // Fallback to storage (includes demo account)
       const volunteer = await storage.getVolunteerByPhone(phone);
       if (volunteer) {
         return res.json(volunteer);
       }
       
+      console.log(`No volunteer found for phone: ${phone}`);
       res.status(404).json({ error: "Volunteer not found" });
       
     } catch (error: any) {
