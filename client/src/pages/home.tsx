@@ -86,7 +86,17 @@ export default function Home() {
               <Calendar className="text-blue-500 text-2xl mr-3" />
               <h1 className="text-xl font-semibold text-gray-900">VolunteerShift</h1>
             </div>
+            
             <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Powered by</span>
+                <img 
+                  src="/src/assets/r8-logo.png"
+                  alt="R8 Logo" 
+                  className="w-8 h-8"
+                />
+                <span className="text-sm font-medium text-gray-900">R8</span>
+              </div>
               {/* Notification Settings */}
               <Dialog>
                 <DialogTrigger asChild>
@@ -358,7 +368,7 @@ export default function Home() {
             <img 
               src="/src/assets/r8-logo.png"
               alt="R8 Logo" 
-              className="w-6 h-6"
+              className="w-8 h-8"
             />
             <span className="text-sm font-medium">R8</span>
           </div>
