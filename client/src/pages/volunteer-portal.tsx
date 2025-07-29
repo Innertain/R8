@@ -1645,6 +1645,21 @@ export default function VolunteerPortal() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t border-gray-200 py-6 mt-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center space-x-2 text-gray-600">
+            <span className="text-sm">Powered by</span>
+            <img 
+              src="/src/assets/r8-logo.png"
+              alt="R8 Logo" 
+              className="w-6 h-6"
+            />
+            <span className="text-sm font-medium">R8</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
