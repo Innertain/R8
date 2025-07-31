@@ -424,8 +424,8 @@ export function EnhancedRssFeed({
                           <span className="font-medium">{alert.location}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="bg-white/70 px-2 py-1 rounded text-xs font-semibold border border-white/40 shadow-sm">
-                            {alert.alertType}
+                          <span className="bg-blue-500/20 text-blue-900 px-2 py-1 rounded text-xs font-semibold border border-blue-300 shadow-sm">
+                            NWS: {alert.alertType}
                           </span>
                         </div>
                       </div>
@@ -447,9 +447,9 @@ export function EnhancedRssFeed({
                             href={alert.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-medium inline-flex items-center gap-1 hover:underline opacity-75 hover:opacity-100 transition-opacity"
+                            className="text-xs font-medium inline-flex items-center gap-1 hover:underline opacity-75 hover:opacity-100 transition-opacity bg-white/50 px-2 py-1 rounded"
                           >
-                            Details <ExternalLink className="w-3 h-3" />
+                            NWS Alert <ExternalLink className="w-3 h-3" />
                           </a>
                         )}
                       </div>
