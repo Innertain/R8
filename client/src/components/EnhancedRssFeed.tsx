@@ -1,152 +1,102 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
+import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3, CloudRain, CloudSnow, CloudLightning, Thermometer } from "lucide-react";
 
 interface EmergencyAlert {
   id: string;
   title: string;
-  description: string;
-  location: string;
   severity: string;
-  urgency: string;
-  certainty: string;
-  sent: string;
-  expires?: string;
-  senderName: string;
-  web?: string;
+  alertType: string;
+  location: string;
+  description?: string;
+  pubDate: string;
+  guid: string;
+  link?: string;
 }
 
 interface FemaDisasterItem {
-  title: string;
-  link: string;
-  pubDate: string;
-  description: string;
   guid: string;
-  disasterNumber: string;
+  title: string;
   state: string;
-  incidentType: string;
   declarationType: string;
+  disasterNumber: string;
+  incidentType?: string;
   declarationDate: string;
   incidentBeginDate?: string;
   incidentEndDate?: string;
+  description?: string;
+  femaRegion?: string;
+  placeCode?: string;
+  designatedArea?: string;
 }
 
 interface ReliefWebItem {
-  title: string;
-  link: string;
-  pubDate: string;
-  description: string;
   guid: string;
+  title: string;
   country: string;
-  glideCode: string;
   disasterType: string;
-}
-
-interface HumanitarianItem {
-  title: string;
-  link: string;
+  glideCode?: string;
+  description?: string;
   pubDate: string;
-  description: string;
-  guid: string;
-  category: string;
-  region: string;
-  newsType: string;
-}
-
-interface AlertsResponse {
-  success: boolean;
-  alerts: EmergencyAlert[];
-  source: string;
-  lastUpdated: string;
-}
-
-interface RssResponse {
-  success: boolean;
-  items: FemaRssItem[];
+  link: string;
 }
 
 interface EnhancedRssFeedProps {
-  maxItems?: number;
   stateFilter?: string;
+  maxItems?: number;
   showFilters?: boolean;
   showAnalytics?: boolean;
 }
 
-const severityColors = {
-  extreme: "bg-red-100 border-red-300 text-red-800",
-  severe: "bg-orange-100 border-orange-300 text-orange-800", 
-  moderate: "bg-yellow-100 border-yellow-300 text-yellow-800",
-  minor: "bg-blue-100 border-blue-300 text-blue-800",
-  unknown: "bg-gray-100 border-gray-300 text-gray-800"
-};
-
-const urgencyColors = {
-  immediate: "border-l-4 border-l-red-500",
-  expected: "border-l-4 border-l-orange-500",
-  future: "border-l-4 border-l-yellow-500",
-  past: "border-l-4 border-l-gray-500",
-  unknown: "border-l-4 border-l-gray-400"
-};
-
-export default function EnhancedRssFeed({ 
-  maxItems = 10, 
+export function EnhancedRssFeed({ 
   stateFilter, 
-  showFilters = true,
+  maxItems = 50, 
+  showFilters = true, 
   showAnalytics = true 
 }: EnhancedRssFeedProps) {
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [femaDisasters, setFemaDisasters] = useState<FemaDisasterItem[]>([]);
   const [globalDisasters, setGlobalDisasters] = useState<ReliefWebItem[]>([]);
-  const [humanitarianNews, setHumanitarianNews] = useState<HumanitarianItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'live' | 'declarations' | 'global' | 'news'>('live');
+  const [activeTab, setActiveTab] = useState<'live' | 'declarations' | 'global'>('live');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [locationFilter, setLocationFilter] = useState<string>(stateFilter || 'all');
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchEmergencyData = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // Fetch live alerts, FEMA disasters, global disasters, and humanitarian news
-        const [alertsResponse, femaResponse, globalResponse, newsResponse] = await Promise.all([
-          fetch('/api/emergency-alerts'),
-          fetch('/api/fema-disasters'),
-          fetch('/api/reliefweb-disasters'),
-          fetch('/api/humanitarian-news')
-        ]);
-        
+
+        // Fetch emergency alerts
+        const alertsResponse = await fetch('/api/emergency-alerts');
         if (alertsResponse.ok) {
-          const alertsData: AlertsResponse = await alertsResponse.json();
+          const alertsData = await alertsResponse.json();
           if (alertsData.success) {
             setAlerts(alertsData.alerts || []);
           }
         }
-        
+
+        // Fetch FEMA disaster declarations
+        const femaResponse = await fetch('/api/fema-disasters');
         if (femaResponse.ok) {
           const femaData = await femaResponse.json();
           if (femaData.success) {
             setFemaDisasters(femaData.items || []);
           }
         }
-        
+
+        // Fetch global disasters from ReliefWeb
+        const globalResponse = await fetch('/api/reliefweb-disasters');
         if (globalResponse.ok) {
           const globalData = await globalResponse.json();
           if (globalData.success) {
             setGlobalDisasters(globalData.items || []);
-          }
-        }
-        
-        if (newsResponse.ok) {
-          const newsData = await newsResponse.json();
-          if (newsData.success) {
-            setHumanitarianNews(newsData.items || []);
           }
         }
         
@@ -158,73 +108,87 @@ export default function EnhancedRssFeed({
       }
     };
 
-    fetchData();
-    // Refresh every 30 minutes to reduce API calls - emergency data doesn't change frequently
-    const interval = setInterval(fetchData, 30 * 60 * 1000); // Refresh every 30 minutes
+    fetchEmergencyData();
+    
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchEmergencyData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // Filter alerts based on current filters
+  // Function to get appropriate icon for alert type with enhanced weather icons
+  const getAlertIcon = (alertType: string) => {
+    if (!alertType) return AlertTriangle;
+    const type = alertType.toLowerCase();
+    if (type.includes('fire')) return Flame;
+    if (type.includes('flood')) return Waves;
+    if (type.includes('storm') || type.includes('wind')) return Wind;
+    if (type.includes('heat')) return Sun;
+    if (type.includes('snow') || type.includes('ice')) return CloudSnow;
+    if (type.includes('rain') || type.includes('precipitation')) return CloudRain;
+    if (type.includes('thunder') || type.includes('lightning')) return CloudLightning;
+    if (type.includes('temperature') || type.includes('temp')) return Thermometer;
+    if (type.includes('earthquake')) return Mountain;
+    if (type.includes('weather')) return Sun;
+    return AlertTriangle;
+  };
+
+  // Function to get appropriate icon for disaster type
+  const getDisasterIcon = (disasterType?: string) => {
+    if (!disasterType) return AlertTriangle;
+    const type = disasterType.toLowerCase();
+    if (type.includes('fire')) return Flame;
+    if (type.includes('flood')) return Waves;
+    if (type.includes('hurricane') || type.includes('storm')) return Wind;
+    if (type.includes('earthquake')) return Mountain;
+    if (type.includes('drought')) return Sun;
+    if (type.includes('snow') || type.includes('ice')) return Snowflake;
+    if (type.includes('tornado')) return Wind;
+    if (type.includes('severe storm')) return Zap;
+    return AlertTriangle;
+  };
+
+  // Filter alerts based on severity and location
   const filteredAlerts = alerts.filter(alert => {
-    if (severityFilter !== 'all' && alert.severity !== severityFilter) return false;
-    if (locationFilter !== 'all' && !alert.location.toUpperCase().includes(locationFilter.toUpperCase())) return false;
-    return true;
+    const severityMatch = severityFilter === 'all' || (alert.severity && alert.severity.toLowerCase().includes(severityFilter.toLowerCase()));
+    const locationMatch = locationFilter === 'all' || (alert.location && alert.location.toLowerCase().includes(locationFilter.toLowerCase()));
+    return severityMatch && locationMatch;
   }).slice(0, maxItems);
 
-  // Filter FEMA disasters based on location filter
+  // Filter FEMA disasters by state if specified
   const filteredFemaDisasters = femaDisasters.filter(disaster => {
-    if (locationFilter !== 'all' && disaster.state !== locationFilter && !disaster.title.toUpperCase().includes(locationFilter.toUpperCase())) return false;
+    if (stateFilter && stateFilter !== 'all') {
+      return disaster.state === stateFilter;
+    }
     return true;
   }).slice(0, maxItems);
 
-  // FEMA Disaster Statistics
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  // Calculate statistics for analytics
   const femaStats = {
-    byType: femaDisasters.reduce((acc, disaster) => {
-      const type = disaster.incidentType || 'Other';
-      acc[type] = (acc[type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>),
+    totalDeclarations: femaDisasters.length,
     byState: femaDisasters.reduce((acc, disaster) => {
       acc[disaster.state] = (acc[disaster.state] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    byType: femaDisasters.reduce((acc, disaster) => {
+      const type = disaster.incidentType || 'Unknown';
+      acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
     byDeclarationType: femaDisasters.reduce((acc, disaster) => {
       acc[disaster.declarationType] = (acc[disaster.declarationType] || 0) + 1;
       return acc;
-    }, {} as Record<string, number>),
-    totalDeclarations: femaDisasters.length
+    }, {} as Record<string, number>)
   };
 
-  // Get disaster type icon
-  const getDisasterIcon = (incidentType: string) => {
-    const type = incidentType?.toLowerCase() || '';
-    if (type.includes('fire') || type.includes('wildfire')) return Flame;
-    if (type.includes('flood') || type.includes('flooding')) return Waves;
-    if (type.includes('hurricane') || type.includes('typhoon') || type.includes('storm')) return Wind;
-    if (type.includes('earthquake') || type.includes('seismic')) return Mountain;
-    if (type.includes('tornado') || type.includes('severe storm')) return Wind;
-    if (type.includes('drought') || type.includes('heat')) return Sun;
-    if (type.includes('winter') || type.includes('snow') || type.includes('ice')) return Snowflake;
-    if (type.includes('hazmat') || type.includes('chemical')) return Factory;
-    if (type.includes('terrorist') || type.includes('attack')) return AlertTriangle;
-    return Home; // Default for other/multiple incidents
-  };
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'Unknown';
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
-    } catch {
-      return 'Unknown';
-    }
-  };
-
-  // Analytics data
   const severityStats = alerts.reduce((acc, alert) => {
     acc[alert.severity] = (acc[alert.severity] || 0) + 1;
     return acc;
@@ -304,8 +268,8 @@ export default function EnhancedRssFeed({
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'live' | 'declarations' | 'global' | 'news')}>
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'live' | 'declarations' | 'global')}>
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="live" className="flex items-center gap-1 text-xs">
               <Activity className="w-3 h-3" />
               Live ({alerts.length})
@@ -317,10 +281,6 @@ export default function EnhancedRssFeed({
             <TabsTrigger value="global" className="flex items-center gap-1 text-xs">
               <MapPin className="w-3 h-3" />
               Global ({globalDisasters.length})
-            </TabsTrigger>
-            <TabsTrigger value="news" className="flex items-center gap-1 text-xs">
-              <Clock className="w-3 h-3" />
-              News ({humanitarianNews.length})
             </TabsTrigger>
           </TabsList>
 
@@ -382,39 +342,24 @@ export default function EnhancedRssFeed({
               </div>
 
               <div className="bg-white rounded-lg p-4 border">
-                <div className="text-sm font-medium text-gray-600 mb-3">Data Sources</div>
+                <div className="text-sm font-medium text-gray-600 mb-3">Alert Types</div>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>FEMA IPAWS</span>
-                    <span className="font-medium text-green-600">Active</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>NWS Alerts</span>
-                    <span className="font-medium text-green-600">Active</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>RSS Declarations</span>
-                    <span className="font-medium text-green-600">Active</span>
-                  </div>
+                  {Object.entries(alerts.reduce((acc, alert) => {
+                    acc[alert.alertType] = (acc[alert.alertType] || 0) + 1;
+                    return acc;
+                  }, {} as Record<string, number>)).slice(0, 4).map(([type, count]) => (
+                    <div key={type} className="flex justify-between text-sm">
+                      <span className="truncate">{type}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               <div className="bg-white rounded-lg p-4 border">
-                <div className="text-sm font-medium text-gray-600 mb-3">Feed Status</div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Last Update</span>
-                    <span className="font-medium">{new Date().toLocaleTimeString()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Refresh Rate</span>
-                    <span className="font-medium">30min</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Total Items</span>
-                    <span className="font-medium">{alerts.length + femaDisasters.length + globalDisasters.length + humanitarianNews.length}</span>
-                  </div>
-                </div>
+                <div className="text-sm font-medium text-gray-600 mb-3">Total Active</div>
+                <div className="text-2xl font-bold text-orange-600">{alerts.length}</div>
+                <div className="text-xs text-gray-500">Live Alerts</div>
               </div>
             </div>
           )}
@@ -423,56 +368,79 @@ export default function EnhancedRssFeed({
             {filteredAlerts.length === 0 ? (
               <div className="bg-white rounded-lg p-6 border text-center">
                 <Activity className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">No active emergency alerts</p>
+                <p className="text-gray-600">No emergency alerts currently active</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredAlerts.map((alert) => (
-                  <div
-                    key={alert.id}
-                    className={`rounded-lg border p-4 transition-all hover:shadow-sm bg-white ${urgencyColors[alert.urgency as keyof typeof urgencyColors] || urgencyColors.unknown}`}
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <h3 className="font-semibold text-sm leading-tight flex-1">
-                        {alert.title}
-                      </h3>
-                      <Badge className={severityColors[alert.severity as keyof typeof severityColors] || severityColors.unknown}>
-                        {alert.severity.toUpperCase()}
-                      </Badge>
-                    </div>
-                    
-                    {alert.description && (
-                      <p className="text-xs text-gray-700 mb-3 leading-relaxed">
-                        {alert.description.substring(0, 150)}
-                        {alert.description.length > 150 && '...'}
-                      </p>
-                    )}
-                    
-                    <div className="flex items-center justify-between text-xs text-gray-600">
-                      <div className="flex items-center gap-4">
+                {filteredAlerts.map((alert, index) => {
+                  const AlertIcon = getAlertIcon(alert.alertType);
+                  const severityColors = {
+                    'extreme': 'bg-red-100 border-red-300 text-red-800',
+                    'severe': 'bg-orange-100 border-orange-300 text-orange-800',
+                    'moderate': 'bg-yellow-100 border-yellow-300 text-yellow-800',
+                    'minor': 'bg-blue-100 border-blue-300 text-blue-800'
+                  };
+                  
+                  return (
+                    <div
+                      key={`${alert.guid}-${index}`}
+                      className={`rounded-lg border p-4 transition-all hover:shadow-lg ${severityColors[alert.severity.toLowerCase() as keyof typeof severityColors] || 'bg-gray-100 border-gray-300'}`}
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-full bg-white/50">
+                            <AlertIcon className="w-4 h-4" />
+                          </div>
+                          <h3 className="font-semibold text-sm leading-tight flex-1">
+                            {alert.title}
+                          </h3>
+                        </div>
+                        <Badge className={`text-xs whitespace-nowrap ${alert.severity === 'Extreme' ? 'bg-red-600 text-white' : 
+                          alert.severity === 'Severe' ? 'bg-orange-600 text-white' : 
+                          alert.severity === 'Moderate' ? 'bg-yellow-600 text-white' : 
+                          'bg-blue-600 text-white'}`}>
+                          {alert.severity}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 mb-3 text-xs">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
-                          <span>{alert.location}</span>
+                          <span className="font-medium">{alert.location}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{new Date(alert.sent).toLocaleDateString()}</span>
+                          <span className="bg-white/50 px-2 py-1 rounded text-xs font-medium">
+                            {alert.alertType}
+                          </span>
                         </div>
                       </div>
                       
-                      {alert.web && (
-                        <a
-                          href={alert.web}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
-                        >
-                          Details <ExternalLink className="w-3 h-3" />
-                        </a>
+                      {alert.description && (
+                        <p className="text-xs text-gray-700 mb-3 leading-relaxed line-clamp-3">
+                          {alert.description}
+                        </p>
                       )}
+                      
+                      <div className="flex items-center justify-between pt-2 border-t border-white/30">
+                        <div className="flex items-center gap-1 text-xs opacity-75">
+                          <Clock className="w-3 h-3" />
+                          <span>{new Date(alert.pubDate).toLocaleDateString()}</span>
+                        </div>
+                        
+                        {alert.link && (
+                          <a
+                            href={alert.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-medium inline-flex items-center gap-1 hover:underline opacity-75 hover:opacity-100 transition-opacity"
+                          >
+                            Details <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </TabsContent>
@@ -534,7 +502,7 @@ export default function EnhancedRssFeed({
                     <span className="font-medium text-sm">Total Active</span>
                   </div>
                   <div className="text-2xl font-bold text-orange-600">{femaStats.totalDeclarations}</div>
-                  <div className="text-xs text-gray-500">2025 Declarations</div>
+                  <div className="text-xs text-gray-500">2024-2025 Declarations</div>
                 </div>
               </div>
             )}
@@ -629,19 +597,12 @@ export default function EnhancedRssFeed({
                       <div className="flex items-center justify-between pt-2 border-t">
                         <div className="flex items-center gap-1 text-xs text-gray-500">
                           <Clock className="w-3 h-3" />
-                          <span>
-                            {Math.floor((new Date().getTime() - new Date(disaster.declarationDate).getTime()) / (1000 * 60 * 60 * 24))} days ago
-                          </span>
+                          <span>{formatDate(disaster.declarationDate)}</span>
                         </div>
                         
-                        <a
-                          href={disaster.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
-                        >
-                          FEMA Details <ExternalLink className="w-3 h-3" />
-                        </a>
+                        <div className="text-xs text-blue-700 font-medium">
+                          FEMA-{disaster.disasterNumber}
+                        </div>
                       </div>
                     </div>
                   );
@@ -654,30 +615,27 @@ export default function EnhancedRssFeed({
             {globalDisasters.length === 0 ? (
               <div className="bg-white rounded-lg p-6 border text-center">
                 <MapPin className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">No global disasters reported</p>
+                <p className="text-gray-600">No international disasters reported</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {globalDisasters.slice(0, maxItems).map((disaster, index) => {
-                  const disasterColors = {
-                    'earthquake': 'bg-red-50 border-red-200',
-                    'flood': 'bg-blue-50 border-blue-200',
-                    'wildfire': 'bg-orange-50 border-orange-200',
-                    'hurricane': 'bg-purple-50 border-purple-200',
-                    'drought': 'bg-yellow-50 border-yellow-200',
-                    'other': 'bg-gray-50 border-gray-200'
-                  };
-                  
+                  const DisasterIcon = getDisasterIcon(disaster.disasterType);
                   return (
                     <div
                       key={`${disaster.guid}-${index}`}
-                      className={`rounded-lg border p-4 transition-all hover:shadow-sm ${disasterColors[disaster.disasterType as keyof typeof disasterColors] || disasterColors.other}`}
+                      className="rounded-lg border p-4 transition-all hover:shadow-sm bg-white"
                     >
                       <div className="flex items-start justify-between gap-3 mb-2">
-                        <h3 className="font-semibold text-sm leading-tight flex-1">
-                          {disaster.title}
-                        </h3>
-                        <Badge className="text-xs whitespace-nowrap capitalize bg-blue-100 text-blue-800">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-full bg-gray-100">
+                            <DisasterIcon className="w-4 h-4 text-gray-600" />
+                          </div>
+                          <h3 className="font-semibold text-sm leading-tight flex-1">
+                            {disaster.title}
+                          </h3>
+                        </div>
+                        <Badge className="text-xs whitespace-nowrap capitalize bg-green-100 text-green-800">
                           {disaster.disasterType}
                         </Badge>
                       </div>
@@ -721,79 +679,10 @@ export default function EnhancedRssFeed({
               </div>
             )}
           </TabsContent>
-
-          <TabsContent value="news" className="mt-6">
-            {humanitarianNews.length === 0 ? (
-              <div className="bg-white rounded-lg p-6 border text-center">
-                <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">No humanitarian news available</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {humanitarianNews.slice(0, maxItems).map((news, index) => {
-                  const newsColors = {
-                    'conflict': 'bg-red-50 border-red-200',
-                    'climate': 'bg-green-50 border-green-200',
-                    'health': 'bg-blue-50 border-blue-200',
-                    'food': 'bg-yellow-50 border-yellow-200',
-                    'policy': 'bg-purple-50 border-purple-200',
-                    'funding': 'bg-indigo-50 border-indigo-200',
-                    'general': 'bg-gray-50 border-gray-200'
-                  };
-                  
-                  return (
-                    <div
-                      key={`${news.guid}-${index}`}
-                      className={`rounded-lg border p-4 transition-all hover:shadow-sm ${newsColors[news.newsType as keyof typeof newsColors] || newsColors.general}`}
-                    >
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <h3 className="font-semibold text-sm leading-tight flex-1">
-                          {news.title}
-                        </h3>
-                        <Badge className="text-xs whitespace-nowrap capitalize bg-orange-100 text-orange-800">
-                          {news.newsType}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 mb-3 text-xs text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          <span>{news.region}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="bg-gray-100 px-1 rounded">{news.category}</span>
-                        </div>
-                      </div>
-                      
-                      {news.description && (
-                        <p className="text-xs text-gray-700 mb-3 leading-relaxed">
-                          {news.description}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <Clock className="w-3 h-3" />
-                          <span>{new Date(news.pubDate).toLocaleDateString()}</span>
-                        </div>
-                        
-                        <a
-                          href={news.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
-                        >
-                          Read More <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </TabsContent>
         </Tabs>
       </CardHeader>
     </Card>
   );
 }
+
+export default EnhancedRssFeed;
