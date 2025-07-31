@@ -91,9 +91,26 @@ export default function StatsDashboard() {
 
     const stateMap = new Map<string, StateSummary>();
 
+    // Helper function to normalize state names and filter out invalid ones
+    const normalizeState = (state: string | null | undefined): string | null => {
+      if (!state || state.trim() === '' || state.toLowerCase() === 'unknown') return null;
+      
+      // Normalize common state variations
+      const normalized = state.trim().toUpperCase();
+      
+      // Handle common state name variations
+      if (normalized === 'NORTH CAROLINA') return 'NC';
+      if (normalized === 'CALIFORNIA') return 'CA';
+      if (normalized === 'WEST VIRGINIA') return 'WV';
+      
+      return normalized;
+    };
+
     // Initialize with sites data
     data.sites?.forEach((site: any) => {
-      const state = site.State || 'Unknown';
+      const state = normalizeState(site.State);
+      if (!state) return; // Skip invalid states
+      
       if (!stateMap.has(state)) {
         stateMap.set(state, {
           state,
@@ -109,7 +126,9 @@ export default function StatsDashboard() {
 
     // Add deliveries data
     data.deliveries?.forEach((delivery: any) => {
-      const state = delivery.State || delivery['Delivery State'] || 'Unknown';
+      const state = normalizeState(delivery.State || delivery['Delivery State']);
+      if (!state) return; // Skip invalid states
+      
       if (!stateMap.has(state)) {
         stateMap.set(state, {
           state,
@@ -126,9 +145,11 @@ export default function StatsDashboard() {
       }
     });
 
-    // Add volunteers data - support both API responses and Airtable records
+    // Add volunteers data
     data.volunteers?.forEach((volunteer: any) => {
-      const state = volunteer.state || volunteer.State || volunteer['State'] || 'Unknown';
+      const state = normalizeState(volunteer.state || volunteer.State || volunteer['State']);
+      if (!state) return; // Skip invalid states
+      
       if (!stateMap.has(state)) {
         stateMap.set(state, {
           state,
@@ -144,7 +165,9 @@ export default function StatsDashboard() {
 
     // Add drivers data
     data.drivers?.forEach((driver: any) => {
-      const state = driver.State || driver.state || 'Unknown';
+      const state = normalizeState(driver.State || driver.state);
+      if (!state) return; // Skip invalid states
+      
       if (!stateMap.has(state)) {
         stateMap.set(state, {
           state,
@@ -158,9 +181,11 @@ export default function StatsDashboard() {
       stateMap.get(state)!.drivers++;
     });
 
-    return Array.from(stateMap.values()).sort((a, b) => 
-      (b.sites + b.deliveries + b.volunteers + b.drivers) - (a.sites + a.deliveries + a.volunteers + a.drivers)
-    );
+    return Array.from(stateMap.values())
+      .filter(summary => summary.state !== 'UNKNOWN') // Extra safety filter
+      .sort((a, b) => 
+        (b.sites + b.deliveries + b.volunteers + b.drivers) - (a.sites + a.deliveries + a.volunteers + a.drivers)
+      );
   };
 
   const stateSummaries = processStatsData(statsData);
@@ -499,9 +524,6 @@ export default function StatsDashboard() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Drivers
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Completion Rate
-                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -523,20 +545,6 @@ export default function StatsDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {state.drivers.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {state.deliveries > 0 ? (
-                            <Badge 
-                              variant={
-                                state.completedDeliveries / state.deliveries > 0.8 ? "default" : 
-                                state.completedDeliveries / state.deliveries > 0.5 ? "secondary" : "destructive"
-                              }
-                            >
-                              {((state.completedDeliveries / state.deliveries) * 100).toFixed(1)}%
-                            </Badge>
-                          ) : (
-                            <span className="text-gray-400">N/A</span>
-                          )}
                         </td>
                       </tr>
                     ))}
