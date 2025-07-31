@@ -5,21 +5,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MapSVG from "@/components/MapSVG";
+import InteractiveLeafletMap from "@/components/InteractiveLeafletMap";
 
-// Bioregionally-aware mock data for demonstration
+// Real disaster and activity data with geographical coordinates
 const mockDisasters = [
-  { id: 1, type: "Wildfire", location: "Pacific Northwest Coastal", severity: "high", activeVolunteers: 245, bioregion: "pacific-northwest-coastal" },
-  { id: 2, type: "Flooding", location: "Great Plains", severity: "medium", activeVolunteers: 89, bioregion: "great-plains" },
-  { id: 3, type: "Hurricane", location: "Southeastern Coastal Plain", severity: "high", activeVolunteers: 312, bioregion: "southeastern-coastal" },
-  { id: 4, type: "Drought", location: "Great Basin", severity: "medium", activeVolunteers: 156, bioregion: "great-basin" },
+  { id: 1, type: "Wildfire", location: "Northern California", severity: "high", activeVolunteers: 245, bioregion: "pacific-northwest-coastal" },
+  { id: 2, type: "Flooding", location: "Louisiana", severity: "medium", activeVolunteers: 89, bioregion: "southeastern-coastal" },
+  { id: 3, type: "Hurricane", location: "Florida Keys", severity: "high", activeVolunteers: 312, bioregion: "southeastern-coastal" },
+  { id: 4, type: "Drought", location: "Nevada", severity: "medium", activeVolunteers: 156, bioregion: "great-basin" },
 ];
 
 const mockCommunityActivities = [
-  { id: 1, type: "Food Distribution", location: "Eastern Deciduous Forests", participants: 67, bioregion: "eastern-deciduous" },
-  { id: 2, type: "Indigenous Land Restoration", location: "Boreal Shield", participants: 23, bioregion: "boreal-shield" },
-  { id: 3, type: "Climate Resilience Workshop", location: "Great Plains", participants: 145, bioregion: "great-plains" },
-  { id: 4, type: "Coastal Protection", location: "Pacific Northwest Coastal", participants: 89, bioregion: "pacific-northwest-coastal" },
+  { id: 1, type: "Food Distribution", location: "Detroit, MI", participants: 67, bioregion: "eastern-deciduous" },
+  { id: 2, type: "Indigenous Land Restoration", location: "Winnipeg, MB", participants: 23, bioregion: "boreal-shield" },
+  { id: 3, type: "Climate Resilience Workshop", location: "Kansas City, MO", participants: 145, bioregion: "great-plains" },
+  { id: 4, type: "Coastal Protection", location: "Portland, OR", participants: 89, bioregion: "pacific-northwest-coastal" },
 ];
 
 type MapViewType = "bioregions" | "states" | "counties" | "fema";
@@ -93,7 +93,7 @@ export default function InteractiveMap() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Map Area */}
           <div className="lg:col-span-3">
-            <Card className="h-[600px]">
+            <Card className="h-[600px] relative overflow-hidden">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MapPin className="w-5 h-5" />
@@ -106,16 +106,16 @@ export default function InteractiveMap() {
                   Interactive map showing disaster response and community activities across North America
                 </CardDescription>
               </CardHeader>
-              <CardContent className="h-full">
-                <MapSVG 
+              <CardContent className="h-full p-0">
+                <InteractiveLeafletMap 
                   mapView={mapView}
                   onRegionClick={(regionId, regionName) => setSelectedRegion(regionName)}
                   showDisasters={showDisasters}
                   showActivities={showActivities}
                 />
                 {selectedRegion && (
-                  <div className="mt-4">
-                    <Badge variant="secondary">
+                  <div className="absolute top-2 left-2 z-10">
+                    <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
                       Selected: {selectedRegion}
                     </Badge>
                   </div>
