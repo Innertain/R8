@@ -1,5 +1,5 @@
 // Debug recent updates field structure
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function debugFields() {
   try {

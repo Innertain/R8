@@ -67,6 +67,13 @@ function RecentUpdatesSection() {
   }
 
   const { inventory = [], needs = [] } = recentUpdates.data;
+  
+  // Debug: Log actual field data
+  console.log('First inventory item fields:', inventory[0]?.fields ? Object.keys(inventory[0].fields) : 'No fields');
+  console.log('First needs item fields:', needs[0]?.fields ? Object.keys(needs[0].fields) : 'No fields');
+  console.log('Sample inventory data:', inventory[0]);
+  console.log('Sample needs data:', needs[0]);
+  
   const allUpdates = [
     ...inventory.slice(0, 5).map((item: any) => ({
       ...item,
