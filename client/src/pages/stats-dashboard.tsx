@@ -95,13 +95,14 @@ export default function StatsDashboard() {
     const normalizeState = (state: string | null | undefined): string | null => {
       if (!state || state.trim() === '' || state.toLowerCase() === 'unknown') return null;
       
-      // Normalize common state variations
+      // Normalize common state variations and clean up whitespace
       const normalized = state.trim().toUpperCase();
       
       // Handle common state name variations
       if (normalized === 'NORTH CAROLINA') return 'NC';
-      if (normalized === 'CALIFORNIA') return 'CA';
+      if (normalized === 'CALIFORNIA') return 'CA';  
       if (normalized === 'WEST VIRGINIA') return 'WV';
+      if (normalized === 'NC ') return 'NC'; // Handle trailing space
       
       return normalized;
     };
@@ -124,9 +125,23 @@ export default function StatsDashboard() {
       stateMap.get(state)!.sites++;
     });
 
-    // Add deliveries data
+    // Create site lookup map for delivery state resolution
+    const siteStateMap = new Map();
+    data.sites?.forEach((site: any) => {
+      siteStateMap.set(site.id, site.State);
+    });
+
+    // Add deliveries data - resolve state through drop-off site
     data.deliveries?.forEach((delivery: any) => {
-      const state = normalizeState(delivery.State || delivery['Delivery State']);
+      let deliveryState = delivery.State || delivery['Delivery State'];
+      
+      // If no direct state, try to get it from the drop-off site
+      if (!deliveryState && delivery['Drop Off Site']?.length > 0) {
+        const dropOffSiteId = delivery['Drop Off Site'][0]; // Get first site ID
+        deliveryState = siteStateMap.get(dropOffSiteId);
+      }
+      
+      const state = normalizeState(deliveryState);
       if (!state) return; // Skip invalid states
       
       if (!stateMap.has(state)) {
@@ -140,7 +155,7 @@ export default function StatsDashboard() {
         });
       }
       stateMap.get(state)!.deliveries++;
-      if (delivery.Status === 'Completed' || delivery.status === 'completed') {
+      if (delivery.Status === 'Delivery Completed' || delivery.status === 'completed') {
         stateMap.get(state)!.completedDeliveries++;
       }
     });
