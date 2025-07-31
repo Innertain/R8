@@ -7,17 +7,19 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MapSVG from "@/components/MapSVG";
 
-// Mock data for demonstration - will be replaced with real data
+// Bioregionally-aware mock data for demonstration
 const mockDisasters = [
-  { id: 1, type: "Wildfire", location: "Northern California", severity: "high", activeVolunteers: 245 },
-  { id: 2, type: "Flooding", location: "Louisiana", severity: "medium", activeVolunteers: 89 },
-  { id: 3, type: "Hurricane", location: "Florida Keys", severity: "high", activeVolunteers: 312 },
+  { id: 1, type: "Wildfire", location: "Pacific Northwest Coastal", severity: "high", activeVolunteers: 245, bioregion: "pacific-northwest-coastal" },
+  { id: 2, type: "Flooding", location: "Great Plains", severity: "medium", activeVolunteers: 89, bioregion: "great-plains" },
+  { id: 3, type: "Hurricane", location: "Southeastern Coastal Plain", severity: "high", activeVolunteers: 312, bioregion: "southeastern-coastal" },
+  { id: 4, type: "Drought", location: "Great Basin", severity: "medium", activeVolunteers: 156, bioregion: "great-basin" },
 ];
 
 const mockCommunityActivities = [
-  { id: 1, type: "Food Distribution", location: "Detroit, MI", participants: 67 },
-  { id: 2, type: "Community Garden", location: "Portland, OR", participants: 23 },
-  { id: 3, type: "Disaster Preparedness", location: "Austin, TX", participants: 145 },
+  { id: 1, type: "Food Distribution", location: "Eastern Deciduous Forests", participants: 67, bioregion: "eastern-deciduous" },
+  { id: 2, type: "Indigenous Land Restoration", location: "Boreal Shield", participants: 23, bioregion: "boreal-shield" },
+  { id: 3, type: "Climate Resilience Workshop", location: "Great Plains", participants: 145, bioregion: "great-plains" },
+  { id: 4, type: "Coastal Protection", location: "Pacific Northwest Coastal", participants: 89, bioregion: "pacific-northwest-coastal" },
 ];
 
 type MapViewType = "bioregions" | "states" | "counties" | "fema";
@@ -168,6 +170,30 @@ export default function InteractiveMap() {
                     </div>
                   </div>
                 </div>
+                
+                {mapView === "bioregions" && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">Bioregions</h4>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#8FBC8F"}}></div>
+                        <span>Pacific Northwest Coastal</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#F0E68C"}}></div>
+                        <span>Great Plains</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#90EE90"}}></div>
+                        <span>Eastern Deciduous</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#DDA0DD"}}></div>
+                        <span>Boreal Shield</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
