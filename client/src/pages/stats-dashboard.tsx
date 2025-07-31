@@ -253,13 +253,6 @@ export default function StatsDashboard() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Impact Dashboard</h1>
         <p className="text-gray-600">Real-time statistics and impact metrics from your volunteer network</p>
-        {lastUpdated && (
-          <div className="mt-3 text-sm text-gray-500 flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isCached ? 'bg-blue-500' : 'bg-green-500'}`}></div>
-            {isCached ? 'Data cached' : 'Data refreshed'} on {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
-            <span className="text-gray-400">• Updates every 24 hours</span>
-          </div>
-        )}
       </div>
 
       {/* Filters */}
@@ -521,7 +514,7 @@ export default function StatsDashboard() {
 
 
         <TabsContent value="impact" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -572,6 +565,28 @@ export default function StatsDashboard() {
                 </p>
               </CardContent>
             </Card>
+
+            {lastUpdated && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${isCached ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+                    Data Freshness
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-lg font-bold text-gray-800">
+                    {isCached ? 'Cached' : 'Fresh'}
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Updated {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Refreshes every 24 hours
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
       </Tabs>
