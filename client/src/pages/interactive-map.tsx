@@ -286,9 +286,9 @@ export default function InteractiveMap() {
           </div>
         </div>
         
-        {/* FEMA RSS Feed Section */}
-        <div className="mt-8">
-          <FemaRssFeed maxItems={5} />
+        {/* Emergency Alerts Section */}
+        <div className="mt-8 max-w-4xl">
+          <FemaRssFeed maxItems={4} />
         </div>
       </main>
     </div>
