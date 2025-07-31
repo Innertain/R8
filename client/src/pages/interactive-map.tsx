@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { MapPin, Layers, Filter, Home, AlertTriangle, Users, Activity } from "lucide-react";
+import { MapPin, Layers, Filter, Home, AlertTriangle, Users, Activity, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import InteractiveLeafletMap from "@/components/InteractiveLeafletMap";
+import InteractiveUSMap from "@/components/InteractiveUSMap";
 import FemaRssFeed from "@/components/FemaRssFeed";
 
 // Real disaster and activity data with geographical coordinates
@@ -26,10 +26,27 @@ const mockCommunityActivities = [
 type MapViewType = "bioregions" | "states" | "counties" | "fema";
 
 export default function InteractiveMap() {
-  const [mapView, setMapView] = useState<MapViewType>("states");
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [showDisasters, setShowDisasters] = useState(true);
-  const [showActivities, setShowActivities] = useState(true);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [selectedCounty, setSelectedCounty] = useState<string | null>(null);
+  const [showCounties, setShowCounties] = useState(false);
+
+  const handleStateClick = (stateCode: string, stateName: string) => {
+    setSelectedState(stateCode);
+    setShowCounties(true);
+    setSelectedCounty(null);
+    console.log(`Selected state: ${stateName} (${stateCode})`);
+  };
+
+  const handleCountyClick = (countyName: string, stateCode: string) => {
+    setSelectedCounty(countyName);
+    console.log(`Selected county: ${countyName} in ${stateCode}`);
+  };
+
+  const handleBackToStates = () => {
+    setSelectedState(null);
+    setShowCounties(false);
+    setSelectedCounty(null);
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {

@@ -957,31 +957,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // RSS feed endpoint for FEMA alerts
-  app.get("/api/fema-rss", async (req, res) => {
+  // Better emergency alerts endpoint using IPAWS API
+  app.get("/api/emergency-alerts", async (req, res) => {
     try {
-      const rssUrl = 'https://www.fema.gov/feeds/disasters-emergency.rss';
-      const response = await fetch(rssUrl);
+      // FEMA IPAWS (Integrated Public Alert & Warning System) API
+      const ipawsUrl = 'https://www.fema.gov/api/open/v2/IpawsArchivedAlerts';
+      const params = new URLSearchParams({
+        '$top': '20',
+        '$orderby': 'sent desc',
+        '$filter': `sent ge '${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()}'` // Last 7 days
+      });
+      
+      const response = await fetch(`${ipawsUrl}?${params}`);
       
       if (!response.ok) {
-        throw new Error(`RSS fetch failed: ${response.status}`);
+        throw new Error(`IPAWS API failed: ${response.status}`);
       }
       
-      const xmlData = await response.text();
-      const { parseRssXml } = await import("./rss-parser");
-      const rssItems = parseRssXml(xmlData);
+      const data = await response.json();
+      
+      // Process IPAWS alerts into simplified format
+      const alerts = (data.IpawsArchivedAlerts || []).map((alert: any) => ({
+        id: alert.alertId || alert.id,
+        title: alert.headline || alert.event || 'Emergency Alert',
+        description: alert.description || '',
+        location: alert.areaDesc || 'Location not specified',
+        severity: alert.severity?.toLowerCase() || 'medium',
+        urgency: alert.urgency?.toLowerCase() || 'unknown',
+        certainty: alert.certainty?.toLowerCase() || 'unknown',
+        sent: alert.sent,
+        expires: alert.expires,
+        senderName: alert.senderName,
+        web: alert.web
+      }));
       
       res.json({
         success: true,
-        items: rssItems.slice(0, 10), // Limit to 10 items
+        alerts: alerts.slice(0, 10),
+        source: 'FEMA IPAWS',
         lastUpdated: new Date().toISOString()
       });
     } catch (error) {
-      console.error('FEMA RSS error:', error);
+      console.error('Emergency alerts API error:', error);
+      
+      // Fallback to National Weather Service alerts
+      try {
+        const nwsResponse = await fetch('https://api.weather.gov/alerts/active');
+        if (nwsResponse.ok) {
+          const nwsData = await nwsResponse.json();
+          const nwsAlerts = (nwsData.features || []).slice(0, 10).map((feature: any) => ({
+            id: feature.id,
+            title: feature.properties?.headline || 'Weather Alert',
+            description: feature.properties?.description || '',
+            location: feature.properties?.areaDesc || 'Location not specified',
+            severity: feature.properties?.severity?.toLowerCase() || 'medium',
+            urgency: feature.properties?.urgency?.toLowerCase() || 'unknown',
+            certainty: feature.properties?.certainty?.toLowerCase() || 'unknown',
+            sent: feature.properties?.sent,
+            expires: feature.properties?.expires,
+            senderName: 'National Weather Service',
+            web: feature.properties?.web
+          }));
+          
+          return res.json({
+            success: true,
+            alerts: nwsAlerts,
+            source: 'National Weather Service (fallback)',
+            lastUpdated: new Date().toISOString()
+          });
+        }
+      } catch (fallbackError) {
+        console.error('NWS fallback also failed:', fallbackError);
+      }
+      
       res.status(500).json({
         success: false,
-        error: 'Failed to fetch FEMA RSS feed',
-        items: []
+        error: 'Failed to fetch emergency alerts',
+        alerts: []
       });
     }
   });
