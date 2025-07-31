@@ -1778,8 +1778,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
 
-      // Use FEMA's official OpenData API for comprehensive recent disaster declarations
-      const femaUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(fyDeclared ge 2023) and (declarationType eq 'DR' or declarationType eq 'EM')&$orderby=declarationDate desc&$top=200&$format=json`;
+      // Enhanced FEMA query to get more diverse and interesting disasters
+      // Include 2020-2025 to capture major hurricanes, wildfires, and diverse disasters
+      const femaUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(fyDeclared ge 2020) and (declarationType eq 'DR' or declarationType eq 'EM')&$orderby=declarationDate desc&$top=300&$format=json`;
       
       console.log('Fetching FEMA disaster declarations from OpenData API...');
       const response = await fetch(femaUrl);

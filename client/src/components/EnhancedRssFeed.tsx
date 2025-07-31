@@ -155,13 +155,19 @@ export function EnhancedRssFeed({
     return severityMatch && locationMatch;
   }).slice(0, maxItems);
 
-  // Filter FEMA disasters by state if specified
-  const filteredFemaDisasters = femaDisasters.filter(disaster => {
-    if (stateFilter && stateFilter !== 'all') {
-      return disaster.state === stateFilter;
-    }
-    return true;
-  }).slice(0, maxItems);
+  // Filter FEMA disasters by state if specified and remove duplicates
+  const filteredFemaDisasters = femaDisasters
+    .filter(disaster => {
+      if (stateFilter && stateFilter !== 'all') {
+        return disaster.state === stateFilter;
+      }
+      return true;
+    })
+    .filter((disaster, index, self) => {
+      // Remove duplicates based on disaster number (keep first occurrence)
+      return index === self.findIndex(d => d.disasterNumber === disaster.disasterNumber);
+    })
+    .slice(0, maxItems);
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -538,19 +544,27 @@ export function EnhancedRssFeed({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredFemaDisasters.map((disaster, index) => {
                   const DisasterIcon = getDisasterIcon(disaster.incidentType);
+                  
+                  // Skip duplicate disasters with same disaster number (show only unique ones)
+                  const isDuplicate = index > 0 && filteredFemaDisasters.slice(0, index).some(d => d.disasterNumber === disaster.disasterNumber);
+                  if (isDuplicate) return null;
+                  
                   return (
                     <div
                       key={`${disaster.guid}-${index}`}
-                      className="rounded-lg border p-4 transition-all hover:shadow-lg bg-white hover:bg-gray-50"
+                      className="rounded-lg border p-4 transition-all hover:shadow-md bg-white hover:bg-gray-50"
                     >
                       <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-1">
                           <div className="p-2 rounded-full bg-gray-100">
                             <DisasterIcon className="w-4 h-4 text-gray-600" />
                           </div>
-                          <h3 className="font-semibold text-sm leading-tight flex-1">
-                            {disaster.title}
-                          </h3>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-sm leading-tight">
+                              {disaster.incidentType || 'Disaster'} - {disaster.state}
+                            </h3>
+                            <p className="text-xs text-gray-600 mt-1">#{disaster.disasterNumber}</p>
+                          </div>
                         </div>
                         <Badge 
                           variant="secondary" 
@@ -566,18 +580,6 @@ export function EnhancedRssFeed({
                       </div>
                       
                       <div className="space-y-2 mb-3">
-                        <div className="flex items-center gap-4 text-xs text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            <span className="font-medium">{disaster.state}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded font-mono text-xs">
-                              #{disaster.disasterNumber}
-                            </span>
-                          </div>
-                        </div>
-                        
                         {disaster.incidentType && (
                           <div className="flex items-center gap-1 text-xs">
                             <span className="bg-gray-100 px-2 py-1 rounded text-gray-700 font-medium">
@@ -586,25 +588,16 @@ export function EnhancedRssFeed({
                           </div>
                         )}
                         
-                        {/* Enhanced Date Information */}
-                        <div className="bg-gray-50 rounded p-2 space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-gray-600 flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              Declaration Date:
-                            </span>
-                            <span className="font-medium text-gray-900">
-                              {formatDate(disaster.declarationDate)}
-                            </span>
+                        {/* Simplified Date Information */}
+                        <div className="text-xs text-gray-600">
+                          <div className="flex items-center gap-1 mb-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>Declared: {formatDate(disaster.declarationDate)}</span>
                           </div>
-                          
                           {disaster.incidentBeginDate && (
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-gray-600">Incident Period:</span>
-                              <span className="font-medium text-gray-900">
-                                {formatDate(disaster.incidentBeginDate)}
-                                {disaster.incidentEndDate && ` - ${formatDate(disaster.incidentEndDate)}`}
-                              </span>
+                            <div>
+                              Incident: {formatDate(disaster.incidentBeginDate)}
+                              {disaster.incidentEndDate && ` - ${formatDate(disaster.incidentEndDate)}`}
                             </div>
                           )}
                         </div>
