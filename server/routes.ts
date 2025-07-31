@@ -1021,31 +1021,10 @@ app.get('/api/stats', async (req, res) => {
       return sum + count;
     }, 0);
 
-    // Count completed deliveries - checking driver status and other completion indicators
+    // Count completed deliveries - exactly matching your Airtable dashboard
     const completedDeliveries = transformedDeliveries.filter((delivery: any) => {
-      const driverStatus = String(delivery['Driver Status'] || '').toLowerCase();
-      const status = String(delivery.Status || delivery.status || '').toLowerCase();
-      
-      // Check various completion indicators 
-      return driverStatus === 'completed' || 
-             driverStatus === 'delivered' ||
-             driverStatus === 'confirmed' ||
-             status === 'completed' || 
-             status === 'complete' || 
-             status === 'delivered' ||
-             status === 'confirmed' ||
-             status === 'finished';
+      return delivery.Status === 'Delivery Completed';
     }).length;
-
-    // Log some driver status examples to help debug completion detection
-    const statusExamples = transformedDeliveries.slice(0, 10).map(d => d['Driver Status']).filter(Boolean);
-    console.log('Sample driver statuses for completion detection:', statusExamples);
-
-    // Log some sample records to help identify correct field names
-    if (transformedDeliveries.length > 0) {
-      console.log('Sample delivery record fields:', Object.keys(transformedDeliveries[0]));
-      console.log('Sample delivery record:', transformedDeliveries[0]);
-    }
 
     console.log(`✓ Stats loaded: ${transformedSites.length} sites, ${transformedDeliveries.length} deliveries (${completedDeliveries} completed), ${transformedDrivers.length} drivers, ${transformedVolunteers.length} volunteers`);
     console.log(`✓ Total food boxes delivered: ${totalFoodBoxes}`);
@@ -1074,6 +1053,61 @@ app.get('/api/stats', async (req, res) => {
       success: false, 
       error: error.message 
     });
+  }
+});
+
+// Debug endpoint to analyze delivery status values
+app.get('/api/debug/delivery-statuses', async (req, res) => {
+  try {
+    const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+    const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+    
+    if (!AIRTABLE_TOKEN || !baseId) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Missing Airtable configuration' 
+      });
+    }
+
+    // Fetch first 100 deliveries for analysis
+    const response = await fetch(`https://api.airtable.com/v0/${baseId}/Deliveries?maxRecords=100`, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+    });
+
+    if (!response.ok) {
+      return res.status(500).json({ success: false, error: 'Failed to fetch deliveries' });
+    }
+
+    const data = await response.json();
+    const deliveries = data.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [];
+
+    // Analyze all status-related fields
+    const statusAnalysis = {
+      allFields: Object.keys(deliveries[0] || {}),
+      driverStatuses: [...new Set(deliveries.map(d => d['Driver Status']).filter(Boolean))],
+      statuses: [...new Set(deliveries.map(d => d.Status || d.status).filter(Boolean))],
+      statusLikeFields: Object.keys(deliveries[0] || {}).filter(field => 
+        field.toLowerCase().includes('status') || 
+        field.toLowerCase().includes('complete') || 
+        field.toLowerCase().includes('deliver') ||
+        field.toLowerCase().includes('confirm')
+      ),
+      sampleRecords: deliveries.slice(0, 3).map(d => ({
+        id: d.id,
+        driverStatus: d['Driver Status'],
+        status: d.Status || d.status,
+        allStatusFields: Object.keys(d).filter(key => 
+          key.toLowerCase().includes('status') || 
+          key.toLowerCase().includes('complete') || 
+          key.toLowerCase().includes('deliver')
+        ).reduce((obj, key) => ({ ...obj, [key]: d[key] }), {})
+      }))
+    };
+
+    return res.json({ success: true, analysis: statusAnalysis });
+    
+  } catch (error: any) {
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
