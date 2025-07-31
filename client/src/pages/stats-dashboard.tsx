@@ -165,7 +165,7 @@ function RecentUpdatesSection() {
           Showing latest {allUpdates.length} updates from {inventory.length} inventory and {needs.length} needs records
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          Auto-refreshes every 30 seconds • Last update: {new Date().toLocaleTimeString()}
+          Data cached for optimal performance • Last update: {recentUpdates?.cached ? 'Cached' : 'Fresh'}
         </p>
       </div>
     </div>
@@ -397,7 +397,7 @@ export default function StatsDashboard() {
         <p className="text-gray-600 mb-2">Real-time statistics and impact metrics from your volunteer network</p>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-xs text-blue-700">
-            <strong>Data Updates:</strong> Statistics refresh every 24 hours • Recent activity updates every 6 hours • Data sourced from live Airtable records
+            <strong>Data Caching:</strong> Statistics cached for 24 hours • Activity updates cached for 6 hours • Emergency data cached for 30 minutes • Optimized to minimize API usage
           </p>
         </div>
       </div>

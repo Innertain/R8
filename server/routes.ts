@@ -1492,9 +1492,24 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
-  // ReliefWeb Global Disasters RSS Feed endpoint
+  // Cache for ReliefWeb disaster data
+  let reliefWebCache: any = null;
+  let reliefWebCacheTime: number = 0;
+  const RELIEFWEB_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hour cache
+
+  // ReliefWeb Global Disasters RSS Feed endpoint (with caching)
   app.get("/api/reliefweb-disasters", async (req, res) => {
     try {
+      // Check cache first
+      const now = Date.now();
+      if (reliefWebCache && (now - reliefWebCacheTime) < RELIEFWEB_CACHE_DURATION) {
+        console.log('✓ Returning cached ReliefWeb disasters');
+        return res.json({
+          ...reliefWebCache,
+          cached: true,
+          lastUpdated: new Date(reliefWebCacheTime).toISOString()
+        });
+      }
       const response = await fetch('https://reliefweb.int/disasters/rss.xml');
       
       if (!response.ok) {
@@ -1589,12 +1604,19 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       
       console.log(`✓ ReliefWeb disasters: ${reliefWebItems.length} global disasters loaded`);
       
-      res.json({
+      const responseData = {
         success: true,
         items: reliefWebItems,
         source: 'ReliefWeb International',
-        lastUpdated: new Date().toISOString()
-      });
+        lastUpdated: new Date().toISOString(),
+        cached: false
+      };
+
+      // Cache the response
+      reliefWebCache = responseData;
+      reliefWebCacheTime = now;
+      
+      res.json(responseData);
     } catch (error) {
       console.error('ReliefWeb RSS error:', error);
       res.json({
@@ -1607,9 +1629,24 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
-  // The New Humanitarian RSS Feed endpoint
+  // Cache for humanitarian news data
+  let humanitarianNewsCache: any = null;
+  let humanitarianNewsCacheTime: number = 0;
+  const HUMANITARIAN_NEWS_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hour cache
+
+  // The New Humanitarian RSS Feed endpoint (with caching)
   app.get("/api/humanitarian-news", async (req, res) => {
     try {
+      // Check cache first
+      const now = Date.now();
+      if (humanitarianNewsCache && (now - humanitarianNewsCacheTime) < HUMANITARIAN_NEWS_CACHE_DURATION) {
+        console.log('✓ Returning cached humanitarian news');
+        return res.json({
+          ...humanitarianNewsCache,
+          cached: true,
+          lastUpdated: new Date(humanitarianNewsCacheTime).toISOString()
+        });
+      }
       const response = await fetch('https://www.thenewhumanitarian.org/rss/all.xml');
       
       if (!response.ok) {
@@ -1697,12 +1734,19 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       
       console.log(`✓ Humanitarian news: ${humanitarianItems.length} articles loaded`);
       
-      res.json({
+      const responseData = {
         success: true,
         items: humanitarianItems,
         source: 'The New Humanitarian',
-        lastUpdated: new Date().toISOString()
-      });
+        lastUpdated: new Date().toISOString(),
+        cached: false
+      };
+
+      // Cache the response
+      humanitarianNewsCache = responseData;
+      humanitarianNewsCacheTime = now;
+      
+      res.json(responseData);
     } catch (error) {
       console.error('Humanitarian RSS error:', error);
       res.json({
@@ -1715,9 +1759,25 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
-  // FEMA OpenData API - Real Disaster Declarations
+  // Cache for FEMA disaster data
+  let femaDisastersCache: any = null;
+  let femaDisastersCacheTime: number = 0;
+  const FEMA_CACHE_DURATION = 60 * 60 * 1000; // 1 hour cache
+
+  // FEMA OpenData API - Real Disaster Declarations (with caching)
   app.get("/api/fema-disasters", async (req, res) => {
     try {
+      // Check cache first
+      const now = Date.now();
+      if (femaDisastersCache && (now - femaDisastersCacheTime) < FEMA_CACHE_DURATION) {
+        console.log('✓ Returning cached FEMA disaster declarations');
+        return res.json({
+          ...femaDisastersCache,
+          cached: true,
+          lastUpdated: new Date(femaDisastersCacheTime).toISOString()
+        });
+      }
+
       // Use FEMA's official OpenData API for current disaster declarations
       const currentYear = new Date().getFullYear();
       const femaUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=fyDeclared eq ${currentYear}&$orderby=declarationDate desc&$top=50&$format=json`;
@@ -1754,14 +1814,21 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       
       console.log(`✓ FEMA OpenData: ${transformedDeclarations.length} disaster declarations loaded`);
       
-      res.json({
+      const responseData = {
         success: true,
         items: transformedDeclarations,
         source: 'FEMA OpenData API',
         dataUrl: femaUrl,
         lastUpdated: new Date().toISOString(),
-        totalRecords: declarations.length
-      });
+        totalRecords: declarations.length,
+        cached: false
+      };
+
+      // Cache the response
+      femaDisastersCache = responseData;
+      femaDisastersCacheTime = now;
+      
+      res.json(responseData);
       
     } catch (error) {
       console.error('FEMA OpenData API error:', error);

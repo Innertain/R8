@@ -159,7 +159,8 @@ export default function EnhancedRssFeed({
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 5 * 60 * 1000); // Refresh every 5 minutes
+    // Refresh every 30 minutes to reduce API calls - emergency data doesn't change frequently
+    const interval = setInterval(fetchData, 30 * 60 * 1000); // Refresh every 30 minutes
     return () => clearInterval(interval);
   }, []);
 
@@ -360,7 +361,7 @@ export default function EnhancedRssFeed({
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Refresh Rate</span>
-                    <span className="font-medium">5min</span>
+                    <span className="font-medium">30min</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Total Items</span>

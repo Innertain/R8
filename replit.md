@@ -42,6 +42,7 @@ The platform features a clean, professional design with a focus on readability. 
 - **Host Integration**: Display of mutual aid partners (hosts) with logos on shift cards.
 - **Emergency Alerts System**: Real-time emergency alerts via IPAWS/NWS APIs with comprehensive disaster tracking and community notification system. Map interface removed per user request due to inability to meet authentic geographic boundary requirements.
 - **Supply Site Activity Tracking**: Advanced metrics for supply site activity within last 60 days based on inventory updates, delivery tracking, and recent needs/requests. Includes three activity metrics: Active Sites (inventory updates), Sites with Deliveries (received aid), and Sites with Recent Activity (current needs or updates).
+- **Performance Optimization**: Comprehensive caching system to minimize API usage - FEMA disasters cached 1 hour, ReliefWeb/Humanitarian news cached 2 hours, frontend refresh intervals set to 30 minutes, stats cached 24 hours, activity data cached 6 hours.
 
 ## External Dependencies
 ### Core Framework & Libraries
