@@ -104,7 +104,12 @@ function RecentUpdatesSection() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="font-medium text-sm text-gray-900 truncate">
-                  {update.fields?.['Site Name'] || update.fields?.Name || 'Unknown Site'}
+                  {update.fields?.['Site Name'] || 
+                   update.fields?.Name || 
+                   update.fields?.['Organization Name'] ||
+                   update.fields?.['Site'] ||
+                   update.fields?.['Location'] ||
+                   'Supply Site'}
                 </h4>
                 <Badge variant="outline" className="text-xs">
                   {update.type === 'inventory' ? 'Inventory' : 'Need'}
@@ -112,17 +117,30 @@ function RecentUpdatesSection() {
               </div>
               <p className="text-xs text-gray-600 mb-1">
                 {update.type === 'inventory' 
-                  ? `Updated inventory: ${update.fields?.['Item Name'] || 'items'}`
-                  : `New need: ${update.fields?.['Item Needed'] || update.fields?.Description || 'supplies'}`
+                  ? `Updated: ${update.fields?.['Item Name'] || update.fields?.['Item'] || update.fields?.['Supply Type'] || 'inventory items'} (Qty: ${update.fields?.['Quantity'] || update.fields?.['Count'] || 'N/A'})`
+                  : `Requested: ${update.fields?.['Item Needed'] || update.fields?.['Request'] || update.fields?.['Description'] || update.fields?.['Supply Needed'] || 'supplies needed'}`
                 }
               </p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Clock className="w-3 h-3" />
                 <span>{timeDisplay}</span>
-                {update.fields?.City && update.fields?.State && (
+                {(update.fields?.City || update.fields?.Location || update.fields?.Address) && (
                   <>
                     <span>•</span>
-                    <span>{update.fields.City}, {update.fields.State}</span>
+                    <span>
+                      {update.fields?.City && update.fields?.State 
+                        ? `${update.fields.City}, ${update.fields.State}`
+                        : update.fields?.Location || update.fields?.Address || 'Location available'
+                      }
+                    </span>
+                  </>
+                )}
+                {update.fields?.Status && (
+                  <>
+                    <span>•</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {update.fields.Status}
+                    </Badge>
                   </>
                 )}
               </div>
@@ -133,7 +151,10 @@ function RecentUpdatesSection() {
       
       <div className="text-center pt-2 border-t border-gray-100">
         <p className="text-xs text-gray-500">
-          Showing latest updates from {inventory.length} inventory and {needs.length} needs records
+          Showing latest {allUpdates.length} updates from {inventory.length} inventory and {needs.length} needs records
+        </p>
+        <p className="text-xs text-gray-400 mt-1">
+          Auto-refreshes every 30 seconds • Last update: {new Date().toLocaleTimeString()}
         </p>
       </div>
     </div>
