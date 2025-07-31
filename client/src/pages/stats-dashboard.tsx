@@ -66,14 +66,16 @@ const useStatsData = () => {
         totalFoodBoxes: result.counts?.totalFoodBoxes || 0
       });
 
-      // Return both data and raw result for accessing counts
+      // Return both data and raw result for accessing counts, plus cache metadata
       return { 
         sites: sites || [], 
         deliveries: deliveries || [], 
         volunteers: volunteers || [], 
         drivers: drivers || [],
         data: result.data,
-        counts: result.counts
+        counts: result.counts,
+        cached: result.cached,
+        lastUpdated: result.lastUpdated
       };
     },
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
@@ -90,9 +92,12 @@ export default function StatsDashboard() {
 
   // Extract cache information from API response
   useEffect(() => {
-    if (statsData && (statsData as any).lastUpdated) {
-      setLastUpdated((statsData as any).lastUpdated);
-      setIsCached((statsData as any).cached || false);
+    if (statsData) {
+      const cacheData = statsData as any;
+      if (cacheData.lastUpdated) {
+        setLastUpdated(cacheData.lastUpdated);
+        setIsCached(cacheData.cached || false);
+      }
     }
   }, [statsData]);
 
