@@ -1994,6 +1994,164 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
+  // Cache for FEMA Public Assistance Projects
+  let femaPublicAssistanceCache: any = null;
+  let femaPublicAssistanceCacheTime: number = 0;
+  const FEMA_PA_CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hour cache
+
+  // FEMA Public Assistance - Infrastructure repair and emergency work funding
+  app.get("/api/fema-public-assistance", async (req, res) => {
+    try {
+      // Check cache first
+      const now = Date.now();
+      if (femaPublicAssistanceCache && (now - femaPublicAssistanceCacheTime) < FEMA_PA_CACHE_DURATION) {
+        console.log('✓ Returning cached FEMA public assistance data');
+        return res.json({
+          ...femaPublicAssistanceCache,
+          cached: true,
+          lastUpdated: new Date(femaPublicAssistanceCacheTime).toISOString()
+        });
+      }
+
+      const currentYear = new Date().getFullYear();
+      const femaUrl = `https://www.fema.gov/api/open/v1/PublicAssistanceFundedProjectsDetails?$filter=year(declarationDate) eq ${currentYear}&$orderby=declarationDate desc&$top=50&$format=json`;
+      
+      console.log('Fetching FEMA public assistance projects...');
+      const response = await fetch(femaUrl);
+      
+      if (!response.ok) {
+        throw new Error(`FEMA Public Assistance API failed: ${response.status}`);
+      }
+      
+      const paData = await response.json();
+      const projects = paData.PublicAssistanceFundedProjectsDetails || [];
+      
+      // Calculate statistics
+      const stats = projects.reduce((acc: any, project: any) => {
+        acc.totalProjects += 1;
+        acc.totalObligated += project.projectAmountTotal || 0;
+        acc.totalFederal += project.federalShareObligated || 0;
+        acc.byState[project.state] = (acc.byState[project.state] || 0) + 1;
+        acc.byWorkType[project.damageCategory] = (acc.byWorkType[project.damageCategory] || 0) + 1;
+        return acc;
+      }, { 
+        totalProjects: 0, 
+        totalObligated: 0, 
+        totalFederal: 0, 
+        byState: {} as Record<string, number>,
+        byWorkType: {} as Record<string, number>
+      });
+      
+      console.log(`✓ FEMA Public Assistance: ${projects.length} funded projects loaded`);
+      
+      const responseData = {
+        success: true,
+        items: projects.slice(0, 25), // Limit for display
+        stats: stats,
+        source: 'FEMA Public Assistance',
+        lastUpdated: new Date().toISOString(),
+        totalRecords: projects.length,
+        cached: false
+      };
+
+      // Cache the response
+      femaPublicAssistanceCache = responseData;
+      femaPublicAssistanceCacheTime = now;
+      
+      res.json(responseData);
+      
+    } catch (error) {
+      console.error('FEMA Public Assistance API error:', error);
+      res.json({
+        success: false,
+        items: [],
+        stats: { totalProjects: 0, totalObligated: 0, totalFederal: 0, byState: {}, byWorkType: {} },
+        source: 'FEMA Public Assistance',
+        error: 'Unable to fetch public assistance data',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
+  // Cache for FEMA NFIP Claims
+  let femaNfipCache: any = null;
+  let femaNfipCacheTime: number = 0;
+  const FEMA_NFIP_CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hour cache
+
+  // FEMA NFIP Claims - National Flood Insurance Program claims data
+  app.get("/api/fema-nfip", async (req, res) => {
+    try {
+      // Check cache first
+      const now = Date.now();
+      if (femaNfipCache && (now - femaNfipCacheTime) < FEMA_NFIP_CACHE_DURATION) {
+        console.log('✓ Returning cached FEMA NFIP claims data');
+        return res.json({
+          ...femaNfipCache,
+          cached: true,
+          lastUpdated: new Date(femaNfipCacheTime).toISOString()
+        });
+      }
+
+      const currentYear = new Date().getFullYear();
+      const femaUrl = `https://www.fema.gov/api/open/v2/FimaNfipRedactedClaims?$filter=year(dateLossFrom) eq ${currentYear}&$orderby=dateLossFrom desc&$top=100&$format=json`;
+      
+      console.log('Fetching FEMA NFIP claims data...');
+      const response = await fetch(femaUrl);
+      
+      if (!response.ok) {
+        throw new Error(`FEMA NFIP API failed: ${response.status}`);
+      }
+      
+      const nfipData = await response.json();
+      const claims = nfipData.FimaNfipRedactedClaims || [];
+      
+      // Calculate flood insurance statistics
+      const stats = claims.reduce((acc: any, claim: any) => {
+        acc.totalClaims += 1;
+        acc.totalPaid += claim.amountPaidOnBuildingClaim || 0;
+        acc.totalContentsPaid += claim.amountPaidOnContentsClaim || 0;
+        acc.byState[claim.state] = (acc.byState[claim.state] || 0) + 1;
+        acc.byCounty[claim.countyCode] = (acc.byCounty[claim.countyCode] || 0) + 1;
+        return acc;
+      }, { 
+        totalClaims: 0, 
+        totalPaid: 0, 
+        totalContentsPaid: 0, 
+        byState: {} as Record<string, number>,
+        byCounty: {} as Record<string, number>
+      });
+      
+      console.log(`✓ FEMA NFIP: ${claims.length} flood insurance claims loaded`);
+      
+      const responseData = {
+        success: true,
+        items: claims.slice(0, 20), // Limit for display
+        stats: stats,
+        source: 'FEMA NFIP Claims',
+        lastUpdated: new Date().toISOString(),
+        totalRecords: claims.length,
+        cached: false
+      };
+
+      // Cache the response
+      femaNfipCache = responseData;
+      femaNfipCacheTime = now;
+      
+      res.json(responseData);
+      
+    } catch (error) {
+      console.error('FEMA NFIP Claims API error:', error);
+      res.json({
+        success: false,
+        items: [],
+        stats: { totalClaims: 0, totalPaid: 0, totalContentsPaid: 0, byState: {}, byCounty: {} },
+        source: 'FEMA NFIP Claims',
+        error: 'Unable to fetch NFIP claims data',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
