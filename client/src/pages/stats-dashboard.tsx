@@ -386,7 +386,12 @@ export default function StatsDashboard() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Impact Dashboard</h1>
-        <p className="text-gray-600">Real-time statistics and impact metrics from your volunteer network</p>
+        <p className="text-gray-600 mb-2">Real-time statistics and impact metrics from your volunteer network</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p className="text-xs text-blue-700">
+            <strong>Data Updates:</strong> Statistics refresh every 24 hours • Recent activity updates every 6 hours • Data sourced from live Airtable records
+          </p>
+        </div>
       </div>
 
       {/* Filters */}
@@ -559,6 +564,10 @@ export default function StatsDashboard() {
               </CardTitle>
               <CardDescription>
                 Latest inventory updates and needs requests from active supply sites
+                <br />
+                <span className="text-xs text-gray-500">
+                  Showing latest 8 updates from 100 inventory and 100 needs records • Auto-refreshes every 6 hours • Last update: {new Date().toLocaleTimeString()}
+                </span>
               </CardDescription>
             </CardHeader>
             <CardContent>
