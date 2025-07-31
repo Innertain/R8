@@ -1607,6 +1607,114 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
+  // The New Humanitarian RSS Feed endpoint
+  app.get("/api/humanitarian-news", async (req, res) => {
+    try {
+      const response = await fetch('https://www.thenewhumanitarian.org/rss/all.xml');
+      
+      if (!response.ok) {
+        throw new Error(`Humanitarian RSS fetch failed: ${response.status}`);
+      }
+      
+      const xmlData = await response.text();
+      
+      // Parse humanitarian news RSS items
+      const itemMatches = xmlData.match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
+      
+      const humanitarianItems = itemMatches.map((itemXml, index) => {
+        const getTagContent = (tag: string): string => {
+          const match = itemXml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+          if (!match) return '';
+          
+          let content = match[1].trim();
+          content = content.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1');
+          content = content
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'");
+          
+          return content;
+        };
+
+        const title = getTagContent('title') || 'Humanitarian News';
+        const link = getTagContent('link') || '#';
+        const pubDate = getTagContent('pubDate') || '';
+        const description = getTagContent('description') || '';
+        const guid = getTagContent('guid') || link || `humanitarian-${index}`;
+        const category = getTagContent('category') || '';
+
+        // Extract location/region from title or description
+        const locations = ['Africa', 'Asia', 'Europe', 'Americas', 'Middle East', 'Pacific', 'Global'];
+        let region = 'Global';
+        
+        const titleAndDesc = (title + ' ' + description).toLowerCase();
+        for (const loc of locations) {
+          if (titleAndDesc.includes(loc.toLowerCase())) {
+            region = loc;
+            break;
+          }
+        }
+
+        // Determine news type based on content
+        const newsTypes = {
+          'conflict': ['war', 'conflict', 'violence', 'military', 'refugee', 'displacement'],
+          'climate': ['climate', 'drought', 'flood', 'storm', 'weather', 'temperature'],
+          'health': ['health', 'disease', 'outbreak', 'medical', 'vaccine', 'pandemic'],
+          'food': ['food', 'hunger', 'nutrition', 'famine', 'agriculture'],
+          'policy': ['policy', 'government', 'law', 'regulation', 'politics'],
+          'funding': ['funding', 'aid', 'donation', 'budget', 'finance'],
+          'general': []
+        };
+
+        let newsType = 'general';
+        for (const [type, keywords] of Object.entries(newsTypes)) {
+          if (keywords.some(keyword => titleAndDesc.includes(keyword))) {
+            newsType = type;
+            break;
+          }
+        }
+
+        // Clean description
+        const cleanDescription = description
+          .replace(/<[^>]*>/g, '') // Remove HTML tags
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .substring(0, 350) + (description.length > 350 ? '...' : '');
+
+        return {
+          title,
+          link,
+          pubDate,
+          description: cleanDescription,
+          guid,
+          category: category || 'Humanitarian',
+          region,
+          newsType
+        };
+      });
+      
+      console.log(`✓ Humanitarian news: ${humanitarianItems.length} articles loaded`);
+      
+      res.json({
+        success: true,
+        items: humanitarianItems,
+        source: 'The New Humanitarian',
+        lastUpdated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Humanitarian RSS error:', error);
+      res.json({
+        success: false,
+        items: [],
+        source: 'The New Humanitarian',
+        error: 'Unable to fetch humanitarian news feed',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -39,6 +39,17 @@ interface ReliefWebItem {
   disasterType: string;
 }
 
+interface HumanitarianItem {
+  title: string;
+  link: string;
+  pubDate: string;
+  description: string;
+  guid: string;
+  category: string;
+  region: string;
+  newsType: string;
+}
+
 interface AlertsResponse {
   success: boolean;
   alerts: EmergencyAlert[];
@@ -83,9 +94,10 @@ export default function EnhancedRssFeed({
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [rssItems, setRssItems] = useState<FemaRssItem[]>([]);
   const [globalDisasters, setGlobalDisasters] = useState<ReliefWebItem[]>([]);
+  const [humanitarianNews, setHumanitarianNews] = useState<HumanitarianItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'live' | 'declarations' | 'global'>('live');
+  const [activeTab, setActiveTab] = useState<'live' | 'declarations' | 'global' | 'news'>('live');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [locationFilter, setLocationFilter] = useState<string>(stateFilter || 'all');
 
@@ -95,11 +107,12 @@ export default function EnhancedRssFeed({
         setLoading(true);
         setError(null);
         
-        // Fetch live alerts, RSS declarations, and global disasters
-        const [alertsResponse, rssResponse, globalResponse] = await Promise.all([
+        // Fetch live alerts, RSS declarations, global disasters, and humanitarian news
+        const [alertsResponse, rssResponse, globalResponse, newsResponse] = await Promise.all([
           fetch('/api/emergency-alerts'),
           fetch('/api/fema-rss'),
-          fetch('/api/reliefweb-disasters')
+          fetch('/api/reliefweb-disasters'),
+          fetch('/api/humanitarian-news')
         ]);
         
         if (alertsResponse.ok) {
@@ -120,6 +133,13 @@ export default function EnhancedRssFeed({
           const globalData = await globalResponse.json();
           if (globalData.success) {
             setGlobalDisasters(globalData.items || []);
+          }
+        }
+        
+        if (newsResponse.ok) {
+          const newsData = await newsResponse.json();
+          if (newsData.success) {
+            setHumanitarianNews(newsData.items || []);
           }
         }
         
@@ -229,19 +249,23 @@ export default function EnhancedRssFeed({
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'live' | 'declarations' | 'global')}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="live" className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Live Alerts ({alerts.length})
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'live' | 'declarations' | 'global' | 'news')}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="live" className="flex items-center gap-1 text-xs">
+              <Activity className="w-3 h-3" />
+              Live ({alerts.length})
             </TabsTrigger>
-            <TabsTrigger value="declarations" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              US Declarations ({rssItems.length})
+            <TabsTrigger value="declarations" className="flex items-center gap-1 text-xs">
+              <TrendingUp className="w-3 h-3" />
+              US ({rssItems.length})
             </TabsTrigger>
-            <TabsTrigger value="global" className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              Global Disasters ({globalDisasters.length})
+            <TabsTrigger value="global" className="flex items-center gap-1 text-xs">
+              <MapPin className="w-3 h-3" />
+              Global ({globalDisasters.length})
+            </TabsTrigger>
+            <TabsTrigger value="news" className="flex items-center gap-1 text-xs">
+              <Clock className="w-3 h-3" />
+              News ({humanitarianNews.length})
             </TabsTrigger>
           </TabsList>
 
@@ -333,7 +357,7 @@ export default function EnhancedRssFeed({
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Total Items</span>
-                    <span className="font-medium">{alerts.length + rssItems.length + globalDisasters.length}</span>
+                    <span className="font-medium">{alerts.length + rssItems.length + globalDisasters.length + humanitarianNews.length}</span>
                   </div>
                 </div>
               </div>
@@ -510,6 +534,77 @@ export default function EnhancedRssFeed({
                           className="text-xs text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
                         >
                           ReliefWeb <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="news" className="mt-6">
+            {humanitarianNews.length === 0 ? (
+              <div className="bg-white rounded-lg p-6 border text-center">
+                <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600">No humanitarian news available</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {humanitarianNews.slice(0, maxItems).map((news, index) => {
+                  const newsColors = {
+                    'conflict': 'bg-red-50 border-red-200',
+                    'climate': 'bg-green-50 border-green-200',
+                    'health': 'bg-blue-50 border-blue-200',
+                    'food': 'bg-yellow-50 border-yellow-200',
+                    'policy': 'bg-purple-50 border-purple-200',
+                    'funding': 'bg-indigo-50 border-indigo-200',
+                    'general': 'bg-gray-50 border-gray-200'
+                  };
+                  
+                  return (
+                    <div
+                      key={`${news.guid}-${index}`}
+                      className={`rounded-lg border p-4 transition-all hover:shadow-sm ${newsColors[news.newsType as keyof typeof newsColors] || newsColors.general}`}
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <h3 className="font-semibold text-sm leading-tight flex-1">
+                          {news.title}
+                        </h3>
+                        <Badge className="text-xs whitespace-nowrap capitalize bg-orange-100 text-orange-800">
+                          {news.newsType}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 mb-3 text-xs text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          <span>{news.region}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="bg-gray-100 px-1 rounded">{news.category}</span>
+                        </div>
+                      </div>
+                      
+                      {news.description && (
+                        <p className="text-xs text-gray-700 mb-3 leading-relaxed">
+                          {news.description}
+                        </p>
+                      )}
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
+                          <Clock className="w-3 h-3" />
+                          <span>{new Date(news.pubDate).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <a
+                          href={news.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
+                        >
+                          Read More <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
                     </div>
