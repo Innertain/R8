@@ -957,6 +957,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+// Comprehensive stats endpoint that fetches from all relevant tables
+app.get('/api/stats', async (req, res) => {
+  try {
+    const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+    const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+    
+    if (!AIRTABLE_TOKEN || !baseId) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Missing Airtable configuration' 
+      });
+    }
+
+    console.log('Fetching comprehensive stats from Airtable...');
+
+    // Fetch all relevant data in parallel
+    const [sitesRes, deliveriesRes, driversRes, volunteersRes] = await Promise.all([
+      fetch(`https://api.airtable.com/v0/${baseId}/Site?maxRecords=200`, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+      }),
+      fetch(`https://api.airtable.com/v0/${baseId}/Deliveries?maxRecords=200`, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+      }),
+      fetch(`https://api.airtable.com/v0/${baseId}/Drivers?maxRecords=200`, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+      }),
+      fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications?maxRecords=200`, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+      })
+    ]);
+
+    const results = await Promise.allSettled([
+      sitesRes.ok ? sitesRes.json() : Promise.reject('Sites failed'),
+      deliveriesRes.ok ? deliveriesRes.json() : Promise.reject('Deliveries failed'), 
+      driversRes.ok ? driversRes.json() : Promise.reject('Drivers failed'),
+      volunteersRes.ok ? volunteersRes.json() : Promise.reject('Volunteers failed')
+    ]);
+
+    // Process results, handling failures gracefully
+    const sites = results[0].status === 'fulfilled' ? 
+      results[0].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
+    
+    const deliveries = results[1].status === 'fulfilled' ? 
+      results[1].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
+    
+    const drivers = results[2].status === 'fulfilled' ? 
+      results[2].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
+    
+    const volunteers = results[3].status === 'fulfilled' ? 
+      results[3].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
+
+    console.log(`✓ Stats loaded: ${sites.length} sites, ${deliveries.length} deliveries, ${drivers.length} drivers, ${volunteers.length} volunteers`);
+
+    return res.json({
+      success: true,
+      data: {
+        sites,
+        deliveries, 
+        drivers,
+        volunteers
+      },
+      counts: {
+        sites: sites.length,
+        deliveries: deliveries.length,
+        drivers: drivers.length,
+        volunteers: volunteers.length
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('Error fetching stats:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Generic Airtable table endpoint for stats
+app.get('/api/airtable-table/:tableName', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+    
+    console.log(`Fetching data from Airtable table: ${tableName}`);
+    
+    const airtableToken = process.env.AIRTABLE_TOKEN;
+    const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+    
+    if (!airtableToken || !baseId) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Missing Airtable configuration' 
+      });
+    }
+
+    // Fetch data from the specified table
+    const response = await fetch(
+      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?maxRecords=${limit}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${airtableToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`Airtable API error for table ${tableName}:`, response.status, response.statusText);
+      return res.status(response.status).json({ 
+        success: false, 
+        error: `Airtable API failed: ${response.status}` 
+      });
+    }
+
+    const data = await response.json();
+    console.log(`✓ Successfully fetched ${data.records?.length || 0} records from ${tableName}`);
+    
+    // Transform records to include flattened fields
+    const transformedRecords = data.records?.map((record: any) => ({
+      id: record.id,
+      ...record.fields
+    })) || [];
+
+    return res.json(transformedRecords);
+    
+  } catch (error: any) {
+    console.error(`Error fetching table ${req.params.tableName}:`, error);
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
   // Better emergency alerts endpoint using IPAWS API
   app.get("/api/emergency-alerts", async (req, res) => {
     try {

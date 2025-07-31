@@ -4,13 +4,14 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
 import InteractiveMap from "@/pages/interactive-map-new";
 import AirtableTest from "@/pages/airtable-test";
+import StatsDashboard from "@/pages/stats-dashboard";
 
 function Navigation() {
   const [location] = useLocation();
@@ -58,6 +59,16 @@ function Navigation() {
             >
               <MapPin className="h-4 w-4" />
               Response Map
+            </Button>
+          </Link>
+          <Link href="/stats">
+            <Button 
+              variant={location === "/stats" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Impact Stats
             </Button>
           </Link>
           <Link href="/airtable-test">
@@ -125,6 +136,17 @@ function Navigation() {
                 Response Map
               </Button>
             </Link>
+            <Link href="/stats">
+              <Button 
+                variant={location === "/stats" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <BarChart3 className="h-4 w-4" />
+                Impact Stats
+              </Button>
+            </Link>
             <Link href="/airtable-test">
               <Button 
                 variant={location === "/airtable-test" ? "default" : "outline"} 
@@ -150,6 +172,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/volunteer" component={VolunteerPortal} />
         <Route path="/map" component={InteractiveMap} />
+        <Route path="/stats" component={StatsDashboard} />
         <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />
       </Switch>
