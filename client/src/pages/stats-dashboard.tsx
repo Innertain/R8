@@ -13,7 +13,8 @@ import {
   Package,
   CheckCircle,
   AlertTriangle,
-  Activity
+  Activity,
+  Heart
 } from "lucide-react";
 
 // Color schemes for charts
@@ -171,6 +172,7 @@ export default function StatsDashboard() {
     deliveries: statsData?.data?.deliveries?.length || 0,
     volunteers: statsData?.data?.volunteers?.length || 0,
     drivers: statsData?.data?.drivers?.length || 0,
+    partners: (statsData as any)?.counts?.partners || 0,
     completedDeliveries: (statsData as any)?.counts?.completedDeliveries || 0,
     totalFoodBoxes: (statsData as any)?.counts?.totalFoodBoxes || 0,
     estimatedFamiliesHelped: (statsData as any)?.counts?.estimatedFamiliesHelped || 0,
@@ -330,7 +332,7 @@ export default function StatsDashboard() {
       </div>
 
       {/* Site Activity Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Sites (60 days)</CardTitle>
@@ -361,6 +363,17 @@ export default function StatsDashboard() {
           <CardContent>
             <div className="text-xl font-bold text-rose-600">{totals.sitesWithRecentActivity.toLocaleString()}</div>
             <p className="text-xs text-gray-600">Active requests or needs</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Mutual Aid Partners</CardTitle>
+            <Heart className="h-4 w-4 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-bold text-purple-600">{totals.partners.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Partner organizations</p>
           </CardContent>
         </Card>
       </div>

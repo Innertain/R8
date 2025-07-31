@@ -997,11 +997,12 @@ app.get('/api/stats', async (req, res) => {
     };
 
     // Fetch all relevant data in parallel
-    const [sites, deliveries, drivers, volunteers] = await Promise.all([
+    const [sites, deliveries, drivers, volunteers, partners] = await Promise.all([
       fetchAllRecords('Site'),
       fetchAllRecords('Deliveries'),
       fetchAllRecords('Drivers'),
-      fetchAllRecords('Volunteer Applications')
+      fetchAllRecords('Volunteer Applications'),
+      fetchAllRecords('Mutual Aid Partners')
     ]);
 
     // Transform records to include flattened fields
@@ -1009,6 +1010,7 @@ app.get('/api/stats', async (req, res) => {
     const transformedDeliveries = deliveries.map((r: any) => ({ id: r.id, ...r.fields }));
     const transformedDrivers = drivers.map((r: any) => ({ id: r.id, ...r.fields }));
     const transformedVolunteers = volunteers.map((r: any) => ({ id: r.id, ...r.fields }));
+    const transformedPartners = partners.map((r: any) => ({ id: r.id, ...r.fields }));
 
     // Calculate total food boxes delivered using the correct field name from sample
     const totalFoodBoxes = transformedDeliveries.reduce((sum: number, delivery: any) => {
@@ -1072,7 +1074,7 @@ app.get('/api/stats', async (req, res) => {
       return false;
     }).length;
 
-    console.log(`✓ Stats loaded: ${transformedSites.length} sites, ${transformedDeliveries.length} deliveries (${completedDeliveries} completed), ${transformedDrivers.length} drivers, ${transformedVolunteers.length} volunteers`);
+    console.log(`✓ Stats loaded: ${transformedSites.length} sites, ${transformedDeliveries.length} deliveries (${completedDeliveries} completed), ${transformedDrivers.length} drivers, ${transformedVolunteers.length} volunteers, ${transformedPartners.length} mutual aid partners`);
     console.log(`✓ Total food boxes delivered: ${totalFoodBoxes}`);
     console.log(`✓ Estimated families helped: ${estimatedFamiliesHelped} (${sitesWithFamilyData} sites have data)`);
     console.log(`✓ Active sites (last 60 days): ${activeSitesLast60Days}, Sites with deliveries: ${sitesWithDeliveries.size}, Sites with recent activity: ${sitesWithRecentActivity}`);
@@ -1083,7 +1085,8 @@ app.get('/api/stats', async (req, res) => {
         sites: transformedSites,
         deliveries: transformedDeliveries, 
         drivers: transformedDrivers,
-        volunteers: transformedVolunteers
+        volunteers: transformedVolunteers,
+        partners: transformedPartners
       },
       counts: {
         sites: transformedSites.length,
@@ -1091,6 +1094,7 @@ app.get('/api/stats', async (req, res) => {
         completedDeliveries: completedDeliveries,
         drivers: transformedDrivers.length,
         volunteers: transformedVolunteers.length,
+        partners: transformedPartners.length,
         totalFoodBoxes: totalFoodBoxes,
         estimatedFamiliesHelped: estimatedFamiliesHelped,
         activeSitesLast60Days: activeSitesLast60Days,
