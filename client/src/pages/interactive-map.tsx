@@ -176,20 +176,36 @@ export default function InteractiveMap() {
                     <h4 className="font-medium text-sm">Bioregions</h4>
                     <div className="space-y-1 text-xs">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#8FBC8F"}}></div>
-                        <span>Pacific Northwest Coastal</span>
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#4A7C59"}}></div>
+                        <span>Pacific NW Coastal</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#F0E68C"}}></div>
-                        <span>Great Plains</span>
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#CD853F"}}></div>
+                        <span>Cascade-Sierra</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#F4A460"}}></div>
+                        <span>Great Basin</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded" style={{backgroundColor: "#90EE90"}}></div>
+                        <span>Great Plains</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#32CD32"}}></div>
                         <span>Eastern Deciduous</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#DDA0DD"}}></div>
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#98FB98"}}></div>
+                        <span>SE Coastal Plain</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#9370DB"}}></div>
                         <span>Boreal Shield</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: "#E6E6FA"}}></div>
+                        <span>Arctic Tundra</span>
                       </div>
                     </div>
                   </div>
