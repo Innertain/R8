@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +14,8 @@ import {
   CheckCircle,
   AlertTriangle,
   Activity,
-  Heart
+  Heart,
+  Clock
 } from "lucide-react";
 
 // Color schemes for charts
@@ -32,6 +33,109 @@ interface StatsData {
   drivers: any[];
   data?: any;
   counts?: any;
+}
+
+// Recent Updates Component
+function RecentUpdatesSection() {
+  const { data: recentUpdates, isLoading } = useQuery({
+    queryKey: ['/api/recent-updates'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (!recentUpdates?.data) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
+        <p>No recent activity found</p>
+      </div>
+    );
+  }
+
+  const { inventory, needs } = recentUpdates.data;
+  const allUpdates = [
+    ...inventory.slice(0, 5).map((item: any) => ({
+      ...item,
+      type: 'inventory',
+      icon: Package,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    })),
+    ...needs.slice(0, 5).map((item: any) => ({
+      ...item,
+      type: 'needs',
+      icon: AlertTriangle,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
+    }))
+  ].sort((a, b) => new Date(b.lastModified || b.createdTime).getTime() - new Date(a.lastModified || a.createdTime).getTime())
+    .slice(0, 8);
+
+  return (
+    <div className="space-y-4 max-h-96 overflow-y-auto">
+      {allUpdates.map((update, index) => {
+        const Icon = update.icon;
+        const timeAgo = new Date(update.lastModified || update.createdTime);
+        const now = new Date();
+        const diffHours = Math.floor((now.getTime() - timeAgo.getTime()) / (1000 * 60 * 60));
+        const timeDisplay = diffHours < 1 ? 'Just now' : 
+                           diffHours < 24 ? `${diffHours}h ago` : 
+                           `${Math.floor(diffHours / 24)}d ago`;
+
+        return (
+          <div key={`${update.type}-${update.id || index}`} className="flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors">
+            <div className={`p-2 rounded-full ${update.bgColor}`}>
+              <Icon className={`w-4 h-4 ${update.color}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="font-medium text-sm text-gray-900 truncate">
+                  {update.fields?.['Site Name'] || update.fields?.Name || 'Unknown Site'}
+                </h4>
+                <Badge variant="outline" className="text-xs">
+                  {update.type === 'inventory' ? 'Inventory' : 'Need'}
+                </Badge>
+              </div>
+              <p className="text-xs text-gray-600 mb-1">
+                {update.type === 'inventory' 
+                  ? `Updated inventory: ${update.fields?.['Item Name'] || 'items'}`
+                  : `New need: ${update.fields?.['Item Needed'] || update.fields?.Description || 'supplies'}`
+                }
+              </p>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Clock className="w-3 h-3" />
+                <span>{timeDisplay}</span>
+                {update.fields?.City && update.fields?.State && (
+                  <>
+                    <span>•</span>
+                    <span>{update.fields.City}, {update.fields.State}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      
+      <div className="text-center pt-2 border-t border-gray-100">
+        <p className="text-xs text-gray-500">
+          Showing latest updates from {inventory.length} inventory and {needs.length} needs records
+        </p>
+      </div>
+    </div>
+  );
 }
 
 interface StateSummary {
@@ -417,34 +521,20 @@ export default function StatsDashboard() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="flex justify-center">
-            <Card className="w-full max-w-md">
-              <CardHeader>
-                <CardTitle>Delivery Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={deliveryStatusData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {deliveryStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-600" />
+                Recent Supply Site Activity
+              </CardTitle>
+              <CardDescription>
+                Latest inventory updates and needs requests from active supply sites
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RecentUpdatesSection />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="states" className="space-y-6">
