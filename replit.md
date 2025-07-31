@@ -40,7 +40,7 @@ The platform features a clean, professional design with a focus on readability. 
 - **Profile Management**: Volunteers can manage their profiles, including skills and status (Active, Taking a Break, Remove Data).
 - **Duplicate Prevention**: Backend validation to prevent duplicate shift assignments.
 - **Host Integration**: Display of mutual aid partners (hosts) with logos on shift cards.
-- **Interactive Response Map**: North America map with bioregional approach, state/county/FEMA region overlays, disaster tracking, and community activity visualization. Features real-time event markers and region-based filtering.
+- **Interactive Response Map**: Dual-view North America map featuring both political boundaries (states/counties) and ecological bioregions inspired by One Earth Navigator. Includes disaster tracking, real-time emergency alerts via IPAWS/NWS APIs, and community activity visualization with region-based filtering.
 
 ## External Dependencies
 ### Core Framework & Libraries
