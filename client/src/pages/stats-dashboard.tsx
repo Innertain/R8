@@ -172,7 +172,8 @@ export default function StatsDashboard() {
     volunteers: statsData?.data?.volunteers?.length || 0,
     drivers: statsData?.data?.drivers?.length || 0,
     completedDeliveries: (statsData as any)?.counts?.completedDeliveries || 0,
-    totalFoodBoxes: (statsData as any)?.counts?.totalFoodBoxes || 0
+    totalFoodBoxes: (statsData as any)?.counts?.totalFoodBoxes || 0,
+    estimatedFamiliesHelped: (statsData as any)?.counts?.estimatedFamiliesHelped || 0
   };
 
   // Prepare chart data
@@ -257,7 +258,7 @@ export default function StatsDashboard() {
       </div>
 
       {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Supply Sites</CardTitle>
@@ -312,6 +313,24 @@ export default function StatsDashboard() {
             <p className="text-xs text-gray-600">Available drivers</p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Estimated Families Helped</CardTitle>
+            <Users className="h-4 w-4 text-teal-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-teal-600">{(totals.estimatedFamiliesHelped || 0).toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Site estimates*</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Disclaimer for estimated families */}
+      <div className="mb-6">
+        <p className="text-xs text-gray-500 italic">
+          * Estimated families helped numbers are estimates provided by supply sites and may not reflect exact counts.
+        </p>
       </div>
 
       {/* Charts Section */}

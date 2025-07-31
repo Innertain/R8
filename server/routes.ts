@@ -1026,8 +1026,19 @@ app.get('/api/stats', async (req, res) => {
       return delivery.Status === 'Delivery Completed';
     }).length;
 
+    // Calculate estimated families helped from site information using "Weekly Served" field
+    const estimatedFamiliesHelped = transformedSites.reduce((sum: number, site: any) => {
+      const familiesEstimate = site['Weekly Served'] || 0;
+      const count = parseInt(String(familiesEstimate)) || 0;
+      return sum + count;
+    }, 0);
+    
+    // Count sites with actual family data for verification
+    const sitesWithFamilyData = transformedSites.filter(site => site['Weekly Served'] && site['Weekly Served'] > 0).length;
+
     console.log(`✓ Stats loaded: ${transformedSites.length} sites, ${transformedDeliveries.length} deliveries (${completedDeliveries} completed), ${transformedDrivers.length} drivers, ${transformedVolunteers.length} volunteers`);
     console.log(`✓ Total food boxes delivered: ${totalFoodBoxes}`);
+    console.log(`✓ Estimated families helped: ${estimatedFamiliesHelped} (${sitesWithFamilyData} sites have data)`);
 
     return res.json({
       success: true,
@@ -1043,7 +1054,8 @@ app.get('/api/stats', async (req, res) => {
         completedDeliveries: completedDeliveries,
         drivers: transformedDrivers.length,
         volunteers: transformedVolunteers.length,
-        totalFoodBoxes: totalFoodBoxes
+        totalFoodBoxes: totalFoodBoxes,
+        estimatedFamiliesHelped: estimatedFamiliesHelped
       }
     });
     
@@ -1053,6 +1065,45 @@ app.get('/api/stats', async (req, res) => {
       success: false, 
       error: error.message 
     });
+  }
+});
+
+// Debug endpoint to analyze site field names
+app.get('/api/debug/site-fields', async (req, res) => {
+  try {
+    const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+    const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+    
+    if (!AIRTABLE_TOKEN || !baseId) {
+      return res.status(500).json({ success: false, error: 'Missing Airtable configuration' });
+    }
+
+    const response = await fetch(`https://api.airtable.com/v0/${baseId}/Site?maxRecords=5`, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+    });
+
+    if (!response.ok) {
+      return res.status(500).json({ success: false, error: 'Failed to fetch sites' });
+    }
+
+    const data = await response.json();
+    const sites = data.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [];
+
+    const analysis = {
+      allFields: Object.keys(sites[0] || {}),
+      familyLikeFields: Object.keys(sites[0] || {}).filter(field => 
+        field.toLowerCase().includes('famil') || 
+        field.toLowerCase().includes('served') ||
+        field.toLowerCase().includes('help') ||
+        field.toLowerCase().includes('people') ||
+        field.toLowerCase().includes('estimate')
+      ),
+      sampleSite: sites[0] || {}
+    };
+
+    return res.json({ success: true, analysis });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
