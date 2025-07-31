@@ -153,11 +153,12 @@ export default function FemaRssFeed({ maxItems = 10 }: FemaRssFeedProps) {
           <p className="text-sm text-gray-600">No recent emergency alerts.</p>
         ) : (
           <div className="space-y-4">
-            {rssItems.map((item) => {
+            {rssItems.map((item, index) => {
               const severity = getSeverityFromTitle(item.title);
+              const uniqueKey = item.guid || `${item.title}-${index}`;
               return (
                 <div
-                  key={item.guid}
+                  key={uniqueKey}
                   className="border-l-4 border-orange-200 pl-4 pb-3"
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
