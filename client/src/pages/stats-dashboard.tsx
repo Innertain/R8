@@ -257,7 +257,7 @@ export default function StatsDashboard() {
       </div>
 
       {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Supply Sites</CardTitle>
@@ -271,26 +271,33 @@ export default function StatsDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Deliveries</CardTitle>
+            <CardTitle className="text-sm font-medium">Completed Deliveries</CardTitle>
             <Package className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{totals.completedDeliveries.toLocaleString()}</div>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant="outline" className="text-xs">
-                {totals.totalFoodBoxes.toLocaleString()} food boxes
-              </Badge>
-            </div>
+            <p className="text-xs text-gray-600">Successfully delivered</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Food Boxes</CardTitle>
+            <Package className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">{totals.totalFoodBoxes.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Total distributed</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Volunteers</CardTitle>
-            <Users className="h-4 w-4 text-yellow-600" />
+            <Users className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{totals.volunteers.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-purple-600">{totals.volunteers.toLocaleString()}</div>
             <p className="text-xs text-gray-600">Active volunteers</p>
           </CardContent>
         </Card>
@@ -298,10 +305,10 @@ export default function StatsDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Drivers</CardTitle>
-            <Truck className="h-4 w-4 text-red-600" />
+            <Truck className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{totals.drivers.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-orange-600">{totals.drivers.toLocaleString()}</div>
             <p className="text-xs text-gray-600">Available drivers</p>
           </CardContent>
         </Card>

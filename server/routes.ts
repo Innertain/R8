@@ -1026,13 +1026,20 @@ app.get('/api/stats', async (req, res) => {
       const driverStatus = String(delivery['Driver Status'] || '').toLowerCase();
       const status = String(delivery.Status || delivery.status || '').toLowerCase();
       
+      // Check various completion indicators 
       return driverStatus === 'completed' || 
              driverStatus === 'delivered' ||
+             driverStatus === 'confirmed' ||
              status === 'completed' || 
              status === 'complete' || 
              status === 'delivered' ||
+             status === 'confirmed' ||
              status === 'finished';
     }).length;
+
+    // Log some driver status examples to help debug completion detection
+    const statusExamples = transformedDeliveries.slice(0, 10).map(d => d['Driver Status']).filter(Boolean);
+    console.log('Sample driver statuses for completion detection:', statusExamples);
 
     // Log some sample records to help identify correct field names
     if (transformedDeliveries.length > 0) {
