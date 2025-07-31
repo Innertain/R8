@@ -972,57 +972,93 @@ app.get('/api/stats', async (req, res) => {
 
     console.log('Fetching comprehensive stats from Airtable...');
 
+    // Function to fetch all records from a table (handling pagination)
+    const fetchAllRecords = async (tableName: string) => {
+      let allRecords: any[] = [];
+      let offset = '';
+      
+      do {
+        const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}${offset ? `?offset=${offset}` : ''}`;
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+        });
+        
+        if (!response.ok) {
+          console.log(`Failed to fetch ${tableName}: ${response.status}`);
+          return [];
+        }
+        
+        const data = await response.json();
+        allRecords = allRecords.concat(data.records || []);
+        offset = data.offset || '';
+      } while (offset);
+      
+      return allRecords;
+    };
+
     // Fetch all relevant data in parallel
-    const [sitesRes, deliveriesRes, driversRes, volunteersRes] = await Promise.all([
-      fetch(`https://api.airtable.com/v0/${baseId}/Site?maxRecords=200`, {
-        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-      }),
-      fetch(`https://api.airtable.com/v0/${baseId}/Deliveries?maxRecords=200`, {
-        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-      }),
-      fetch(`https://api.airtable.com/v0/${baseId}/Drivers?maxRecords=200`, {
-        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-      }),
-      fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications?maxRecords=200`, {
-        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-      })
+    const [sites, deliveries, drivers, volunteers] = await Promise.all([
+      fetchAllRecords('Site'),
+      fetchAllRecords('Deliveries'),
+      fetchAllRecords('Drivers'),
+      fetchAllRecords('Volunteer Applications')
     ]);
 
-    const results = await Promise.allSettled([
-      sitesRes.ok ? sitesRes.json() : Promise.reject('Sites failed'),
-      deliveriesRes.ok ? deliveriesRes.json() : Promise.reject('Deliveries failed'), 
-      driversRes.ok ? driversRes.json() : Promise.reject('Drivers failed'),
-      volunteersRes.ok ? volunteersRes.json() : Promise.reject('Volunteers failed')
-    ]);
+    // Transform records to include flattened fields
+    const transformedSites = sites.map((r: any) => ({ id: r.id, ...r.fields }));
+    const transformedDeliveries = deliveries.map((r: any) => ({ id: r.id, ...r.fields }));
+    const transformedDrivers = drivers.map((r: any) => ({ id: r.id, ...r.fields }));
+    const transformedVolunteers = volunteers.map((r: any) => ({ id: r.id, ...r.fields }));
 
-    // Process results, handling failures gracefully
-    const sites = results[0].status === 'fulfilled' ? 
-      results[0].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
-    
-    const deliveries = results[1].status === 'fulfilled' ? 
-      results[1].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
-    
-    const drivers = results[2].status === 'fulfilled' ? 
-      results[2].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
-    
-    const volunteers = results[3].status === 'fulfilled' ? 
-      results[3].value.records?.map((r: any) => ({ id: r.id, ...r.fields })) || [] : [];
+    // Calculate total food boxes delivered - checking multiple possible field names
+    const totalFoodBoxes = transformedDeliveries.reduce((sum: number, delivery: any) => {
+      // Check various possible field names for food box count
+      const foodBoxCount = delivery['Food Boxes'] || 
+                          delivery['FoodBoxes'] || 
+                          delivery['Food Box Count'] || 
+                          delivery['Boxes Delivered'] ||
+                          delivery['Boxes'] || 
+                          delivery['# of Boxes'] ||
+                          delivery['Total Boxes'] ||
+                          0;
+      const count = parseInt(String(foodBoxCount)) || 0;
+      return sum + count;
+    }, 0);
 
-    console.log(`✓ Stats loaded: ${sites.length} sites, ${deliveries.length} deliveries, ${drivers.length} drivers, ${volunteers.length} volunteers`);
+    // Count completed deliveries - checking multiple possible status values
+    const completedDeliveries = transformedDeliveries.filter((delivery: any) => {
+      const status = String(delivery.Status || delivery.status || delivery['Delivery Status'] || '').toLowerCase();
+      return status === 'completed' || 
+             status === 'complete' || 
+             status === 'delivered' ||
+             status === 'finished' ||
+             status === 'done';
+    }).length;
+
+    // Log some sample records to help identify correct field names
+    if (transformedDeliveries.length > 0) {
+      console.log('Sample delivery record fields:', Object.keys(transformedDeliveries[0]));
+      console.log('Sample delivery record:', transformedDeliveries[0]);
+    }
+
+    console.log(`✓ Stats loaded: ${transformedSites.length} sites, ${transformedDeliveries.length} deliveries (${completedDeliveries} completed), ${transformedDrivers.length} drivers, ${transformedVolunteers.length} volunteers`);
+    console.log(`✓ Total food boxes delivered: ${totalFoodBoxes}`);
 
     return res.json({
       success: true,
       data: {
-        sites,
-        deliveries, 
-        drivers,
-        volunteers
+        sites: transformedSites,
+        deliveries: transformedDeliveries, 
+        drivers: transformedDrivers,
+        volunteers: transformedVolunteers
       },
       counts: {
-        sites: sites.length,
-        deliveries: deliveries.length,
-        drivers: drivers.length,
-        volunteers: volunteers.length
+        sites: transformedSites.length,
+        deliveries: transformedDeliveries.length,
+        completedDeliveries: completedDeliveries,
+        drivers: transformedDrivers.length,
+        volunteers: transformedVolunteers.length,
+        totalFoodBoxes: totalFoodBoxes
       }
     });
     

@@ -29,6 +29,8 @@ interface StatsData {
   deliveries: any[];
   volunteers: any[];
   drivers: any[];
+  data?: any;
+  counts?: any;
 }
 
 interface StateSummary {
@@ -57,15 +59,20 @@ const useStatsData = () => {
       console.log('Stats data loaded:', { 
         sites: sites?.length || 0, 
         deliveries: deliveries?.length || 0, 
+        completedDeliveries: result.counts?.completedDeliveries || 0,
         volunteers: volunteers?.length || 0, 
-        drivers: drivers?.length || 0 
+        drivers: drivers?.length || 0,
+        totalFoodBoxes: result.counts?.totalFoodBoxes || 0
       });
 
+      // Return both data and raw result for accessing counts
       return { 
         sites: sites || [], 
         deliveries: deliveries || [], 
         volunteers: volunteers || [], 
-        drivers: drivers || [] 
+        drivers: drivers || [],
+        data: result.data,
+        counts: result.counts
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -158,14 +165,15 @@ export default function StatsDashboard() {
   const stateSummaries = processStatsData(statsData);
   const filteredData = selectedState === "all" ? stateSummaries : stateSummaries.filter(s => s.state === selectedState);
 
-  // Calculate totals
-  const totals = stateSummaries.reduce((acc, curr) => ({
-    sites: acc.sites + curr.sites,
-    deliveries: acc.deliveries + curr.deliveries,
-    volunteers: acc.volunteers + curr.volunteers,
-    drivers: acc.drivers + curr.drivers,
-    completedDeliveries: acc.completedDeliveries + curr.completedDeliveries
-  }), { sites: 0, deliveries: 0, volunteers: 0, drivers: 0, completedDeliveries: 0 });
+  // Calculate totals from processed data and API counts
+  const totals = {
+    sites: statsData?.data?.sites?.length || 0,
+    deliveries: statsData?.data?.deliveries?.length || 0,
+    volunteers: statsData?.data?.volunteers?.length || 0,
+    drivers: statsData?.data?.drivers?.length || 0,
+    completedDeliveries: (statsData as any)?.counts?.completedDeliveries || 0,
+    totalFoodBoxes: (statsData as any)?.counts?.totalFoodBoxes || 0
+  };
 
   // Prepare chart data
   const topStates = stateSummaries.slice(0, 10);
@@ -267,10 +275,10 @@ export default function StatsDashboard() {
             <Package className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{totals.deliveries.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-600">{totals.completedDeliveries.toLocaleString()}</div>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="outline" className="text-xs">
-                {totals.completedDeliveries} completed
+                {totals.totalFoodBoxes.toLocaleString()} food boxes
               </Badge>
             </div>
           </CardContent>
