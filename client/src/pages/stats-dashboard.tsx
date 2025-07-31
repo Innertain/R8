@@ -145,46 +145,12 @@ export default function StatsDashboard() {
       }
     });
 
-    // Add volunteers data
-    data.volunteers?.forEach((volunteer: any) => {
-      const state = normalizeState(volunteer.state || volunteer.State || volunteer['State']);
-      if (!state) return; // Skip invalid states
-      
-      if (!stateMap.has(state)) {
-        stateMap.set(state, {
-          state,
-          sites: 0,
-          deliveries: 0,
-          volunteers: 0,
-          drivers: 0,
-          completedDeliveries: 0
-        });
-      }
-      stateMap.get(state)!.volunteers++;
-    });
-
-    // Add drivers data
-    data.drivers?.forEach((driver: any) => {
-      const state = normalizeState(driver.State || driver.state);
-      if (!state) return; // Skip invalid states
-      
-      if (!stateMap.has(state)) {
-        stateMap.set(state, {
-          state,
-          sites: 0,
-          deliveries: 0,
-          volunteers: 0,
-          drivers: 0,
-          completedDeliveries: 0
-        });
-      }
-      stateMap.get(state)!.drivers++;
-    });
+    // Note: Volunteers and drivers don't have location data yet, so we skip them for state breakdown
 
     return Array.from(stateMap.values())
       .filter(summary => summary.state !== 'UNKNOWN') // Extra safety filter
       .sort((a, b) => 
-        (b.sites + b.deliveries + b.volunteers + b.drivers) - (a.sites + a.deliveries + a.volunteers + a.drivers)
+        (b.sites + b.deliveries) - (a.sites + a.deliveries)
       );
   };
 
@@ -481,7 +447,7 @@ export default function StatsDashboard() {
         <TabsContent value="states" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Resources by State (Top 10)</CardTitle>
+              <CardTitle>Sites and Deliveries by State (Top 10)</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
@@ -491,9 +457,8 @@ export default function StatsDashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="sites" stackId="a" fill="#3b82f6" name="Supply Sites" />
-                  <Bar dataKey="volunteers" stackId="a" fill="#f59e0b" name="Volunteers" />
-                  <Bar dataKey="drivers" stackId="a" fill="#ef4444" name="Drivers" />
+                  <Bar dataKey="sites" fill="#3b82f6" name="Supply Sites" />
+                  <Bar dataKey="deliveries" fill="#10b981" name="Deliveries" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -518,12 +483,6 @@ export default function StatsDashboard() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Deliveries
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Volunteers
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Drivers
-                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -539,12 +498,6 @@ export default function StatsDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {state.deliveries.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {state.volunteers.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {state.drivers.toLocaleString()}
                         </td>
                       </tr>
                     ))}
