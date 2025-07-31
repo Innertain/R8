@@ -33,6 +33,8 @@ interface StatsData {
   drivers: any[];
   data?: any;
   counts?: any;
+  cached?: boolean;
+  lastUpdated?: string;
 }
 
 // Recent Updates Component
@@ -64,7 +66,7 @@ function RecentUpdatesSection() {
     );
   }
 
-  const { inventory, needs } = recentUpdates.data;
+  const { inventory = [], needs = [] } = recentUpdates.data;
   const allUpdates = [
     ...inventory.slice(0, 5).map((item: any) => ({
       ...item,
@@ -183,7 +185,7 @@ const useStatsData = () => {
       };
     },
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
-    cacheTime: 24 * 60 * 60 * 1000, // 24 hours
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
   });
 };
 
