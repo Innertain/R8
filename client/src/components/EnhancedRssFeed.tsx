@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity } from "lucide-react";
+import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
 
 interface EmergencyAlert {
   id: string;
@@ -176,6 +176,53 @@ export default function EnhancedRssFeed({
     if (locationFilter !== 'all' && disaster.state !== locationFilter && !disaster.title.toUpperCase().includes(locationFilter.toUpperCase())) return false;
     return true;
   }).slice(0, maxItems);
+
+  // FEMA Disaster Statistics
+  const femaStats = {
+    byType: femaDisasters.reduce((acc, disaster) => {
+      const type = disaster.incidentType || 'Other';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    byState: femaDisasters.reduce((acc, disaster) => {
+      acc[disaster.state] = (acc[disaster.state] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    byDeclarationType: femaDisasters.reduce((acc, disaster) => {
+      acc[disaster.declarationType] = (acc[disaster.declarationType] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    totalDeclarations: femaDisasters.length
+  };
+
+  // Get disaster type icon
+  const getDisasterIcon = (incidentType: string) => {
+    const type = incidentType?.toLowerCase() || '';
+    if (type.includes('fire') || type.includes('wildfire')) return Flame;
+    if (type.includes('flood') || type.includes('flooding')) return Waves;
+    if (type.includes('hurricane') || type.includes('typhoon') || type.includes('storm')) return Wind;
+    if (type.includes('earthquake') || type.includes('seismic')) return Mountain;
+    if (type.includes('tornado') || type.includes('severe storm')) return Wind;
+    if (type.includes('drought') || type.includes('heat')) return Sun;
+    if (type.includes('winter') || type.includes('snow') || type.includes('ice')) return Snowflake;
+    if (type.includes('hazmat') || type.includes('chemical')) return Factory;
+    if (type.includes('terrorist') || type.includes('attack')) return AlertTriangle;
+    return Home; // Default for other/multiple incidents
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Unknown';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
+      return 'Unknown';
+    }
+  };
 
   // Analytics data
   const severityStats = alerts.reduce((acc, alert) => {
@@ -431,6 +478,67 @@ export default function EnhancedRssFeed({
           </TabsContent>
 
           <TabsContent value="declarations" className="mt-6">
+            {/* FEMA Statistics Dashboard */}
+            {femaDisasters.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BarChart3 className="w-4 h-4 text-blue-600" />
+                    <span className="font-medium text-sm">Disaster Types</span>
+                  </div>
+                  <div className="space-y-2">
+                    {Object.entries(femaStats.byType).slice(0, 3).map(([type, count]) => (
+                      <div key={type} className="flex justify-between text-xs">
+                        <span className="truncate">{type}</span>
+                        <span className="font-medium">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-white rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin className="w-4 h-4 text-green-600" />
+                    <span className="font-medium text-sm">By State</span>
+                  </div>
+                  <div className="space-y-2">
+                    {Object.entries(femaStats.byState).slice(0, 3).map(([state, count]) => (
+                      <div key={state} className="flex justify-between text-xs">
+                        <span className="truncate">{state}</span>
+                        <span className="font-medium">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-white rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="w-4 h-4 text-purple-600" />
+                    <span className="font-medium text-sm">Declaration Types</span>
+                  </div>
+                  <div className="space-y-2">
+                    {Object.entries(femaStats.byDeclarationType).map(([type, count]) => (
+                      <div key={type} className="flex justify-between text-xs">
+                        <span className="truncate">
+                          {type === 'DR' ? 'Major Disaster' : type === 'EM' ? 'Emergency' : 'Fire Mgmt'}
+                        </span>
+                        <span className="font-medium">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-white rounded-lg p-4 border">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-orange-600" />
+                    <span className="font-medium text-sm">Total Active</span>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-600">{femaStats.totalDeclarations}</div>
+                  <div className="text-xs text-gray-500">2025 Declarations</div>
+                </div>
+              </div>
+            )}
+
             {filteredFemaDisasters.length === 0 ? (
               <div className="bg-white rounded-lg p-6 border text-center">
                 <TrendingUp className="w-8 h-8 text-gray-400 mx-auto mb-2" />
@@ -438,66 +546,106 @@ export default function EnhancedRssFeed({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredFemaDisasters.map((disaster, index) => (
-                  <div
-                    key={`${disaster.guid}-${index}`}
-                    className="rounded-lg border p-4 transition-all hover:shadow-sm bg-white"
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <h3 className="font-semibold text-sm leading-tight flex-1">
-                        {disaster.title}
-                      </h3>
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs whitespace-nowrap ${
-                          disaster.declarationType === 'DR' ? 'bg-red-100 text-red-800' :
-                          disaster.declarationType === 'EM' ? 'bg-orange-100 text-orange-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {disaster.declarationType === 'DR' ? 'MAJOR DISASTER' :
-                         disaster.declarationType === 'EM' ? 'EMERGENCY' : 'FIRE MGMT'}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 mb-3 text-xs text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{disaster.state}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="bg-gray-100 px-1 rounded">#{disaster.disasterNumber}</span>
-                      </div>
-                      {disaster.incidentType && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-gray-500">{disaster.incidentType}</span>
+                {filteredFemaDisasters.map((disaster, index) => {
+                  const DisasterIcon = getDisasterIcon(disaster.incidentType);
+                  return (
+                    <div
+                      key={`${disaster.guid}-${index}`}
+                      className="rounded-lg border p-4 transition-all hover:shadow-lg bg-white hover:bg-gray-50"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-full bg-gray-100">
+                            <DisasterIcon className="w-4 h-4 text-gray-600" />
+                          </div>
+                          <h3 className="font-semibold text-sm leading-tight flex-1">
+                            {disaster.title}
+                          </h3>
                         </div>
-                      )}
-                    </div>
-                    
-                    {disaster.description && (
-                      <p className="text-xs text-gray-700 mb-3 leading-relaxed">
-                        {disaster.description}
-                      </p>
-                    )}
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-xs text-gray-600">
-                        <Clock className="w-3 h-3" />
-                        <span>{new Date(disaster.declarationDate).toLocaleDateString()}</span>
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-xs whitespace-nowrap ${
+                            disaster.declarationType === 'DR' ? 'bg-red-100 text-red-800' :
+                            disaster.declarationType === 'EM' ? 'bg-orange-100 text-orange-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {disaster.declarationType === 'DR' ? 'MAJOR DISASTER' :
+                           disaster.declarationType === 'EM' ? 'EMERGENCY' : 'FIRE MGMT'}
+                        </Badge>
                       </div>
                       
-                      <a
-                        href={disaster.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
-                      >
-                        FEMA Details <ExternalLink className="w-3 h-3" />
-                      </a>
+                      <div className="space-y-2 mb-3">
+                        <div className="flex items-center gap-4 text-xs text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            <span className="font-medium">{disaster.state}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded font-mono text-xs">
+                              #{disaster.disasterNumber}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {disaster.incidentType && (
+                          <div className="flex items-center gap-1 text-xs">
+                            <span className="bg-gray-100 px-2 py-1 rounded text-gray-700 font-medium">
+                              {disaster.incidentType}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Enhanced Date Information */}
+                        <div className="bg-gray-50 rounded p-2 space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-600 flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              Declaration Date:
+                            </span>
+                            <span className="font-medium text-gray-900">
+                              {formatDate(disaster.declarationDate)}
+                            </span>
+                          </div>
+                          
+                          {disaster.incidentBeginDate && (
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-gray-600">Incident Period:</span>
+                              <span className="font-medium text-gray-900">
+                                {formatDate(disaster.incidentBeginDate)}
+                                {disaster.incidentEndDate && ` - ${formatDate(disaster.incidentEndDate)}`}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {disaster.description && (
+                        <p className="text-xs text-gray-700 mb-3 leading-relaxed line-clamp-3">
+                          {disaster.description}
+                        </p>
+                      )}
+                      
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <Clock className="w-3 h-3" />
+                          <span>
+                            {Math.floor((new Date().getTime() - new Date(disaster.declarationDate).getTime()) / (1000 * 60 * 60 * 24))} days ago
+                          </span>
+                        </div>
+                        
+                        <a
+                          href={disaster.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
+                        >
+                          FEMA Details <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </TabsContent>

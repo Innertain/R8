@@ -1842,6 +1842,158 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
+  // Cache for FEMA Mission Assignments
+  let femaMissionCache: any = null;
+  let femaMissionCacheTime: number = 0;
+  const FEMA_MISSION_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hour cache
+
+  // FEMA Mission Assignments - Real-time disaster response coordination
+  app.get("/api/fema-missions", async (req, res) => {
+    try {
+      // Check cache first
+      const now = Date.now();
+      if (femaMissionCache && (now - femaMissionCacheTime) < FEMA_MISSION_CACHE_DURATION) {
+        console.log('✓ Returning cached FEMA mission assignments');
+        return res.json({
+          ...femaMissionCache,
+          cached: true,
+          lastUpdated: new Date(femaMissionCacheTime).toISOString()
+        });
+      }
+
+      const femaUrl = 'https://www.fema.gov/api/open/v2/MissionAssignments?$orderby=missionAssignmentDate desc&$top=25&$format=json';
+      
+      console.log('Fetching FEMA mission assignments...');
+      const response = await fetch(femaUrl);
+      
+      if (!response.ok) {
+        throw new Error(`FEMA Mission API failed: ${response.status}`);
+      }
+      
+      const missionData = await response.json();
+      const missions = missionData.MissionAssignments || [];
+      
+      const transformedMissions = missions.map((mission: any, index: number) => ({
+        id: mission.id || `mission-${index}`,
+        disasterNumber: mission.disasterNumber,
+        missionNumber: mission.missionNumber,
+        requestingAgency: mission.requestingAgency || 'Unknown',
+        performingAgency: mission.performingAgency || 'Unknown',
+        missionDescription: mission.missionDescription || '',
+        missionAssignmentDate: mission.missionAssignmentDate,
+        estimatedCost: mission.estimatedCost || 0,
+        status: mission.status || 'Active',
+        state: mission.state || '',
+        county: mission.county || '',
+        workOrderType: mission.workOrderType || 'Emergency Response'
+      }));
+      
+      console.log(`✓ FEMA Missions: ${transformedMissions.length} active mission assignments loaded`);
+      
+      const responseData = {
+        success: true,
+        items: transformedMissions,
+        source: 'FEMA Mission Assignments',
+        lastUpdated: new Date().toISOString(),
+        totalRecords: missions.length,
+        cached: false
+      };
+
+      // Cache the response
+      femaMissionCache = responseData;
+      femaMissionCacheTime = now;
+      
+      res.json(responseData);
+      
+    } catch (error) {
+      console.error('FEMA Mission Assignments API error:', error);
+      res.json({
+        success: false,
+        items: [],
+        source: 'FEMA Mission Assignments',
+        error: 'Unable to fetch mission assignments',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
+  // Cache for FEMA Housing Assistance
+  let femaHousingCache: any = null;
+  let femaHousingCacheTime: number = 0;
+  const FEMA_HOUSING_CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hour cache
+
+  // FEMA Housing Assistance - Individual assistance for disaster victims
+  app.get("/api/fema-housing", async (req, res) => {
+    try {
+      // Check cache first
+      const now = Date.now();
+      if (femaHousingCache && (now - femaHousingCacheTime) < FEMA_HOUSING_CACHE_DURATION) {
+        console.log('✓ Returning cached FEMA housing assistance data');
+        return res.json({
+          ...femaHousingCache,
+          cached: true,
+          lastUpdated: new Date(femaHousingCacheTime).toISOString()
+        });
+      }
+
+      const currentYear = new Date().getFullYear();
+      const femaUrl = `https://www.fema.gov/api/open/v2/HousingAssistanceProgramDataOwners?$filter=year(declarationDate) eq ${currentYear}&$orderby=declarationDate desc&$top=100&$format=json`;
+      
+      console.log('Fetching FEMA housing assistance data...');
+      const response = await fetch(femaUrl);
+      
+      if (!response.ok) {
+        throw new Error(`FEMA Housing API failed: ${response.status}`);
+      }
+      
+      const housingData = await response.json();
+      const assistanceRecords = housingData.HousingAssistanceProgramDataOwners || [];
+      
+      // Aggregate stats
+      const stats = assistanceRecords.reduce((acc: any, record: any) => {
+        acc.totalApplicants += record.approvedBetween1And10000 || 0;
+        acc.totalApproved += record.approvedForRentalAssistance || 0;
+        acc.totalAmount += record.totalApprovedAmount || 0;
+        acc.byState[record.state] = (acc.byState[record.state] || 0) + 1;
+        return acc;
+      }, { 
+        totalApplicants: 0, 
+        totalApproved: 0, 
+        totalAmount: 0, 
+        byState: {} as Record<string, number> 
+      });
+      
+      console.log(`✓ FEMA Housing: ${assistanceRecords.length} housing assistance records loaded`);
+      
+      const responseData = {
+        success: true,
+        items: assistanceRecords.slice(0, 20), // Limit for display
+        stats: stats,
+        source: 'FEMA Housing Assistance',
+        lastUpdated: new Date().toISOString(),
+        totalRecords: assistanceRecords.length,
+        cached: false
+      };
+
+      // Cache the response
+      femaHousingCache = responseData;
+      femaHousingCacheTime = now;
+      
+      res.json(responseData);
+      
+    } catch (error) {
+      console.error('FEMA Housing Assistance API error:', error);
+      res.json({
+        success: false,
+        items: [],
+        stats: { totalApplicants: 0, totalApproved: 0, totalAmount: 0, byState: {} },
+        source: 'FEMA Housing Assistance',
+        error: 'Unable to fetch housing assistance data',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
