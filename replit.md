@@ -41,6 +41,7 @@ The platform features a clean, professional design with a focus on readability. 
 - **Duplicate Prevention**: Backend validation to prevent duplicate shift assignments.
 - **Host Integration**: Display of mutual aid partners (hosts) with logos on shift cards.
 - **Emergency Alerts System**: Real-time emergency alerts via IPAWS/NWS APIs with comprehensive disaster tracking and community notification system. Map interface removed per user request due to inability to meet authentic geographic boundary requirements.
+- **Supply Site Activity Tracking**: Advanced metrics for supply site activity within last 60 days based on inventory updates, delivery tracking, and recent needs/requests. Includes three activity metrics: Active Sites (inventory updates), Sites with Deliveries (received aid), and Sites with Recent Activity (current needs or updates).
 
 ## External Dependencies
 ### Core Framework & Libraries

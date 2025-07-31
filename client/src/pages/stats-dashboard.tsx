@@ -173,7 +173,10 @@ export default function StatsDashboard() {
     drivers: statsData?.data?.drivers?.length || 0,
     completedDeliveries: (statsData as any)?.counts?.completedDeliveries || 0,
     totalFoodBoxes: (statsData as any)?.counts?.totalFoodBoxes || 0,
-    estimatedFamiliesHelped: (statsData as any)?.counts?.estimatedFamiliesHelped || 0
+    estimatedFamiliesHelped: (statsData as any)?.counts?.estimatedFamiliesHelped || 0,
+    activeSitesLast60Days: (statsData as any)?.counts?.activeSitesLast60Days || 0,
+    sitesWithDeliveries: (statsData as any)?.counts?.sitesWithDeliveries || 0,
+    sitesWithRecentActivity: (statsData as any)?.counts?.sitesWithRecentActivity || 0
   };
 
   // Prepare chart data
@@ -326,10 +329,47 @@ export default function StatsDashboard() {
         </Card>
       </div>
 
+      {/* Site Activity Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Sites (60 days)</CardTitle>
+            <MapPin className="h-4 w-4 text-emerald-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-bold text-emerald-600">{totals.activeSitesLast60Days.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Updated inventory recently</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Sites with Deliveries</CardTitle>
+            <Package className="h-4 w-4 text-indigo-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-bold text-indigo-600">{totals.sitesWithDeliveries.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Received aid deliveries</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Sites with Recent Activity</CardTitle>
+            <Users className="h-4 w-4 text-rose-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-bold text-rose-600">{totals.sitesWithRecentActivity.toLocaleString()}</div>
+            <p className="text-xs text-gray-600">Active requests or needs</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Disclaimer for estimated families */}
       <div className="mb-6">
         <p className="text-xs text-gray-500 italic">
           * Estimated families helped numbers are estimates provided by supply sites and may not reflect exact counts.
+          Supply sites are locations that have received aid deliveries or requested supplies in the system.
         </p>
       </div>
 

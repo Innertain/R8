@@ -1036,9 +1036,46 @@ app.get('/api/stats', async (req, res) => {
     // Count sites with actual family data for verification
     const sitesWithFamilyData = transformedSites.filter(site => site['Weekly Served'] && site['Weekly Served'] > 0).length;
 
+    // Calculate active sites within last 60 days based on inventory updates
+    const sixtyDaysAgo = new Date();
+    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+    
+    const activeSitesLast60Days = transformedSites.filter(site => {
+      const lastModified = site['Last Modified'] || site['Date Modified'] || site['Last Update'];
+      if (!lastModified) return false;
+      
+      const lastModifiedDate = new Date(lastModified);
+      return lastModifiedDate >= sixtyDaysAgo;
+    }).length;
+
+    // Count sites that have received deliveries (drop-off locations)
+    const sitesWithDeliveries = new Set();
+    transformedDeliveries.forEach((delivery: any) => {
+      const dropOffSite = delivery['Drop Off Site'] || delivery['Delivery Site'] || delivery['Site'];
+      if (dropOffSite) {
+        sitesWithDeliveries.add(dropOffSite);
+      }
+    });
+
+    // Count sites with recent needs/supply requests (last 60 days)
+    const sitesWithRecentActivity = transformedSites.filter(site => {
+      const needsCount = parseInt(String(site['Needs Count'] || 0));
+      const lastUpdate = site['Last Update'] || site['Last Modified'];
+      
+      if (needsCount > 0) return true; // Has current needs
+      
+      if (lastUpdate) {
+        const updateDate = new Date(lastUpdate);
+        return updateDate >= sixtyDaysAgo; // Recent activity
+      }
+      
+      return false;
+    }).length;
+
     console.log(`✓ Stats loaded: ${transformedSites.length} sites, ${transformedDeliveries.length} deliveries (${completedDeliveries} completed), ${transformedDrivers.length} drivers, ${transformedVolunteers.length} volunteers`);
     console.log(`✓ Total food boxes delivered: ${totalFoodBoxes}`);
     console.log(`✓ Estimated families helped: ${estimatedFamiliesHelped} (${sitesWithFamilyData} sites have data)`);
+    console.log(`✓ Active sites (last 60 days): ${activeSitesLast60Days}, Sites with deliveries: ${sitesWithDeliveries.size}, Sites with recent activity: ${sitesWithRecentActivity}`);
 
     return res.json({
       success: true,
@@ -1055,7 +1092,10 @@ app.get('/api/stats', async (req, res) => {
         drivers: transformedDrivers.length,
         volunteers: transformedVolunteers.length,
         totalFoodBoxes: totalFoodBoxes,
-        estimatedFamiliesHelped: estimatedFamiliesHelped
+        estimatedFamiliesHelped: estimatedFamiliesHelped,
+        activeSitesLast60Days: activeSitesLast60Days,
+        sitesWithDeliveries: sitesWithDeliveries.size,
+        sitesWithRecentActivity: sitesWithRecentActivity
       }
     });
     
