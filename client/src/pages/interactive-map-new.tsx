@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import RealTimeAlerts from "@/components/RealTimeAlerts";
+import EnhancedRssFeed from "@/components/EnhancedRssFeed";
 
 // State name mapping for display
 const stateNames: { [key: string]: string } = {
@@ -102,13 +103,13 @@ export default function InteractiveMap() {
           </div>
 
           {/* Emergency Alerts Sidebar */}
-          <div className="lg:col-span-1">
-            <RealTimeAlerts 
-              maxItems={5} 
-              stateFilter={getFilterLocation() || undefined} 
+          <div className="lg:col-span-1 space-y-6">
+            <EnhancedRssFeed 
+              maxItems={8} 
+              stateFilter={getFilterLocation() || undefined}
+              showFilters={true}
+              showAnalytics={true}
             />
-
-
           </div>
         </div>
       </main>
