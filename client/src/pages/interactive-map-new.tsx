@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SimpleVectorMap from "@/components/SimpleVectorMap";
+import GeographicVectorMap from "@/components/GeographicVectorMap";
 import RealTimeAlerts from "@/components/RealTimeAlerts";
 
 // State name mapping for display
@@ -110,7 +110,7 @@ export default function InteractiveMap() {
                   </TabsList>
                   
                   <div className="mt-4">
-                    <SimpleVectorMap
+                    <GeographicVectorMap
                       onRegionClick={handleRegionClick}
                       selectedRegion={selectedRegion || undefined}
                       mapType={mapType}
