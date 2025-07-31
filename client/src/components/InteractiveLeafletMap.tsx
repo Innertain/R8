@@ -326,15 +326,17 @@ export default function InteractiveLeafletMap({
           onRegionClick?.(key, region.name);
         });
         
-        polygon.on('mouseover', function(e) {
-          this.setStyle({
+        polygon.on('mouseover', function(e: L.LeafletEvent) {
+          const layer = e.target as L.Polygon;
+          layer.setStyle({
             fillOpacity: 0.6,
             weight: 3
           });
         });
         
-        polygon.on('mouseout', function(e) {
-          this.setStyle({
+        polygon.on('mouseout', function(e: L.LeafletEvent) {
+          const layer = e.target as L.Polygon;
+          layer.setStyle({
             fillOpacity: 0.4,
             weight: 2
           });

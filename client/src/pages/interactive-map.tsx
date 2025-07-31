@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InteractiveLeafletMap from "@/components/InteractiveLeafletMap";
+import FemaRssFeed from "@/components/FemaRssFeed";
 
 // Real disaster and activity data with geographical coordinates
 const mockDisasters = [
@@ -283,6 +284,11 @@ export default function InteractiveMap() {
               </CardContent>
             </Card>
           </div>
+        </div>
+        
+        {/* FEMA RSS Feed Section */}
+        <div className="mt-8">
+          <FemaRssFeed maxItems={5} />
         </div>
       </main>
     </div>
