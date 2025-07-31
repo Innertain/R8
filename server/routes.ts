@@ -1778,11 +1778,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
 
-      // Use FEMA's official OpenData API for recent disaster declarations (2024-2025)
-      // Include both 2024 and 2025 to capture major disasters like Hurricane Helene, CA wildfires
-      const currentYear = new Date().getFullYear();
-      const previousYear = currentYear - 1;
-      const femaUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(fyDeclared eq ${currentYear} or fyDeclared eq ${previousYear})&$orderby=declarationDate desc&$top=100&$format=json`;
+      // Use FEMA's official OpenData API for comprehensive recent disaster declarations
+      // Search across multiple years and include major disasters by name/location
+      const femaUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(fyDeclared ge 2023) and (declarationType eq 'DR' or declarationType eq 'EM')&$orderby=declarationDate desc&$top=200&$format=json`;
       
       console.log('Fetching FEMA disaster declarations from OpenData API...');
       const response = await fetch(femaUrl);
@@ -1819,12 +1817,14 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Debug: Log major disasters for verification
       const majorDisasters = transformedDeclarations.filter(d => 
         d.state === 'CA' || d.state === 'NC' || 
-        d.incidentType?.includes('Hurricane') || 
-        d.incidentType?.includes('Fire') ||
-        d.title?.includes('Helene') || 
-        d.title?.includes('wildfire')
+        d.incidentType?.toLowerCase().includes('hurricane') || 
+        d.incidentType?.toLowerCase().includes('fire') ||
+        d.title?.toLowerCase().includes('helene') || 
+        d.title?.toLowerCase().includes('wildfire') ||
+        d.title?.toLowerCase().includes('california')
       );
-      console.log(`🔍 Major disasters found: ${majorDisasters.length}`, majorDisasters.map(d => `${d.state}-${d.incidentType}-${d.disasterNumber}`));
+      console.log(`🔍 Major disasters found: ${majorDisasters.length}`);
+      majorDisasters.forEach(d => console.log(`  - ${d.state}: ${d.title} (${d.incidentType}) - ${d.disasterNumber} - ${d.declarationDate}`));
       
       const responseData = {
         success: true,
