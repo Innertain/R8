@@ -68,11 +68,9 @@ function RecentUpdatesSection() {
 
   const { inventory = [], needs = [] } = recentUpdates.data;
   
-  // Debug: Log actual field data
-  console.log('First inventory item fields:', inventory[0]?.fields ? Object.keys(inventory[0].fields) : 'No fields');
-  console.log('First needs item fields:', needs[0]?.fields ? Object.keys(needs[0].fields) : 'No fields');
-  console.log('Sample inventory data:', inventory[0]);
-  console.log('Sample needs data:', needs[0]);
+  // Debug: Log actual field data  
+  console.log('Inventory keys:', inventory[0] ? Object.keys(inventory[0]) : 'No inventory');
+  console.log('Needs keys:', needs[0] ? Object.keys(needs[0]) : 'No needs');
   
   const allUpdates = [
     ...inventory.slice(0, 5).map((item: any) => ({
@@ -111,15 +109,10 @@ function RecentUpdatesSection() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="font-medium text-sm text-gray-900 truncate">
-                  {/* Try multiple possible site name fields from linked records */}
-                  {update.fields?.['Site Name'] || 
-                   update.fields?.['Site']?.[0] || 
-                   update.fields?.['Organization Name'] ||
-                   update.fields?.['Name'] ||
-                   update.fields?.['Location Name'] ||
-                   update.fields?.['Facility Name'] ||
-                   (update.fields?.['Site (from Site Inventory)'] && update.fields['Site (from Site Inventory)'][0]) ||
-                   'Supply Site'}
+                  {/* Extract site name from the "Need Name" field or other available fields */}
+                  {update.type === 'inventory' 
+                    ? (update['Need Name']?.split('@')[1]?.trim() || 'Supply Site')
+                    : (update['Site Name'] || update['Organization Name'] || update['Location'] || 'Supply Site')}
                 </h4>
                 <Badge variant="outline" className="text-xs">
                   {update.type === 'inventory' ? 'Inventory' : 'Need'}
@@ -127,34 +120,29 @@ function RecentUpdatesSection() {
               </div>
               <p className="text-xs text-gray-600 mb-1">
                 {update.type === 'inventory' 
-                  ? `Updated: ${update.fields?.['Item Name'] || update.fields?.['Item'] || update.fields?.['Supply Type'] || update.fields?.['Product'] || 'inventory items'} ${update.fields?.['Quantity'] || update.fields?.['Count'] || update.fields?.['Amount'] ? `(Qty: ${update.fields['Quantity'] || update.fields['Count'] || update.fields['Amount']})` : ''}`
-                  : `Need: ${update.fields?.['Item Needed'] || update.fields?.['Request'] || update.fields?.['Description'] || update.fields?.['Supply Needed'] || update.fields?.['What is needed?'] || update.fields?.['Item'] || 'supplies needed'} ${update.fields?.['Urgency'] || update.fields?.['Priority'] ? `(${update.fields['Urgency'] || update.fields['Priority']} priority)` : ''}`
+                  ? `${update['Need Name']?.split('@')[0]?.trim() || 'Item update'} (${update.Priority || 'Standard priority'})`
+                  : `Need: ${update['Item Name'] || 'Supply item'} ${update['Urgently Needed At Site']?.length > 0 ? '(Urgent)' : update['Needed at Site']?.length > 0 ? '(Standard)' : ''}`
                 }
               </p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Clock className="w-3 h-3" />
                 <span>{timeDisplay}</span>
-                {/* Show location from various possible fields */}
-                {(update.fields?.City || update.fields?.Location || update.fields?.Address || update.fields?.['City (from Site)'] || update.fields?.['State (from Site)']) && (
-                  <>
-                    <span>•</span>
-                    <span>
-                      {update.fields?.City && update.fields?.State 
-                        ? `${update.fields.City}, ${update.fields.State}`
-                        : update.fields?.['City (from Site)'] && update.fields?.['State (from Site)']
-                        ? `${update.fields['City (from Site)'][0]}, ${update.fields['State (from Site)'][0]}`
-                        : update.fields?.Location || update.fields?.Address || 'Location available'
-                      }
-                    </span>
-                  </>
-                )}
-                {/* Show status or urgency */}
-                {(update.fields?.Status || update.fields?.['Request Status'] || update.fields?.Urgency) && (
+                {/* Show site status if available */}
+                {update['Site Status Lookup']?.[0] && (
                   <>
                     <span>•</span>
                     <Badge variant="secondary" className="text-xs">
-                      {update.fields?.Status || update.fields?.['Request Status'] || update.fields?.Urgency}
+                      {update['Site Status Lookup'][0]}
                     </Badge>
+                  </>
+                )}
+                {/* Show urgency count for needs */}
+                {update.type === 'needs' && update['Urgently Needed At Site']?.length > 0 && (
+                  <>
+                    <span>•</span>
+                    <span className="text-red-600 font-medium">
+                      {update['Urgently Needed At Site'].length} urgent sites
+                    </span>
                   </>
                 )}
               </div>
@@ -709,16 +697,21 @@ export default function StatsDashboard() {
                   {isCached ? 'Cached' : 'Fresh'}
                 </div>
                 {lastUpdated ? (
-                  <p className="text-sm text-gray-600">
-                    Updated {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
-                  </p>
+                  <>
+                    <p className="text-sm text-gray-600">
+                      Updated {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {isCached ? 'Using 24-hour cache' : 'Fetched from Airtable'}
+                    </p>
+                  </>
                 ) : (
                   <p className="text-sm text-gray-600">
                     Loading cache status...
                   </p>
                 )}
                 <p className="text-xs text-gray-500 mt-1">
-                  Refreshes every 24 hours
+                  Auto-refreshes every 24 hours
                 </p>
               </CardContent>
             </Card>
