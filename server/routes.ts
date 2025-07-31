@@ -54,6 +54,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Clear stats cache
       statsCache = null;
       
+      // Clear recent updates cache
+      recentUpdatesCache = null;
+      recentUpdatesCacheTime = 0;
+      
       // Clear Airtable cache if available
       try {
         const { clearAirtableCache } = await import('./airtable');
@@ -62,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Ignore if clearAirtableCache doesn't exist
       }
       
-      res.json({ success: true, message: 'Cache cleared successfully' });
+      res.json({ success: true, message: 'All caches cleared successfully' });
     } catch (error) {
       console.error('Error clearing cache:', error);
       res.status(500).json({ error: 'Failed to clear cache' });
@@ -1240,9 +1244,25 @@ app.get('/api/debug/delivery-statuses', async (req, res) => {
   }
 });
 
+// Cache for recent updates (separate from main stats cache)
+let recentUpdatesCache: any = null;
+let recentUpdatesCacheTime: number = 0;
+const RECENT_UPDATES_CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours
+
 // Recent updates endpoint for needs and inventory within last 30 days
 app.get('/api/recent-updates', async (req, res) => {
   try {
+    // Check cache first
+    const now = Date.now();
+    if (recentUpdatesCache && (now - recentUpdatesCacheTime) < RECENT_UPDATES_CACHE_DURATION) {
+      console.log('✓ Returning cached recent updates');
+      return res.json({
+        ...recentUpdatesCache,
+        cached: true,
+        lastUpdated: new Date(recentUpdatesCacheTime).toISOString()
+      });
+    }
+
     const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
     const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
     
@@ -1297,7 +1317,8 @@ app.get('/api/recent-updates', async (req, res) => {
 
     console.log(`✓ Recent updates: ${siteInventory.length} inventory updates, ${needsUpdates.length} needs updates`);
 
-    return res.json({
+    // Cache the response
+    const responseData = {
       success: true,
       data: {
         inventory: siteInventory,
@@ -1311,8 +1332,15 @@ app.get('/api/recent-updates', async (req, res) => {
         inventory: siteInventory.length,
         needs: needsUpdates.length,
         total: siteInventory.length + needsUpdates.length
-      }
-    });
+      },
+      cached: false,
+      lastUpdated: new Date().toISOString()
+    };
+
+    recentUpdatesCache = responseData;
+    recentUpdatesCacheTime = now;
+
+    return res.json(responseData);
     
   } catch (error: any) {
     console.error('Error fetching recent updates:', error);

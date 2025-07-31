@@ -41,7 +41,9 @@ interface StatsData {
 function RecentUpdatesSection() {
   const { data: recentUpdates, isLoading } = useQuery({
     queryKey: ['/api/recent-updates'],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 6 * 60 * 60 * 1000, // 6 hours
+    gcTime: 6 * 60 * 60 * 1000, // 6 hours
+    refetchInterval: 6 * 60 * 60 * 1000, // Refresh every 6 hours
   });
 
   if (isLoading) {
@@ -68,9 +70,8 @@ function RecentUpdatesSection() {
 
   const { inventory = [], needs = [] } = recentUpdates.data;
   
-  // Debug: Log actual field data  
-  console.log('Inventory keys:', inventory[0] ? Object.keys(inventory[0]) : 'No inventory');
-  console.log('Needs keys:', needs[0] ? Object.keys(needs[0]) : 'No needs');
+  // Debug: Log cache status for recent updates
+  console.log('Recent updates cache status:', recentUpdates?.cached ? 'Cached' : 'Fresh');
   
   const allUpdates = [
     ...inventory.slice(0, 5).map((item: any) => ({
@@ -711,7 +712,7 @@ export default function StatsDashboard() {
                   </p>
                 )}
                 <p className="text-xs text-gray-500 mt-1">
-                  Auto-refreshes every 24 hours
+                  Stats: 24hr cache • Updates: 6hr cache
                 </p>
               </CardContent>
             </Card>
