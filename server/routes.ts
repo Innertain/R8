@@ -1010,29 +1010,28 @@ app.get('/api/stats', async (req, res) => {
     const transformedDrivers = drivers.map((r: any) => ({ id: r.id, ...r.fields }));
     const transformedVolunteers = volunteers.map((r: any) => ({ id: r.id, ...r.fields }));
 
-    // Calculate total food boxes delivered - checking multiple possible field names
+    // Calculate total food boxes delivered using the correct field name from sample
     const totalFoodBoxes = transformedDeliveries.reduce((sum: number, delivery: any) => {
-      // Check various possible field names for food box count
-      const foodBoxCount = delivery['Food Boxes'] || 
-                          delivery['FoodBoxes'] || 
-                          delivery['Food Box Count'] || 
-                          delivery['Boxes Delivered'] ||
-                          delivery['Boxes'] || 
-                          delivery['# of Boxes'] ||
-                          delivery['Total Boxes'] ||
+      const foodBoxCount = delivery['Food Box Count Rollup (from Item List)'] || 
+                          delivery['Food Box Count'] ||
+                          delivery['Food Boxes'] || 
+                          delivery['Total Food Boxes'] ||
                           0;
       const count = parseInt(String(foodBoxCount)) || 0;
       return sum + count;
     }, 0);
 
-    // Count completed deliveries - checking multiple possible status values
+    // Count completed deliveries - checking driver status and other completion indicators
     const completedDeliveries = transformedDeliveries.filter((delivery: any) => {
-      const status = String(delivery.Status || delivery.status || delivery['Delivery Status'] || '').toLowerCase();
-      return status === 'completed' || 
+      const driverStatus = String(delivery['Driver Status'] || '').toLowerCase();
+      const status = String(delivery.Status || delivery.status || '').toLowerCase();
+      
+      return driverStatus === 'completed' || 
+             driverStatus === 'delivered' ||
+             status === 'completed' || 
              status === 'complete' || 
              status === 'delivered' ||
-             status === 'finished' ||
-             status === 'done';
+             status === 'finished';
     }).length;
 
     // Log some sample records to help identify correct field names
@@ -1064,6 +1063,89 @@ app.get('/api/stats', async (req, res) => {
     
   } catch (error: any) {
     console.error('Error fetching stats:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Recent updates endpoint for needs and inventory within last 30 days
+app.get('/api/recent-updates', async (req, res) => {
+  try {
+    const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+    const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+    
+    if (!AIRTABLE_TOKEN || !baseId) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Missing Airtable configuration' 
+      });
+    }
+
+    console.log('Fetching recent updates from Airtable...');
+
+    // Calculate date 30 days ago
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const dateFilter = thirtyDaysAgo.toISOString().split('T')[0];
+
+    // Function to fetch recent records from a table
+    const fetchRecentRecords = async (tableName: string) => {
+      try {
+        // Use filterByFormula to get records modified in last 30 days
+        const formula = `IS_AFTER({Last Modified}, '${dateFilter}')`;
+        const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?filterByFormula=${encodeURIComponent(formula)}&maxRecords=200`;
+        
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+        });
+        
+        if (!response.ok) {
+          console.log(`Failed to fetch recent ${tableName}: ${response.status}`);
+          return [];
+        }
+        
+        const data = await response.json();
+        return data.records?.map((r: any) => ({ 
+          id: r.id, 
+          ...r.fields,
+          tableName,
+          lastModified: r.fields['Last Modified'] || r.createdTime
+        })) || [];
+      } catch (error) {
+        console.log(`Error fetching recent ${tableName}:`, error);
+        return [];
+      }
+    };
+
+    // Fetch recent updates from relevant tables
+    const [siteInventory, needsUpdates] = await Promise.all([
+      fetchRecentRecords('Site Inventory'),
+      fetchRecentRecords('Supply List')
+    ]);
+
+    console.log(`✓ Recent updates: ${siteInventory.length} inventory updates, ${needsUpdates.length} needs updates`);
+
+    return res.json({
+      success: true,
+      data: {
+        inventory: siteInventory,
+        needs: needsUpdates,
+        dateRange: {
+          from: dateFilter,
+          to: new Date().toISOString().split('T')[0]
+        }
+      },
+      counts: {
+        inventory: siteInventory.length,
+        needs: needsUpdates.length,
+        total: siteInventory.length + needsUpdates.length
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('Error fetching recent updates:', error);
     return res.status(500).json({ 
       success: false, 
       error: error.message 
