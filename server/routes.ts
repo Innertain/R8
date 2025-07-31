@@ -1715,6 +1715,66 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
+  // FEMA OpenData API - Real Disaster Declarations
+  app.get("/api/fema-disasters", async (req, res) => {
+    try {
+      // Use FEMA's official OpenData API for current disaster declarations
+      const currentYear = new Date().getFullYear();
+      const femaUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=fyDeclared eq ${currentYear}&$orderby=declarationDate desc&$top=50&$format=json`;
+      
+      console.log('Fetching FEMA disaster declarations from OpenData API...');
+      const response = await fetch(femaUrl);
+      
+      if (!response.ok) {
+        throw new Error(`FEMA API failed: ${response.status}`);
+      }
+      
+      const femaData = await response.json();
+      const declarations = femaData.DisasterDeclarationsSummaries || [];
+      
+      // Transform FEMA data to our format
+      const transformedDeclarations = declarations.map((declaration: any, index: number) => ({
+        title: `${declaration.declarationType === 'DR' ? 'Major Disaster' : declaration.declarationType === 'EM' ? 'Emergency' : 'Fire Management'}: ${declaration.title || declaration.disasterNumber}`,
+        link: `https://www.fema.gov/disaster/${declaration.disasterNumber}`,
+        pubDate: declaration.declarationDate || declaration.incidentBeginDate || new Date().toISOString(),
+        description: `${declaration.declarationType === 'DR' ? 'Major Disaster Declaration' : declaration.declarationType === 'EM' ? 'Emergency Declaration' : 'Fire Management Assistance'} for ${declaration.state}. Incident Type: ${declaration.incidentType || 'Various'}. ${declaration.title ? `Details: ${declaration.title}` : ''}`,
+        guid: `fema-${declaration.disasterNumber}-${index}`,
+        disasterNumber: declaration.disasterNumber,
+        state: declaration.state,
+        incidentType: declaration.incidentType,
+        declarationType: declaration.declarationType,
+        declarationDate: declaration.declarationDate,
+        incidentBeginDate: declaration.incidentBeginDate,
+        incidentEndDate: declaration.incidentEndDate,
+        fipsStateCode: declaration.fipsStateCode,
+        fipsCountyCode: declaration.fipsCountyCode,
+        placeCode: declaration.placeCode,
+        designatedArea: declaration.designatedArea
+      }));
+      
+      console.log(`✓ FEMA OpenData: ${transformedDeclarations.length} disaster declarations loaded`);
+      
+      res.json({
+        success: true,
+        items: transformedDeclarations,
+        source: 'FEMA OpenData API',
+        dataUrl: femaUrl,
+        lastUpdated: new Date().toISOString(),
+        totalRecords: declarations.length
+      });
+      
+    } catch (error) {
+      console.error('FEMA OpenData API error:', error);
+      res.json({
+        success: false,
+        items: [],
+        source: 'FEMA OpenData API',
+        error: 'Unable to fetch disaster declarations',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

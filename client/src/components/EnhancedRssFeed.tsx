@@ -20,12 +20,19 @@ interface EmergencyAlert {
   web?: string;
 }
 
-interface FemaRssItem {
+interface FemaDisasterItem {
   title: string;
   link: string;
   pubDate: string;
   description: string;
   guid: string;
+  disasterNumber: string;
+  state: string;
+  incidentType: string;
+  declarationType: string;
+  declarationDate: string;
+  incidentBeginDate?: string;
+  incidentEndDate?: string;
 }
 
 interface ReliefWebItem {
@@ -92,7 +99,7 @@ export default function EnhancedRssFeed({
   showAnalytics = true 
 }: EnhancedRssFeedProps) {
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
-  const [rssItems, setRssItems] = useState<FemaRssItem[]>([]);
+  const [femaDisasters, setFemaDisasters] = useState<FemaDisasterItem[]>([]);
   const [globalDisasters, setGlobalDisasters] = useState<ReliefWebItem[]>([]);
   const [humanitarianNews, setHumanitarianNews] = useState<HumanitarianItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,10 +114,10 @@ export default function EnhancedRssFeed({
         setLoading(true);
         setError(null);
         
-        // Fetch live alerts, RSS declarations, global disasters, and humanitarian news
-        const [alertsResponse, rssResponse, globalResponse, newsResponse] = await Promise.all([
+        // Fetch live alerts, FEMA disasters, global disasters, and humanitarian news
+        const [alertsResponse, femaResponse, globalResponse, newsResponse] = await Promise.all([
           fetch('/api/emergency-alerts'),
-          fetch('/api/fema-rss'),
+          fetch('/api/fema-disasters'),
           fetch('/api/reliefweb-disasters'),
           fetch('/api/humanitarian-news')
         ]);
@@ -122,10 +129,10 @@ export default function EnhancedRssFeed({
           }
         }
         
-        if (rssResponse.ok) {
-          const rssData: RssResponse = await rssResponse.json();
-          if (rssData.success) {
-            setRssItems(rssData.items || []);
+        if (femaResponse.ok) {
+          const femaData = await femaResponse.json();
+          if (femaData.success) {
+            setFemaDisasters(femaData.items || []);
           }
         }
         
@@ -163,9 +170,9 @@ export default function EnhancedRssFeed({
     return true;
   }).slice(0, maxItems);
 
-  // Filter RSS items based on location filter
-  const filteredRssItems = rssItems.filter(item => {
-    if (locationFilter !== 'all' && !item.title.toUpperCase().includes(locationFilter.toUpperCase())) return false;
+  // Filter FEMA disasters based on location filter
+  const filteredFemaDisasters = femaDisasters.filter(disaster => {
+    if (locationFilter !== 'all' && disaster.state !== locationFilter && !disaster.title.toUpperCase().includes(locationFilter.toUpperCase())) return false;
     return true;
   }).slice(0, maxItems);
 
@@ -182,7 +189,7 @@ export default function EnhancedRssFeed({
   }, {} as Record<string, number>);
 
   const exportData = () => {
-    const data = activeTab === 'live' ? filteredAlerts : filteredRssItems;
+    const data = activeTab === 'live' ? filteredAlerts : filteredFemaDisasters;
     const dataStr = JSON.stringify(data, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     
@@ -199,7 +206,7 @@ export default function EnhancedRssFeed({
       try {
         await navigator.share({
           title: `Emergency ${activeTab === 'live' ? 'Alerts' : 'Declarations'}`,
-          text: `${activeTab === 'live' ? filteredAlerts.length : filteredRssItems.length} active emergency ${activeTab === 'live' ? 'alerts' : 'declarations'}`,
+          text: `${activeTab === 'live' ? filteredAlerts.length : filteredFemaDisasters.length} active emergency ${activeTab === 'live' ? 'alerts' : 'declarations'}`,
           url: window.location.href
         });
       } catch (err) {
@@ -257,7 +264,7 @@ export default function EnhancedRssFeed({
             </TabsTrigger>
             <TabsTrigger value="declarations" className="flex items-center gap-1 text-xs">
               <TrendingUp className="w-3 h-3" />
-              US ({rssItems.length})
+              US ({femaDisasters.length})
             </TabsTrigger>
             <TabsTrigger value="global" className="flex items-center gap-1 text-xs">
               <MapPin className="w-3 h-3" />
@@ -357,7 +364,7 @@ export default function EnhancedRssFeed({
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Total Items</span>
-                    <span className="font-medium">{alerts.length + rssItems.length + globalDisasters.length + humanitarianNews.length}</span>
+                    <span className="font-medium">{alerts.length + femaDisasters.length + globalDisasters.length + humanitarianNews.length}</span>
                   </div>
                 </div>
               </div>
@@ -423,46 +430,69 @@ export default function EnhancedRssFeed({
           </TabsContent>
 
           <TabsContent value="declarations" className="mt-6">
-            {filteredRssItems.length === 0 ? (
+            {filteredFemaDisasters.length === 0 ? (
               <div className="bg-white rounded-lg p-6 border text-center">
                 <TrendingUp className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-gray-600">No recent US disaster declarations</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredRssItems.map((item, index) => (
+                {filteredFemaDisasters.map((disaster, index) => (
                   <div
-                    key={`${item.guid}-${index}`}
+                    key={`${disaster.guid}-${index}`}
                     className="rounded-lg border p-4 transition-all hover:shadow-sm bg-white"
                   >
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <h3 className="font-semibold text-sm leading-tight flex-1">
-                        {item.title}
+                        {disaster.title}
                       </h3>
-                      <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                        DECLARED
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-xs whitespace-nowrap ${
+                          disaster.declarationType === 'DR' ? 'bg-red-100 text-red-800' :
+                          disaster.declarationType === 'EM' ? 'bg-orange-100 text-orange-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}
+                      >
+                        {disaster.declarationType === 'DR' ? 'MAJOR DISASTER' :
+                         disaster.declarationType === 'EM' ? 'EMERGENCY' : 'FIRE MGMT'}
                       </Badge>
                     </div>
                     
-                    {item.description && (
+                    <div className="flex items-center gap-4 mb-3 text-xs text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        <span>{disaster.state}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="bg-gray-100 px-1 rounded">#{disaster.disasterNumber}</span>
+                      </div>
+                      {disaster.incidentType && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-gray-500">{disaster.incidentType}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {disaster.description && (
                       <p className="text-xs text-gray-700 mb-3 leading-relaxed">
-                        {item.description}
+                        {disaster.description}
                       </p>
                     )}
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1 text-xs text-gray-600">
                         <Clock className="w-3 h-3" />
-                        <span>{new Date(item.pubDate).toLocaleDateString()}</span>
+                        <span>{new Date(disaster.declarationDate).toLocaleDateString()}</span>
                       </div>
                       
                       <a
-                        href={item.link}
+                        href={disaster.link}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-blue-700 hover:text-blue-900 font-medium inline-flex items-center gap-1 transition-colors"
                       >
-                        View Declaration <ExternalLink className="w-3 h-3" />
+                        FEMA Details <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
                   </div>
