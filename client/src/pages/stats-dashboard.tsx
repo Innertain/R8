@@ -76,7 +76,8 @@ const useStatsData = () => {
         counts: result.counts
       };
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+    cacheTime: 24 * 60 * 60 * 1000, // 24 hours
   });
 };
 
@@ -84,6 +85,16 @@ export default function StatsDashboard() {
   const { data: statsData, isLoading, error } = useStatsData();
   const [selectedState, setSelectedState] = useState<string>("all");
   const [timeRange, setTimeRange] = useState<string>("30d");
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [isCached, setIsCached] = useState<boolean>(false);
+
+  // Extract cache information from API response
+  useEffect(() => {
+    if (statsData && (statsData as any).lastUpdated) {
+      setLastUpdated((statsData as any).lastUpdated);
+      setIsCached((statsData as any).cached || false);
+    }
+  }, [statsData]);
 
   // Process data for visualizations
   const processStatsData = (data: StatsData | undefined): StateSummary[] => {
@@ -237,6 +248,13 @@ export default function StatsDashboard() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Impact Dashboard</h1>
         <p className="text-gray-600">Real-time statistics and impact metrics from your volunteer network</p>
+        {lastUpdated && (
+          <div className="mt-3 text-sm text-gray-500 flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${isCached ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+            {isCached ? 'Data cached' : 'Data refreshed'} on {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
+            <span className="text-gray-400">• Updates every 24 hours</span>
+          </div>
+        )}
       </div>
 
       {/* Filters */}

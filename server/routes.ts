@@ -3,6 +3,10 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { fetchShiftsFromAirtableServer } from "./airtable";
 
+// Server-side cache for stats data
+let statsCache: { data: any; timestamp: number } | null = null;
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // API route to check Airtable base structure
   app.get("/api/airtable-debug", async (req, res) => {
@@ -47,8 +51,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API route to clear cache and force refresh
   app.post("/api/refresh-cache", async (req, res) => {
     try {
-      const { clearAirtableCache } = await import('./airtable');
-      clearAirtableCache();
+      // Clear stats cache
+      statsCache = null;
+      
+      // Clear Airtable cache if available
+      try {
+        const { clearAirtableCache } = await import('./airtable');
+        clearAirtableCache();
+      } catch (e) {
+        // Ignore if clearAirtableCache doesn't exist
+      }
+      
       res.json({ success: true, message: 'Cache cleared successfully' });
     } catch (error) {
       console.error('Error clearing cache:', error);
@@ -970,6 +983,17 @@ app.get('/api/stats', async (req, res) => {
       });
     }
 
+    // Check cache first
+    const now = Date.now();
+    if (statsCache && (now - statsCache.timestamp) < CACHE_DURATION) {
+      console.log('Serving stats from cache...');
+      return res.json({
+        ...statsCache.data,
+        cached: true,
+        lastUpdated: new Date(statsCache.timestamp).toISOString()
+      });
+    }
+
     console.log('Fetching comprehensive stats from Airtable...');
 
     // Function to fetch all records from a table (handling pagination)
@@ -1079,7 +1103,7 @@ app.get('/api/stats', async (req, res) => {
     console.log(`✓ Estimated families helped: ${estimatedFamiliesHelped} (${sitesWithFamilyData} sites have data)`);
     console.log(`✓ Active sites (last 60 days): ${activeSitesLast60Days}, Sites with deliveries: ${sitesWithDeliveries.size}, Sites with recent activity: ${sitesWithRecentActivity}`);
 
-    return res.json({
+    const responseData = {
       success: true,
       data: {
         sites: transformedSites,
@@ -1100,8 +1124,18 @@ app.get('/api/stats', async (req, res) => {
         activeSitesLast60Days: activeSitesLast60Days,
         sitesWithDeliveries: sitesWithDeliveries.size,
         sitesWithRecentActivity: sitesWithRecentActivity
-      }
-    });
+      },
+      cached: false,
+      lastUpdated: new Date().toISOString()
+    };
+
+    // Cache the response
+    statsCache = {
+      data: responseData,
+      timestamp: now
+    };
+
+    return res.json(responseData);
     
   } catch (error: any) {
     console.error('Error fetching stats:', error);
