@@ -8,10 +8,15 @@ interface VectorMapProps {
   mapType: 'states' | 'bioregions';
 }
 
-// Simplified GeoJSON-style coordinates for US states (actual shapes, not boxes)
+// Simplified GeoJSON-style coordinates for US states with detailed info
 const stateVectorData = {
   "CA": {
     name: "California",
+    population: "39.5 million",
+    capital: "Sacramento",
+    area: "163,696 sq mi",
+    disasters: ["Wildfires", "Earthquakes", "Droughts"],
+    emergencyContacts: "1-800-CAL-EMA",
     coordinates: [
       [[-124.482003, 42.009518], [-124.211006, 41.998902], [-124.053108, 42.000709], 
        [-123.233256, 42.006186], [-122.378853, 42.011663], [-121.037003, 41.995232], 
@@ -36,7 +41,12 @@ const stateVectorData = {
     ]
   },
   "TX": {
-    name: "Texas", 
+    name: "Texas",
+    population: "30.0 million", 
+    capital: "Austin",
+    area: "268,596 sq mi",
+    disasters: ["Hurricanes", "Tornadoes", "Floods"],
+    emergencyContacts: "1-800-TX-READY",
     coordinates: [
       [[-106.645646, 25.837164], [-93.508292, 25.837164], [-93.508292, 29.417565], 
        [-93.507934, 29.421428], [-93.50759, 29.77502], [-93.341613, 30.05364], 
@@ -75,6 +85,11 @@ const stateVectorData = {
   },
   "FL": {
     name: "Florida",
+    population: "22.6 million",
+    capital: "Tallahassee", 
+    area: "65,758 sq mi",
+    disasters: ["Hurricanes", "Flooding", "Sinkholes"],
+    emergencyContacts: "1-800-FL-HELP",
     coordinates: [
       [[-87.359296, 35.00118], [-85.606675, 34.984749], [-85.431413, 34.124869], 
        [-85.184951, 33.160898], [-85.069935, 32.580372], [-84.960751, 32.421875], 
@@ -91,6 +106,11 @@ const stateVectorData = {
   },
   "NY": {
     name: "New York",
+    population: "19.4 million",
+    capital: "Albany",
+    area: "54,555 sq mi", 
+    disasters: ["Blizzards", "Flooding", "Ice Storms"],
+    emergencyContacts: "1-800-NY-ALERT",
     coordinates: [
       [[-79.762152, 42.269327], [-79.762152, 42.696007], [-79.149363, 42.844539], 
        [-78.930207, 42.86371], [-78.853530, 42.783338], [-78.555044, 42.783338], 
@@ -114,10 +134,14 @@ const stateVectorData = {
   }
 };
 
-// Bioregional vector boundaries (simplified ecological regions)
+// Bioregional vector boundaries with ecological information
 const bioregionVectorData = {
   "pacific_northwest": {
     name: "Pacific Northwest Coastal Forests",
+    climate: "Temperate oceanic",
+    keySpecies: ["Douglas Fir", "Western Red Cedar", "Salmon"],
+    threats: ["Logging", "Climate Change", "Ocean Acidification"],
+    area: "~200,000 sq mi",
     coordinates: [
       [[-125.0, 48.0], [-124.0, 47.0], [-123.0, 46.0], [-122.0, 45.0], 
        [-121.0, 44.0], [-120.0, 43.0], [-119.0, 42.0], [-118.0, 41.0],
@@ -128,7 +152,11 @@ const bioregionVectorData = {
     color: "#2d5016"
   },
   "great_plains": {
-    name: "Great Plains Prairie",
+    name: "Great Plains Prairie", 
+    climate: "Continental semi-arid",
+    keySpecies: ["Bison", "Prairie Grasses", "Pronghorn"],
+    threats: ["Agriculture", "Drought", "Invasive Species"],
+    area: "~500,000 sq mi",
     coordinates: [
       [[-104.0, 49.0], [-96.0, 49.0], [-96.0, 37.0], [-100.0, 32.0],
        [-104.0, 32.0], [-104.0, 37.0], [-104.0, 49.0]]
@@ -136,7 +164,11 @@ const bioregionVectorData = {
     color: "#daa520"
   },
   "eastern_forests": {
-    name: "Eastern Deciduous Forests", 
+    name: "Eastern Deciduous Forests",
+    climate: "Humid continental", 
+    keySpecies: ["Oak", "Maple", "White-tailed Deer"],
+    threats: ["Urbanization", "Acid Rain", "Invasive Insects"],
+    area: "~300,000 sq mi",
     coordinates: [
       [[-96.0, 49.0], [-80.0, 49.0], [-80.0, 45.0], [-75.0, 40.0],
        [-70.0, 35.0], [-75.0, 30.0], [-85.0, 25.0], [-96.0, 25.0],
@@ -146,6 +178,10 @@ const bioregionVectorData = {
   },
   "southwestern_desert": {
     name: "Southwestern Desert",
+    climate: "Hot desert",
+    keySpecies: ["Saguaro Cactus", "Roadrunner", "Desert Bighorn Sheep"], 
+    threats: ["Water Scarcity", "Urban Sprawl", "Extreme Heat"],
+    area: "~140,000 sq mi",
     coordinates: [
       [[-115.0, 37.0], [-103.0, 37.0], [-103.0, 25.0], [-115.0, 25.0],
        [-120.0, 30.0], [-115.0, 37.0]]
@@ -214,30 +250,124 @@ export default function VectorMap({
         opacity: 0.8
       });
 
-      polygon.bindPopup(`
-        <div class="p-3 max-w-xs">
-          <h3 class="font-bold text-lg mb-2">${region.name}</h3>
-          <p class="text-sm text-gray-700 mb-3">
-            ${mapType === 'bioregions' 
-              ? 'Natural ecological boundary based on ecosystem characteristics'
-              : 'Click to explore emergency resources and volunteer opportunities'
-            }
-          </p>
-        </div>
-      `);
+      // Create detailed popup content
+      const popupContent = mapType === 'states' 
+        ? `
+          <div class="p-4 max-w-sm">
+            <h3 class="font-bold text-lg mb-3 text-blue-700">${region.name}</h3>
+            <div class="space-y-2 text-sm">
+              <div><strong>Population:</strong> ${(region as any).population}</div>
+              <div><strong>Capital:</strong> ${(region as any).capital}</div>
+              <div><strong>Area:</strong> ${(region as any).area}</div>
+              <div><strong>Emergency Contact:</strong> ${(region as any).emergencyContacts}</div>
+              <div class="pt-2 border-t">
+                <strong>Common Disasters:</strong>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  ${(region as any).disasters.map((disaster: string) => 
+                    `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">${disaster}</span>`
+                  ).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+        : `
+          <div class="p-4 max-w-sm">
+            <h3 class="font-bold text-lg mb-3 text-green-700">${region.name}</h3>
+            <div class="space-y-2 text-sm">
+              <div><strong>Climate:</strong> ${(region as any).climate}</div>
+              <div><strong>Area:</strong> ${(region as any).area}</div>
+              <div class="pt-2 border-t">
+                <strong>Key Species:</strong>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  ${(region as any).keySpecies.map((species: string) => 
+                    `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">${species}</span>`
+                  ).join('')}
+                </div>
+              </div>
+              <div class="pt-2 border-t">
+                <strong>Environmental Threats:</strong>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  ${(region as any).threats.map((threat: string) => 
+                    `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">${threat}</span>`
+                  ).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+      polygon.bindPopup(popupContent);
 
       polygon.on('click', () => {
         onRegionClick?.(id, region.name, mapType === 'states' ? 'state' : 'bioregion');
+      });
+
+      // Create hover tooltip
+      const createTooltipContent = () => {
+        if (mapType === 'states') {
+          return `
+            <div class="text-center">
+              <div class="font-semibold text-blue-700">${region.name}</div>
+              <div class="text-xs text-gray-600">Pop: ${(region as any).population}</div>
+              <div class="text-xs text-gray-500">Hover for details</div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="text-center">
+              <div class="font-semibold text-green-700">${region.name}</div>
+              <div class="text-xs text-gray-600">Climate: ${(region as any).climate}</div>
+              <div class="text-xs text-gray-500">Hover for details</div>
+            </div>
+          `;
+        }
+      };
+
+      polygon.bindTooltip(createTooltipContent(), {
+        permanent: false,
+        direction: 'top',
+        className: 'custom-tooltip'
       });
 
       polygon.on('mouseover', function(e: L.LeafletEvent) {
         const layer = e.target as L.Polygon;
         if (!isSelected) {
           layer.setStyle({
-            fillOpacity: 0.3,
+            fillOpacity: 0.4,
             weight: 3
           });
         }
+        
+        // Show enhanced tooltip on hover
+        layer.unbindTooltip();
+        const detailedTooltip = mapType === 'states' 
+          ? `
+            <div class="max-w-xs">
+              <div class="font-bold text-blue-700 mb-2">${region.name}</div>
+              <div class="text-xs space-y-1">
+                <div><strong>Population:</strong> ${(region as any).population}</div>
+                <div><strong>Capital:</strong> ${(region as any).capital}</div>
+                <div><strong>Disasters:</strong> ${(region as any).disasters.slice(0, 2).join(', ')}</div>
+              </div>
+            </div>
+          `
+          : `
+            <div class="max-w-xs">
+              <div class="font-bold text-green-700 mb-2">${region.name}</div>
+              <div class="text-xs space-y-1">
+                <div><strong>Climate:</strong> ${(region as any).climate}</div>
+                <div><strong>Area:</strong> ${(region as any).area}</div>
+                <div><strong>Key Species:</strong> ${(region as any).keySpecies.slice(0, 2).join(', ')}</div>
+              </div>
+            </div>
+          `;
+        
+        layer.bindTooltip(detailedTooltip, {
+          permanent: false,
+          direction: 'top',
+          className: 'detailed-tooltip'
+        }).openTooltip();
       });
 
       polygon.on('mouseout', function(e: L.LeafletEvent) {
@@ -248,6 +378,14 @@ export default function VectorMap({
             weight: 2
           });
         }
+        
+        // Revert to simple tooltip
+        layer.unbindTooltip();
+        layer.bindTooltip(createTooltipContent(), {
+          permanent: false,
+          direction: 'top',
+          className: 'custom-tooltip'
+        });
       });
 
       map.addLayer(polygon);
@@ -261,6 +399,28 @@ export default function VectorMap({
 
   return (
     <div className="relative">
+      <style>{`
+        .custom-tooltip {
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 8px;
+          font-size: 12px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .detailed-tooltip {
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 12px;
+          font-size: 12px;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          max-width: 250px;
+        }
+        .leaflet-tooltip-top:before {
+          border-top-color: white;
+        }
+      `}</style>
       <div 
         ref={mapRef} 
         className="w-full h-[600px] rounded-lg border border-gray-200 shadow-sm"
