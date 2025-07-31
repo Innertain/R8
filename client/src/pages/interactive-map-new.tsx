@@ -82,30 +82,11 @@ export default function InteractiveMap() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Map Section */}
-          <div className="lg:col-span-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-600" />
-                  Map Interface Removed
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="p-8 text-center text-gray-500">
-                  <MapPin className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-lg font-medium mb-2">Map Component Removed</h3>
-                  <p className="text-sm">The interactive map has been removed as requested.</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Emergency Alerts Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+        <div className="max-w-full">
+          {/* Emergency Data Feed - Full Width */}
+          <div className="w-full">
             <EnhancedRssFeed 
-              maxItems={8} 
+              maxItems={20} 
               stateFilter={getFilterLocation() || undefined}
               showFilters={true}
               showAnalytics={true}

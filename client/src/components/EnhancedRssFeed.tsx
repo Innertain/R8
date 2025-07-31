@@ -192,11 +192,11 @@ export default function EnhancedRssFeed({
   }
 
   return (
-    <Card className="bg-gray-50/50">
+    <Card className="bg-gray-50/50 w-full">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between mb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <AlertTriangle className="w-5 h-5 text-orange-600" />
+          <CardTitle className="flex items-center gap-2 text-2xl">
+            <AlertTriangle className="w-6 h-6 text-orange-600" />
             Emergency Data Feed
           </CardTitle>
           <div className="flex gap-2">
@@ -253,12 +253,12 @@ export default function EnhancedRssFeed({
           )}
 
           {showAnalytics && (
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="bg-white rounded-lg p-3 border">
-                <div className="text-xs font-medium text-gray-600 mb-2">Severity Breakdown</div>
-                <div className="space-y-1">
+            <div className="grid grid-cols-4 gap-4 mt-4">
+              <div className="bg-white rounded-lg p-4 border">
+                <div className="text-sm font-medium text-gray-600 mb-3">Severity Breakdown</div>
+                <div className="space-y-2">
                   {Object.entries(severityStats).map(([severity, count]) => (
-                    <div key={severity} className="flex justify-between text-xs">
+                    <div key={severity} className="flex justify-between text-sm">
                       <span className="capitalize">{severity}</span>
                       <span className="font-medium">{count}</span>
                     </div>
@@ -266,15 +266,51 @@ export default function EnhancedRssFeed({
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg p-3 border">
-                <div className="text-xs font-medium text-gray-600 mb-2">Active Locations</div>
-                <div className="space-y-1">
-                  {Object.entries(locationStats).slice(0, 3).map(([location, count]) => (
-                    <div key={location} className="flex justify-between text-xs">
+              <div className="bg-white rounded-lg p-4 border">
+                <div className="text-sm font-medium text-gray-600 mb-3">Active Locations</div>
+                <div className="space-y-2">
+                  {Object.entries(locationStats).slice(0, 4).map(([location, count]) => (
+                    <div key={location} className="flex justify-between text-sm">
                       <span className="truncate">{location}</span>
                       <span className="font-medium">{count}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4 border">
+                <div className="text-sm font-medium text-gray-600 mb-3">Data Sources</div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>FEMA IPAWS</span>
+                    <span className="font-medium text-green-600">Active</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>NWS Alerts</span>
+                    <span className="font-medium text-green-600">Active</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>RSS Declarations</span>
+                    <span className="font-medium text-green-600">Active</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4 border">
+                <div className="text-sm font-medium text-gray-600 mb-3">Feed Status</div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Last Update</span>
+                    <span className="font-medium">{new Date().toLocaleTimeString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Refresh Rate</span>
+                    <span className="font-medium">5min</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Total Items</span>
+                    <span className="font-medium">{alerts.length + rssItems.length}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -287,7 +323,7 @@ export default function EnhancedRssFeed({
                 <p className="text-gray-600">No active emergency alerts</p>
               </div>
             ) : (
-              <div className="grid gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredAlerts.map((alert) => (
                   <div
                     key={alert.id}
@@ -345,7 +381,7 @@ export default function EnhancedRssFeed({
                 <p className="text-gray-600">No recent disaster declarations</p>
               </div>
             ) : (
-              <div className="grid gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredRssItems.map((item, index) => (
                   <div
                     key={`${item.guid}-${index}`}
