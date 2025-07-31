@@ -221,9 +221,13 @@ export default function StatsDashboard() {
   useEffect(() => {
     if (statsData) {
       const cacheData = statsData as any;
+      console.log('Cache data received:', { cached: cacheData.cached, lastUpdated: cacheData.lastUpdated });
       if (cacheData.lastUpdated) {
         setLastUpdated(cacheData.lastUpdated);
         setIsCached(cacheData.cached || false);
+        console.log('Cache state set:', { lastUpdated: cacheData.lastUpdated, isCached: cacheData.cached });
+      } else {
+        console.log('No lastUpdated found in cache data');
       }
     }
   }, [statsData]);
@@ -679,27 +683,31 @@ export default function StatsDashboard() {
               </CardContent>
             </Card>
 
-            {lastUpdated && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${isCached ? 'bg-blue-500' : 'bg-green-500'}`}></div>
-                    Data Freshness
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-lg font-bold text-gray-800">
-                    {isCached ? 'Cached' : 'Fresh'}
-                  </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${isCached ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+                  Data Freshness
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg font-bold text-gray-800">
+                  {isCached ? 'Cached' : 'Fresh'}
+                </div>
+                {lastUpdated ? (
                   <p className="text-sm text-gray-600">
                     Updated {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Refreshes every 24 hours
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    Loading cache status...
                   </p>
-                </CardContent>
-              </Card>
-            )}
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Refreshes every 24 hours
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
