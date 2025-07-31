@@ -1,287 +1,61 @@
 # Volunteer Management Platform
 
 ## Overview
-
-This is a full-stack volunteer management application built with React/TypeScript frontend and Express.js backend. The platform manages volunteer shifts and activities with Airtable integration for real-time data synchronization. Features include shift browsing, filtering, search functionality, volunteer signup tracking, and a comprehensive volunteer availability calendar system.
-
-## Recent Changes (July 27, 2025)
-
-✓ **Airtable Integration Complete**: Successfully connected to all production tables
-✓ **Real Data Access**: Connected Drivers (100 records), Volunteer Applications (67 records), V Availability (4 records), V Shift Assignment (9+ records), V Shifts (6 records)  
-✓ **Token Permissions Fixed**: Resolved authentication issues with proper scopes and base ID formatting
-✓ **Table Schema Discovery**: Identified field structures for volunteer scheduling integration
-✓ **Volunteer Availability Calendar System**: Built complete calendar interface using react-big-calendar
-✓ **Volunteer Registration & Login**: Phone number-based authentication system  
-✓ **Database Schema**: Added volunteers, availability, and shift assignment tables
-✓ **Demo Account**: Created demo volunteer (555-DEMO) for testing
-✓ **API Integration**: Full CRUD operations for volunteers and availability
-✓ **Navigation**: Added volunteer portal with clean navigation between shift browsing and calendar management
-✓ **Shift Assignment Sync**: Fixed Airtable V Shift Assignment integration with proper field mapping
-✓ **Live Assignment Creation**: Shift signups now create records directly in Airtable with correct status options
-✓ **Personal Account Integration**: Alex Mengel's account working with flexible phone number search (formatted and digits-only)
-✓ **Volunteer Dashboard**: Added "My Shifts" dashboard tab showing assigned shifts with status indicators
-✓ **Assignment Management**: Cancel shift assignments with confirmation dialog, updates status to "cancelled" in Airtable
-✓ **Google Calendar Integration**: Add to Calendar button generates Google Calendar events with shift details
-✓ **Authentication Required**: Home page shows read-only shifts, signup requires login through volunteer portal
-✓ **Route Configuration**: Fixed volunteer portal routing from /volunteer-portal to /volunteer
-✓ **Browse Shifts Tab**: Added authenticated shift browsing with signup status indicators
-✓ **Signup Status Tracking**: Visual indicators show when volunteers are already registered for shifts
-✓ **Assignment Creation Fixed**: Resolved Airtable field errors, assignments now sync successfully
-✓ **Shift Name Population**: Fixed shift name display in assignments and "My Shifts" dashboard
-✓ **Live Data Sync**: New shifts and activities added to Airtable automatically appear in volunteer portal
-✓ **Assignment Records Working**: All volunteer signups successfully create records in V Shift Assignment table
-✓ **Shift Name Display**: API correctly retrieves and displays shift names in volunteer portal
-✓ **Airtable Field Linking Fixed**: V Shift Assignment "Shift ID" properly configured as linked field with array format
-✓ **Complete Airtable Integration**: All users (Demo, Alex Mengel) successfully create assignments with shift names visible
-✓ **Real Airtable Skills Integration**: Profile system now pulls actual volunteer skills/tags from existing Volunteer Applications table
-✓ **Profile Updates for Real Users**: Profile management works for both demo volunteers and real Airtable volunteer records
-✓ **Dynamic Skills Loading**: API endpoint extracts unique skills from 68 volunteer records including diverse specialties like "Chainsaw Operator", "GIS / Mapping", "Strategic Leadership", etc.
-✓ **Airtable Profile Persistence**: Profile updates can sync back to Airtable fields when available (Bio, Emergency contacts, etc.)
-✓ **Mobile-Optimized Tab Navigation**: Icon-based tabs with responsive design - vertical layout on mobile, horizontal on desktop
-✓ **Enhanced Tab Interactions**: Added smooth hover effects with scale animation and color transitions for better UX
-✓ **PII Protection**: Removed all personally identifiable information from login page - only demo account shown publicly
-✓ **Volunteer Status Management**: Added account status options - "Active Volunteer", "Taking a Break", and secure "Remove My Data" functionality
-✓ **Calendar Integration Complete**: Signed-up shifts now appear on volunteer availability calendar with real-time updates and visual status indicators
-✓ **Host Integration Complete**: Successfully integrated Mutual Aid Partners (hosts) into shift displays with logo support
-✓ **Airtable Host Mapping**: V Shifts now properly link to Mutual Aid Partners table with cached host data lookup
-✓ **Host Visual Display**: Shift cards show host logos and names with fallback initial badges for partners without logos
-✓ **Real Host Data**: Connected to 48+ mutual aid partners including FREEHOTMEALS.ORG, Impact LA Inc, WNCRR, Grassroots AID Partnership with actual logos
-✓ **Host API Endpoint**: Added /api/mutual-aid-partners endpoint for accessing partner data with proper caching system
-✓ **Duplicate Assignment Prevention**: Added backend validation to prevent multiple active assignments per volunteer per event with 409 error responses
-✓ **Enhanced Error Handling**: Improved frontend error messages for duplicate signups with clear user guidance to "My Shifts" tab
-✓ **Calendar Event Hover Effects**: Added smooth hover highlighting for calendar events with scale animation, brightness effects, and colored shadows for better visual feedback
-✓ **Calendar Hover Tooltips**: Implemented detailed tooltips that appear on calendar event hover showing shift names, locations, times, status badges, and notes with professional styling
-✓ **Evening Availability Workaround**: Added manual "Add Evening Hours (8-11 PM)" button to bypass React Big Calendar limitations with late evening time slot selection
-✓ **Calendar Time Range Fixed**: Restored full day calendar view (6 AM - 11:59 PM) with proper 30-minute time slots for better usability
-✓ **Full 24-Hour Calendar Grid**: Removed all min/max time constraints to display complete day from 12 AM to 11:59 PM with hourly intervals
-✓ **Evening Time Selection Working**: Calendar allows selection of evening/night hours after 8 PM through direct click-and-drag on weekly/daily view  
-✓ **6 AM Scroll Position**: Calendar automatically scrolls to 6 AM on load but shows full 24-hour grid for complete availability management
-✓ **Complete Overnight Coverage**: Calendar grid displays full 24-hour cycle including early morning hours (1 AM, 2 AM, 3 AM, etc.) for night shift scheduling
-✓ **6 AM Grid Start**: Calendar grid properly starts at 6 AM at the top and extends through to 5:59 AM for complete overnight shift coverage
-✓ **FINAL CALENDAR SOLUTION**: Grid starts at 6 AM (first time slot) and displays complete 24-hour cycle through 5:59 AM next day with proper overnight coverage
-✓ **Calendar Sync Foundation**: Implemented basic Google Calendar and Apple Calendar integration with .ics export functionality for confirmed volunteer shifts
-✓ **Active Notification System**: Bell icon now functional with comprehensive notification settings dialog for volunteer preferences
-✓ **User Profile Management**: JD profile dropdown with account access, volunteer portal navigation, and settings menu
-✓ **Notification Badge Counter**: Visual unread notification indicator with red badge showing count
-✓ **Notification Preferences**: Toggle controls for new shifts, reminders, updates, email, SMS, and push notifications
-✓ **SMS Notification Placeholder**: Added SMS text message notification option with MessageSquare icon for future Twilio integration
-✓ **User Authentication Display**: Dynamic user initials and profile information with professional dropdown interface
-✓ **Volunteer Portal Notifications**: Added bell notification system to volunteer portal with badge counter and full settings dialog
-✓ **Volunteer Portal User Menu**: Implemented user profile dropdown in volunteer portal with account settings, navigation, and logout
-✓ **Consistent UX Across Platform**: Bell and user profile functionality now available in both home page and volunteer portal
-✓ **Dynamic User Initials**: Profile avatars show actual volunteer initials extracted from their names
-✓ **Notification Settings Enhanced**: Added Sparkles and Timer icons to notification preferences, removed "Shift Updates" option
-✓ **Emergency Alerts Added**: Added AlertTriangle-icon emergency alerts for critical volunteer needs and urgent situations
-✓ **Complete Icon Integration**: All 6 notification categories now have visual icons (Sparkles, Timer, AlertTriangle, Mail, MessageSquare, Smartphone)
-✓ **Settings Icon Interface**: Changed bell icon to settings icon to clearly indicate notification preferences rather than active notifications
-✓ **Enhanced Hover Effects**: Added pronounced border stroke effects with contrasting colors - blue/indigo borders on cards and buttons, amber borders on settings icons
-✓ **Interactive UI Elements**: All major components (shift cards, buttons, settings) now have smooth hover animations with border color transitions and lift effects
-✓ **Advanced Card Animations**: Implemented gradient border highlights, color transitions, scaling effects, icon glow animations, and pulsing progress bars on hover
-✓ **Premium UX Interactions**: Cards lift 8px with gradient outer strokes, icons pulse with blue glow, settings icons rotate 180°, buttons shimmer with light sweep effects
-✓ **Volunteer Portal Enhanced**: Applied premium hover effects to all interactive elements including login cards, "My Shifts" dashboard, browse tab, and action buttons
-✓ **Complete Portal Animation**: All volunteer portal components now feature gradient borders, icon animations, button shimmer effects, and smooth lift transitions
-✓ **Reversed Hover Color Scheme**: Cards and buttons now start with colored backgrounds (blue gradients) and transform to clean white/readable text on hover
-✓ **Enhanced Readability Focus**: Hover states prioritize readability with white backgrounds and dark text while maintaining premium visual effects
-✓ **Softer Color Scheme**: Replaced bright colors with subtle light grey backgrounds and improved contrast for better readability
-✓ **Mobile UI Optimizations**: Added responsive design fixes, improved touch targets, and reduced animation complexity for mobile devices
-✓ **Toned Down Effects**: Reduced hover lift distance, softer shadows, and gentler color transitions for more professional appearance
-✓ **Streamlined Notification Categories**: Simplified to New Shifts, Shift Reminders, Emergency Alerts, Email, SMS, and Push notifications with visual icons
-✓ **Updated Context Description**: Dialog descriptions now include emergency alerts alongside volunteer opportunities and shifts
-✓ **High Contrast Hover Effects**: Redesigned hover states with pure white backgrounds, dark text, and strong blue borders for maximum readability
-✓ **Pop-Out Visual Effects**: Cards lift 6px with prominent shadows and blue border highlights when hovered for clear visual feedback
-✓ **Mobile Layout Fixes**: Fixed breaking mobile UI with responsive flex layouts, proper button sizing, and improved text wrapping
-✓ **ID Badge Cleanup**: Removed confusing ID badges from shift cards to simplify user interface and reduce visual clutter
-✓ **Force Text Readability**: Added CSS rules to ensure all text remains dark and readable on white hover backgrounds across all components
-✓ **Clean Professional Design**: Reverted to simple, clean UI with white backgrounds and proper readability
-✓ **Subtle Hover Effects**: Cards lift slightly on hover with enhanced shadows and blue border highlights
-✓ **Optimized Performance**: Removed complex CSS animations and gradients for better performance
-✓ **Mobile-Friendly**: Responsive design with appropriate touch targets and simplified animations
-
-## Future Enhancements (To Revisit)
-
-**Calendar Sync Advanced Features**:
-- Google Calendar API integration for automatic bi-directional sync
-- Apple Calendar automated sync via CalDAV protocol
-- Real-time availability sync from personal calendars to volunteer system
-- Smart conflict detection between personal events and volunteer shifts
-- Recurring volunteer shift patterns with calendar automation
-- Bulk shift management and calendar coordination tools
+This project is a full-stack volunteer management application designed to streamline the coordination of volunteer shifts and activities. It features a React/TypeScript frontend and an Express.js backend, with real-time data synchronization via Airtable. The platform enables volunteers to browse and filter shifts, search for opportunities, track their sign-ups, and manage their availability through a comprehensive calendar system. The vision is to create an efficient, user-friendly platform that simplifies volunteer coordination and enhances community engagement.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
+### UI/UX Decisions
+The platform features a clean, professional design with a focus on readability. It utilizes a soft color scheme with light grey backgrounds and improved contrast. Interactive UI elements incorporate subtle hover effects, such as slight lifting, enhanced shadows, and blue border highlights for clear visual feedback. The design is mobile-optimized with responsive layouts, appropriate touch targets, and simplified animations for a consistent experience across devices. Navigation uses icon-based tabs with responsive layouts (vertical on mobile, horizontal on desktop).
 
-### Frontend Architecture
+### Technical Implementations
+#### Frontend
 - **Framework**: React 18 with TypeScript
-- **Routing**: Wouter (lightweight React router)
-- **State Management**: TanStack Query (React Query) for server state
-- **UI Framework**: shadcn/ui components built on Radix UI primitives
-- **Styling**: Tailwind CSS with CSS custom properties for theming
-- **Build Tool**: Vite with hot module replacement
+- **Routing**: Wouter
+- **State Management**: TanStack Query
+- **UI Framework**: shadcn/ui (built on Radix UI)
+- **Styling**: Tailwind CSS with CSS custom properties
+- **Build Tool**: Vite
 
-### Backend Architecture
+#### Backend
 - **Runtime**: Node.js with Express.js
-- **Language**: TypeScript with ES modules
-- **Development**: tsx for TypeScript execution
-- **Production**: esbuild for bundling
+- **Language**: TypeScript (ES modules)
+- **Development**: `tsx`
+- **Production**: `esbuild` for bundling
 
-### Database & ORM
+#### Database & ORM
 - **ORM**: Drizzle ORM
 - **Database**: PostgreSQL (configured for Neon Database)
-- **Migrations**: Drizzle Kit for schema management
-- **Storage Interface**: Abstracted storage layer with in-memory fallback
+- **Migrations**: Drizzle Kit
+- **Storage Interface**: Abstracted layer with in-memory fallback
 
-## Key Components
-
-### Frontend Components
-- **ShiftCard**: Displays volunteer shift information with status indicators
-- **UI Components**: Comprehensive shadcn/ui component library including:
-  - Form controls (inputs, selects, checkboxes)
-  - Layout components (cards, dialogs, sheets)
-  - Navigation (menus, tabs, breadcrumbs)
-  - Data display (tables, charts, progress bars)
-
-### Backend Components
-- **Storage Layer**: Interface-based storage with pluggable implementations
-- **Route Handler**: Centralized route registration system
-- **Middleware**: Request logging and error handling
-- **Development Tools**: Vite integration with HMR support
-
-### Shared Components
-- **Schema Definitions**: Drizzle schema with Zod validation
-- **Type Safety**: Shared TypeScript types between frontend and backend
-
-## Data Flow
-
-1. **Client Requests**: Frontend makes API calls using fetch with credentials
-2. **Server Processing**: Express routes handle API requests with centralized error handling
-3. **Data Persistence**: Storage interface abstracts database operations
-4. **State Management**: TanStack Query manages client-side caching and synchronization
-5. **UI Updates**: React components re-render based on query state changes
+### Feature Specifications
+- **Volunteer Management**: Shift browsing, filtering, search, signup tracking, availability calendar.
+- **Authentication**: Phone number-based authentication system for volunteers with demo account support.
+- **Airtable Integration**: Real-time data sync for volunteer shifts, assignments, availability, and volunteer profiles.
+- **Calendar System**: Comprehensive calendar with event display, detailed tooltips on hover, and full 24-hour grid display for availability management. Includes .ics export for Google and Apple Calendars.
+- **Notification System**: In-app notifications with customizable preferences (new shifts, reminders, emergency alerts) and visual indicators.
+- **Profile Management**: Volunteers can manage their profiles, including skills and status (Active, Taking a Break, Remove Data).
+- **Duplicate Prevention**: Backend validation to prevent duplicate shift assignments.
+- **Host Integration**: Display of mutual aid partners (hosts) with logos on shift cards.
+- **Interactive Response Map**: North America map with bioregional approach, state/county/FEMA region overlays, disaster tracking, and community activity visualization. Features real-time event markers and region-based filtering.
 
 ## External Dependencies
-
-### Core Framework Dependencies
-- **@neondatabase/serverless**: Neon PostgreSQL integration
-- **@tanstack/react-query**: Server state management and data fetching
-- **@radix-ui/***: Headless UI component primitives
-- **drizzle-orm**: Type-safe database ORM
-- **wouter**: Lightweight React routing
+### Core Framework & Libraries
+- `@neondatabase/serverless`: Neon PostgreSQL integration
+- `@tanstack/react-query`: Server state management
+- `@radix-ui/*`: Headless UI component primitives
+- `drizzle-orm`: Type-safe database ORM
+- `wouter`: Lightweight React routing
+- `tailwindcss`: Utility-first CSS framework
+- `lucide-react`: Icon library
+- `date-fns`: Date manipulation utilities
 
 ### Data Integration
-- **Airtable API**: Real-time volunteer shift data synchronization
-- **Environment Variables**: VITE_AIRTABLE_TOKEN, VITE_BASE_ID
+- **Airtable API**: Primary data source for volunteer shifts, assignments, and volunteer information. Uses `AIRTABLE_TOKEN` and `VITE_BASE_ID` environment variables.
 
-### Development Dependencies
-- **@replit/vite-plugin-runtime-error-modal**: Enhanced error reporting
-- **@replit/vite-plugin-cartographer**: Development tooling integration
-
-### UI & Styling
-- **tailwindcss**: Utility-first CSS framework
-- **class-variance-authority**: Component variant management
-- **lucide-react**: Icon library
-- **date-fns**: Date manipulation utilities
-
-## Deployment Strategy
-
-### Development
-- **Hot Reload**: Vite dev server with Express middleware integration
-- **TypeScript**: Real-time compilation with strict type checking
-- **Environment**: NODE_ENV=development with enhanced debugging
-
-### Production
-- **Build Process**: 
-  1. Vite builds optimized frontend bundle
-  2. esbuild bundles server code for Node.js
-  3. Static assets served from dist/public
-- **Database**: PostgreSQL via DATABASE_URL environment variable
-- **Process**: Single Node.js process serving both API and static files
-
-### Database Management
-- **Schema**: Managed through Drizzle migrations in ./migrations
-- **Environment**: Requires DATABASE_URL for PostgreSQL connection
-- **Development**: In-memory storage fallback for rapid prototyping
-
-## Airtable Setup Instructions
-
-To connect your volunteer management system to Airtable:
-
-### 1. Authentication Setup
-- **Get your Airtable Personal Access Token:**
-  - Go to https://airtable.com/create/tokens
-  - Create a new token with access to your base
-  - Add the token to Replit Secrets as `AIRTABLE_TOKEN`
-
-- **Find your Base ID:**
-  - Open your Airtable base
-  - Go to Help > API documentation
-  - Your Base ID starts with "app" (e.g., appXXXXXXXXXXXXXX)
-  - Add this to Replit Secrets as `VITE_BASE_ID`
-
-### 2. Required Airtable Tables
-
-#### Table 1: "V Shifts" (Already Working)
-Your existing shifts table with these columns:
-- `activityName` (Single line text)
-- `dateTime` (Single line text)
-- `location` (Single line text) 
-- `volunteersNeeded` (Number)
-- `volunteersSignedUp` (Number)
-- `status` (Single select: active, urgent, remote, full)
-- `category` (Single line text)
-- `icon` (Single line text: utensils, users, book, gift, laptop, heart)
-
-#### Table 2: "Volunteers" (New Table to Add)
-Create this table with these exact field names:
-- `Name` (Single line text) - Required
-- `Phone` (Phone number) - Required, unique identifier
-- `Email` (Email) - Optional
-- `Is Driver` (Checkbox) - Whether volunteer can drive
-- `Is Active` (Checkbox) - Whether volunteer is currently active
-- `Airtable ID` (Formula: RECORD_ID()) - Auto-generated unique ID
-- `Created Date` (Created time) - Auto-populated
-
-#### Table 3: "Volunteer Availability" (New Table to Add)
-Create this table with these exact field names:
-- `Volunteer` (Link to Volunteers table) - Required
-- `Start Time` (Date with time) - Required
-- `End Time` (Date with time) - Required  
-- `Is Recurring` (Checkbox) - Whether this is a recurring availability
-- `Recurring Pattern` (Single select: Weekly, Bi-weekly, Monthly) - If recurring
-- `Notes` (Long text) - Optional volunteer notes
-- `Created Date` (Created time) - Auto-populated
-
-#### Table 4: "Shift Assignments" (New Table to Add)
-Create this table with these exact field names:
-- `Volunteer` (Link to Volunteers table) - Required
-- `Shift ID` (Link to V Shifts table) - Required, links to shift records
-- `Shift Name` (Lookup from V Shifts via Shift ID link) - Auto-populated from linked V Shifts
-- `Status` (Single select: confirmed, pending, cancelled) - Optional
-- `Assigned Date` (Date with time) - Auto-populated 
-- `Notes` (Long text) - Optional assignment notes
-
-**Important**: The `Shift ID` field should be a **Link to V Shifts table**, not just text. This allows the `Shift Name` to be a lookup field that automatically shows the activity name.
-
-### 3. Sample Data Setup
-
-#### Add Sample Volunteers:
-1. Demo Volunteer (Phone: 555-DEMO, Name: Demo User, Is Driver: Yes, Is Active: Yes)
-2. Add 2-3 more test volunteers with different phone numbers
-
-#### Add Sample Availability:
-1. Create availability slots for your demo volunteer
-2. Use current week dates with various time ranges
-3. Mix regular and recurring patterns
-
-### 4. Testing Your Setup
-After creating these tables:
-1. Use phone number "555-DEMO" to log into the volunteer portal
-2. Test shift signup functionality
-3. Check availability calendar management
-4. Verify data sync between app and Airtable
-
-The application will automatically fall back to sample data if Airtable credentials are not configured, ensuring the app works out of the box for development and testing.
-
-The application follows a modern full-stack architecture with strong type safety, component-based UI design, and a clear separation between data access, business logic, and presentation layers.
+### Development Tools
+- `@replit/vite-plugin-runtime-error-modal`: Enhanced error reporting
+- `@replit/vite-plugin-cartographer`: Development tooling integration

@@ -4,11 +4,12 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Calendar, Home as HomeIcon, Menu, X } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
+import InteractiveMap from "@/pages/interactive-map";
 import AirtableTest from "@/pages/airtable-test";
 
 function Navigation() {
@@ -47,6 +48,16 @@ function Navigation() {
             >
               <Calendar className="h-4 w-4" />
               Volunteer Portal
+            </Button>
+          </Link>
+          <Link href="/map">
+            <Button 
+              variant={location === "/map" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <MapPin className="h-4 w-4" />
+              Response Map
             </Button>
           </Link>
           <Link href="/airtable-test">
@@ -103,6 +114,17 @@ function Navigation() {
                 Volunteer Portal
               </Button>
             </Link>
+            <Link href="/map">
+              <Button 
+                variant={location === "/map" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <MapPin className="h-4 w-4" />
+                Response Map
+              </Button>
+            </Link>
             <Link href="/airtable-test">
               <Button 
                 variant={location === "/airtable-test" ? "default" : "outline"} 
@@ -127,6 +149,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/volunteer" component={VolunteerPortal} />
+        <Route path="/map" component={InteractiveMap} />
         <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />
       </Switch>
