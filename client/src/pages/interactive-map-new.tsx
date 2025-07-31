@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import InteractiveUSMap from "@/components/InteractiveUSMap";
-import BioregionalMap from "@/components/BioregionalMap";
+import VectorMap from "@/components/VectorMap";
 import RealTimeAlerts from "@/components/RealTimeAlerts";
 
 // State name mapping for display
@@ -23,51 +22,25 @@ const stateNames: { [key: string]: string } = {
 };
 
 export default function InteractiveMap() {
-  const [mapType, setMapType] = useState<"political" | "bioregions">("bioregions");
-  
-  // Political boundaries state
-  const [selectedState, setSelectedState] = useState<string | null>(null);
-  const [selectedCounty, setSelectedCounty] = useState<string | null>(null);
-  const [showCounties, setShowCounties] = useState(false);
+  const [mapType, setMapType] = useState<"states" | "bioregions">("bioregions");
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [selectedRegionName, setSelectedRegionName] = useState<string | null>(null);
+  const [selectedRegionType, setSelectedRegionType] = useState<'state' | 'bioregion' | null>(null);
 
-  // Bioregional state
-  const [selectedBioregion, setSelectedBioregion] = useState<string | null>(null);
-
-  const handleStateClick = (stateCode: string, stateName: string) => {
-    setSelectedState(stateCode);
-    setShowCounties(true);
-    setSelectedCounty(null);
+  const handleRegionClick = (regionId: string, regionName: string, regionType: 'state' | 'bioregion') => {
+    setSelectedRegion(regionId);
+    setSelectedRegionName(regionName);
+    setSelectedRegionType(regionType);
   };
 
-  const handleCountyClick = (countyName: string, stateCode: string) => {
-    setSelectedCounty(countyName);
-  };
-
-  const handleBioregionClick = (bioregionId: string, bioregionName: string) => {
-    setSelectedBioregion(bioregionId);
-  };
-
-  const handleBackToStates = () => {
-    setSelectedState(null);
-    setShowCounties(false);
-    setSelectedCounty(null);
-  };
-
-  const handleBackToBioregions = () => {
-    setSelectedBioregion(null);
-  };
-
-  const getSelectedStateName = () => {
-    return selectedState ? stateNames[selectedState] || selectedState : null;
+  const handleBackToMap = () => {
+    setSelectedRegion(null);
+    setSelectedRegionName(null);
+    setSelectedRegionType(null);
   };
 
   const getFilterLocation = () => {
-    if (mapType === "political") {
-      return getSelectedStateName();
-    } else {
-      // For bioregions, we could filter by bioregion name, but for now use null
-      return null;
-    }
+    return selectedRegionType === 'state' ? selectedRegionName : null;
   };
 
   return (
@@ -82,26 +55,23 @@ export default function InteractiveMap() {
             </div>
             
             <div className="flex items-center space-x-4">
-              {(selectedState || selectedBioregion) && (
+              {selectedRegion && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={mapType === "political" ? handleBackToStates : handleBackToBioregions}
+                  onClick={handleBackToMap}
                   className="flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  {mapType === "political" ? "Back to States" : "Back to Bioregions"}
+                  Back to Map
                 </Button>
               )}
               
               <Badge variant="secondary" className="flex items-center gap-1">
-                {mapType === "political" ? <MapPin className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
-                {mapType === "political" 
-                  ? (selectedState 
-                      ? (showCounties ? "County View" : "State View") 
-                      : "National View"
-                    )
-                  : (selectedBioregion ? "Bioregion View" : "Ecological View")
+                {mapType === "states" ? <MapPin className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
+                {selectedRegion
+                  ? `${selectedRegionType === 'state' ? 'State' : 'Bioregion'} View`
+                  : `${mapType === 'states' ? 'Political' : 'Ecological'} View`
                 }
               </Badge>
             </div>
@@ -117,26 +87,21 @@ export default function InteractiveMap() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  {mapType === "political" ? <MapPin className="w-5 h-5 text-blue-600" /> : <Globe className="w-5 h-5 text-green-600" />}
-                  Interactive North America Map
-                  {selectedState && mapType === "political" && (
+                  {mapType === "states" ? <MapPin className="w-5 h-5 text-blue-600" /> : <Globe className="w-5 h-5 text-green-600" />}
+                  Vector Map - North America
+                  {selectedRegion && (
                     <Badge variant="outline">
-                      {selectedState}
-                    </Badge>
-                  )}
-                  {selectedBioregion && mapType === "bioregions" && (
-                    <Badge variant="outline">
-                      Bioregion {selectedBioregion}
+                      {selectedRegionName}
                     </Badge>
                   )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Tabs value={mapType} onValueChange={(value) => setMapType(value as "political" | "bioregions")} className="mb-4">
+                <Tabs value={mapType} onValueChange={(value) => setMapType(value as "states" | "bioregions")} className="mb-4">
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="political" className="flex items-center gap-2">
+                    <TabsTrigger value="states" className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Political Boundaries
+                      State Boundaries
                     </TabsTrigger>
                     <TabsTrigger value="bioregions" className="flex items-center gap-2">
                       <Globe className="w-4 h-4" />
@@ -144,22 +109,13 @@ export default function InteractiveMap() {
                     </TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="political" className="mt-4">
-                    <InteractiveUSMap
-                      onStateClick={handleStateClick}
-                      onCountyClick={handleCountyClick}
-                      selectedState={selectedState}
-                      showCounties={showCounties}
+                  <div className="mt-4">
+                    <VectorMap
+                      onRegionClick={handleRegionClick}
+                      selectedRegion={selectedRegion || undefined}
+                      mapType={mapType}
                     />
-                  </TabsContent>
-                  
-                  <TabsContent value="bioregions" className="mt-4">
-                    <BioregionalMap
-                      onBioregionClick={handleBioregionClick}
-                      selectedBioregion={selectedBioregion}
-                      showEcoRegions={true}
-                    />
-                  </TabsContent>
+                  </div>
                 </Tabs>
               </CardContent>
             </Card>
@@ -169,46 +125,35 @@ export default function InteractiveMap() {
           <div className="lg:col-span-1">
             <RealTimeAlerts 
               maxItems={5} 
-              stateFilter={getFilterLocation()} 
+              stateFilter={getFilterLocation() || undefined} 
             />
 
             {/* Selected Region Info */}
-            {(selectedState || selectedCounty || selectedBioregion) && (
+            {selectedRegion && (
               <Card className="mt-6">
                 <CardHeader>
                   <CardTitle className="text-lg">
-                    {selectedBioregion ? "Bioregion Information" : 
-                     selectedCounty ? "County Information" : "State Information"}
+                    {selectedRegionType === 'bioregion' ? "Bioregion Information" : "State Information"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {selectedCounty && (
-                      <div>
-                        <strong className="text-sm">County:</strong>
-                        <p className="text-sm text-gray-600">{selectedCounty}</p>
-                      </div>
-                    )}
-                    {selectedState && mapType === "political" && (
-                      <div>
-                        <strong className="text-sm">State:</strong>
-                        <p className="text-sm text-gray-600">{getSelectedStateName()}</p>
-                      </div>
-                    )}
-                    {selectedBioregion && mapType === "bioregions" && (
-                      <div>
-                        <strong className="text-sm">Ecological Region:</strong>
-                        <p className="text-sm text-gray-600">Bioregion {selectedBioregion}</p>
+                    <div>
+                      <strong className="text-sm">
+                        {selectedRegionType === 'bioregion' ? 'Ecological Region:' : 'State:'}
+                      </strong>
+                      <p className="text-sm text-gray-600">{selectedRegionName}</p>
+                      {selectedRegionType === 'bioregion' && (
                         <p className="text-xs text-gray-500 mt-1">
-                          Natural ecosystem boundaries that cross political borders
+                          Natural ecosystem boundaries based on climate, geology, and biology
                         </p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <div className="pt-3 border-t">
                       <p className="text-xs text-gray-500">
-                        {mapType === "bioregions" 
-                          ? "Explore emergency resources organized by natural ecosystem boundaries."
-                          : "Click on different regions to explore emergency resources and volunteer opportunities."
+                        {selectedRegionType === 'bioregion' 
+                          ? "Emergency resources organized by natural ecosystem characteristics and environmental patterns."
+                          : "Emergency resources and volunteer opportunities for this state."
                         }
                       </p>
                     </div>
