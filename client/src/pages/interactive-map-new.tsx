@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import GeographicVectorMap from "@/components/GeographicVectorMap";
+
 import RealTimeAlerts from "@/components/RealTimeAlerts";
 
 // State name mapping for display
@@ -87,36 +87,16 @@ export default function InteractiveMap() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  {mapType === "states" ? <MapPin className="w-5 h-5 text-blue-600" /> : <Globe className="w-5 h-5 text-green-600" />}
-                  Vector Map - North America
-                  {selectedRegion && (
-                    <Badge variant="outline">
-                      {selectedRegionName}
-                    </Badge>
-                  )}
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  Map Interface Removed
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Tabs value={mapType} onValueChange={(value) => setMapType(value as "states" | "bioregions")} className="mb-4">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="states" className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      State Boundaries
-                    </TabsTrigger>
-                    <TabsTrigger value="bioregions" className="flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
-                      Ecological Regions
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <div className="mt-4">
-                    <GeographicVectorMap
-                      onRegionClick={handleRegionClick}
-                      selectedRegion={selectedRegion || undefined}
-                      mapType={mapType}
-                    />
-                  </div>
-                </Tabs>
+                <div className="p-8 text-center text-gray-500">
+                  <MapPin className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <h3 className="text-lg font-medium mb-2">Map Component Removed</h3>
+                  <p className="text-sm">The interactive map has been removed as requested.</p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -128,39 +108,7 @@ export default function InteractiveMap() {
               stateFilter={getFilterLocation() || undefined} 
             />
 
-            {/* Selected Region Info */}
-            {selectedRegion && (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    {selectedRegionType === 'bioregion' ? "Bioregion Information" : "State Information"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div>
-                      <strong className="text-sm">
-                        {selectedRegionType === 'bioregion' ? 'Ecological Region:' : 'State:'}
-                      </strong>
-                      <p className="text-sm text-gray-600">{selectedRegionName}</p>
-                      {selectedRegionType === 'bioregion' && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Natural ecosystem boundaries based on climate, geology, and biology
-                        </p>
-                      )}
-                    </div>
-                    <div className="pt-3 border-t">
-                      <p className="text-xs text-gray-500">
-                        {selectedRegionType === 'bioregion' 
-                          ? "Emergency resources organized by natural ecosystem characteristics and environmental patterns."
-                          : "Emergency resources and volunteer opportunities for this state."
-                        }
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+
           </div>
         </div>
       </main>
