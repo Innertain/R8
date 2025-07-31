@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3, CloudRain, CloudSnow, CloudLightning, Thermometer } from "lucide-react";
+import DisasterAnalyticsDashboard from "./DisasterAnalyticsDashboard";
 
 interface EmergencyAlert {
   id: string;
@@ -271,8 +272,8 @@ export function EnhancedRssFeed({
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'live' | 'declarations' | 'global')}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="live" className="flex items-center gap-1 text-xs">
-              <Activity className="w-3 h-3" />
-              Live ({alerts.length})
+              <CloudLightning className="w-3 h-3" />
+              Weather Alerts ({alerts.length})
             </TabsTrigger>
             <TabsTrigger value="declarations" className="flex items-center gap-1 text-xs">
               <TrendingUp className="w-3 h-3" />
@@ -365,10 +366,24 @@ export function EnhancedRssFeed({
           )}
 
           <TabsContent value="live" className="mt-6">
+            {/* Weather Alerts Header */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <CloudLightning className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg text-blue-900">National Weather Service Alerts</h3>
+                  <p className="text-sm text-blue-700">Real-time weather warnings and watches from NOAA/NWS emergency systems</p>
+                </div>
+              </div>
+            </div>
+
             {filteredAlerts.length === 0 ? (
               <div className="bg-white rounded-lg p-6 border text-center">
-                <Activity className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">No emergency alerts currently active</p>
+                <Sun className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600">No active weather alerts - Clear conditions</p>
+                <p className="text-xs text-gray-500 mt-1">Powered by National Weather Service</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -384,18 +399,18 @@ export function EnhancedRssFeed({
                   return (
                     <div
                       key={`${alert.guid}-${index}`}
-                      className={`rounded-lg border p-4 transition-all hover:shadow-lg ${severityColors[alert.severity.toLowerCase() as keyof typeof severityColors] || 'bg-gray-100 border-gray-300'}`}
+                      className={`rounded-lg border p-4 transition-all hover:shadow-lg bg-gradient-to-br ${severityColors[alert.severity.toLowerCase() as keyof typeof severityColors] || 'bg-gray-100 border-gray-300'} hover:scale-105`}
                     >
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2">
-                          <div className="p-2 rounded-full bg-white/50">
-                            <AlertIcon className="w-4 h-4" />
+                          <div className="p-2 rounded-full bg-white/70 shadow-sm border border-white/30">
+                            <AlertIcon className="w-5 h-5" />
                           </div>
                           <h3 className="font-semibold text-sm leading-tight flex-1">
                             {alert.title}
                           </h3>
                         </div>
-                        <Badge className={`text-xs whitespace-nowrap ${alert.severity === 'Extreme' ? 'bg-red-600 text-white' : 
+                        <Badge className={`text-xs whitespace-nowrap font-bold shadow-sm ${alert.severity === 'Extreme' ? 'bg-red-600 text-white animate-pulse' : 
                           alert.severity === 'Severe' ? 'bg-orange-600 text-white' : 
                           alert.severity === 'Moderate' ? 'bg-yellow-600 text-white' : 
                           'bg-blue-600 text-white'}`}>
@@ -409,7 +424,7 @@ export function EnhancedRssFeed({
                           <span className="font-medium">{alert.location}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="bg-white/50 px-2 py-1 rounded text-xs font-medium">
+                          <span className="bg-white/70 px-2 py-1 rounded text-xs font-semibold border border-white/40 shadow-sm">
                             {alert.alertType}
                           </span>
                         </div>
@@ -446,6 +461,13 @@ export function EnhancedRssFeed({
           </TabsContent>
 
           <TabsContent value="declarations" className="mt-6">
+            {/* Enhanced Analytics Integration - Comprehensive Data Analysis */}
+            {femaDisasters.length > 0 && (
+              <div className="mb-6">
+                <DisasterAnalyticsDashboard disasters={femaDisasters} />
+              </div>
+            )}
+            
             {/* FEMA Statistics Dashboard */}
             {femaDisasters.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
