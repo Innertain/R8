@@ -6,6 +6,109 @@ export interface RssItem {
   guid: string;
 }
 
+export interface ReliefWebItem {
+  title: string;
+  link: string;
+  pubDate: string;
+  description: string;
+  guid: string;
+  country: string;
+  glideCode: string;
+  disasterType: string;
+}
+
+export function parseReliefWebRss(xmlString: string): ReliefWebItem[] {
+  try {
+    // Parse ReliefWeb RSS items
+    const itemMatches = xmlString.match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
+    
+    return itemMatches.map((itemXml, index) => {
+      const getTagContent = (tag: string): string => {
+        const match = itemXml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+        if (!match) return '';
+        
+        let content = match[1].trim();
+        content = content.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1');
+        content = content
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&amp;/g, '&')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'");
+        
+        return content;
+      };
+
+      const title = getTagContent('title') || 'Global Disaster';
+      const link = getTagContent('link') || '#';
+      const pubDate = getTagContent('pubDate') || '';
+      const description = getTagContent('description') || '';
+      const guid = getTagContent('guid') || link || `reliefweb-${index}`;
+
+      // Extract structured data from categories and content
+      const categories = [...itemXml.matchAll(/<category>([^<]+)<\/category>/gi)];
+      let country = '';
+      let glideCode = '';
+      
+      // Find country and GLIDE code from categories
+      categories.forEach(([, categoryText]) => {
+        const category = categoryText.trim();
+        if (category.includes('-') && category.includes('202')) {
+          glideCode = category; // GLIDE codes look like "EQ-2025-000111-GTM"
+        } else if (!country && category.length > 2) {
+          country = category; // Country names
+        }
+      });
+
+      // Extract disaster type from title
+      const disasterTypes = {
+        'earthquake': ['earthquake', 'eq-'],
+        'flood': ['flood', 'fl-'],
+        'wildfire': ['wildfire', 'fire', 'wf-'],
+        'hurricane': ['hurricane', 'typhoon', 'cyclone', 'tc-'],
+        'drought': ['drought', 'dr-'],
+        'volcano': ['volcano', 'vo-'],
+        'landslide': ['landslide', 'ls-'],
+        'storm': ['storm', 'st-'],
+        'tsunami': ['tsunami', 'ts-'],
+        'other': ['pollution', 'accident', 'ac-']
+      };
+
+      let disasterType = 'other';
+      const titleLower = title.toLowerCase();
+      const glideLower = glideCode.toLowerCase();
+      
+      for (const [type, keywords] of Object.entries(disasterTypes)) {
+        if (keywords.some(keyword => titleLower.includes(keyword) || glideLower.includes(keyword))) {
+          disasterType = type;
+          break;
+        }
+      }
+
+      // Clean up description by removing HTML tags and extracting key info
+      const cleanDescription = description
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .substring(0, 300) + (description.length > 300 ? '...' : '');
+
+      return {
+        title,
+        link,
+        pubDate,
+        description: cleanDescription,
+        guid,
+        country: country || 'Unknown',
+        glideCode: glideCode || '',
+        disasterType
+      };
+    });
+  } catch (error) {
+    console.error('ReliefWeb RSS parsing error:', error);
+    return [];
+  }
+}
+
 export function parseRssXml(xmlString: string): RssItem[] {
   try {
     // Simple regex-based XML parsing for RSS items

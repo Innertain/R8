@@ -1492,6 +1492,121 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
+  // ReliefWeb Global Disasters RSS Feed endpoint
+  app.get("/api/reliefweb-disasters", async (req, res) => {
+    try {
+      const response = await fetch('https://reliefweb.int/disasters/rss.xml');
+      
+      if (!response.ok) {
+        throw new Error(`ReliefWeb RSS fetch failed: ${response.status}`);
+      }
+      
+      const xmlData = await response.text();
+      
+      // Parse ReliefWeb RSS items with enhanced parsing
+      const itemMatches = xmlData.match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
+      
+      const reliefWebItems = itemMatches.map((itemXml, index) => {
+        const getTagContent = (tag: string): string => {
+          const match = itemXml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+          if (!match) return '';
+          
+          let content = match[1].trim();
+          content = content.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1');
+          content = content
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'");
+          
+          return content;
+        };
+
+        const title = getTagContent('title') || 'Global Disaster';
+        const link = getTagContent('link') || '#';
+        const pubDate = getTagContent('pubDate') || '';
+        const description = getTagContent('description') || '';
+        const guid = getTagContent('guid') || link || `reliefweb-${index}`;
+
+        // Extract structured data from categories
+        const categories = [...itemXml.matchAll(/<category>([^<]+)<\/category>/gi)];
+        let country = '';
+        let glideCode = '';
+        
+        categories.forEach(([, categoryText]) => {
+          const category = categoryText.trim();
+          if (category.includes('-') && category.includes('202')) {
+            glideCode = category; // GLIDE codes like "EQ-2025-000111-GTM"
+          } else if (!country && category.length > 2) {
+            country = category; // Country names
+          }
+        });
+
+        // Extract disaster type
+        const disasterTypes = {
+          'earthquake': ['earthquake', 'eq-'],
+          'flood': ['flood', 'fl-'],
+          'wildfire': ['wildfire', 'fire', 'wf-'],
+          'hurricane': ['hurricane', 'typhoon', 'cyclone', 'tc-'],
+          'drought': ['drought', 'dr-'],
+          'volcano': ['volcano', 'vo-'],
+          'landslide': ['landslide', 'ls-'],
+          'storm': ['storm', 'st-'],
+          'tsunami': ['tsunami', 'ts-'],
+          'other': ['pollution', 'accident', 'ac-']
+        };
+
+        let disasterType = 'other';
+        const titleLower = title.toLowerCase();
+        const glideLower = glideCode.toLowerCase();
+        
+        for (const [type, keywords] of Object.entries(disasterTypes)) {
+          if (keywords.some(keyword => titleLower.includes(keyword) || glideLower.includes(keyword))) {
+            disasterType = type;
+            break;
+          }
+        }
+
+        // Clean description
+        const cleanDescription = description
+          .replace(/<[^>]*>/g, '') // Remove HTML tags
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .substring(0, 400) + (description.length > 400 ? '...' : '');
+
+        return {
+          title,
+          link,
+          pubDate,
+          description: cleanDescription,
+          guid,
+          country: country || 'Unknown',
+          glideCode: glideCode || '',
+          disasterType
+        };
+      });
+      
+      console.log(`✓ ReliefWeb disasters: ${reliefWebItems.length} global disasters loaded`);
+      
+      res.json({
+        success: true,
+        items: reliefWebItems,
+        source: 'ReliefWeb International',
+        lastUpdated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('ReliefWeb RSS error:', error);
+      res.json({
+        success: false,
+        items: [],
+        source: 'ReliefWeb International',
+        error: 'Unable to fetch global disasters feed',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
