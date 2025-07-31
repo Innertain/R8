@@ -59,19 +59,27 @@ function RecentUpdatesSection() {
     );
   }
 
-  if (!recentUpdates?.data) {
+  if (!recentUpdates?.success || !recentUpdates?.data || (!recentUpdates.data.inventory?.length && !recentUpdates.data.needs?.length)) {
     return (
       <div className="text-center py-8 text-gray-500">
         <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
         <p>No recent activity found</p>
+        <p className="text-xs mt-1">Cache status: {recentUpdates?.cached ? 'Cached' : 'Fresh'}</p>
       </div>
     );
   }
 
   const { inventory = [], needs = [] } = recentUpdates.data;
   
-  // Debug: Log cache status for recent updates
+  // Debug: Log cache status and data structure for recent updates
+  console.log('Recent updates full response:', recentUpdates);
   console.log('Recent updates cache status:', recentUpdates?.cached ? 'Cached' : 'Fresh');
+  console.log('Data availability:', { 
+    hasSuccess: !!recentUpdates?.success,
+    hasData: !!recentUpdates?.data,
+    inventoryLength: recentUpdates?.data?.inventory?.length || 0,
+    needsLength: recentUpdates?.data?.needs?.length || 0
+  });
   
   const allUpdates = [
     ...inventory.slice(0, 5).map((item: any) => ({

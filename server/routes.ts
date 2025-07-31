@@ -1337,8 +1337,11 @@ app.get('/api/recent-updates', async (req, res) => {
       lastUpdated: new Date().toISOString()
     };
 
+    // Store in cache
     recentUpdatesCache = responseData;
     recentUpdatesCacheTime = now;
+
+    console.log('✓ Recent updates cached successfully for 6 hours');
 
     return res.json(responseData);
     
