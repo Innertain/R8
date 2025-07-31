@@ -957,6 +957,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // RSS feed endpoint for FEMA alerts
+  app.get("/api/fema-rss", async (req, res) => {
+    try {
+      const rssUrl = 'https://www.fema.gov/feeds/disasters-emergency.rss';
+      const response = await fetch(rssUrl);
+      
+      if (!response.ok) {
+        throw new Error(`RSS fetch failed: ${response.status}`);
+      }
+      
+      const xmlData = await response.text();
+      const { parseRssXml } = await import("./rss-parser");
+      const rssItems = parseRssXml(xmlData);
+      
+      res.json({
+        success: true,
+        items: rssItems.slice(0, 10), // Limit to 10 items
+        lastUpdated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('FEMA RSS error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch FEMA RSS feed',
+        items: []
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

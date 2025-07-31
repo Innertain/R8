@@ -26,47 +26,23 @@ export default function FemaRssFeed({ maxItems = 10 }: FemaRssFeedProps) {
         setLoading(true);
         setError(null);
         
-        // Use CORS proxy to fetch RSS feed
-        const proxyUrl = 'https://api.allorigins.win/get?url=';
-        const rssUrl = 'https://www.fema.gov/feeds/disasters-emergency.rss';
-        const response = await fetch(proxyUrl + encodeURIComponent(rssUrl));
+        // Use our backend endpoint to fetch RSS feed
+        const response = await fetch('/api/fema-rss');
         
         if (!response.ok) {
           throw new Error('Failed to fetch RSS feed');
         }
         
         const data = await response.json();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
         
-        // Check for parsing errors
-        const parserError = xmlDoc.querySelector('parsererror');
-        if (parserError) {
-          throw new Error('Failed to parse RSS feed');
+        if (!data.success || !data.items) {
+          throw new Error('Invalid RSS feed response');
         }
         
-        const items = xmlDoc.querySelectorAll('item');
-        const rssData: RssItem[] = [];
+        // Limit items based on maxItems prop
+        const limitedItems = data.items.slice(0, maxItems);
+        setRssItems(limitedItems);
         
-        items.forEach((item, index) => {
-          if (index < maxItems) {
-            const title = item.querySelector('title')?.textContent || 'No title';
-            const link = item.querySelector('link')?.textContent || '#';
-            const pubDate = item.querySelector('pubDate')?.textContent || '';
-            const description = item.querySelector('description')?.textContent || '';
-            const guid = item.querySelector('guid')?.textContent || `item-${index}`;
-            
-            rssData.push({
-              title: title.trim(),
-              link: link.trim(),
-              pubDate: pubDate.trim(),
-              description: description.trim(),
-              guid: guid.trim()
-            });
-          }
-        });
-        
-        setRssItems(rssData);
       } catch (err) {
         console.error('RSS feed error:', err);
         setError('Unable to load emergency alerts. Please check your connection.');
