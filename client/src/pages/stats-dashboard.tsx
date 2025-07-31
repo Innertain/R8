@@ -412,10 +412,9 @@ export default function StatsDashboard() {
 
       {/* Charts Section */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="states">By State</TabsTrigger>
-          <TabsTrigger value="deliveries">Deliveries</TabsTrigger>
           <TabsTrigger value="impact">Impact</TabsTrigger>
         </TabsList>
 
@@ -541,26 +540,7 @@ export default function StatsDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="deliveries" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Delivery Performance by State</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={topStates} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="state" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="completedDeliveries" fill="#10b981" name="Completed Deliveries" />
-                  <Bar dataKey="deliveries" fill="#f59e0b" name="Total Deliveries" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
+
 
         <TabsContent value="impact" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
