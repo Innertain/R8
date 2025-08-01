@@ -1854,88 +1854,156 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       const emergencyDeclarations = [];
       const seenDeclarations = new Set();
 
-      // Also check RSS feeds from government sources for official proclamations
-      const governmentRssFeeds = [
-        'https://www.governor.ny.gov/news.rss', // New York Governor
-        'https://gov.texas.gov/news/rss', // Texas Governor
-        'https://www.gov.ca.gov/feed/', // California Governor
-        'https://www.pa.gov/agencies/governor/news/rss/', // Pennsylvania Governor
-        'https://www.governor.state.mn.us/feed/', // Minnesota Governor
+      // Check official government sources for emergency declarations
+      const officialSources = [
+        {
+          state: 'NY',
+          name: 'New York Governor',
+          url: 'https://www.governor.ny.gov/news',
+          rss: 'https://www.governor.ny.gov/news.rss'
+        },
+        {
+          state: 'TX',
+          name: 'Texas Governor',
+          url: 'https://gov.texas.gov/news',
+          rss: 'https://gov.texas.gov/news/rss'
+        },
+        {
+          state: 'CA',
+          name: 'California Governor',
+          url: 'https://www.gov.ca.gov/news/',
+          rss: 'https://www.gov.ca.gov/feed/'
+        },
+        {
+          state: 'FL',
+          name: 'Florida Governor',
+          url: 'https://www.flgov.com/news/',
+          rss: 'https://www.flgov.com/feed/'
+        },
+        {
+          state: 'MN',
+          name: 'Minnesota Governor',
+          url: 'https://mn.gov/governor/news/',
+          rss: 'https://mn.gov/governor/news/feed.rss'
+        },
+        {
+          state: 'PA',
+          name: 'Pennsylvania Governor',
+          url: 'https://www.pa.gov/agencies/governor/news/',
+          rss: 'https://www.pa.gov/agencies/governor/news/feed/'
+        },
+        {
+          state: 'OH',
+          name: 'Ohio Governor',
+          url: 'https://gov.ohio.gov/media/news-and-media',
+          rss: 'https://gov.ohio.gov/media/news-and-media/rss'
+        },
+        {
+          state: 'MI',
+          name: 'Michigan Governor',
+          url: 'https://www.michigan.gov/whitmer/news',
+          rss: 'https://www.michigan.gov/whitmer/news/_jcr_content.feed'
+        },
+        {
+          state: 'GA',
+          name: 'Georgia Governor',
+          url: 'https://gov.georgia.gov/press-releases',
+          rss: 'https://gov.georgia.gov/press-releases/feed'
+        },
+        {
+          state: 'NC',
+          name: 'North Carolina Governor',
+          url: 'https://governor.nc.gov/news',
+          rss: 'https://governor.nc.gov/news/rss.xml'
+        }
       ];
 
-      // Check government RSS feeds first
-      for (const rssUrl of governmentRssFeeds) {
-        try {
-          const rssResponse = await fetch(rssUrl, {
-            headers: { 'User-Agent': 'DisasterWatchCenter/1.0' }
-          });
-          
-          if (rssResponse.ok) {
-            const rssText = await rssResponse.text();
+      // Check official government sources first - higher priority than news
+      for (const source of officialSources) {
+        if (source.rss) {
+          try {
+            const rssResponse = await fetch(source.rss, {
+              headers: { 'User-Agent': 'DisasterWatchCenter/1.0' },
+              timeout: 5000
+            });
             
-            // Simple RSS parsing for emergency declarations
-            const itemMatches = rssText.match(/<item>([\s\S]*?)<\/item>/g) || [];
-            
-            itemMatches.slice(0, 10).forEach(item => { // Check recent 10 items
-              const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
-              const linkMatch = item.match(/<link>(.*?)<\/link>/);
-              const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
-              const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+            if (rssResponse.ok) {
+              const rssText = await rssResponse.text();
               
-              if (titleMatch && linkMatch) {
-                const title = titleMatch[1]?.toLowerCase() || '';
-                const description = descMatch?.[1]?.toLowerCase() || '';
-                const fullText = `${title} ${description}`;
+              // Enhanced RSS parsing for emergency declarations
+              const itemMatches = rssText.match(/<item>([\s\S]*?)<\/item>/g) || [];
+              
+              itemMatches.slice(0, 15).forEach(item => { // Check recent 15 items
+                const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+                const linkMatch = item.match(/<link>(.*?)<\/link>/);
+                const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+                const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
                 
-                // Check for emergency keywords
-                const hasEmergencyKeywords = [
-                  'emergency declaration', 'state of emergency', 'emergency order',
-                  'disaster declaration', 'declares emergency', 'proclaims emergency'
-                ].some(keyword => fullText.includes(keyword));
-                
-                if (hasEmergencyKeywords) {
-                  // Determine state from RSS URL
-                  let state = '';
-                  if (rssUrl.includes('governor.ny.gov')) state = 'NY';
-                  else if (rssUrl.includes('gov.texas.gov')) state = 'TX';
-                  else if (rssUrl.includes('gov.ca.gov')) state = 'CA';
-                  else if (rssUrl.includes('pa.gov')) state = 'PA';
-                  else if (rssUrl.includes('governor.state.mn.us')) state = 'MN';
+                if (titleMatch && linkMatch) {
+                  const title = titleMatch[1] || '';
+                  const description = descMatch?.[1] || '';
+                  const fullText = `${title} ${description}`.toLowerCase();
                   
-                  if (state) {
-                    const pubDate = pubDateMatch ? new Date(pubDateMatch[1]).toISOString() : new Date().toISOString();
-                    const declarationKey = `${state}-rss-${pubDate}`;
+                  // Enhanced emergency detection patterns
+                  const emergencyPatterns = [
+                    /state of emergency/i,
+                    /emergency declaration/i,
+                    /disaster emergency/i,
+                    /emergency order/i,
+                    /declares emergency/i,
+                    /proclaims emergency/i,
+                    /activates emergency/i,
+                    /emergency proclamation/i,
+                    /executive order.*emergency/i,
+                    /emergency response/i
+                  ];
+                  
+                  const hasEmergencyContent = emergencyPatterns.some(pattern => pattern.test(fullText));
+                  
+                  // Also check for recent date relevance (last 30 days)
+                  const itemDate = pubDateMatch ? new Date(pubDateMatch[1]) : new Date();
+                  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+                  const isRecent = itemDate >= thirtyDaysAgo;
+                  
+                  if (hasEmergencyContent && isRecent) {
+                    const pubDate = itemDate.toISOString();
+                    const declarationKey = `${source.state}-official-${pubDate}`;
                     
                     if (!seenDeclarations.has(declarationKey)) {
                       seenDeclarations.add(declarationKey);
                       
-                      // Extract emergency type
+                      // Enhanced emergency type detection
                       let emergencyType = 'General Emergency';
-                      if (fullText.includes('flood')) emergencyType = 'Flooding';
-                      else if (fullText.includes('fire') || fullText.includes('wildfire')) emergencyType = 'Wildfire';
-                      else if (fullText.includes('hurricane') || fullText.includes('storm')) emergencyType = 'Storm/Hurricane';
-                      else if (fullText.includes('winter') || fullText.includes('snow')) emergencyType = 'Winter Weather';
+                      if (/flood|flooding|rain|storm/i.test(fullText)) emergencyType = 'Flooding';
+                      else if (/fire|wildfire|blaze/i.test(fullText)) emergencyType = 'Wildfire';
+                      else if (/hurricane|tropical storm|typhoon/i.test(fullText)) emergencyType = 'Storm/Hurricane';
+                      else if (/winter|snow|blizzard|ice/i.test(fullText)) emergencyType = 'Winter Weather';
+                      else if (/earthquake|seismic/i.test(fullText)) emergencyType = 'Earthquake';
+                      else if (/tornado|twister/i.test(fullText)) emergencyType = 'Tornado';
+                      else if (/cyber|cyberattack|hack/i.test(fullText)) emergencyType = 'Cybersecurity';
+                      else if (/health|pandemic|disease/i.test(fullText)) emergencyType = 'Public Health';
                       
                       emergencyDeclarations.push({
-                        id: `rss-${state}-${Date.parse(pubDate)}`,
-                        state,
-                        stateName: getStateName(state),
-                        title: titleMatch[1],
-                        description: descMatch?.[1] || '',
+                        id: `official-${source.state}-${Date.parse(pubDate)}`,
+                        state: source.state,
+                        stateName: getStateName(source.state),
+                        title: title,
+                        description: description,
                         emergencyType,
                         publishedAt: pubDate,
-                        source: 'Official Government RSS',
+                        source: source.name,
                         url: linkMatch[1],
-                        author: `${getStateName(state)} Governor's Office`
+                        author: `${source.name} Office`,
+                        priority: 'official' // Mark as official source for higher credibility
                       });
                     }
                   }
                 }
-              }
-            });
+              });
+            }
+          } catch (rssError) {
+            console.error(`Error fetching RSS from ${source.name}:`, rssError.message);
           }
-        } catch (rssError) {
-          console.error(`Error fetching RSS from ${rssUrl}:`, rssError);
         }
       }
 
@@ -2075,10 +2143,15 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         }
       }
 
-      // Sort by most recent
-      emergencyDeclarations.sort((a, b) => 
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      );
+      // Sort by priority (official sources first) and then by date
+      emergencyDeclarations.sort((a, b) => {
+        // Official sources get priority
+        if (a.priority === 'official' && b.priority !== 'official') return -1;
+        if (b.priority === 'official' && a.priority !== 'official') return 1;
+        
+        // Then sort by date
+        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      });
 
       // Limit to most recent 50 declarations
       const recentDeclarations = emergencyDeclarations.slice(0, 50);
@@ -2090,7 +2163,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         declarations: recentDeclarations,
         count: recentDeclarations.length,
         lastUpdated: new Date().toISOString(),
-        sources: ['NewsAPI.org', 'Official Government RSS Feeds'],
+        sources: ['Official Government RSS', 'NewsAPI.org'],
         searchQueries
       });
 
