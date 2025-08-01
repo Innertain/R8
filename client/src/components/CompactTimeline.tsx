@@ -34,7 +34,12 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
   const filteredDisasters = disasters
     .filter(d => d.declarationType !== 'FM') // Remove fire incidents
     .filter(d => timelineFilter === 'all' || d.declarationType === timelineFilter)
-    .sort((a, b) => new Date(b.declarationDate).getTime() - new Date(a.declarationDate).getTime());
+    .sort((a, b) => {
+      // Sort by incident date (incidentBeginDate) if available, otherwise fall back to declaration date
+      const aDate = a.incidentBeginDate ? new Date(a.incidentBeginDate) : new Date(a.declarationDate);
+      const bDate = b.incidentBeginDate ? new Date(b.incidentBeginDate) : new Date(b.declarationDate);
+      return bDate.getTime() - aDate.getTime();
+    });
 
   const getDisasterIcon = (type: string) => {
     const lowerType = type.toLowerCase();
@@ -171,7 +176,7 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                             }
                           </div>
                           <div className="text-xs text-gray-600">
-                            {disaster.incidentBeginDate ? 'Incident Date' : 'Declaration Date'}
+                            Incident Date
                           </div>
                         </div>
                       </div>
