@@ -73,10 +73,12 @@ export default function InteractiveMap() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <MapPin className="h-8 w-8 text-blue-500 mr-3" />
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">Emergency Response Map</h1>
-                <p className="text-xs text-gray-500">Real-time data from FEMA, NWS, USGS, and InciWeb</p>
-              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Disaster Watch Center</h1>
+            </div>
+            <div className="flex items-center">
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Live Emergency Data
+              </Badge>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -106,7 +108,20 @@ export default function InteractiveMap() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-full space-y-8">
+        {/* Page Description */}
+        <div className="mb-8">
+          <p className="text-lg text-gray-600 max-w-4xl">
+            Real-time monitoring and analysis of emergency situations across the United States. 
+            Track weather alerts, wildfire incidents, earthquake activity, and federal disaster declarations.
+          </p>
+        </div>
+
+        <div className="space-y-8">
+          {/* Disaster Analytics Dashboard */}
+          <div className="w-full">
+            <DisasterAnalyticsDashboard disasters={femaData?.items || []} />
+          </div>
+
           {/* Interactive Weather Alerts Map */}
           <div className="w-full">
             <InteractiveWeatherMap 
