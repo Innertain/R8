@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { alertRules, alertDeliveries, userNotificationSettings, insertAlertRuleSchema, insertNotificationSettingsSchema, emergencyDeclarations, InsertEmergencyDeclaration } from "@shared/schema";
+import { alertRules, alertDeliveries, userNotificationSettings, insertAlertRuleSchema, insertNotificationSettingsSchema } from "@shared/schema";
 import { eq, desc, and, gte } from "drizzle-orm";
 import { alertEngine, type EmergencyEvent } from "./alerting/alertEngine";
 import { fetchShiftsFromAirtableServer } from "./airtable";
@@ -1820,461 +1820,150 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     });
   }
 
-
-  // RSS Monitoring Status endpoint - Check all 50 state RSS feeds
-  app.get("/api/rss-monitoring-status", async (req, res) => {
+  // States Under Emergency endpoint - combines FEMA declarations and NWS alerts
+  app.get("/api/states-under-emergency", async (req, res) => {
     try {
-      console.log('Starting comprehensive RSS monitoring scan...');
+      console.log('Fetching states under emergency status...');
       
-      // Complete list of all 50 states with governor RSS feed URLs
-      const ALL_STATES = [
-        { code: "AL", name: "Alabama", url: "https://www.alabamagovernor.gov/rss.xml" },
-        { code: "AK", name: "Alaska", url: "https://gov.alaska.gov/news/rss.xml" },
-        { code: "AZ", name: "Arizona", url: "https://azgovernor.gov/news/rss.xml" },
-        { code: "AR", name: "Arkansas", url: "https://governor.arkansas.gov/news/rss.xml" },
-        { code: "CA", name: "California", url: "https://www.gov.ca.gov/news/rss.xml" },
-        { code: "CO", name: "Colorado", url: "https://www.colorado.gov/governor/rss.xml" },
-        { code: "CT", name: "Connecticut", url: "https://portal.ct.gov/Office-of-the-Governor/Press-Room/RSS" },
-        { code: "DE", name: "Delaware", url: "https://news.delaware.gov/rss.xml" },
-        { code: "FL", name: "Florida", url: "https://www.flgov.com/news/rss.xml" },
-        { code: "GA", name: "Georgia", url: "https://gov.georgia.gov/press-releases/rss.xml" },
-        { code: "HI", name: "Hawaii", url: "https://www.hawaiigovernor.org/news/rss.xml" },
-        { code: "ID", name: "Idaho", url: "https://gov.idaho.gov/news/rss.xml" },
-        { code: "IL", name: "Illinois", url: "https://www.illinois.gov/news/rss.xml" },
-        { code: "IN", name: "Indiana", url: "https://www.in.gov/gov/news/rss.xml" },
-        { code: "IA", name: "Iowa", url: "https://governor.iowa.gov/news/rss.xml" },
-        { code: "KS", name: "Kansas", url: "https://governor.kansas.gov/news/rss.xml" },
-        { code: "KY", name: "Kentucky", url: "https://kentucky.gov/governor/news/rss.xml" },
-        { code: "LA", name: "Louisiana", url: "https://gov.louisiana.gov/news/rss.xml" },
-        { code: "ME", name: "Maine", url: "https://www.maine.gov/governor/news/rss.xml" },
-        { code: "MD", name: "Maryland", url: "https://governor.maryland.gov/news/rss.xml" },
-        { code: "MA", name: "Massachusetts", url: "https://www.mass.gov/governor/news/rss.xml" },
-        { code: "MI", name: "Michigan", url: "https://www.michigan.gov/governor/news/rss.xml" },
-        { code: "MN", name: "Minnesota", url: "https://mn.gov/governor/news/rss.xml" },
-        { code: "MS", name: "Mississippi", url: "https://www.ms.gov/governor/news/rss.xml" },
-        { code: "MO", name: "Missouri", url: "https://governor.mo.gov/news/rss.xml" },
-        { code: "MT", name: "Montana", url: "https://gov.mt.gov/news/rss.xml" },
-        { code: "NE", name: "Nebraska", url: "https://governor.nebraska.gov/news/rss.xml" },
-        { code: "NV", name: "Nevada", url: "https://gov.nv.gov/news/rss.xml" },
-        { code: "NH", name: "New Hampshire", url: "https://www.governor.nh.gov/news/rss.xml" },
-        { code: "NJ", name: "New Jersey", url: "https://www.nj.gov/governor/news/rss.xml" },
-        { code: "NM", name: "New Mexico", url: "https://www.governor.state.nm.us/news/rss.xml" },
-        { code: "NY", name: "New York", url: "https://www.governor.ny.gov/news/rss.xml" },
-        { code: "NC", name: "North Carolina", url: "https://governor.nc.gov/news/rss.xml" },
-        { code: "ND", name: "North Dakota", url: "https://www.governor.nd.gov/news/rss.xml" },
-        { code: "OH", name: "Ohio", url: "https://governor.ohio.gov/news/rss.xml" },
-        { code: "OK", name: "Oklahoma", url: "https://www.governor.ok.gov/news/rss.xml" },
-        { code: "OR", name: "Oregon", url: "https://www.oregon.gov/governor/news/rss.xml" },
-        { code: "PA", name: "Pennsylvania", url: "https://www.pa.gov/governor/news/rss.xml" },
-        { code: "RI", name: "Rhode Island", url: "https://www.ri.gov/governor/news/rss.xml" },
-        { code: "SC", name: "South Carolina", url: "https://governor.sc.gov/news/rss.xml" },
-        { code: "SD", name: "South Dakota", url: "https://gov.sd.gov/news/rss.xml" },
-        { code: "TN", name: "Tennessee", url: "https://www.tn.gov/governor/news/rss.xml" },
-        { code: "TX", name: "Texas", url: "https://gov.texas.gov/news/rss.xml" },
-        { code: "UT", name: "Utah", url: "https://governor.utah.gov/news/rss.xml" },
-        { code: "VT", name: "Vermont", url: "https://governor.vermont.gov/news/rss.xml" },
-        { code: "VA", name: "Virginia", url: "https://www.governor.virginia.gov/news/rss.xml" },
-        { code: "WA", name: "Washington", url: "https://www.governor.wa.gov/news/rss.xml" },
-        { code: "WV", name: "West Virginia", url: "https://governor.wv.gov/news/rss.xml" },
-        { code: "WI", name: "Wisconsin", url: "https://www.evers.wi.gov/news/rss.xml" },
-        { code: "WY", name: "Wyoming", url: "https://gov.wyo.gov/news/rss.xml" }
-      ];
+      // Get current FEMA active emergency declarations
+      const femaResponse = await fetch('https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentEndDate eq null&$top=1000', {
+        headers: { 'User-Agent': 'DisasterApp/1.0 (monitoring@example.com)' }
+      });
       
-      const statuses = [];
+      // Get current NWS active alerts
+      const nwsResponse = await fetch('https://api.weather.gov/alerts/active', {
+        headers: { 'User-Agent': 'DisasterApp/1.0 (monitoring@example.com)' }
+      });
       
-      // Check each state's RSS feed
-      for (const state of ALL_STATES) {
-        try {
-          console.log(`Checking RSS feed for ${state.name}...`);
-          
-          const response = await fetch(state.url, {
-            headers: { 
-              'User-Agent': 'DisasterApp/1.0 (emergency-monitoring@example.com)',
-              'Accept': 'application/rss+xml, application/xml, text/xml' 
-            },
-            timeout: 10000 // 10 second timeout
-          });
-          
-          if (response.ok) {
-            const xmlText = await response.text();
-            
-            // Count RSS items
-            const itemMatches = xmlText.match(/<item[^>]*>.*?<\/item>/gis) || [];
-            const itemCount = itemMatches.length;
-            
-            // Look for emergency-related content
-            const emergencyKeywords = [
-              'emergency', 'disaster', 'evacuation', 'alert', 'warning', 
-              'flooding', 'wildfire', 'hurricane', 'tornado', 'blizzard',
-              'state of emergency', 'declares emergency', 'emergency declaration'
-            ];
-            
-            let emergencyDeclarations = 0;
-            let lastDeclaration = null;
-            
-            for (const itemXml of itemMatches) {
-              const titleMatch = itemXml.match(/<title[^>]*>(.*?)<\/title>/is);
-              const descMatch = itemXml.match(/<description[^>]*>(.*?)<\/description>/is);
-              const pubDateMatch = itemXml.match(/<pubDate[^>]*>(.*?)<\/pubDate>/is);
-              
-              const title = titleMatch ? titleMatch[1].trim() : '';
-              const description = descMatch ? descMatch[1].trim() : '';
-              const content = (title + ' ' + description).toLowerCase();
-              
-              const hasEmergencyKeyword = emergencyKeywords.some(keyword => 
-                content.includes(keyword.toLowerCase())
-              );
-              
-              if (hasEmergencyKeyword) {
-                emergencyDeclarations++;
-                if (!lastDeclaration) {
-                  lastDeclaration = {
-                    title: title,
-                    publishedAt: pubDateMatch ? pubDateMatch[1].trim() : new Date().toISOString()
-                  };
-                }
-              }
-            }
-            
-            statuses.push({
-              state: state.code,
-              stateName: state.name,
-              url: state.url,
-              status: 'success',
-              lastChecked: new Date().toISOString(),
-              itemCount,
-              emergencyDeclarations,
-              lastDeclaration
-            });
-            
-          } else {
-            console.log(`RSS feed error for ${state.name}: ${response.status}`);
-            statuses.push({
-              state: state.code,
-              stateName: state.name,
-              url: state.url,
-              status: 'error',
-              lastChecked: new Date().toISOString(),
-              itemCount: 0,
-              emergencyDeclarations: 0,
-              error: `HTTP ${response.status}: ${response.statusText}`
-            });
-          }
-          
-        } catch (error: any) {
-          console.log(`RSS fetch failed for ${state.name}:`, error.message);
-          statuses.push({
-            state: state.code,
-            stateName: state.name,
-            url: state.url,
-            status: 'error',
-            lastChecked: new Date().toISOString(),
-            itemCount: 0,
-            emergencyDeclarations: 0,
-            error: error.message || 'Fetch failed'
-          });
-        }
-      }
-      
-      const summary = {
-        total: ALL_STATES.length,
-        connected: statuses.filter(s => s.status === 'success').length,
-        errors: statuses.filter(s => s.status === 'error').length,
-        totalEmergencies: statuses.reduce((sum, s) => sum + s.emergencyDeclarations, 0)
+      const emergencyStates = new Map();
+      const stateNames = {
+        'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+        'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+        'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+        'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+        'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
+        'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
+        'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
+        'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+        'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+        'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming',
+        'DC': 'District of Columbia', 'PR': 'Puerto Rico', 'VI': 'Virgin Islands', 'GU': 'Guam', 'AS': 'American Samoa'
       };
       
-      console.log(`✓ RSS monitoring complete: ${summary.connected}/${summary.total} feeds connected, ${summary.totalEmergencies} emergency declarations found`);
-      
-      res.json({
-        success: true,
-        statuses,
-        summary,
-        lastUpdated: new Date().toISOString()
-      });
-      
-    } catch (error: any) {
-      console.error('Error in RSS monitoring:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to complete RSS monitoring scan',
-        details: error.message
-      });
-    }
-  });
-
-  // State Emergency Declarations endpoint - Official Government Sources Only
-  app.get("/api/state-emergency-declarations", async (req, res) => {
-    try {
-      console.log('Fetching state emergency declarations from official government sources...');
-      
-      // First, try to return cached database results
-      try {
-        const cachedDeclarations = await db.select()
-          .from(emergencyDeclarations)
-          .orderBy(desc(emergencyDeclarations.publishedAt))
-          .limit(50);
-
-        // If we have recent data (less than 1 hour old), return it
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-        const hasRecentData = cachedDeclarations.some(d => d.createdAt && d.createdAt > oneHourAgo);
+      // Process FEMA active declarations
+      if (femaResponse.ok) {
+        const femaData = await femaResponse.json();
         
-        if (hasRecentData && cachedDeclarations.length > 0) {
-          console.log(`✓ Returning ${cachedDeclarations.length} cached emergency declarations`);
-          return res.json({
-            success: true,
-            declarations: cachedDeclarations,
-            count: cachedDeclarations.length,
-            lastUpdated: new Date().toISOString(),
-            sources: ['Official Government RSS Feeds Only'],
-            totalStatesMonitored: 46,
-            cached: true
-          });
-        }
-      } catch (dbError) {
-        console.log('Database not ready, proceeding with RSS fetch');
-      }
-
-      // Fetch fresh data from RSS feeds
-      const declarationsData: any[] = [];
-      const seenDeclarations = new Set<string>();
-
-      // Comprehensive list of all 50 state government RSS feeds for emergency declarations
-      const officialSources = [
-        // High Population States
-        { state: 'CA', name: 'California Governor', url: 'https://www.gov.ca.gov/feed/' },
-        { state: 'TX', name: 'Texas Governor', url: 'https://gov.texas.gov/news/rss' },
-        { state: 'FL', name: 'Florida Governor', url: 'https://www.flgov.com/feed/' },
-        { state: 'NY', name: 'New York Governor', url: 'https://www.governor.ny.gov/news/rss.xml' },
-        { state: 'PA', name: 'Pennsylvania Governor', url: 'https://www.pa.gov/agencies/governor/news/feed/' },
-        { state: 'IL', name: 'Illinois Governor', url: 'https://www2.illinois.gov/Pages/news-rss.aspx' },
-        { state: 'OH', name: 'Ohio Governor', url: 'https://gov.ohio.gov/media/news-and-media/rss' },
-        { state: 'GA', name: 'Georgia Governor', url: 'https://gov.georgia.gov/press-releases/feed' },
-        { state: 'NC', name: 'North Carolina Governor', url: 'https://governor.nc.gov/news/rss.xml' },
-        { state: 'MI', name: 'Michigan Governor', url: 'https://www.michigan.gov/whitmer/news/_jcr_content.feed' },
-        
-        // Western States (Wildfire Prone)
-        { state: 'WA', name: 'Washington Governor', url: 'https://www.governor.wa.gov/news-media/rss.xml' },
-        { state: 'OR', name: 'Oregon Governor', url: 'https://www.oregon.gov/gov/news/rss.xml' },
-        { state: 'AZ', name: 'Arizona Governor', url: 'https://azgovernor.gov/news/feed' },
-        { state: 'CO', name: 'Colorado Governor', url: 'https://www.colorado.gov/governor/news-releases/rss.xml' },
-        { state: 'NV', name: 'Nevada Governor', url: 'https://gov.nv.gov/News/Feed/' },
-        { state: 'UT', name: 'Utah Governor', url: 'https://gov.utah.gov/news/feed/' },
-        { state: 'NM', name: 'New Mexico Governor', url: 'https://www.governor.state.nm.us/feed/' },
-        { state: 'ID', name: 'Idaho Governor', url: 'https://gov.idaho.gov/news/feed/' },
-        { state: 'MT', name: 'Montana Governor', url: 'https://news.mt.gov/feed' },
-        { state: 'WY', name: 'Wyoming Governor', url: 'https://wyo.gov/governor/news/feed/' },
-        { state: 'AK', name: 'Alaska Governor', url: 'https://gov.alaska.gov/news/feed/' },
-        { state: 'HI', name: 'Hawaii Governor', url: 'https://gov.hawaii.gov/newsroom/feed/' },
-        
-        // Hurricane/Storm Prone States
-        { state: 'LA', name: 'Louisiana Governor', url: 'https://gov.louisiana.gov/news/feed' },
-        { state: 'SC', name: 'South Carolina Governor', url: 'https://gov.sc.gov/news/feed' },
-        { state: 'AL', name: 'Alabama Governor', url: 'https://governor.alabama.gov/news/feed/' },
-        { state: 'MS', name: 'Mississippi Governor', url: 'https://www.governorreeves.ms.gov/news/feed/' },
-        
-        // Northeastern States
-        { state: 'MA', name: 'Massachusetts Governor', url: 'https://www.mass.gov/news/rss' },
-        { state: 'VA', name: 'Virginia Governor', url: 'https://www.governor.virginia.gov/newsroom/feed/' },
-        { state: 'NJ', name: 'New Jersey Governor', url: 'https://nj.gov/governor/news/rss.xml' },
-        { state: 'MD', name: 'Maryland Governor', url: 'https://governor.maryland.gov/news/feed/' },
-        { state: 'CT', name: 'Connecticut Governor', url: 'https://portal.ct.gov/office-of-the-governor/news/feed' },
-        { state: 'ME', name: 'Maine Governor', url: 'https://www.maine.gov/governor/mills/news/feed' },
-        { state: 'NH', name: 'New Hampshire Governor', url: 'https://www.nh.gov/governor/news/feed.rss' },
-        { state: 'VT', name: 'Vermont Governor', url: 'https://vermont.gov/gov/news/feed' },
-        { state: 'RI', name: 'Rhode Island Governor', url: 'https://www.ri.gov/press/feed/' },
-        { state: 'DE', name: 'Delaware Governor', url: 'https://news.delaware.gov/feed/' },
-        
-        // Midwest States
-        { state: 'WI', name: 'Wisconsin Governor', url: 'https://evers.wi.gov/Pages/Newsroom/feed.xml' },
-        { state: 'MN', name: 'Minnesota Governor', url: 'https://mn.gov/governor/news/feed.rss' },
-        { state: 'IN', name: 'Indiana Governor', url: 'https://www.in.gov/gov/news/feed/' },
-        { state: 'MO', name: 'Missouri Governor', url: 'https://www.gov.mo.gov/news/feed' },
-        { state: 'IA', name: 'Iowa Governor', url: 'https://www.gov.iowa.gov/news/feed' },
-        { state: 'KS', name: 'Kansas Governor', url: 'https://gov.kansas.gov/news/feed/' },
-        { state: 'NE', name: 'Nebraska Governor', url: 'https://gov.nebraska.gov/news/feed/' },
-        { state: 'ND', name: 'North Dakota Governor', url: 'https://www.gov.nd.gov/news/feed' },
-        { state: 'SD', name: 'South Dakota Governor', url: 'https://gov.sd.gov/news/feed.rss' },
-        
-        // Southern States
-        { state: 'TN', name: 'Tennessee Governor', url: 'https://www.tn.gov/governor/news.rss' },
-        { state: 'KY', name: 'Kentucky Governor', url: 'https://gov.ky.gov/news/feed/' },
-        { state: 'WV', name: 'West Virginia Governor', url: 'https://governor.wv.gov/news/rss.xml' },
-        { state: 'AR', name: 'Arkansas Governor', url: 'https://www.governor.arkansas.gov/news/feed/' },
-        { state: 'OK', name: 'Oklahoma Governor', url: 'https://www.gov.ok.gov/news/feed' }
-      ];
-
-      // Parse official government RSS feeds for emergency declarations
-      for (const source of officialSources) {
-        try {
-          const rssResponse = await fetch(source.url, {
-            headers: { 'User-Agent': 'DisasterWatchCenter/1.0' }
-          });
+        femaData.DisasterDeclarationsSummaries?.forEach((declaration: any) => {
+          const state = declaration.state;
+          if (!state || !stateNames[state]) return;
           
-          if (rssResponse.ok) {
-            const rssText = await rssResponse.text();
-            
-            // Parse RSS items for emergency content
-            const itemMatches = rssText.match(/<item>([\s\S]*?)<\/item>/g) || [];
-            
-            itemMatches.slice(0, 10).forEach(item => { // Check recent 10 items
-              const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
-              const linkMatch = item.match(/<link>(.*?)<\/link>/);
-              const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
-              const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
-              
-              if (titleMatch && linkMatch) {
-                const title = titleMatch[1] || '';
-                const description = descMatch?.[1] || '';
-                const fullText = `${title} ${description}`.toLowerCase();
-                
-                // Emergency detection patterns
-                const emergencyPatterns = [
-                  /state of emergency/i,
-                  /emergency declaration/i,
-                  /disaster emergency/i,
-                  /emergency order/i,
-                  /declares emergency/i,
-                  /emergency proclamation/i,
-                  /executive order.*emergency/i
-                ];
-                
-                const hasEmergencyContent = emergencyPatterns.some(pattern => pattern.test(fullText));
-                
-                // Check for recent date relevance (last 60 days)
-                const itemDate = pubDateMatch ? new Date(pubDateMatch[1]) : new Date();
-                const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
-                const isRecent = itemDate >= sixtyDaysAgo;
-                
-                if (hasEmergencyContent && isRecent) {
-                  const pubDate = itemDate.toISOString();
-                  const declarationKey = `${source.state}-${Date.parse(pubDate)}`;
-                  
-                  if (!seenDeclarations.has(declarationKey)) {
-                    seenDeclarations.add(declarationKey);
-                    
-                    // Detect emergency type
-                    let emergencyType = 'General Emergency';
-                    if (/flood|flooding|rain|storm/i.test(fullText)) emergencyType = 'Flooding';
-                    else if (/fire|wildfire|blaze/i.test(fullText)) emergencyType = 'Wildfire';
-                    else if (/hurricane|tropical storm/i.test(fullText)) emergencyType = 'Storm/Hurricane';
-                    else if (/winter|snow|blizzard|ice/i.test(fullText)) emergencyType = 'Winter Weather';
-                    else if (/earthquake|seismic/i.test(fullText)) emergencyType = 'Earthquake';
-                    else if (/tornado|twister/i.test(fullText)) emergencyType = 'Tornado';
-                    else if (/cyber|hack/i.test(fullText)) emergencyType = 'Cybersecurity';
-                    else if (/health|pandemic|disease/i.test(fullText)) emergencyType = 'Public Health';
-                    
-                    declarationsData.push({
-                      id: `official-${source.state}-${Date.parse(pubDate)}`,
-                      state: source.state,
-                      stateName: getStateName(source.state),
-                      title: title,
-                      description: description,
-                      emergencyType,
-                      publishedAt: new Date(pubDate),
-                      source: source.name,
-                      sourceType: 'official' as const,
-                      url: linkMatch[1],
-                      author: `${source.name} Office`,
-                      urlToImage: null,
-                      confidence: 'high' as const
-                    });
-                  }
-                }
-              }
+          if (!emergencyStates.has(state)) {
+            emergencyStates.set(state, {
+              state,
+              stateName: stateNames[state],
+              femaDeclarations: [],
+              weatherAlerts: [],
+              emergencyLevel: 'minor',
+              lastUpdated: new Date().toISOString()
             });
           }
-        } catch (rssError: any) {
-          console.error(`Error fetching RSS from ${source.name}:`, rssError.message);
-        }
-      }
-
-      // Store new declarations in database
-      const newDeclarations = [];
-      for (const declaration of declarationsData) {
-        try {
-          // Check if declaration already exists
-          const existing = await db.select()
-            .from(emergencyDeclarations)
-            .where(eq(emergencyDeclarations.id, declaration.id))
-            .limit(1);
-
-          if (existing.length === 0) {
-            // Insert new declaration
-            const insertedDeclaration = await db.insert(emergencyDeclarations)
-              .values({
-                id: declaration.id,
-                state: declaration.state,
-                stateName: declaration.stateName,
-                title: declaration.title,
-                description: declaration.description,
-                emergencyType: declaration.emergencyType,
-                publishedAt: declaration.publishedAt,
-                source: declaration.source,
-                sourceType: declaration.sourceType,
-                url: declaration.url,
-                author: declaration.author,
-                urlToImage: declaration.urlToImage,
-                confidence: declaration.confidence
-              })
-              .returning();
-            
-            newDeclarations.push(insertedDeclaration[0]);
+          
+          const stateInfo = emergencyStates.get(state);
+          stateInfo.femaDeclarations.push({
+            disasterNumber: declaration.disasterNumber,
+            declarationType: declaration.declarationType,
+            incidentType: declaration.incidentType,
+            title: declaration.declarationTitle,
+            declarationDate: declaration.declarationDate,
+            incidentBeginDate: declaration.incidentBeginDate
+          });
+          
+          // Determine emergency level based on declaration type
+          if (declaration.declarationType === 'DR') {
+            stateInfo.emergencyLevel = 'severe'; // Major Disaster
+          } else if (declaration.declarationType === 'EM' && stateInfo.emergencyLevel !== 'severe') {
+            stateInfo.emergencyLevel = 'moderate'; // Emergency Declaration
           }
-        } catch (dbError) {
-          console.error(`Error storing declaration ${declaration.id}:`, dbError);
-        }
+        });
       }
-
-      // Get all recent declarations from database
-      const allDeclarations = await db.select()
-        .from(emergencyDeclarations)
-        .orderBy(desc(emergencyDeclarations.publishedAt))
-        .limit(100);
-
-      // Sort by date (most recent first) and limit to 50
-      const recentDeclarations = allDeclarations
-        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-        .slice(0, 50);
-
-      console.log(`✓ State emergency declarations processed: ${recentDeclarations.length} declarations found, ${newDeclarations.length} new from RSS feeds`);
-
+      
+      // Process NWS active alerts
+      if (nwsResponse.ok) {
+        const nwsData = await nwsResponse.json();
+        
+        nwsData.features?.forEach((alert: any) => {
+          const properties = alert.properties || {};
+          const areas = properties.areaDesc || '';
+          
+          // Extract state codes from area description
+          const stateMatches = areas.match(/\b([A-Z]{2})\b/g) || [];
+          
+          stateMatches.forEach((state: string) => {
+            if (!stateNames[state]) return;
+            
+            if (!emergencyStates.has(state)) {
+              emergencyStates.set(state, {
+                state,
+                stateName: stateNames[state],
+                femaDeclarations: [],
+                weatherAlerts: [],
+                emergencyLevel: 'minor',
+                lastUpdated: new Date().toISOString()
+              });
+            }
+            
+            const stateInfo = emergencyStates.get(state);
+            stateInfo.weatherAlerts.push({
+              event: properties.event,
+              severity: properties.severity?.toLowerCase() || 'minor',
+              urgency: properties.urgency?.toLowerCase() || 'unknown',
+              certainty: properties.certainty?.toLowerCase() || 'unknown',
+              areaDesc: properties.areaDesc,
+              effective: properties.effective,
+              expires: properties.expires,
+              headline: properties.headline
+            });
+            
+            // Update emergency level based on weather severity
+            const severity = properties.severity?.toLowerCase();
+            if ((severity === 'extreme' || severity === 'severe') && stateInfo.emergencyLevel === 'minor') {
+              stateInfo.emergencyLevel = severity === 'extreme' ? 'severe' : 'moderate';
+            }
+          });
+        });
+      }
+      
+      // Convert map to array and sort by emergency level and state name
+      const statesArray = Array.from(emergencyStates.values()).sort((a, b) => {
+        const levelOrder = { 'severe': 3, 'moderate': 2, 'minor': 1 };
+        const levelDiff = levelOrder[b.emergencyLevel] - levelOrder[a.emergencyLevel];
+        return levelDiff !== 0 ? levelDiff : a.stateName.localeCompare(b.stateName);
+      });
+      
+      console.log(`✓ States under emergency processed: ${statesArray.length} states found`);
+      
       res.json({
         success: true,
-        declarations: recentDeclarations,
-        count: recentDeclarations.length,
-        newDeclarations: newDeclarations.length,
+        states: statesArray,
+        count: statesArray.length,
+        summary: {
+          severe: statesArray.filter(s => s.emergencyLevel === 'severe').length,
+          moderate: statesArray.filter(s => s.emergencyLevel === 'moderate').length,
+          minor: statesArray.filter(s => s.emergencyLevel === 'minor').length
+        },
         lastUpdated: new Date().toISOString(),
-        sources: ['Official Government RSS Feeds Only'],
-        totalStatesMonitored: officialSources.length,
-        dataFreshness: 'Live RSS parsing enabled'
+        sources: ['FEMA OpenData API', 'National Weather Service API']
       });
-
     } catch (error: any) {
-      console.error('Error fetching state emergency declarations:', error);
+      console.error('Error fetching states under emergency:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to fetch emergency declarations',
+        error: 'Failed to fetch emergency state data',
         details: error.message || 'Unknown error'
       });
     }
   });
-
-  function getStateName(code: string): string {
-    const stateNames: { [key: string]: string } = {
-      'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
-      'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
-      'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
-      'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
-      'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
-      'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
-      'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
-      'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
-      'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
-      'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming',
-      'DC': 'District of Columbia'
-    };
-    return stateNames[code] || code;
-  }
 
   // Basic Weather Alerts endpoint (alias for RSS endpoint)
   app.get("/api/weather-alerts", async (req, res) => {
