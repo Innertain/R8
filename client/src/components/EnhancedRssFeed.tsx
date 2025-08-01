@@ -67,6 +67,8 @@ export function EnhancedRssFeed({
   const [activeTab, setActiveTab] = useState<'live' | 'declarations' | 'global'>('live');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [locationFilter, setLocationFilter] = useState<string>(stateFilter || 'all');
+  const [stateSearchFilter, setStateSearchFilter] = useState<string>('all');
+  const [disasterTypeFilter, setDisasterTypeFilter] = useState<string>('all');
 
   useEffect(() => {
     const fetchEmergencyData = async () => {
@@ -155,11 +157,24 @@ export function EnhancedRssFeed({
     return severityMatch && locationMatch;
   }).slice(0, maxItems);
 
-  // Filter FEMA disasters by state if specified and remove duplicates
+  // Get unique states and disaster types for filter options
+  const uniqueStates = [...new Set(femaDisasters.map(d => d.state))].sort();
+  const uniqueDisasterTypes = [...new Set(femaDisasters.map(d => d.incidentType).filter(Boolean))].sort();
+
+  // Filter FEMA disasters by state, disaster type, and remove duplicates
   const filteredFemaDisasters = femaDisasters
     .filter(disaster => {
+      // Apply existing state filter prop
       if (stateFilter && stateFilter !== 'all') {
         return disaster.state === stateFilter;
+      }
+      // Apply new state search filter
+      if (stateSearchFilter && stateSearchFilter !== 'all') {
+        return disaster.state === stateSearchFilter;
+      }
+      // Apply disaster type filter
+      if (disasterTypeFilter && disasterTypeFilter !== 'all') {
+        return disaster.incidentType === disasterTypeFilter;
       }
       return true;
     })
@@ -535,10 +550,82 @@ export function EnhancedRssFeed({
               </div>
             )}
 
+            {/* Search and Filter Controls for Disaster Cards */}
+            {showFilters && femaDisasters.length > 0 && (
+              <div className="bg-white rounded-lg p-4 border mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Filter className="w-4 h-4 text-gray-600" />
+                  <span className="font-medium text-sm">Search & Filter Disasters</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* State Filter */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-2">Search by State</label>
+                    <Select value={stateSearchFilter} onValueChange={setStateSearchFilter}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="All States" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All States ({uniqueStates.length})</SelectItem>
+                        {uniqueStates.map(state => (
+                          <SelectItem key={state} value={state}>
+                            {state} ({femaDisasters.filter(d => d.state === state).length})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Disaster Type Filter */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-2">Filter by Disaster Type</label>
+                    <Select value={disasterTypeFilter} onValueChange={setDisasterTypeFilter}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="All Types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types ({uniqueDisasterTypes.length})</SelectItem>
+                        {uniqueDisasterTypes.map(type => (
+                          <SelectItem key={type} value={type}>
+                            {type} ({femaDisasters.filter(d => d.incidentType === type).length})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Clear Filters */}
+                {(stateSearchFilter !== 'all' || disasterTypeFilter !== 'all') && (
+                  <div className="mt-4 pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setStateSearchFilter('all');
+                        setDisasterTypeFilter('all');
+                      }}
+                      className="text-xs"
+                    >
+                      Clear All Filters
+                    </Button>
+                    <span className="ml-3 text-xs text-gray-600">
+                      Showing {filteredFemaDisasters.length} of {femaDisasters.length} disasters
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {filteredFemaDisasters.length === 0 ? (
               <div className="bg-white rounded-lg p-6 border text-center">
                 <TrendingUp className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">No recent US disaster declarations</p>
+                <p className="text-gray-600">
+                  No disasters found{stateSearchFilter !== 'all' ? ` for ${stateSearchFilter}` : ''}{disasterTypeFilter !== 'all' ? ` (${disasterTypeFilter})` : ''}
+                </p>
+                {(stateSearchFilter !== 'all' || disasterTypeFilter !== 'all') && (
+                  <p className="text-xs text-gray-500 mt-2">Try adjusting your search filters above.</p>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
