@@ -93,8 +93,18 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
   });
 
   const alerts = alertsData?.alerts || [];
+  
+  // Filter alerts based on selected state and severity
   const activeAlerts = alerts.filter((alert: WeatherAlert) => {
-    const matchesState = selectedState === 'all' || alert.location.includes(selectedState);
+    let matchesState = selectedState === 'all';
+    
+    if (!matchesState) {
+      // Check if the alert location contains the selected state code or name
+      const stateName = US_STATES[selectedState as keyof typeof US_STATES]?.name;
+      matchesState = alert.location.includes(selectedState) || 
+                   (stateName && alert.location.toLowerCase().includes(stateName.toLowerCase()));
+    }
+    
     const matchesSeverity = severityFilter === 'all' || alert.severity.toLowerCase() === severityFilter.toLowerCase();
     return matchesState && matchesSeverity;
   });
@@ -178,9 +188,26 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-orange-600" />
                 Active Weather Warnings & Watches
+                {selectedState !== 'all' && (
+                  <Badge variant="outline" className="ml-2">
+                    {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
+                  </Badge>
+                )}
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                {activeAlerts.length} active alerts from NWS Multi-Feed System
+                {activeAlerts.length} active alert{activeAlerts.length !== 1 ? 's' : ''} 
+                {selectedState !== 'all' 
+                  ? ` in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}` 
+                  : ' from NWS Multi-Feed System'
+                }
+                {selectedState !== 'all' && (
+                  <button 
+                    onClick={() => setSelectedState('all')}
+                    className="ml-2 text-blue-600 hover:text-blue-800 text-xs underline"
+                  >
+                    (View All States)
+                  </button>
+                )}
               </p>
             </div>
             <div className="flex gap-2">
@@ -241,17 +268,44 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
             <div className="space-y-6">
               {/* Interactive Map Representation */}
               <div className="bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-6 border">
-                <h3 className="text-lg font-semibold mb-4 text-center">United States Weather Alert Map</h3>
+                <h3 className="text-lg font-semibold mb-4 text-center">
+                  United States Weather Alert Map
+                  {selectedState !== 'all' && (
+                    <span className="block text-sm font-normal text-gray-600 mt-1">
+                      Filtered for: {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
+                    </span>
+                  )}
+                </h3>
                 
                 {Object.keys(statesWithAlerts).length === 0 ? (
                   <div className="text-center py-8">
                     <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-600">No active weather warnings or watches</p>
-                    <p className="text-sm text-gray-500 mt-1">All clear across monitored regions</p>
+                    <p className="text-gray-600">
+                      {selectedState === 'all' 
+                        ? 'No active weather warnings or watches' 
+                        : `No active alerts in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}`
+                      }
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {selectedState === 'all' 
+                        ? 'All clear across monitored regions' 
+                        : 'This state currently has no active weather warnings or watches'
+                      }
+                    </p>
+                    {selectedState !== 'all' && (
+                      <button 
+                        onClick={() => setSelectedState('all')}
+                        className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
+                      >
+                        View all states
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-                    {Object.entries(statesWithAlerts).map(([stateCode, stateAlerts]) => {
+                    {Object.entries(statesWithAlerts)
+                      .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
+                      .map(([stateCode, stateAlerts]) => {
                       const state = US_STATES[stateCode as keyof typeof US_STATES];
                       const maxSeverity = stateAlerts.reduce((max, alert) => {
                         const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
@@ -263,8 +317,14 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                       return (
                         <div
                           key={stateCode}
-                          className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${getSeverityColor(maxSeverity)}`}
-                          onClick={() => setSelectedState(stateCode)}
+                          className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
+                            selectedState === stateCode 
+                              ? 'ring-4 ring-blue-500 shadow-lg scale-105' 
+                              : ''
+                          } ${getSeverityColor(maxSeverity)}`}
+                          onClick={() => {
+                            setSelectedState(selectedState === stateCode ? 'all' : stateCode);
+                          }}
                         >
                           <div className="text-center">
                             <div className="font-bold text-lg">{stateCode}</div>
@@ -285,7 +345,7 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-red-600">
-                      {alerts.filter(a => a.severity.toLowerCase() === 'extreme').length}
+                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'extreme').length}
                     </div>
                     <div className="text-sm text-gray-600">Extreme</div>
                   </CardContent>
@@ -293,7 +353,7 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-orange-600">
-                      {alerts.filter(a => a.severity.toLowerCase() === 'severe').length}
+                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'severe').length}
                     </div>
                     <div className="text-sm text-gray-600">Severe</div>
                   </CardContent>
@@ -301,7 +361,7 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-yellow-600">
-                      {alerts.filter(a => a.severity.toLowerCase() === 'moderate').length}
+                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'moderate').length}
                     </div>
                     <div className="text-sm text-gray-600">Moderate</div>
                   </CardContent>
@@ -309,7 +369,7 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-blue-600">
-                      {alerts.filter(a => a.severity.toLowerCase() === 'minor').length}
+                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'minor').length}
                     </div>
                     <div className="text-sm text-gray-600">Minor</div>
                   </CardContent>
