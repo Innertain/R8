@@ -225,7 +225,6 @@ const useStatsData = () => {
 export default function StatsDashboard() {
   const { data: statsData, isLoading, error } = useStatsData();
   const [selectedState, setSelectedState] = useState<string>("all");
-  const [timeRange, setTimeRange] = useState<string>("30d");
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [isCached, setIsCached] = useState<boolean>(false);
 
@@ -416,18 +415,6 @@ export default function StatsDashboard() {
                 {state.state}
               </SelectItem>
             ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Time Range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7d">Last 7 Days</SelectItem>
-            <SelectItem value="30d">Last 30 Days</SelectItem>
-            <SelectItem value="90d">Last 90 Days</SelectItem>
-            <SelectItem value="all">All Time</SelectItem>
           </SelectContent>
         </Select>
       </div>
