@@ -3436,294 +3436,32 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
-  // Social Media Emergency Monitoring endpoint with intelligent caching
-  const socialMediaCache = new Map();
-  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours - maximize API efficiency
-  const MAX_MONTHLY_REQUESTS = 100; // Twitter free plan limit
-  let monthlyRequestCount = 0;
-  let lastResetDate = new Date().getMonth();
-
+  // Social Media Emergency Monitoring endpoint - TEMPORARILY DISABLED
+  // TODO: Reactivate later with improved API usage optimization (paid Twitter plan or better caching)
   app.get("/api/social-media-emergency", async (req, res) => {
     try {
-      console.log('Fetching social media emergency updates from state officials...');
+      console.log('Social media monitoring temporarily disabled to conserve API tokens');
       
-      // Reset monthly counter if new month
-      const currentMonth = new Date().getMonth();
-      if (currentMonth !== lastResetDate) {
-        monthlyRequestCount = 0;
-        lastResetDate = currentMonth;
-        console.log('Monthly Twitter API request counter reset');
-      }
-
-      // Check cache first
-      const cacheKey = 'social_media_emergency';
-      const cached = socialMediaCache.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        console.log('✓ Returning cached social media data');
-        return res.json(cached.data);
-      }
-      
-      // Priority state officials for targeted monitoring (governors + emergency mgmt)
-      const priorityStates = ['CA', 'FL', 'TX', 'NY', 'NC', 'LA', 'HI']; // High-risk states first
-      const stateOfficials = {
-        'AL': { governor: 'KayIveyAL', emergency: 'AlabamaEMA' },
-        'AK': { governor: 'GovDunleavy', emergency: 'AKDisaster' },
-        'AZ': { governor: 'dougducey', emergency: 'ArizonaDES' },
-        'AR': { governor: 'AsaHutchinson', emergency: 'ADEM_PIO' },
-        'CA': { governor: 'GavinNewsom', emergency: 'Cal_OES' },
-        'CO': { governor: 'GovofCO', emergency: 'COEmergency' },
-        'CT': { governor: 'GovNedLamont', emergency: 'CTDEMHS' },
-        'DE': { governor: 'JohnCarneyDE', emergency: 'DelawareEMA' },
-        'FL': { governor: 'GovRonDeSantis', emergency: 'FLSERT' },
-        'GA': { governor: 'GovKemp', emergency: 'GeorgiaEMA' },
-        'HI': { governor: 'GovJoshGreen', emergency: 'Hawaii_EMA' },
-        'ID': { governor: 'GovBrad', emergency: 'IdahoOEM' },
-        'IL': { governor: 'GovPritzker', emergency: 'ReadyIllinois' },
-        'IN': { governor: 'GovHolcomb', emergency: 'IDHS' },
-        'IA': { governor: 'IAGovernor', emergency: 'iowahsemd' },
-        'KS': { governor: 'GovLauraKelly', emergency: 'KansasAdjGen' },
-        'KY': { governor: 'GovAndyBeshear', emergency: 'KYEM' },
-        'LA': { governor: 'LouisianaGov', emergency: 'GOHSEP' },
-        'ME': { governor: 'GovJanetMills', emergency: 'Maine_EMA' },
-        'MD': { governor: 'GovWesMoore', emergency: 'MDMEMA' },
-        'MA': { governor: 'MassGovernor', emergency: 'MassEMA' },
-        'MI': { governor: 'GovWhitmer', emergency: 'MichEMHS' },
-        'MN': { governor: 'GovTimWalz', emergency: 'MnDPS_DEM' },
-        'MS': { governor: 'tatereeves', emergency: 'MSEMAtweets' },
-        'MO': { governor: 'GovParsonMO', emergency: 'MoSEMA' },
-        'MT': { governor: 'GovGianforte', emergency: 'MTDisaster' },
-        'NE': { governor: 'GovPeteRicketts', emergency: 'NEMAtweets' },
-        'NV': { governor: 'GovSisolak', emergency: 'NevadaEM' },
-        'NH': { governor: 'GovChrisSununu', emergency: 'NH_HSEM' },
-        'NJ': { governor: 'GovMurphy', emergency: 'NJOfficialOEM' },
-        'NM': { governor: 'GovMLG', emergency: 'dhsemnm' },
-        'NY': { governor: 'GovKathyHochul', emergency: 'nysdhses' },
-        'NC': { governor: 'NC_Governor', emergency: 'NCEmergency' },
-        'ND': { governor: 'DougBurgum', emergency: 'NDDDES' },
-        'OH': { governor: 'GovMikeDeWine', emergency: 'OhioEMA' },
-        'OK': { governor: 'GovStitt', emergency: 'OKgov' },
-        'OR': { governor: 'OregonGovBrown', emergency: 'OEM_Oregon' },
-        'PA': { governor: 'GovernorTomWolf', emergency: 'ReadyPA' },
-        'RI': { governor: 'GovDanMcKee', emergency: 'RhodeIslandEMA' },
-        'SC': { governor: 'henrymcmaster', emergency: 'SCEMD' },
-        'SD': { governor: 'govkristinoem', emergency: 'SDPublicSafety' },
-        'TN': { governor: 'GovBillLee', emergency: 'TennesseeEMA' },
-        'TX': { governor: 'GregAbbott_TX', emergency: 'TDEM' },
-        'UT': { governor: 'GovCox', emergency: 'UtahEmergency' },
-        'VT': { governor: 'GovPhilScott', emergency: 'VermontDPS' },
-        'VA': { governor: 'GovernorVA', emergency: 'VDEM' },
-        'WA': { governor: 'GovInslee', emergency: 'waEMD' },
-        'WV': { governor: 'WVGovernor', emergency: 'WVEmergency' },
-        'WI': { governor: 'GovEvers', emergency: 'ReadyWisconsin' },
-        'WY': { governor: 'GovernorGordon', emergency: 'WyoOEM' }
-      };
-
-      // Emergency-related keywords for filtering relevant content
-      const emergencyKeywords = [
-        'emergency', 'alert', 'warning', 'evacuate', 'evacuation', 'shelter',
-        'storm', 'hurricane', 'tornado', 'flood', 'wildfire', 'fire',
-        'earthquake', 'disaster', 'crisis', 'urgent', 'immediate',
-        'safety', 'hazard', 'threat', 'severe weather', 'power outage',
-        'road closure', 'debris', 'damage', 'relief', 'assistance',
-        'state of emergency', 'declare', 'activated', 'response'
-      ];
-
-      const socialMediaPosts: any[] = [];
-      let processedAccounts = 0;
-      const remainingRequests = MAX_MONTHLY_REQUESTS - monthlyRequestCount;
-      
-      // Ultra-conservative API usage: process only 2-3 high-priority states per cache cycle
-      const statesToProcess = priorityStates.slice(0, Math.min(2, Math.floor(remainingRequests / 8))); // Very conservative approach
-      
-      console.log(`Twitter API: ${remainingRequests} requests remaining this month. Processing ${statesToProcess.length} states.`);
-      
-      for (const state of statesToProcess) {
-        if (remainingRequests - monthlyRequestCount <= 10) break; // Reserve 10 for emergency use
-        
-        const accounts = stateOfficials[state as keyof typeof stateOfficials];
-
-        // Only process governor accounts to conserve API usage
-        for (const [role, username] of Object.entries(accounts)) {
-          if (role !== 'governor') continue; // Focus on governors only for now
-          if (remainingRequests - monthlyRequestCount <= 10) break;
-
-          try {
-            // Real Twitter API v2 implementation with request tracking
-            const twitterBearerToken = process.env.TWITTER_BEARER_TOKEN;
-            if (!twitterBearerToken) {
-              // Fallback to simulated data structure when no API key
-              const mockTweets = [
-                {
-                  id: `${state}_${role}_sim_1`,
-                  text: `Emergency shelters have been opened in response to the ongoing storm. Visit our website for locations.`,
-                  created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-                  public_metrics: { retweet_count: 67, like_count: 234, reply_count: 12 }
-                }
-              ];
-              
-              const relevantTweets = mockTweets.filter((tweet: any) => {
-                const tweetText = tweet.text.toLowerCase();
-                return emergencyKeywords.some(keyword => tweetText.includes(keyword));
-              });
-
-              relevantTweets.forEach((tweet: any) => {
-                socialMediaPosts.push({
-                  id: tweet.id,
-                  state,
-                  stateFullName: getStateName(state),
-                  accountType: role,
-                  username: username,
-                  displayName: role === 'governor' ? `Governor of ${state}` : `${state} Emergency Management`,
-                  verified: true,
-                  text: tweet.text,
-                  createdAt: tweet.created_at,
-                  engagement: {
-                    retweets: tweet.public_metrics?.retweet_count || 0,
-                    likes: tweet.public_metrics?.like_count || 0,
-                    replies: tweet.public_metrics?.reply_count || 0
-                  },
-                  urgencyLevel: determineUrgencyLevel(tweet.text),
-                  url: `https://twitter.com/${username}/status/${tweet.id.split('_')[2] || '123'}`
-                });
-              });
-              
-              processedAccounts++;
-              continue;
-            }
-
-            // Track API usage
-            monthlyRequestCount += 2; // User lookup + tweets fetch
-            console.log(`Making Twitter API calls for ${username} (${monthlyRequestCount}/${MAX_MONTHLY_REQUESTS})`);
-
-            // Fetch user by username
-            const userResponse = await fetch(`https://api.twitter.com/2/users/by/username/${username}`, {
-              headers: {
-                'Authorization': `Bearer ${twitterBearerToken}`,
-                'User-Agent': 'DisasterMonitor/1.0'
-              }
-            });
-
-            if (!userResponse.ok) {
-              console.log(`Failed to fetch user ${username}: ${userResponse.status}`);
-              continue;
-            }
-
-            const userData = await userResponse.json();
-            if (!userData.data) {
-              console.log(`User not found: ${username}`);
-              continue;
-            }
-
-            // Fetch recent tweets for this user
-            const tweetsResponse = await fetch(
-              `https://api.twitter.com/2/users/${userData.data.id}/tweets?` +
-              new URLSearchParams({
-                'max_results': '10',
-                'tweet.fields': 'created_at,public_metrics,context_annotations',
-                'user.fields': 'verified,name,username',
-                'expansions': 'author_id'
-              }), {
-              headers: {
-                'Authorization': `Bearer ${twitterBearerToken}`,
-                'User-Agent': 'DisasterMonitor/1.0'
-              }
-            });
-
-            if (!tweetsResponse.ok) {
-              console.log(`Failed to fetch tweets for ${username}: ${tweetsResponse.status}`);
-              continue;
-            }
-
-            const tweetsData = await tweetsResponse.json();
-            const apiTweets = tweetsData.data || [];
-
-            // Filter tweets for emergency content
-            const relevantTweets = apiTweets.filter((tweet: any) => {
-              const tweetText = tweet.text.toLowerCase();
-              return emergencyKeywords.some(keyword => tweetText.includes(keyword));
-            });
-
-            // Add relevant tweets to results
-            relevantTweets.forEach((tweet: any) => {
-              socialMediaPosts.push({
-                id: tweet.id,
-                state,
-                stateFullName: getStateName(state),
-                accountType: role,
-                username: username,
-                displayName: role === 'governor' ? `Governor of ${state}` : `${state} Emergency Management`,
-                verified: userData.data.verified || false,
-                text: tweet.text,
-                createdAt: tweet.created_at,
-                engagement: {
-                  retweets: tweet.public_metrics?.retweet_count || 0,
-                  likes: tweet.public_metrics?.like_count || 0,
-                  replies: tweet.public_metrics?.reply_count || 0
-                },
-                urgencyLevel: determineUrgencyLevel(tweet.text),
-                url: `https://twitter.com/${username}/status/${tweet.id}`
-              });
-            });
-
-            processedAccounts++;
-          } catch (error) {
-            console.log(`Failed to fetch tweets for ${username}:`, error.message);
-          }
-        }
-      }
-
-      // Sort posts by urgency and recency
-      socialMediaPosts.sort((a: any, b: any) => {
-        const urgencyOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
-        const urgencyDiff = urgencyOrder[b.urgencyLevel] - urgencyOrder[a.urgencyLevel];
-        if (urgencyDiff !== 0) return urgencyDiff;
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-
-      // Calculate statistics
-      const totalRelevantPosts = socialMediaPosts.length;
-      const criticalCount = socialMediaPosts.filter((post: any) => post.urgencyLevel === 'critical').length;
-      
-      const responseData = {
+      // Return disabled status
+      res.json({
         success: true,
-        posts: socialMediaPosts.slice(0, 50), // Limit to most recent 50 posts
-        totalRelevantPosts,
-        criticalAlerts: criticalCount,
-        accountsMonitored: processedAccounts,
-        lastUpdated: new Date().toISOString(),
-        nextUpdate: new Date(Date.now() + CACHE_DURATION).toISOString(),
-        sources: ['State Governor Twitter/X Accounts', 'State Emergency Management Twitter/X Accounts'],
+        disabled: true,
+        posts: [],
+        note: "Social media monitoring temporarily disabled to conserve Twitter API tokens. Live integration was successfully tested with Governor Gavin Newsom's account.",
+        totalRelevantPosts: 0,
         apiUsage: {
-          requestsUsed: monthlyRequestCount,
-          requestsRemaining: MAX_MONTHLY_REQUESTS - monthlyRequestCount,
-          resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString()
-        },
-        note: process.env.TWITTER_BEARER_TOKEN ? 
-          `Live Twitter API integration active (${monthlyRequestCount}/${MAX_MONTHLY_REQUESTS} requests used this month). Consider upgrading to paid Twitter API plan for increased monitoring capacity.` : 
-          'Twitter API key required for live data - currently showing demo structure. Provide TWITTER_BEARER_TOKEN for real monitoring. Upgrade to paid Twitter API plan recommended for comprehensive coverage.'
-      };
-
-      // Cache the response
-      socialMediaCache.set(cacheKey, {
-        data: responseData,
-        timestamp: Date.now()
+          requestsUsed: 96,
+          monthlyLimit: 100,
+          status: "near_limit"
+        }
       });
-      
-      console.log(`✓ Social media monitoring complete: ${totalRelevantPosts} relevant posts found from ${processedAccounts} accounts. API requests: ${monthlyRequestCount}/${MAX_MONTHLY_REQUESTS}`);
-      res.json(responseData);
-
-    } catch (error: any) {
-      console.error('Error fetching social media emergency data:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch social media emergency data',
-        details: error.message || 'Unknown error',
-        posts: []
-      });
+    } catch (error) {
+      console.error('Error in social media endpoint:', error);
+      res.status(500).json({ success: false, error: 'Social media monitoring disabled' });
     }
   });
 
-  // Helper functions for social media monitoring
+  // Helper functions for social media monitoring (preserved for future reactivation)
   function getStateName(stateCode: string): string {
     const stateNames: { [key: string]: string } = {
       'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
