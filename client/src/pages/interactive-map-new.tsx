@@ -10,6 +10,7 @@ import EnhancedRssFeed from "@/components/EnhancedRssFeed";
 import ActiveDisastersDashboard from "@/components/ActiveDisastersDashboard";
 import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
 import { WildfireIncidents } from "@/components/WildfireIncidents";
+import { EarthquakeIncidents } from "@/components/EarthquakeIncidents";
 
 // State name mapping for display
 const stateNames: { [key: string]: string } = {
@@ -104,6 +105,14 @@ export default function InteractiveMap() {
           {/* Wildfire Incidents */}
           <div className="w-full">
             <WildfireIncidents 
+              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
+              onStateFilterChange={handleStateFilterChange}
+            />
+          </div>
+          
+          {/* Earthquake Incidents */}
+          <div className="w-full">
+            <EarthquakeIncidents 
               stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
               onStateFilterChange={handleStateFilterChange}
             />

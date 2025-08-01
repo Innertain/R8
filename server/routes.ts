@@ -1626,6 +1626,157 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
+  // USGS Earthquake Data endpoint
+  app.get('/api/earthquake-incidents', async (req, res) => {
+    try {
+      console.log('Fetching earthquake incidents from USGS GeoJSON feed...');
+      
+      // Get significant earthquakes from the past 7 days
+      const response = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_week.geojson', {
+        headers: { 'User-Agent': 'DisasterApp/1.0 (earthquake-monitoring@example.com)' }
+      });
+      
+      if (!response.ok) {
+        // Fallback to all earthquakes magnitude 4.5+ in the past 7 days if significant fails
+        const fallbackResponse = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson', {
+          headers: { 'User-Agent': 'DisasterApp/1.0 (earthquake-monitoring@example.com)' }
+        });
+        
+        if (!fallbackResponse.ok) {
+          throw new Error(`HTTP error! status: ${fallbackResponse.status}`);
+        }
+        
+        const data = await fallbackResponse.json();
+        const earthquakes = processEarthquakeData(data);
+        
+        return res.json({
+          success: true,
+          incidents: earthquakes,
+          count: earthquakes.length,
+          lastUpdated: new Date().toISOString(),
+          source: 'USGS Earthquake GeoJSON Feed (4.5+ Magnitude)'
+        });
+      }
+      
+      const data = await response.json();
+      const earthquakes = processEarthquakeData(data);
+      
+      console.log(`✓ Earthquake incidents processed: ${earthquakes.length} earthquakes found`);
+      
+      res.json({
+        success: true,
+        incidents: earthquakes,
+        count: earthquakes.length,
+        lastUpdated: new Date().toISOString(),
+        source: 'USGS Earthquake GeoJSON Feed (Significant Events)'
+      });
+    } catch (error: any) {
+      console.error('Error fetching earthquake incidents:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch earthquake incidents',
+        details: error.message || 'Unknown error'
+      });
+    }
+  });
+
+  function processEarthquakeData(geoJsonData: any) {
+    if (!geoJsonData.features || !Array.isArray(geoJsonData.features)) {
+      return [];
+    }
+
+    // Valid US state codes + territories + Canada
+    const validLocations = new Set([
+      'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+      'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+      'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+      'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+      'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+      // US Territories
+      'PR', 'VI', 'GU', 'AS', 'MP',
+      // Canada (provinces)
+      'AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT'
+    ]);
+
+    return geoJsonData.features.map((feature: any, index: number) => {
+      const props = feature.properties || {};
+      const coords = feature.geometry?.coordinates || [0, 0, 0];
+      const [longitude, latitude, depth] = coords;
+
+      // Extract location information
+      const place = props.place || '';
+      let state = '';
+      let location = place;
+
+      // Try to extract state/province from place string
+      const stateMatch = place.match(/\b([A-Z]{2})\b/g) || [];
+      for (const match of stateMatch) {
+        if (validLocations.has(match)) {
+          state = match;
+          break;
+        }
+      }
+
+      // If no state found, try to determine from coordinates (basic US/Canada check)
+      if (!state) {
+        if (latitude >= 25 && latitude <= 71 && longitude >= -180 && longitude <= -50) {
+          // Rough bounds for US/Canada/Alaska
+          if (latitude >= 60 && longitude <= -130) {
+            state = 'AK'; // Alaska
+          } else if (latitude >= 19 && latitude <= 23 && longitude >= -161 && longitude <= -154) {
+            state = 'HI'; // Hawaii
+          } else if (latitude >= 49) {
+            // Basic Canada province mapping - simplified
+            if (longitude >= -141 && longitude <= -60) {
+              if (longitude >= -141 && longitude <= -120) state = 'BC'; // British Columbia
+              else if (longitude >= -120 && longitude <= -100) state = 'AB'; // Alberta  
+              else if (longitude >= -100 && longitude <= -90) state = 'SK'; // Saskatchewan
+              else if (longitude >= -96 && longitude <= -89) state = 'MB'; // Manitoba
+              else if (longitude >= -95 && longitude <= -74) state = 'ON'; // Ontario
+              else if (longitude >= -79 && longitude <= -60) state = 'QC'; // Quebec
+              else state = 'CA'; // Generic Canada
+            }
+          }
+        }
+      }
+
+      // Skip if not in valid locations
+      if (!state) {
+        return null;
+      }
+
+      const magnitude = props.mag || 0;
+      const time = props.time ? new Date(props.time).toISOString() : new Date().toISOString();
+      
+      // Determine severity based on magnitude
+      let severity = 'minor';
+      if (magnitude >= 7.0) severity = 'severe';
+      else if (magnitude >= 5.0) severity = 'moderate';
+      
+      // Determine alert level
+      let alertLevel = props.alert || 'green';
+      
+      return {
+        id: props.ids || feature.id || `earthquake-${index}`,
+        title: props.title || `M${magnitude} Earthquake`,
+        description: `Magnitude ${magnitude} earthquake ${place}. Depth: ${depth}km`,
+        link: props.url || 'https://earthquake.usgs.gov/',
+        pubDate: time,
+        state,
+        location: place,
+        magnitude,
+        depth,
+        latitude,
+        longitude,
+        severity,
+        alertLevel,
+        tsunami: props.tsunami || 0,
+        source: 'USGS',
+        type: props.type || 'earthquake'
+      };
+    }).filter(Boolean); // Remove null entries
+  }
+
   // Enhanced Weather Alerts from Multiple National Weather Service RSS Feeds
   app.get("/api/weather-alerts-rss", async (req, res) => {
     try {
