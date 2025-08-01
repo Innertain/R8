@@ -163,7 +163,7 @@ export function SocialMediaEmergencyMonitor() {
               Social Media Monitoring Temporarily Disabled
             </div>
             <p className="text-sm text-yellow-700 mb-3">
-              {data.note || "Live Twitter integration temporarily disabled to conserve API tokens."}
+              {data.note || "Social media monitoring is disabled and may be coming soon."}
             </p>
             {data.apiUsage && (
               <div className="text-xs text-yellow-600 bg-yellow-100 rounded p-2">

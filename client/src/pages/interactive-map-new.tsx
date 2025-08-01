@@ -173,11 +173,6 @@ export default function InteractiveMap() {
             />
           </div>
 
-          {/* Social Media Emergency Monitor */}
-          <div id="social-media" className="w-full">
-            <SocialMediaEmergencyMonitor />
-          </div>
-
           {/* Disaster Analytics Dashboard */}
           <div id="analytics" className="w-full">
             {isLoading ? (
@@ -185,13 +180,18 @@ export default function InteractiveMap() {
                 <div className="text-lg text-gray-600">Loading disaster data...</div>
               </div>
             ) : (
-              <DisasterAnalyticsDashboard disasters={femaData?.items || []} />
+              <DisasterAnalyticsDashboard disasters={(femaData as any)?.items || []} />
             )}
           </div>
           
           {/* Data Sources Overview */}
           <div id="data-sources" className="w-full">
             <DataSourcesOverview />
+          </div>
+          
+          {/* Social Media Emergency Monitor - Moved to bottom */}
+          <div id="social-media" className="w-full">
+            <SocialMediaEmergencyMonitor />
           </div>
         </div>
       </main>

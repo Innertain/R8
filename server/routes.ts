@@ -3496,7 +3496,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         success: true,
         disabled: true,
         posts: [],
-        note: "Social media monitoring temporarily disabled to conserve Twitter API tokens. Live integration was successfully tested with Governor Gavin Newsom's account.",
+        note: "Social media monitoring is disabled and may be coming soon.",
         totalRelevantPosts: 0,
         apiUsage: {
           requestsUsed: 96,
