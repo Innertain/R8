@@ -1820,6 +1820,151 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     });
   }
 
+  // States Under Emergency endpoint - combines FEMA declarations and NWS alerts
+  app.get("/api/states-under-emergency", async (req, res) => {
+    try {
+      console.log('Fetching states under emergency status...');
+      
+      // Get current FEMA active emergency declarations
+      const femaResponse = await fetch('https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentEndDate eq null&$top=1000', {
+        headers: { 'User-Agent': 'DisasterApp/1.0 (monitoring@example.com)' }
+      });
+      
+      // Get current NWS active alerts
+      const nwsResponse = await fetch('https://api.weather.gov/alerts/active', {
+        headers: { 'User-Agent': 'DisasterApp/1.0 (monitoring@example.com)' }
+      });
+      
+      const emergencyStates = new Map();
+      const stateNames = {
+        'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+        'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+        'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+        'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+        'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
+        'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
+        'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
+        'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+        'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+        'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming',
+        'DC': 'District of Columbia', 'PR': 'Puerto Rico', 'VI': 'Virgin Islands', 'GU': 'Guam', 'AS': 'American Samoa'
+      };
+      
+      // Process FEMA active declarations
+      if (femaResponse.ok) {
+        const femaData = await femaResponse.json();
+        
+        femaData.DisasterDeclarationsSummaries?.forEach((declaration: any) => {
+          const state = declaration.state;
+          if (!state || !stateNames[state]) return;
+          
+          if (!emergencyStates.has(state)) {
+            emergencyStates.set(state, {
+              state,
+              stateName: stateNames[state],
+              femaDeclarations: [],
+              weatherAlerts: [],
+              emergencyLevel: 'minor',
+              lastUpdated: new Date().toISOString()
+            });
+          }
+          
+          const stateInfo = emergencyStates.get(state);
+          stateInfo.femaDeclarations.push({
+            disasterNumber: declaration.disasterNumber,
+            declarationType: declaration.declarationType,
+            incidentType: declaration.incidentType,
+            title: declaration.declarationTitle,
+            declarationDate: declaration.declarationDate,
+            incidentBeginDate: declaration.incidentBeginDate
+          });
+          
+          // Determine emergency level based on declaration type
+          if (declaration.declarationType === 'DR') {
+            stateInfo.emergencyLevel = 'severe'; // Major Disaster
+          } else if (declaration.declarationType === 'EM' && stateInfo.emergencyLevel !== 'severe') {
+            stateInfo.emergencyLevel = 'moderate'; // Emergency Declaration
+          }
+        });
+      }
+      
+      // Process NWS active alerts
+      if (nwsResponse.ok) {
+        const nwsData = await nwsResponse.json();
+        
+        nwsData.features?.forEach((alert: any) => {
+          const properties = alert.properties || {};
+          const areas = properties.areaDesc || '';
+          
+          // Extract state codes from area description
+          const stateMatches = areas.match(/\b([A-Z]{2})\b/g) || [];
+          
+          stateMatches.forEach((state: string) => {
+            if (!stateNames[state]) return;
+            
+            if (!emergencyStates.has(state)) {
+              emergencyStates.set(state, {
+                state,
+                stateName: stateNames[state],
+                femaDeclarations: [],
+                weatherAlerts: [],
+                emergencyLevel: 'minor',
+                lastUpdated: new Date().toISOString()
+              });
+            }
+            
+            const stateInfo = emergencyStates.get(state);
+            stateInfo.weatherAlerts.push({
+              event: properties.event,
+              severity: properties.severity?.toLowerCase() || 'minor',
+              urgency: properties.urgency?.toLowerCase() || 'unknown',
+              certainty: properties.certainty?.toLowerCase() || 'unknown',
+              areaDesc: properties.areaDesc,
+              effective: properties.effective,
+              expires: properties.expires,
+              headline: properties.headline
+            });
+            
+            // Update emergency level based on weather severity
+            const severity = properties.severity?.toLowerCase();
+            if ((severity === 'extreme' || severity === 'severe') && stateInfo.emergencyLevel === 'minor') {
+              stateInfo.emergencyLevel = severity === 'extreme' ? 'severe' : 'moderate';
+            }
+          });
+        });
+      }
+      
+      // Convert map to array and sort by emergency level and state name
+      const statesArray = Array.from(emergencyStates.values()).sort((a, b) => {
+        const levelOrder = { 'severe': 3, 'moderate': 2, 'minor': 1 };
+        const levelDiff = levelOrder[b.emergencyLevel] - levelOrder[a.emergencyLevel];
+        return levelDiff !== 0 ? levelDiff : a.stateName.localeCompare(b.stateName);
+      });
+      
+      console.log(`✓ States under emergency processed: ${statesArray.length} states found`);
+      
+      res.json({
+        success: true,
+        states: statesArray,
+        count: statesArray.length,
+        summary: {
+          severe: statesArray.filter(s => s.emergencyLevel === 'severe').length,
+          moderate: statesArray.filter(s => s.emergencyLevel === 'moderate').length,
+          minor: statesArray.filter(s => s.emergencyLevel === 'minor').length
+        },
+        lastUpdated: new Date().toISOString(),
+        sources: ['FEMA OpenData API', 'National Weather Service API']
+      });
+    } catch (error: any) {
+      console.error('Error fetching states under emergency:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch emergency state data',
+        details: error.message || 'Unknown error'
+      });
+    }
+  });
+
   // Basic Weather Alerts endpoint (alias for RSS endpoint)
   app.get("/api/weather-alerts", async (req, res) => {
     try {
