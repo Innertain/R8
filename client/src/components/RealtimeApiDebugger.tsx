@@ -160,28 +160,28 @@ export function RealtimeApiDebugger() {
 
   if (!isVisible) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-[9999]">
         <Button
           onClick={() => setIsVisible(true)}
           variant="outline"
           size="sm"
-          className="bg-white shadow-lg hover:shadow-xl transition-shadow"
+          className="bg-blue-600 text-white border-blue-600 shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-300 animate-pulse"
         >
           <Activity className="w-4 h-4 mr-2" />
-          API Status ({connectedCount}/{totalCount})
+          Watch Center ({connectedCount}/{totalCount})
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-96">
-      <Card className="shadow-xl border-2">
+    <div className="fixed bottom-4 right-4 z-[9999] w-96">
+      <Card className="shadow-2xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-blue-600" />
-              API Connection Monitor
+              Watch Center
               <Badge variant="outline" className={`text-xs ${connectedCount === totalCount ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>
                 {connectedCount}/{totalCount} Online
               </Badge>
