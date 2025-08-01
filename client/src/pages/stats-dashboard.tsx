@@ -44,7 +44,9 @@ function RecentUpdatesSection() {
     queryKey: ['/api/recent-updates'],
     staleTime: 6 * 60 * 60 * 1000, // 6 hours
     gcTime: 6 * 60 * 60 * 1000, // 6 hours
-    refetchInterval: 6 * 60 * 60 * 1000, // Refresh every 6 hours
+    refetchInterval: false, // Don't auto-refetch
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
   });
 
   if (isLoading) {
@@ -219,6 +221,9 @@ const useStatsData = () => {
     },
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
     gcTime: 24 * 60 * 60 * 1000, // 24 hours
+    refetchInterval: false, // Don't auto-refetch
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
   });
 };
 
@@ -552,10 +557,9 @@ export default function StatsDashboard() {
 
       {/* Charts Section */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="states">By State</TabsTrigger>
-          <TabsTrigger value="impact">Impact</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -658,91 +662,7 @@ export default function StatsDashboard() {
 
 
 
-        <TabsContent value="impact" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  Success Rate
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-green-600">
-                  {totals.deliveries > 0 ? ((totals.completedDeliveries / totals.deliveries) * 100).toFixed(1) : 0}%
-                </div>
-                <p className="text-sm text-gray-600">
-                  {totals.completedDeliveries.toLocaleString()} of {totals.deliveries.toLocaleString()} deliveries completed
-                </p>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-blue-600" />
-                  Active States
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-blue-600">
-                  {stateSummaries.length}
-                </div>
-                <p className="text-sm text-gray-600">
-                  States with active operations
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-purple-600" />
-                  Network Strength
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-purple-600">
-                  {((totals.volunteers + totals.drivers) / Math.max(totals.sites, 1)).toFixed(1)}
-                </div>
-                <p className="text-sm text-gray-600">
-                  Average volunteers + drivers per site
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${isCached ? 'bg-blue-500' : 'bg-green-500'}`}></div>
-                  Data Freshness
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg font-bold text-gray-800">
-                  {isCached ? 'Cached' : 'Fresh'}
-                </div>
-                {lastUpdated ? (
-                  <>
-                    <p className="text-sm text-gray-600">
-                      Updated {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {isCached ? 'Using 24-hour cache' : 'Fetched from Airtable'}
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-sm text-gray-600">
-                    Loading cache status...
-                  </p>
-                )}
-                <p className="text-xs text-gray-500 mt-1">
-                  Stats: 24hr cache • Updates: 6hr cache
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
       
 
