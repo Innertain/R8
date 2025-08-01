@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface FemaDisasterItem {
   guid: string;
@@ -454,41 +455,59 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-end justify-between gap-1 h-32 mb-4">
-                    {Object.entries(analytics.monthlyStats)
-                      .sort(([a], [b]) => a.localeCompare(b))
-                      .slice(-12)
-                      .map(([month, count]) => {
-                        const maxCount = Math.max(...Object.values(analytics.monthlyStats));
-                        const heightPercent = Math.max(15, (count / maxCount) * 100);
-                        return (
-                          <div key={month} className="flex flex-col items-center flex-1 group">
-                            <div className="relative w-full">
-                              <div 
-                                className="bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm transition-all duration-300 group-hover:from-blue-700 group-hover:to-blue-500 cursor-pointer shadow-sm"
-                                style={{ height: `${heightPercent}%`, minHeight: '20px' }}
-                                title={`${month}: ${count} declarations`}
-                              />
-                              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                {count}
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={Object.entries(analytics.monthlyStats)
+                        .sort(([a], [b]) => a.localeCompare(b))
+                        .slice(-12)
+                        .map(([month, count]) => ({
+                          month: `${month.split('-')[1]}/${month.split('-')[0].slice(-2)}`,
+                          fullMonth: month,
+                          declarations: count
+                        }))}
+                      margin={{
+                        top: 20,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
+                      <XAxis 
+                        dataKey="month" 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                      />
+                      <YAxis 
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                      />
+                      <Tooltip 
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-white p-3 border rounded-lg shadow-lg">
+                                <p className="font-medium text-gray-900">{`${label}`}</p>
+                                <p className="text-blue-600">
+                                  {`${payload[0].value} declarations`}
+                                </p>
                               </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                  <div className="grid grid-cols-12 gap-1 text-center">
-                    {Object.entries(analytics.monthlyStats)
-                      .sort(([a], [b]) => a.localeCompare(b))
-                      .slice(-12)
-                      .map(([month, count]) => (
-                        <div key={month} className="text-xs text-gray-600">
-                          <div className="font-medium">{month.split('-')[1]}/{month.split('-')[0].slice(-2)}</div>
-                          <div className="text-gray-800 font-semibold">{count}</div>
-                        </div>
-                      ))}
-                  </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar 
+                        dataKey="declarations" 
+                        fill="#2563eb"
+                        radius={[4, 4, 0, 0]}
+                        className="hover:opacity-80 transition-opacity"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
