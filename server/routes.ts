@@ -1785,6 +1785,195 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }).filter(Boolean); // Remove null entries
   }
 
+  // Helper functions for weather alert processing
+  function extractLocationFromContent(text: string): string {
+    const statePattern = /\b[A-Z]{2}\b/g;
+    const matches = text.match(statePattern);
+    return matches ? matches.join(', ') : 'Location not specified';
+  }
+
+  function extractSeverityFromContent(text: string): string {
+    const lowerText = text.toLowerCase();
+    if (lowerText.includes('extreme') || lowerText.includes('tornado')) return 'extreme';
+    if (lowerText.includes('severe') || lowerText.includes('hurricane')) return 'severe';
+    if (lowerText.includes('moderate') || lowerText.includes('thunderstorm')) return 'moderate';
+    return 'minor';
+  }
+
+  function extractEventFromContent(title: string): string {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('tornado')) return 'Tornado Warning';
+    if (lowerTitle.includes('hurricane')) return 'Hurricane Warning';
+    if (lowerTitle.includes('flood')) return 'Flood Warning';
+    if (lowerTitle.includes('fire')) return 'Fire Weather Watch';
+    if (lowerTitle.includes('storm')) return 'Severe Thunderstorm Warning';
+    return 'Weather Alert';
+  }
+
+  function removeDuplicateAlerts(alerts: any[]): any[] {
+    const seen = new Set();
+    return alerts.filter(alert => {
+      const key = `${alert.title}-${alert.location}`.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  // Basic Weather Alerts endpoint (alias for RSS endpoint)
+  app.get("/api/weather-alerts", async (req, res) => {
+    try {
+      // Multiple NWS RSS feeds for comprehensive weather alert coverage
+      const nwsFeeds = [
+        // Primary National Alerts
+        'https://api.weather.gov/alerts/active',
+        // Hurricane/Tropical Systems - Atlantic
+        'https://www.nhc.noaa.gov/index-at.xml',
+        // Severe Weather from Storm Prediction Center
+        'https://www.spc.noaa.gov/products/spcrss.xml'
+      ];
+
+      console.log('Fetching comprehensive weather alerts from NWS RSS feeds...');
+      
+      let allAlerts: any[] = [];
+      let processedCount = { nws: 0, hurricane: 0, spc: 0 };
+
+      // Process each feed
+      for (let i = 0; i < nwsFeeds.length; i++) {
+        const feedUrl = nwsFeeds[i];
+        try {
+          let feedData;
+          
+          if (feedUrl === 'https://api.weather.gov/alerts/active') {
+            // Handle NWS API format
+            const response = await fetch(feedUrl, {
+              headers: {
+                'User-Agent': 'DisasterWatch/1.0 (contact@example.com)'
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.features) {
+                processedCount.nws = data.features.length;
+                const nwsAlerts = data.features.map((feature: any) => ({
+                  id: feature.properties.id || `nws-${Date.now()}-${Math.random()}`,
+                  title: feature.properties.headline || feature.properties.event || 'Weather Alert',
+                  description: feature.properties.description || feature.properties.instruction || 'No description available',
+                  location: `${feature.properties.areaDesc || 'Unknown Area'}`,
+                  severity: feature.properties.severity || 'Unknown',
+                  urgency: feature.properties.urgency || 'Unknown',
+                  certainty: feature.properties.certainty || 'Unknown',
+                  sent: feature.properties.sent || new Date().toISOString(),
+                  expires: feature.properties.expires,
+                  senderName: feature.properties.senderName || 'National Weather Service',
+                  web: feature.properties.web,
+                  event: feature.properties.event || 'Weather Alert',
+                  category: feature.properties.category?.[0] || 'Weather',
+                  alertType: 'warning'
+                }));
+                
+                // Only include warnings and watches, filter out advisories
+                const activeAlerts = nwsAlerts.filter((alert: any) => 
+                  alert.title.toLowerCase().includes('warning') || 
+                  alert.title.toLowerCase().includes('watch') ||
+                  alert.event.toLowerCase().includes('warning') ||
+                  alert.event.toLowerCase().includes('watch')
+                );
+                
+                allAlerts.push(...activeAlerts);
+              }
+            }
+          } else {
+            // Handle RSS feeds (Hurricane Center and Storm Prediction Center)
+            const response = await fetch(feedUrl);
+            if (response.ok) {
+              const xml = await response.text();
+              const Parser = (await import('rss-parser')).default;
+              const parser = new Parser();
+              const feed = await parser.parseString(xml);
+              
+              if (feed.items) {
+                const count = feed.items.length;
+                if (feedUrl.includes('nhc.noaa.gov')) {
+                  processedCount.hurricane = count;
+                } else if (feedUrl.includes('spc.noaa.gov')) {
+                  processedCount.spc = count;
+                }
+                
+                const rssAlerts = feed.items.map((item: any) => ({
+                  id: item.guid || `rss-${Date.now()}-${Math.random()}`,
+                  title: item.title || 'Weather Alert',
+                  description: item.contentSnippet || item.content || item.summary || 'No description available',
+                  location: extractLocationFromContent(item.title + ' ' + item.contentSnippet),
+                  severity: extractSeverityFromContent(item.title + ' ' + item.contentSnippet),
+                  urgency: 'Immediate',
+                  certainty: 'Likely',
+                  sent: item.pubDate || item.isoDate || new Date().toISOString(),
+                  senderName: feedUrl.includes('nhc.noaa.gov') ? 'National Hurricane Center' : 'Storm Prediction Center',
+                  web: item.link,
+                  event: extractEventFromContent(item.title),
+                  category: 'Weather',
+                  alertType: 'warning'
+                }));
+                
+                allAlerts.push(...rssAlerts);
+              }
+            }
+          }
+        } catch (feedError) {
+          console.warn(`Failed to fetch from ${feedUrl}:`, feedError.message);
+        }
+      }
+
+      // Remove duplicates based on title and location similarity
+      const uniqueAlerts = removeDuplicateAlerts(allAlerts);
+      
+      // Sort by severity (Extreme > Severe > Moderate > Minor)
+      const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
+      uniqueAlerts.sort((a: any, b: any) => {
+        const aSeverity = severityOrder[a.severity.toLowerCase() as keyof typeof severityOrder] || 0;
+        const bSeverity = severityOrder[b.severity.toLowerCase() as keyof typeof severityOrder] || 0;
+        return bSeverity - aSeverity;
+      });
+
+      // Filter to only active warnings/watches
+      const activeAlerts = uniqueAlerts.filter((alert: any) => 
+        alert.title.toLowerCase().includes('warning') || 
+        alert.title.toLowerCase().includes('watch') ||
+        alert.event.toLowerCase().includes('warning') ||
+        alert.event.toLowerCase().includes('watch')
+      );
+
+      console.log(`✓ Weather alerts processed: NWS API: ${processedCount.nws}, Hurricane Center: ${processedCount.hurricane}, Storm Prediction Center: ${processedCount.spc}`);
+      console.log(`✓ Total unique alerts: ${uniqueAlerts.length}`);
+      console.log(`✓ Active warnings/watches: ${activeAlerts.length}`);
+
+      res.json({
+        success: true,
+        alerts: activeAlerts,
+        metadata: {
+          total: uniqueAlerts.length,
+          activeWarningsWatches: activeAlerts.length,
+          sources: {
+            nws: processedCount.nws,
+            hurricane: processedCount.hurricane,
+            stormPrediction: processedCount.spc
+          },
+          lastUpdated: new Date().toISOString()
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('Weather alerts error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message,
+        alerts: []
+      });
+    }
+  });
+
   // Enhanced Weather Alerts from Multiple National Weather Service RSS Feeds
   app.get("/api/weather-alerts-rss", async (req, res) => {
     try {
