@@ -580,11 +580,19 @@ export default function StatsDashboard() {
         </TabsContent>
 
         <TabsContent value="states" className="space-y-6">
-          <Card>
+          <Card className="border-yellow-200 bg-yellow-50/50">
             <CardHeader>
-              <CardTitle>Sites and Deliveries by State (Top 10)</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Sites and Deliveries by State (Top 10)</CardTitle>
+                <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                  Work in Progress
+                </Badge>
+              </div>
+              <div className="text-sm text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-lg p-3 mt-2">
+                <strong>Note:</strong> State breakdown functionality is currently under development. Data shown may not accurately reflect state-specific statistics.
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="opacity-75">
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={topStates} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -600,11 +608,16 @@ export default function StatsDashboard() {
           </Card>
 
           {/* State Details Table */}
-          <Card>
+          <Card className="border-yellow-200 bg-yellow-50/50">
             <CardHeader>
-              <CardTitle>Detailed Breakdown by State</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Detailed Breakdown by State</CardTitle>
+                <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                  Work in Progress
+                </Badge>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="opacity-75">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
