@@ -3438,7 +3438,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
   // Social Media Emergency Monitoring endpoint with intelligent caching
   const socialMediaCache = new Map();
-  const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours - maximize API efficiency
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours - maximize API efficiency
   const MAX_MONTHLY_REQUESTS = 100; // Twitter free plan limit
   let monthlyRequestCount = 0;
   let lastResetDate = new Date().getMonth();
@@ -3532,20 +3532,20 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       let processedAccounts = 0;
       const remainingRequests = MAX_MONTHLY_REQUESTS - monthlyRequestCount;
       
-      // Smart account prioritization: focus on high-risk states and recent activity
-      const statesToProcess = priorityStates.concat(
-        Object.keys(stateOfficials).filter(s => !priorityStates.includes(s))
-      ).slice(0, Math.max(5, Math.floor(remainingRequests / 4))); // Reserve requests intelligently
+      // Ultra-conservative API usage: process only 2-3 high-priority states per cache cycle
+      const statesToProcess = priorityStates.slice(0, Math.min(2, Math.floor(remainingRequests / 8))); // Very conservative approach
       
       console.log(`Twitter API: ${remainingRequests} requests remaining this month. Processing ${statesToProcess.length} states.`);
       
       for (const state of statesToProcess) {
-        if (remainingRequests - monthlyRequestCount <= 5) break; // Reserve 5 for emergency use
+        if (remainingRequests - monthlyRequestCount <= 10) break; // Reserve 10 for emergency use
         
         const accounts = stateOfficials[state as keyof typeof stateOfficials];
 
+        // Only process governor accounts to conserve API usage
         for (const [role, username] of Object.entries(accounts)) {
-          if (remainingRequests - monthlyRequestCount <= 5) break;
+          if (role !== 'governor') continue; // Focus on governors only for now
+          if (remainingRequests - monthlyRequestCount <= 10) break;
 
           try {
             // Real Twitter API v2 implementation with request tracking
