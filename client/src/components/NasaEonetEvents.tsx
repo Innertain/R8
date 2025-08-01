@@ -136,6 +136,7 @@ export function NasaEonetEvents() {
   const [selectedIncidentType, setSelectedIncidentType] = useState<string>("all");
   const [visibleCount, setVisibleCount] = useState<number>(10);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
 
   // Build query URL with filters (fetch more data initially for infinite scroll)
@@ -394,113 +395,155 @@ export function NasaEonetEvents() {
             return (
               <div
                 key={event.id}
-                className="border rounded-lg p-4 hover:shadow-lg transition-all duration-200 bg-white hover:bg-gray-50 hover:border-blue-200"
+                className="border rounded-lg p-4 hover:shadow-lg transition-all duration-200 bg-white hover:bg-gray-50 hover:border-blue-200 cursor-pointer"
+                onClick={() => setExpandedEvent(expandedEvent === event.id ? null : event.id)}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-start gap-3 flex-1">
+                {/* Compact Summary Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <div className={`p-3 rounded-full shadow-sm ${categoryColor.replace('border-', 'bg-').replace('text-', 'text-white bg-')}`}>
                       <Icon className="w-5 h-5" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800 text-sm leading-tight mb-1">{event.title}</h3>
-                      {event.category && (
-                        <Badge className={`text-xs ${categoryColor} mb-2`}>
-                          {event.category.title}
-                        </Badge>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 text-base leading-tight">{event.title}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        {event.category && (
+                          <Badge className={`text-xs ${categoryColor}`}>
+                            {event.category.title}
+                          </Badge>
+                        )}
+                        {event.magnitude && (
+                          <span className="text-xs text-gray-600">
+                            {event.magnitude} {event.magnitudeUnit}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-gray-900">
+                        {event.date ? format(new Date(event.date), 'MMM dd') : 'Active'}
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {(event.latitude && event.longitude) ? getLocationName(event.latitude, event.longitude) : 'Location TBD'}
+                      </div>
+                    </div>
+                    
+                    {/* Expand/Collapse Indicator */}
+                    <div className={`transition-transform duration-200 ${expandedEvent === event.id ? 'rotate-180' : ''}`}>
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Details */}
+                {expandedEvent === event.id && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* When Section */}
+                      {event.date && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-4 h-4 text-blue-600" />
+                            <span className="font-semibold text-blue-800 text-sm">When</span>
+                          </div>
+                          <div className="text-sm text-blue-700">
+                            {format(new Date(event.date), 'EEEE, MMMM dd, yyyy')}
+                            <div className="text-xs mt-1 text-blue-600">
+                              {format(new Date(event.date), 'h:mm a')} ({format(new Date(event.date), 'O')})
+                            </div>
+                          </div>
+                        </div>
                       )}
-                    </div>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-3">
-                    {event.date && (
-                      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                        <Calendar className="w-5 h-5 text-blue-600" />
-                        <div>
-                          <div className="font-medium text-blue-900">When</div>
-                          <div className="text-blue-700">{format(new Date(event.date || new Date()), 'MMM dd, yyyy')}</div>
-                          <div className="text-xs text-blue-600">{format(new Date(event.date || new Date()), 'h:mm a')}</div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {(event.latitude && event.longitude) && (
-                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
-                        <MapPin className="w-5 h-5 text-green-600" />
-                        <div className="flex-1">
-                          <div className="font-medium text-green-900">Location</div>
-                          <div className="text-green-700 font-semibold">
+                      {/* Location Section */}
+                      {(event.latitude && event.longitude) && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <MapPin className="w-4 h-4 text-green-600" />
+                            <span className="font-semibold text-green-800 text-sm">Location</span>
+                          </div>
+                          <div className="text-sm text-green-700">
                             {getLocationName(event.latitude, event.longitude)}
-                          </div>
-                          <div className="text-xs text-green-600 mt-1">
-                            {event.latitude > 0 ? `${event.latitude.toFixed(2)}°N` : `${Math.abs(event.latitude).toFixed(2)}°S`}, {' '}
-                            {event.longitude > 0 ? `${event.longitude.toFixed(2)}°E` : `${Math.abs(event.longitude).toFixed(2)}°W`}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {event.magnitude && (
-                      <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
-                        <AlertTriangle className="w-5 h-5 text-orange-600" />
-                        <div>
-                          <div className="font-medium text-orange-900">Size/Intensity</div>
-                          <div className="text-orange-700 font-semibold">{event.magnitude} {event.magnitudeUnit}</div>
-                          <div className="text-xs text-orange-600">
-                            {event.magnitudeUnit === 'acres' ? 'Burned area' : 
-                             event.magnitudeUnit === 'kts' ? 'Wind speed' : 
-                             'Measured intensity'}
+                            <div className="text-xs mt-1 text-green-600">
+                              {event.latitude > 0 ? `${event.latitude.toFixed(2)}°N` : `${Math.abs(event.latitude).toFixed(2)}°S`}, {' '}
+                              {event.longitude > 0 ? `${event.longitude.toFixed(2)}°E` : `${Math.abs(event.longitude).toFixed(2)}°W`}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
 
-                  <div className="space-y-3">
-                    {event.source && (
-                      <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
-                        <ExternalLink className="w-5 h-5 text-purple-600" />
-                        <div>
-                          <div className="font-medium text-purple-900">Data Source</div>
-                          <a 
-                            href={event.source.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-purple-700 hover:text-purple-800 font-medium"
-                          >
-                            {event.source.id === 'IRWIN' ? 'US Forest Service' :
-                             event.source.id === 'JTWC' ? 'Military Weather' :
-                             event.source.id === 'USGS' ? 'US Geological Survey' :
-                             event.source.id}
-                          </a>
-                          <div className="text-xs text-purple-600">Official agency data</div>
+                      {/* Size/Intensity Section */}
+                      {event.magnitude && (
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <AlertTriangle className="w-4 h-4 text-orange-600" />
+                            <span className="font-semibold text-orange-800 text-sm">Size/Intensity</span>
+                          </div>
+                          <div className="text-sm text-orange-700">
+                            {event.magnitude} {event.magnitudeUnit}
+                            <div className="text-xs mt-1 text-orange-600">
+                              {event.magnitudeUnit === 'acres' ? 'Burned area' : 
+                               event.magnitudeUnit === 'kts' ? 'Wind speed' : 
+                               'Measured intensity'}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <Globe className="w-5 h-5 text-gray-600" />
-                      <div>
-                        <div className="font-medium text-gray-900">Satellite Updates</div>
-                        <div className="text-gray-700">{event.geometry.length} tracking points</div>
-                        <div className="text-xs text-gray-600">
-                          {event.geometry.length === 1 ? 'Single location' : 
-                           event.geometry.length < 5 ? 'Few updates' : 
-                           event.geometry.length < 20 ? 'Regular monitoring' : 
-                           'Highly monitored'}
+                      )}
+
+                      {/* Data Source Section */}
+                      {event.source && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <ExternalLink className="w-4 h-4 text-purple-600" />
+                            <span className="font-semibold text-purple-800 text-sm">Data Source</span>
+                          </div>
+                          <div className="text-sm text-purple-700">
+                            <a 
+                              href={event.source.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-purple-700 hover:text-purple-800 font-medium"
+                            >
+                              {event.source.id === 'IRWIN' ? 'US Forest Service' :
+                               event.source.id === 'JTWC' ? 'Military Weather' :
+                               event.source.id === 'USGS' ? 'US Geological Survey' :
+                               event.source.id}
+                            </a>
+                            <div className="text-xs mt-1 text-purple-600">Official agency data</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Satellite Updates Section */}
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Globe className="w-4 h-4 text-gray-600" />
+                          <span className="font-semibold text-gray-800 text-sm">Satellite Updates</span>
+                        </div>
+                        <div className="text-sm text-gray-700">
+                          {event.geometry.length} tracking points
+                          <div className="text-xs mt-1 text-gray-600">
+                            {event.geometry.length === 1 ? 'Single location' : 
+                             event.geometry.length < 5 ? 'Few updates' : 
+                             event.geometry.length < 20 ? 'Regular monitoring' : 
+                             'Highly monitored'}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {event.description && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-                      <div className="font-medium text-blue-900 text-sm mb-2">Additional Details</div>
-                      <p className="text-sm text-blue-800 leading-relaxed">{event.description}</p>
-                    </div>
+                    {/* Additional Details */}
+                    {event.description && (
+                      <div className="bg-white/80 border border-gray-200 rounded-lg p-3">
+                        <div className="font-semibold text-gray-700 text-sm mb-2">Additional Details</div>
+                        <p className="text-sm text-gray-600 leading-relaxed">{event.description}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
