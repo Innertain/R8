@@ -6,6 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 
+import RealTimeAlerts from "@/components/RealTimeAlerts";
+import EnhancedRssFeed from "@/components/EnhancedRssFeed";
+import ActiveDisastersDashboard from "@/components/ActiveDisastersDashboard";
+import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
+import { WildfireIncidents } from "@/components/WildfireIncidents";
+import { EarthquakeIncidents } from "@/components/EarthquakeIncidents";
 import { DisasterAnalyticsDashboard } from "@/components/DisasterAnalyticsDashboard";
 
 // State name mapping for display
@@ -96,6 +102,30 @@ export default function InteractiveMap() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-full space-y-8">
+          {/* Interactive Weather Alerts Map */}
+          <div className="w-full">
+            <InteractiveWeatherMap 
+              stateFilter={getFilterLocation() || undefined} 
+              onStateFilterChange={handleStateFilterChange}
+            />
+          </div>
+          
+          {/* Wildfire Incidents */}
+          <div className="w-full">
+            <WildfireIncidents 
+              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
+              onStateFilterChange={handleStateFilterChange}
+            />
+          </div>
+          
+          {/* Earthquake Incidents */}
+          <div className="w-full">
+            <EarthquakeIncidents 
+              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
+              onStateFilterChange={handleStateFilterChange}
+            />
+          </div>
+          
           {/* Disaster Analytics Dashboard */}
           <div className="w-full">
             {isLoading ? (
@@ -105,6 +135,16 @@ export default function InteractiveMap() {
             ) : (
               <DisasterAnalyticsDashboard disasters={(femaData as any)?.items || []} />
             )}
+          </div>
+          
+          {/* Enhanced Emergency Data Feed */}
+          <div className="w-full">
+            <EnhancedRssFeed 
+              maxItems={20} 
+              stateFilter={getFilterLocation() || undefined}
+              showFilters={true}
+              showAnalytics={true}
+            />
           </div>
         </div>
       </main>
