@@ -260,19 +260,21 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                         .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
                         .map(([stateCode, stateIncidents]) => {
                         const state = stateNames[stateCode as keyof typeof stateNames];
-                        const maxSeverity = (stateIncidents as WildfireIncident[]).reduce((max: string, incident: WildfireIncident) => {
-                          const severityOrder = { 'severe': 4, 'moderate': 3, 'minor': 2, 'low': 1 };
-                          const incidentLevel = severityOrder[incident.severity.toLowerCase() as keyof typeof severityOrder] || 0;
-                          const maxLevel = severityOrder[max.toLowerCase() as keyof typeof severityOrder] || 0;
-                          return incidentLevel > maxLevel ? incident.severity : max;
-                        }, 'low');
+                        const maxStatus = (stateIncidents as WildfireIncident[]).reduce((max: string, incident: WildfireIncident) => {
+                          const statusOrder = { 'active': 4, 'contained': 3, 'controlled': 2, 'out': 1, 'suppressed': 1 };
+                          const incidentLevel = statusOrder[incident.status.toLowerCase() as keyof typeof statusOrder] || 0;
+                          const maxLevel = statusOrder[max.toLowerCase() as keyof typeof statusOrder] || 0;
+                          return incidentLevel > maxLevel ? incident.status : max;
+                        }, 'out');
 
-                        const getSeverityColor = (severity: string) => {
-                          switch (severity.toLowerCase()) {
-                            case 'severe': return 'bg-red-500 text-white border-red-600';
-                            case 'moderate': return 'bg-orange-500 text-white border-orange-600';
-                            case 'minor': return 'bg-yellow-400 text-black border-yellow-500';
-                            default: return 'bg-orange-200 text-orange-800 border-orange-300';
+                        const getStatusColor = (status: string) => {
+                          switch (status.toLowerCase()) {
+                            case 'active': return 'bg-red-500 text-white border-red-600';
+                            case 'contained': return 'bg-yellow-500 text-white border-yellow-600';
+                            case 'controlled': return 'bg-blue-500 text-white border-blue-600';
+                            case 'out': 
+                            case 'suppressed': return 'bg-green-500 text-white border-green-600';
+                            default: return 'bg-gray-400 text-white border-gray-500';
                           }
                         };
 
@@ -283,7 +285,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                               selectedState === stateCode 
                                 ? 'ring-4 ring-orange-500 shadow-lg scale-105' 
                                 : ''
-                            } ${getSeverityColor(maxSeverity)}`}
+                            } ${getStatusColor(maxStatus)}`}
                             onClick={() => {
                               const newState = selectedState === stateCode ? 'all' : stateCode;
                               handleStateClick(newState);
@@ -313,25 +315,77 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   </>
                 )}
                 
+                {/* Show incidents for selected state */}
+                {selectedState !== 'all' && incidentsByState[selectedState] && (
+                  <div className="mt-6 bg-white rounded-lg border p-4">
+                    <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                      Wildfire Incidents in {stateNames[selectedState as keyof typeof stateNames] || selectedState}
+                    </h4>
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                      {(incidentsByState[selectedState] as WildfireIncident[]).map((incident: WildfireIncident) => (
+                        <div key={incident.id} className="p-3 bg-gray-50 rounded border-l-4 border-l-orange-500">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h5 className="font-semibold text-gray-900 text-sm">{incident.title}</h5>
+                                <Badge className={getStatusColor(incident.status)}>
+                                  {incident.status}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                                {incident.description}
+                              </p>
+                              <div className="flex items-center gap-4 text-xs text-gray-500">
+                                {incident.acres && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" />
+                                    {incident.acres.toLocaleString()} acres
+                                  </span>
+                                )}
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(incident.pubDate).toLocaleDateString()}
+                                </span>
+                                <span className="text-orange-600">
+                                  {incident.incidentType}
+                                </span>
+                              </div>
+                            </div>
+                            <a 
+                              href={incident.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1 mt-1"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Details
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 {/* Color Legend */}
                 <div className="mt-6 p-4 bg-white rounded-lg border">
                   <h4 className="text-sm font-semibold mb-3 text-gray-700">Incident Status Colors</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-red-500 rounded border"></div>
-                      <span>Severe (&gt;1000 acres)</span>
+                      <span>Active</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-orange-500 rounded border"></div>
-                      <span>Moderate (100-1000 acres)</span>
+                      <div className="w-4 h-4 bg-yellow-500 rounded border"></div>
+                      <span>Contained</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-yellow-400 rounded border"></div>
-                      <span>Minor (&lt;100 acres)</span>
+                      <div className="w-4 h-4 bg-blue-500 rounded border"></div>
+                      <span>Controlled</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-orange-200 rounded border"></div>
-                      <span>Unknown size</span>
+                      <div className="w-4 h-4 bg-green-500 rounded border"></div>
+                      <span>Out/Suppressed</span>
                     </div>
                   </div>
                 </div>
