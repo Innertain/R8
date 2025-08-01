@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import RealTimeAlerts from "@/components/RealTimeAlerts";
 import EnhancedRssFeed from "@/components/EnhancedRssFeed";
+import ActiveDisastersDashboard from "@/components/ActiveDisastersDashboard";
 
 // State name mapping for display
 const stateNames: { [key: string]: string } = {

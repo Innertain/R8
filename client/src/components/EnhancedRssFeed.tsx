@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3, CloudRain, CloudSnow, CloudLightning, Thermometer } from "lucide-react";
 import DisasterAnalyticsDashboard from "./DisasterAnalyticsDashboard";
+import ActiveDisastersDashboard from "./ActiveDisastersDashboard";
 
 interface EmergencyAlert {
   id: string;
@@ -64,7 +65,7 @@ export function EnhancedRssFeed({
   const [globalDisasters, setGlobalDisasters] = useState<ReliefWebItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'live' | 'declarations' | 'global'>('live');
+  const [activeTab, setActiveTab] = useState<'live' | 'declarations' | 'analytics' | 'global'>('live');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [locationFilter, setLocationFilter] = useState<string>(stateFilter || 'all');
   const [stateSearchFilter, setStateSearchFilter] = useState<string>('all');
@@ -290,15 +291,19 @@ export function EnhancedRssFeed({
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'live' | 'declarations' | 'global')}>
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'live' | 'declarations' | 'analytics' | 'global')}>
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="live" className="flex items-center gap-1 text-xs">
               <CloudLightning className="w-3 h-3" />
               Weather Alerts ({alerts.length})
             </TabsTrigger>
             <TabsTrigger value="declarations" className="flex items-center gap-1 text-xs">
               <TrendingUp className="w-3 h-3" />
-              US ({femaDisasters.length})
+              Active Disasters ({femaDisasters.length})
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-1 text-xs">
+              <BarChart3 className="w-3 h-3" />
+              Analytics Dashboard
             </TabsTrigger>
             <TabsTrigger value="global" className="flex items-center gap-1 text-xs">
               <MapPin className="w-3 h-3" />
@@ -711,6 +716,10 @@ export function EnhancedRssFeed({
                 })}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-6">
+            <ActiveDisastersDashboard disasters={femaDisasters} loading={loading} />
           </TabsContent>
 
           <TabsContent value="global" className="mt-6">
