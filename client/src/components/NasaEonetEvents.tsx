@@ -20,9 +20,7 @@ import {
   Sun,
   Thermometer,
   ChevronDown,
-  Loader2,
-  Maximize2,
-  X
+  Loader2
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -140,7 +138,6 @@ export function NasaEonetEvents() {
   const [visibleCount, setVisibleCount] = useState<number>(10);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
 
   // Build query URL with filters (fetch more data initially for infinite scroll)
@@ -542,38 +539,37 @@ export function NasaEonetEvents() {
                       </div>
                     </div>
 
-                    {/* Satellite Imagery Section */}
-                    {event.satelliteImageUrl && (
+                    {/* Location Map Link Section */}
+                    {(event.latitude && event.longitude) && (
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <div className="font-semibold text-blue-800 text-sm mb-3 flex items-center gap-2">
                           <Globe className="w-4 h-4" />
-                          Live Satellite Imagery
+                          View Location
                         </div>
-                        <div className="relative group">
-                          <img 
-                            src={event.satelliteImageUrl} 
-                            alt={`Satellite view of ${event.title}`}
-                            className="w-full h-64 object-cover rounded-lg border border-blue-300 cursor-pointer transition-transform hover:scale-[1.02]"
-                            onClick={() => setLightboxImage(event.satelliteImageUrl)}
-                            onError={(e) => {
-                              const img = e.target as HTMLImageElement;
-                              img.style.display = 'none';
-                              const parent = img.parentElement;
-                              if (parent) {
-                                parent.innerHTML = '<div class="flex items-center justify-center h-64 bg-gray-100 rounded-lg border border-gray-300"><span class="text-gray-500 text-sm">Satellite imagery not available</span></div>';
-                              }
-                            }}
-                          />
-                          
-                          {/* Expand overlay */}
-                          <div className="absolute top-2 right-2 bg-black/50 rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Maximize2 className="w-4 h-4 text-white" />
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap gap-2">
+                            <a 
+                              href={`https://www.google.com/maps/@${event.latitude},${event.longitude},12z`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Google Maps
+                            </a>
+                            <a 
+                              href={`https://www.google.com/maps/@${event.latitude},${event.longitude},12z/data=!3m1!1e3`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                              <Globe className="w-4 h-4" />
+                              Satellite View
+                            </a>
                           </div>
-                          
-                          <div className="mt-2 text-xs text-blue-600">
-                            <div>Source: Esri World Imagery (High-Resolution Satellite Tiles)</div>
-                            <div>Data: Latest available satellite imagery for location</div>
-                            <div className="mt-1 text-blue-500">Click image to view full size</div>
+                          <div className="text-xs text-blue-600">
+                            <div>Coordinates: {event.latitude.toFixed(4)}°, {event.longitude.toFixed(4)}°</div>
+                            <div className="mt-1 text-blue-500">Opens in new tab with live satellite imagery</div>
                           </div>
                         </div>
                       </div>
@@ -623,36 +619,7 @@ export function NasaEonetEvents() {
       </CardContent>
     </Card>
 
-    {/* Satellite Image Lightbox Modal */}
-    {lightboxImage && (
-      <div 
-        className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-        onClick={() => setLightboxImage(null)}
-      >
-        <div className="relative max-w-4xl max-h-full">
-          <button
-            onClick={() => setLightboxImage(null)}
-            className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-colors z-10"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          
-          <img
-            src={lightboxImage}
-            alt="Satellite imagery - full size view"
-            className="max-w-full max-h-full object-contain rounded-lg"
-            onClick={(e) => e.stopPropagation()}
-            onError={() => setLightboxImage(null)}
-          />
-          
-          <div className="absolute bottom-4 left-4 right-4 bg-black/50 rounded-lg p-3 text-white text-sm">
-            <div className="font-medium">High-Resolution Satellite Imagery</div>
-            <div className="text-xs opacity-80 mt-1">Source: Esri World Imagery (Live Satellite Tiles)</div>
-            <div className="text-xs opacity-60 mt-1">Click outside image or X button to close</div>
-          </div>
-        </div>
-      </div>
-    )}
+
     </>
   );
 }
