@@ -539,37 +539,76 @@ export function NasaEonetEvents() {
                       </div>
                     </div>
 
-                    {/* Location Map Link Section */}
+                    {/* Enhanced Location & Imagery Section */}
                     {(event.latitude && event.longitude) && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <div className="font-semibold text-blue-800 text-sm mb-3 flex items-center gap-2">
-                          <Globe className="w-4 h-4" />
-                          View Location
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap gap-2">
-                            <a 
-                              href={`https://www.google.com/maps/@${event.latitude},${event.longitude},12z`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                              Google Maps
-                            </a>
-                            <a 
-                              href={`https://www.google.com/maps/@${event.latitude},${event.longitude},12z/data=!3m1!1e3`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-                            >
+                      <div className="space-y-3">
+                        {/* Satellite Imagery from API */}
+                        {event.satelliteImageUrl && (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <div className="font-semibold text-blue-800 text-sm mb-3 flex items-center gap-2">
                               <Globe className="w-4 h-4" />
-                              Satellite View
-                            </a>
+                              NASA Satellite Imagery
+                            </div>
+                            <div className="relative group">
+                              <img 
+                                src={event.satelliteImageUrl} 
+                                alt={`Satellite view of ${event.title}`}
+                                className="w-full h-48 object-cover rounded-lg border border-blue-300 cursor-pointer transition-all hover:shadow-lg"
+                                onClick={() => window.open(event.satelliteImageUrl, '_blank')}
+                                onError={(e) => {
+                                  const img = e.target as HTMLImageElement;
+                                  const parent = img.parentElement;
+                                  if (parent) {
+                                    parent.innerHTML = '<div class="flex items-center justify-center h-48 bg-gray-100 rounded-lg border border-gray-300"><span class="text-gray-500 text-sm">Satellite imagery not available</span></div>';
+                                  }
+                                }}
+                              />
+                              
+                              {/* Click hint overlay */}
+                              <div className="absolute inset-0 bg-black/0 hover:bg-black/10 rounded-lg transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
+                                <div className="bg-white/90 px-3 py-1 rounded-full text-sm font-medium text-gray-700">
+                                  Click to open full size
+                                </div>
+                              </div>
+                            </div>
+                            <div className="mt-2 text-xs text-blue-600">
+                              <div>Real-time satellite data from NASA Earth Observing System</div>
+                              <div className="text-blue-500">Click image to view in new tab</div>
+                            </div>
                           </div>
-                          <div className="text-xs text-blue-600">
-                            <div>Coordinates: {event.latitude.toFixed(4)}°, {event.longitude.toFixed(4)}°</div>
-                            <div className="mt-1 text-blue-500">Opens in new tab with live satellite imagery</div>
+                        )}
+                        
+                        {/* Map Links Section */}
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                          <div className="font-semibold text-green-800 text-sm mb-3 flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            Interactive Maps
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap gap-2">
+                              <a 
+                                href={`https://www.google.com/maps/@${event.latitude},${event.longitude},12z`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                Google Maps
+                              </a>
+                              <a 
+                                href={`https://www.google.com/maps/@${event.latitude},${event.longitude},12z/data=!3m1!1e3`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                              >
+                                <Globe className="w-4 h-4" />
+                                Satellite View
+                              </a>
+                            </div>
+                            <div className="text-xs text-green-600">
+                              <div>Coordinates: {event.latitude.toFixed(4)}°, {event.longitude.toFixed(4)}°</div>
+                              <div className="mt-1 text-green-500">Interactive maps open in new tab</div>
+                            </div>
                           </div>
                         </div>
                       </div>

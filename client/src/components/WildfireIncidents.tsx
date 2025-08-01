@@ -336,16 +336,44 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                                   {incident.incidentType}
                                 </span>
                               </div>
+                              
+                              {/* Enhanced Location Links */}
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                <a 
+                                  href={incident.link} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  Official Details
+                                </a>
+                                
+                                {/* Map links for state-based location */}
+                                {incident.state && (
+                                  <>
+                                    <a 
+                                      href={`https://www.google.com/maps/search/wildfire+${encodeURIComponent(incident.title)}+${incident.state}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-green-600 hover:text-green-800 text-xs flex items-center gap-1"
+                                    >
+                                      <MapPin className="w-3 h-3" />
+                                      Google Maps
+                                    </a>
+                                    <a 
+                                      href={`https://www.google.com/maps/search/wildfire+${encodeURIComponent(incident.title)}+${incident.state}/data=!3m1!1e3`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-orange-600 hover:text-orange-800 text-xs flex items-center gap-1"
+                                    >
+                                      <Flame className="w-3 h-3" />
+                                      Satellite View
+                                    </a>
+                                  </>
+                                )}
+                              </div>
                             </div>
-                            <a 
-                              href={incident.link} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1 mt-1"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              Details
-                            </a>
                           </div>
                         </div>
                       ))}

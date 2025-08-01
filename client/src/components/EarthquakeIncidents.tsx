@@ -517,16 +517,40 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
                               {new Date(incident.pubDate).toLocaleDateString()}
                             </span>
                           </div>
+                          
+                          {/* Enhanced Location Links with Precise Coordinates */}
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            <a 
+                              href={incident.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              USGS Details
+                            </a>
+                            
+                            {/* Precise map links using exact coordinates */}
+                            <a 
+                              href={`https://www.google.com/maps/@${incident.latitude},${incident.longitude},12z`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-600 hover:text-green-800 text-xs flex items-center gap-1"
+                            >
+                              <MapPin className="w-3 h-3" />
+                              Google Maps
+                            </a>
+                            <a 
+                              href={`https://www.google.com/maps/@${incident.latitude},${incident.longitude},12z/data=!3m1!1e3`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-purple-600 hover:text-purple-800 text-xs flex items-center gap-1"
+                            >
+                              <Activity className="w-3 h-3" />
+                              Satellite View
+                            </a>
+                          </div>
                         </div>
-                        <a 
-                          href={incident.link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Details
-                        </a>
                       </div>
                     </CardContent>
                   </Card>

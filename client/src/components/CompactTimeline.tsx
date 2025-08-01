@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Calendar, MapPin } from "lucide-react";
+import { Clock, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Calendar, MapPin, ExternalLink, Globe } from "lucide-react";
 
 interface FemaDisasterItem {
   guid: string;
@@ -271,6 +271,42 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                                    daysSinceDeclaration < 365 ? `Declared ${Math.floor(daysSinceDeclaration / 30)} months ago` :
                                    `Declared ${Math.floor(daysSinceDeclaration / 365)} years ago`}
                                 </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Location Map Section */}
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <MapPin className="w-4 h-4 text-green-600" />
+                              <span className="font-semibold text-green-800 text-sm">Location</span>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="text-sm text-green-700">
+                                {getStateName(disaster.state)}, United States
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                <a 
+                                  href={`https://www.google.com/maps/search/${encodeURIComponent(disaster.incidentType || 'disaster')}+disaster+${encodeURIComponent(getStateName(disaster.state))}+${disaster.state}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  Google Maps
+                                </a>
+                                <a 
+                                  href={`https://www.google.com/maps/search/${encodeURIComponent(disaster.incidentType || 'disaster')}+disaster+${encodeURIComponent(getStateName(disaster.state))}+${disaster.state}/data=!3m1!1e3`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                  <Globe className="w-3 h-3" />
+                                  Satellite View
+                                </a>
+                              </div>
+                              <div className="text-xs text-green-600">
+                                Opens interactive maps for disaster area analysis
                               </div>
                             </div>
                           </div>
