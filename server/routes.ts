@@ -1547,16 +1547,65 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
         ]);
 
-        // Extract state from title/description - only match valid state codes
+        // Extract state from title/description - improved extraction logic
         let state = '';
-        const titleStateMatches = item.title.match(/\b([A-Z]{2})\b/g) || [];
-        const descStateMatches = item.description.match(/\b([A-Z]{2})\b/g) || [];
         
-        // Find first valid state code
-        for (const match of [...titleStateMatches, ...descStateMatches]) {
-          if (validStates.has(match)) {
-            state = match;
-            break;
+        // First, try to extract from agency prefixes in titles like "CAMDF", "UTMLF", "OR98S"
+        const agencyPrefixMatch = item.title.match(/^([A-Z]{2,6})\s/);
+        if (agencyPrefixMatch) {
+          const prefix = agencyPrefixMatch[1];
+          // Extract state from common agency prefixes and regional codes
+          const agencyToState: { [key: string]: string } = {
+            // California agencies
+            'CAMDF': 'CA', 'CAONF': 'CA', 'CASHU': 'CA', 'CABDF': 'CA',
+            // Utah agencies  
+            'UTMLF': 'UT', 'UTDNR': 'UT', 'UTFWL': 'UT', 'UTFIF': 'UT',
+            // Idaho agencies
+            'IDSCF': 'ID', 'IDBDF': 'ID', 'IDNEZ': 'ID',
+            // Montana agencies
+            'MTBRF': 'MT', 'MTMTS': 'MT', 'MTBLM': 'MT',
+            // Washington agencies
+            'WANES': 'WA', 'WAOWF': 'WA', 'WADNR': 'WA',
+            // Nevada agencies
+            'NVDOF': 'NV', 'NVBLM': 'NV',
+            // Oregon agencies and regional codes
+            'ORBDF': 'OR', 'ORUSP': 'OR', 'OR98S': 'OR', 'OR39S': 'OR', 'ORSWS': 'OR',
+            // Nebraska agencies
+            'NEBFC': 'NE', 'NEFOR': 'NE',
+            // Texas agencies
+            'TXFOR': 'TX', 'TXBLM': 'TX',
+            // Arizona agencies
+            'AZSTF': 'AZ', 'AZBLM': 'AZ',
+            // Colorado agencies
+            'COFIRE': 'CO', 'COBLM': 'CO',
+            // New Mexico agencies
+            'NMFOR': 'NM', 'NMBLM': 'NM',
+            // Wyoming agencies
+            'WYFIRE': 'WY', 'WYBLM': 'WY'
+          };
+          
+          if (agencyToState[prefix]) {
+            state = agencyToState[prefix];
+          } else {
+            // Try to extract state from first 2 characters of agency code
+            const stateCandidate = prefix.substring(0, 2);
+            if (validStates.has(stateCandidate)) {
+              state = stateCandidate;
+            }
+          }
+        }
+        
+        // If no state found from agency codes, try standard 2-letter extraction
+        if (!state) {
+          const titleStateMatches = item.title.match(/\b([A-Z]{2})\b/g) || [];
+          const descStateMatches = item.description.match(/\b([A-Z]{2})\b/g) || [];
+          
+          // Find first valid state code
+          for (const match of [...titleStateMatches, ...descStateMatches]) {
+            if (validStates.has(match)) {
+              state = match;
+              break;
+            }
           }
         }
         
