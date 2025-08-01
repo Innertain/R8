@@ -1574,10 +1574,22 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       
       // Remove duplicates and sort by severity
       const uniqueAlerts = removeDuplicateAlerts(allAlerts);
-      const sortedAlerts = sortAlertsBySeverity(uniqueAlerts);
+      
+      // Filter for only active warnings and watches (no advisories, statements, or outlooks)
+      const activeAlerts = uniqueAlerts.filter(alert => {
+        const alertType = (alert.alertType || alert.event || '').toLowerCase();
+        return (alertType.includes('warning') || alertType.includes('watch')) && 
+               !alertType.includes('statement') && 
+               !alertType.includes('outlook') && 
+               !alertType.includes('advisory') &&
+               !alertType.includes('summary');
+      });
+      
+      const sortedAlerts = sortAlertsBySeverity(activeAlerts);
       
       console.log(`✓ Weather alerts processed: ${sourceCounts.join(', ')}`);
-      console.log(`✓ Total unique alerts: ${sortedAlerts.length}`);
+      console.log(`✓ Total unique alerts: ${uniqueAlerts.length}`);
+      console.log(`✓ Active warnings/watches: ${sortedAlerts.length}`);
       
       res.json({
         success: true,
@@ -1586,6 +1598,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         feedSources: ['api.weather.gov', 'nhc.noaa.gov', 'spc.noaa.gov'],
         lastUpdated: new Date().toISOString(),
         totalAlerts: sortedAlerts.length,
+        totalProcessed: uniqueAlerts.length,
         feedCounts: sourceCounts
       });
       

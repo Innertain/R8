@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RealTimeAlerts from "@/components/RealTimeAlerts";
 import EnhancedRssFeed from "@/components/EnhancedRssFeed";
 import ActiveDisastersDashboard from "@/components/ActiveDisastersDashboard";
+import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
 
 // State name mapping for display
 const stateNames: { [key: string]: string } = {
@@ -83,8 +84,13 @@ export default function InteractiveMap() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-full">
-          {/* Emergency Data Feed - Full Width */}
+        <div className="max-w-full space-y-8">
+          {/* Interactive Weather Alerts Map */}
+          <div className="w-full">
+            <InteractiveWeatherMap stateFilter={getFilterLocation() || undefined} />
+          </div>
+          
+          {/* Enhanced Emergency Data Feed */}
           <div className="w-full">
             <EnhancedRssFeed 
               maxItems={20} 

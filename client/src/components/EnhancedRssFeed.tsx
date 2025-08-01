@@ -465,7 +465,7 @@ export function EnhancedRssFeed({
                       <div className="flex items-center justify-between pt-2 border-t border-white/30">
                         <div className="flex items-center gap-1 text-xs opacity-75">
                           <Clock className="w-3 h-3" />
-                          <span>{new Date(alert.pubDate).toLocaleDateString()}</span>
+                          <span>{alert.pubDate && alert.pubDate !== 'Invalid Date' ? new Date(alert.pubDate).toLocaleDateString() : 'Current Alert'}</span>
                         </div>
                         
                         {alert.link && (
