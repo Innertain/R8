@@ -302,41 +302,101 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                     )}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-                    {Object.entries(statesWithAlerts)
-                      .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
-                      .map(([stateCode, stateAlerts]) => {
-                      const state = US_STATES[stateCode as keyof typeof US_STATES];
-                      const maxSeverity = stateAlerts.reduce((max, alert) => {
-                        const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
-                        const alertLevel = severityOrder[alert.severity.toLowerCase() as keyof typeof severityOrder] || 0;
-                        const maxLevel = severityOrder[max.toLowerCase() as keyof typeof severityOrder] || 0;
-                        return alertLevel > maxLevel ? alert.severity : max;
-                      }, 'minor');
+                  <>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {Object.entries(statesWithAlerts)
+                        .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
+                        .map(([stateCode, stateAlerts]) => {
+                        const state = US_STATES[stateCode as keyof typeof US_STATES];
+                        const maxSeverity = stateAlerts.reduce((max, alert) => {
+                          const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
+                          const alertLevel = severityOrder[alert.severity.toLowerCase() as keyof typeof severityOrder] || 0;
+                          const maxLevel = severityOrder[max.toLowerCase() as keyof typeof severityOrder] || 0;
+                          return alertLevel > maxLevel ? alert.severity : max;
+                        }, 'minor');
 
-                      return (
-                        <div
-                          key={stateCode}
-                          className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
-                            selectedState === stateCode 
-                              ? 'ring-4 ring-blue-500 shadow-lg scale-105' 
-                              : ''
-                          } ${getSeverityColor(maxSeverity)}`}
-                          onClick={() => {
-                            setSelectedState(selectedState === stateCode ? 'all' : stateCode);
-                          }}
-                        >
-                          <div className="text-center">
-                            <div className="font-bold text-lg">{stateCode}</div>
-                            <div className="text-xs opacity-90">{state?.name}</div>
-                            <div className="text-xs font-semibold mt-1">
-                              {stateAlerts.length} alert{stateAlerts.length !== 1 ? 's' : ''}
+                        return (
+                          <div
+                            key={stateCode}
+                            className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
+                              selectedState === stateCode 
+                                ? 'ring-4 ring-blue-500 shadow-lg scale-105' 
+                                : ''
+                            } ${getSeverityColor(maxSeverity)}`}
+                            onClick={() => {
+                              setSelectedState(selectedState === stateCode ? 'all' : stateCode);
+                            }}
+                          >
+                            <div className="text-center">
+                              <div className="font-bold text-lg">{stateCode}</div>
+                              <div className="text-xs opacity-90">{state?.name}</div>
+                              <div className="text-xs font-semibold mt-1">
+                                {stateAlerts.length} alert{stateAlerts.length !== 1 ? 's' : ''}
+                              </div>
                             </div>
                           </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Show detailed alerts when a specific state is selected */}
+                    {selectedState !== 'all' && activeAlerts.length > 0 && (
+                      <div className="mt-6 space-y-4">
+                        <h4 className="text-lg font-semibold text-gray-900">
+                          Active Alerts in {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
+                        </h4>
+                        <div className="grid gap-4 max-h-96 overflow-y-auto">
+                          {activeAlerts.map((alert: WeatherAlert) => (
+                            <Card key={alert.id} className="hover:shadow-md transition-shadow">
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <h5 className="font-semibold text-gray-900 text-sm">{alert.title}</h5>
+                                      <Badge className={getSeverityColor(alert.severity)}>
+                                        {alert.severity}
+                                      </Badge>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
+                                      <div className="flex items-center gap-1">
+                                        <MapPin className="w-3 h-3" />
+                                        <span>{alert.location}</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <Clock className="w-3 h-3" />
+                                        <span>{alert.sent ? new Date(alert.sent).toLocaleString() : 'Current Alert'}</span>
+                                      </div>
+                                    </div>
+                                    
+                                    <p className="text-sm text-gray-700 mb-3 line-clamp-3">
+                                      {alert.description}
+                                    </p>
+                                    
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xs text-gray-500">
+                                        {alert.senderName} • {alert.event}
+                                      </span>
+                                      {alert.web && (
+                                        <a
+                                          href={alert.web}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                                        >
+                                          View Details <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -382,57 +442,94 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
               {activeAlerts.length === 0 ? (
                 <div className="text-center py-8">
                   <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-600">No active alerts matching your filters</p>
-                  <p className="text-sm text-gray-500 mt-1">Try adjusting your search criteria</p>
+                  <p className="text-gray-600">
+                    {selectedState === 'all' 
+                      ? 'No active alerts matching your filters' 
+                      : `No active alerts in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}`
+                    }
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {selectedState === 'all' 
+                      ? 'Try adjusting your search criteria' 
+                      : 'This state currently has no active weather warnings or watches'
+                    }
+                  </p>
+                  {selectedState !== 'all' && (
+                    <button 
+                      onClick={() => setSelectedState('all')}
+                      className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
+                    >
+                      View all states
+                    </button>
+                  )}
                 </div>
               ) : (
-                activeAlerts.map((alert: WeatherAlert) => (
-                  <Card key={alert.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold text-gray-900">{alert.title}</h3>
-                            <Badge className={getSeverityColor(alert.severity)}>
-                              {alert.severity}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
-                            <div className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              <span>{alert.location}</span>
+                <>
+                  {selectedState !== 'all' && (
+                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h3 className="font-semibold text-blue-900 mb-1">
+                        Showing {activeAlerts.length} alert{activeAlerts.length !== 1 ? 's' : ''} for {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
+                      </h3>
+                      <p className="text-sm text-blue-700">
+                        Active weather warnings and watches only • Updates every 5 minutes
+                      </p>
+                    </div>
+                  )}
+                  
+                  {activeAlerts.map((alert: WeatherAlert) => (
+                    <Card key={alert.id} className="hover:shadow-md transition-shadow border-l-4 border-l-orange-500">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold text-gray-900">{alert.title}</h3>
+                              <Badge className={getSeverityColor(alert.severity)}>
+                                {alert.severity}
+                              </Badge>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" />
-                              <span>{new Date(alert.sent).toLocaleString()}</span>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
+                              <div className="flex items-center gap-1">
+                                <MapPin className="w-4 h-4" />
+                                <span className="font-medium">{alert.location}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" />
+                                <span>{alert.sent ? new Date(alert.sent).toLocaleString() : 'Current Alert'}</span>
+                              </div>
                             </div>
-                          </div>
-                          
-                          <p className="text-sm text-gray-700 mb-3 line-clamp-3">
-                            {alert.description}
-                          </p>
-                          
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">
-                              {alert.senderName} • {alert.event}
-                            </span>
-                            {alert.web && (
-                              <a
-                                href={alert.web}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                              >
-                                View Details <ExternalLink className="w-3 h-3" />
-                              </a>
-                            )}
+                            
+                            <div className="mb-3">
+                              <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
+                                {alert.event || alert.alertType || 'Weather Alert'}
+                              </span>
+                            </div>
+                            
+                            <p className="text-sm text-gray-700 mb-3 leading-relaxed">
+                              {alert.description}
+                            </p>
+                            
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+                              <span className="text-xs text-gray-500">
+                                Source: {alert.senderName}
+                              </span>
+                              {alert.web && (
+                                <a
+                                  href={alert.web}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
+                                >
+                                  View Full Alert <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
+                      </CardContent>
+                    </Card>
+                  ))}
+                </>
               )}
             </div>
           )}
