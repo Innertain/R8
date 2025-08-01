@@ -1530,9 +1530,49 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       const incidents = itemMatches.map((itemXml, index) => {
         const item = parseXMLItem(itemXml);
         
-        // Extract state and location from title/description
-        const stateMatch = item.title.match(/\b([A-Z]{2})\b/) || item.description.match(/\b([A-Z]{2})\b/);
-        const state = stateMatch ? stateMatch[1] : '';
+        // Valid US state codes
+        const validStates = new Set([
+          'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+          'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+          'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+          'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+          'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+        ]);
+
+        // Extract state from title/description - only match valid state codes
+        let state = '';
+        const titleStateMatches = item.title.match(/\b([A-Z]{2})\b/g) || [];
+        const descStateMatches = item.description.match(/\b([A-Z]{2})\b/g) || [];
+        
+        // Find first valid state code
+        for (const match of [...titleStateMatches, ...descStateMatches]) {
+          if (validStates.has(match)) {
+            state = match;
+            break;
+          }
+        }
+        
+        // Also try to extract from location patterns like "State: CA" or "California"
+        if (!state) {
+          const stateNamePattern = /(?:State:|Location:|in )(Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)/i;
+          const stateNameMatch = item.title.match(stateNamePattern) || item.description.match(stateNamePattern);
+          
+          if (stateNameMatch) {
+            const stateNameMap: { [key: string]: string } = {
+              'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA',
+              'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE', 'florida': 'FL', 'georgia': 'GA',
+              'hawaii': 'HI', 'idaho': 'ID', 'illinois': 'IL', 'indiana': 'IN', 'iowa': 'IA',
+              'kansas': 'KS', 'kentucky': 'KY', 'louisiana': 'LA', 'maine': 'ME', 'maryland': 'MD',
+              'massachusetts': 'MA', 'michigan': 'MI', 'minnesota': 'MN', 'mississippi': 'MS', 'missouri': 'MO',
+              'montana': 'MT', 'nebraska': 'NE', 'nevada': 'NV', 'new hampshire': 'NH', 'new jersey': 'NJ',
+              'new mexico': 'NM', 'new york': 'NY', 'north carolina': 'NC', 'north dakota': 'ND', 'ohio': 'OH',
+              'oklahoma': 'OK', 'oregon': 'OR', 'pennsylvania': 'PA', 'rhode island': 'RI', 'south carolina': 'SC',
+              'south dakota': 'SD', 'tennessee': 'TN', 'texas': 'TX', 'utah': 'UT', 'vermont': 'VT',
+              'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV', 'wisconsin': 'WI', 'wyoming': 'WY'
+            };
+            state = stateNameMap[stateNameMatch[1].toLowerCase()] || '';
+          }
+        }
         
         // Extract fire size if available
         const sizeMatch = item.description.match(/(\d+(?:,\d+)*)\s*acres/i);

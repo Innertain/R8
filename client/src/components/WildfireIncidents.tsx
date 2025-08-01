@@ -142,9 +142,24 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
     );
   }
 
-  // Group incidents by state for summary stats
+  // Valid US state codes to filter out invalid data
+  const validStates = new Set([
+    'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+    'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+    'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+    'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+    'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+  ]);
+
+  // Group incidents by state for summary stats - only include valid states
   const incidentsByState = filteredIncidents.reduce((acc: Record<string, WildfireIncident[]>, incident: WildfireIncident) => {
-    const state = incident.state || 'Unknown';
+    let state = incident.state;
+    
+    // Skip if no state or invalid state code
+    if (!state || !validStates.has(state)) {
+      return acc;
+    }
+    
     if (!acc[state]) acc[state] = [];
     acc[state].push(incident);
     return acc;
