@@ -195,38 +195,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                   </span>
                 )}
               </p>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <h4 className="text-sm font-semibold text-red-800 flex items-center gap-2 mb-2">
-                  <InfoIcon className="w-4 h-4" />
-                  Critical Data Limitation - READ THIS FIRST
-                </h4>
-                <div className="text-xs text-red-700 space-y-2">
-                  <p><strong>This is NOT complete historical data!</strong></p>
-                  <div className="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                      <p className="font-medium mb-1">What we have:</p>
-                      <ul className="space-y-0.5">
-                        <li>• 164 declarations total</li>
-                        <li>• Dec 2021 - July 2025 only</li>
-                        <li>• Heavy focus on 2024-2025</li>
-                        <li>• Mostly recent wildfire events</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-medium mb-1">What we're missing:</p>
-                      <ul className="space-y-0.5">
-                        <li>• 1953-2021 historical data</li>
-                        <li>• Major CA earthquakes</li>
-                        <li>• Hurricane seasons</li>
-                        <li>• Thousands of declarations</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <p className="font-medium">
-                    <strong>California historically has the most disasters</strong> - it only ranks #3 here because we're missing decades of data.
-                  </p>
-                </div>
-              </div>
+
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
                 <h4 className="text-sm font-semibold text-green-800 flex items-center gap-2 mb-2">
                   <InfoIcon className="w-4 h-4" />
