@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, MapPin, Clock, ExternalLink, RefreshCw, Filter, Zap, Info as InfoIcon } from 'lucide-react';
+import { AlertTriangle, MapPin, Clock, ExternalLink, RefreshCw, Zap, Info as InfoIcon } from 'lucide-react';
 import { RealtimeApiDebugger } from './RealtimeApiDebugger';
 
 interface WeatherAlert {
@@ -34,59 +34,80 @@ const US_STATES = {
   'CO': { name: 'Colorado', coords: [39.2647, -105.6805] },
   'CT': { name: 'Connecticut', coords: [41.6032, -73.0877] },
   'DE': { name: 'Delaware', coords: [38.9896, -75.5050] },
-  'FL': { name: 'Florida', coords: [27.9944, -81.7603] },
-  'GA': { name: 'Georgia', coords: [32.3293, -83.1137] },
-  'HI': { name: 'Hawaii', coords: [19.8987, -155.6659] },
-  'ID': { name: 'Idaho', coords: [44.3509, -114.6130] },
-  'IL': { name: 'Illinois', coords: [40.0417, -89.1965] },
-  'IN': { name: 'Indiana', coords: [39.7662, -86.4755] },
-  'IA': { name: 'Iowa', coords: [42.0046, -93.3917] },
-  'KS': { name: 'Kansas', coords: [38.4937, -98.3804] },
-  'KY': { name: 'Kentucky', coords: [37.5726, -85.1551] },
-  'LA': { name: 'Louisiana', coords: [31.0689, -91.9968] },
-  'ME': { name: 'Maine', coords: [45.3695, -68.2721] },
-  'MD': { name: 'Maryland', coords: [39.5162, -76.9382] },
-  'MA': { name: 'Massachusetts', coords: [42.2596, -71.8083] },
-  'MI': { name: 'Michigan', coords: [44.8441, -85.7621] },
-  'MN': { name: 'Minnesota', coords: [46.2807, -94.3053] },
-  'MS': { name: 'Mississippi', coords: [32.6873, -89.6010] },
-  'MO': { name: 'Missouri', coords: [38.3566, -92.4580] },
-  'MT': { name: 'Montana', coords: [47.0527, -109.6333] },
-  'NE': { name: 'Nebraska', coords: [41.5378, -99.7951] },
-  'NV': { name: 'Nevada', coords: [39.3289, -116.6312] },
-  'NH': { name: 'New Hampshire', coords: [43.6805, -71.5811] },
-  'NJ': { name: 'New Jersey', coords: [40.1907, -74.7068] },
-  'NM': { name: 'New Mexico', coords: [34.4071, -106.1126] },
-  'NY': { name: 'New York', coords: [42.9538, -75.5268] },
-  'NC': { name: 'North Carolina', coords: [35.5557, -79.3877] },
-  'ND': { name: 'North Dakota', coords: [47.4501, -100.4659] },
-  'OH': { name: 'Ohio', coords: [40.2862, -82.7937] },
-  'OK': { name: 'Oklahoma', coords: [35.5889, -97.4943] },
-  'OR': { name: 'Oregon', coords: [44.0581, -120.7044] },
-  'PA': { name: 'Pennsylvania', coords: [40.8781, -77.7996] },
-  'RI': { name: 'Rhode Island', coords: [41.5801, -71.4774] },
-  'SC': { name: 'South Carolina', coords: [33.9169, -80.8964] },
-  'SD': { name: 'South Dakota', coords: [44.4443, -100.2263] },
-  'TN': { name: 'Tennessee', coords: [35.8580, -86.3505] },
-  'TX': { name: 'Texas', coords: [31.8160, -99.5120] },
+  'FL': { name: 'Florida', coords: [27.7663, -81.6868] },
+  'GA': { name: 'Georgia', coords: [32.1656, -82.9001] },
+  'HI': { name: 'Hawaii', coords: [19.8968, -155.5828] },
+  'ID': { name: 'Idaho', coords: [44.0682, -114.7420] },
+  'IL': { name: 'Illinois', coords: [40.0495, -89.4001] },
+  'IN': { name: 'Indiana', coords: [40.2732, -86.1349] },
+  'IA': { name: 'Iowa', coords: [41.8780, -93.0977] },
+  'KS': { name: 'Kansas', coords: [38.5111, -96.8005] },
+  'KY': { name: 'Kentucky', coords: [37.8393, -84.2700] },
+  'LA': { name: 'Louisiana', coords: [31.1801, -91.8749] },
+  'ME': { name: 'Maine', coords: [45.3695, -69.2187] },
+  'MD': { name: 'Maryland', coords: [39.0458, -76.6413] },
+  'MA': { name: 'Massachusetts', coords: [42.4072, -71.3824] },
+  'MI': { name: 'Michigan', coords: [44.3467, -85.4102] },
+  'MN': { name: 'Minnesota', coords: [46.7296, -94.6859] },
+  'MS': { name: 'Mississippi', coords: [32.3547, -89.3985] },
+  'MO': { name: 'Missouri', coords: [37.9643, -91.8318] },
+  'MT': { name: 'Montana', coords: [47.0527, -110.2148] },
+  'NE': { name: 'Nebraska', coords: [41.4925, -99.9018] },
+  'NV': { name: 'Nevada', coords: [38.8026, -116.4194] },
+  'NH': { name: 'New Hampshire', coords: [43.1939, -71.5724] },
+  'NJ': { name: 'New Jersey', coords: [40.0583, -74.4057] },
+  'NM': { name: 'New Mexico', coords: [34.8405, -106.2485] },
+  'NY': { name: 'New York', coords: [42.1657, -74.9481] },
+  'NC': { name: 'North Carolina', coords: [35.6301, -79.8064] },
+  'ND': { name: 'North Dakota', coords: [47.5515, -101.0020] },
+  'OH': { name: 'Ohio', coords: [40.3888, -82.7649] },
+  'OK': { name: 'Oklahoma', coords: [35.0078, -97.0929] },
+  'OR': { name: 'Oregon', coords: [44.9319, -119.5681] },
+  'PA': { name: 'Pennsylvania', coords: [40.9699, -77.7278] },
+  'RI': { name: 'Rhode Island', coords: [41.6772, -71.5101] },
+  'SC': { name: 'South Carolina', coords: [33.8191, -80.9066] },
+  'SD': { name: 'South Dakota', coords: [44.2853, -99.4632] },
+  'TN': { name: 'Tennessee', coords: [35.7449, -86.7489] },
+  'TX': { name: 'Texas', coords: [31.9686, -99.9018] },
   'UT': { name: 'Utah', coords: [39.3210, -111.0937] },
-  'VT': { name: 'Vermont', coords: [44.5590, -72.5806] },
-  'VA': { name: 'Virginia', coords: [37.5215, -78.8537] },
-  'WA': { name: 'Washington', coords: [47.3826, -120.4472] },
-  'WV': { name: 'West Virginia', coords: [38.6409, -80.6227] },
-  'WI': { name: 'Wisconsin', coords: [44.6243, -89.9941] },
-  'WY': { name: 'Wyoming', coords: [42.9957, -107.5512] }
+  'VT': { name: 'Vermont', coords: [44.0582, -72.5806] },
+  'VA': { name: 'Virginia', coords: [37.7693, -78.2057] },
+  'WA': { name: 'Washington', coords: [47.3917, -121.5708] },
+  'WV': { name: 'West Virginia', coords: [38.4680, -80.9696] },
+  'WI': { name: 'Wisconsin', coords: [44.2619, -89.6165] },
+  'WY': { name: 'Wyoming', coords: [42.7475, -107.2085] },
+  'DC': { name: 'District of Columbia', coords: [38.8974, -77.0365] },
+  'PR': { name: 'Puerto Rico', coords: [18.2208, -66.5901] },
+  'VI': { name: 'U.S. Virgin Islands', coords: [18.0001, -64.8199] },
+  'GU': { name: 'Guam', coords: [13.4443, 144.7937] },
+  'AS': { name: 'American Samoa', coords: [-14.2710, -170.1322] },
+  'MP': { name: 'Northern Mariana Islands', coords: [17.3308, 145.3846] }
+};
+
+// Helper function to determine severity color styling
+const getSeverityColor = (severity: string) => {
+  switch (severity?.toLowerCase()) {
+    case 'extreme':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'severe':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'moderate':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'minor':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
 };
 
 interface InteractiveWeatherMapProps {
   stateFilter?: string;
-  onStateFilterChange?: (stateCode: string) => void;
+  onStateFilterChange?: (state: string) => void;
 }
 
 export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: InteractiveWeatherMapProps) {
   const [selectedState, setSelectedState] = useState<string>(stateFilter || 'all');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
 
   // Function to handle state selection and notify parent
   const handleStateClick = (stateCode: string) => {
@@ -96,116 +117,87 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
     }
   };
 
-  const { data: alertsData, isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/weather-alerts-rss'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
+  // Update local state when prop changes
+  useEffect(() => {
+    if (stateFilter !== undefined) {
+      setSelectedState(stateFilter);
+    }
+  }, [stateFilter]);
+
+  const { data: response, refetch, isLoading, error } = useQuery({
+    queryKey: ['/api/weather-alerts'],
+    refetchInterval: 300000, // 5 minutes
   });
 
-  const alerts = alertsData?.alerts || [];
-  
-  // Filter alerts based on selected state and severity
-  const activeAlerts = alerts.filter((alert: WeatherAlert) => {
-    // State filtering
-    let matchesState = selectedState === 'all';
-    if (!matchesState) {
-      const stateName = US_STATES[selectedState as keyof typeof US_STATES]?.name;
-      const locationText = alert.location.toLowerCase();
-      const selectedStateUpper = selectedState.toUpperCase();
-      const selectedStateLower = selectedState.toLowerCase();
-      
-      // More precise state matching - look for state code in various formats
-      const statePatterns = [
-        new RegExp(`\\b${selectedStateUpper}\\b`), // Exact state code (e.g., "NC")
-        new RegExp(`\\b${selectedStateLower}\\b`), // Lowercase state code
-        new RegExp(`\\(${selectedStateUpper}\\)`), // State code in parentheses (e.g., "(NC)")
-        new RegExp(`\\b${stateName?.toLowerCase()}\\b`), // Full state name
-      ].filter(Boolean);
-      
-      matchesState = statePatterns.some(pattern => pattern.test(alert.location));
-    }
-    
-    // Severity filtering
-    let matchesSeverity = severityFilter === 'all';
-    if (!matchesSeverity) {
-      const alertSeverity = (alert.severity || '').toLowerCase().trim();
-      const filterSeverity = severityFilter.toLowerCase().trim();
-      matchesSeverity = alertSeverity === filterSeverity;
-    }
-    
-    return matchesState && matchesSeverity;
-  });
+  const alerts = response?.alerts || [];
 
-  // Extract states with active alerts for the map visualization using same logic as activeAlerts
+  // Group alerts by state
   const statesWithAlerts = alerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
-    // Check all state codes to see which ones match this alert using the same logic as activeAlerts
-    Object.keys(US_STATES).forEach(stateCode => {
-      const stateName = US_STATES[stateCode as keyof typeof US_STATES]?.name;
-      const statePatterns = [
-        new RegExp(`\\b${stateCode.toUpperCase()}\\b`), // Exact state code (e.g., "WA")
-        new RegExp(`\\b${stateCode.toLowerCase()}\\b`), // Lowercase state code
-        new RegExp(`\\(${stateCode.toUpperCase()}\\)`), // State code in parentheses (e.g., "(WA)")
-        new RegExp(`\\b${stateName?.toLowerCase()}\\b`), // Full state name
-      ].filter(Boolean);
-      
-      const matchesState = statePatterns.some(pattern => pattern.test(alert.location));
-      
-      if (matchesState) {
-        if (!acc[stateCode]) acc[stateCode] = [];
-        acc[stateCode].push(alert);
-      }
-    });
+    // Extract state from location
+    const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
+    const state = stateMatch ? stateMatch[1] : null;
+    
+    if (state && US_STATES[state as keyof typeof US_STATES]) {
+      if (!acc[state]) acc[state] = [];
+      acc[state].push(alert);
+    }
     return acc;
   }, {});
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity.toLowerCase()) {
-      case 'extreme': return 'bg-red-600 border-red-700 text-white';
-      case 'severe': return 'bg-orange-500 border-orange-600 text-white';
-      case 'moderate': return 'bg-yellow-400 border-yellow-500 text-black';
-      case 'minor': return 'bg-blue-400 border-blue-500 text-white';
-      default: return 'bg-gray-400 border-gray-500 text-white';
+  // Filter alerts based on selected state and severity
+  const filteredAlerts = alerts.filter((alert: WeatherAlert) => {
+    // State filter
+    if (selectedState !== 'all') {
+      const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
+      const alertState = stateMatch ? stateMatch[1] : null;
+      if (alertState !== selectedState) return false;
     }
-  };
+
+    // Severity filter
+    if (severityFilter !== 'all') {
+      if (alert.severity?.toLowerCase() !== severityFilter.toLowerCase()) return false;
+    }
+
+    return true;
+  });
+
+  const activeAlerts = filteredAlerts;
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Zap className="w-5 h-5 animate-pulse" />
-            Loading Active Weather Alerts...
+            <Zap className="w-5 h-5 text-yellow-500" />
+            Weather Alerts Map
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse space-y-4">
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="grid grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-gray-200 rounded"></div>
-              ))}
-            </div>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="text-gray-600 mt-4">Loading weather alerts...</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  if (error || !alertsData?.success) {
+  if (error) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
-            Weather Alerts Unavailable
+            <Zap className="w-5 h-5 text-yellow-500" />
+            Weather Alerts Map
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6">
-            <p className="text-gray-600 mb-4">Unable to load current weather alerts</p>
-            <Button onClick={() => refetch()} variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Retry Loading
+          <div className="text-center py-8">
+            <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+            <p className="text-gray-600">Unable to load weather alerts</p>
+            <p className="text-sm text-gray-500 mt-1">Please check your internet connection and try again</p>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              Try Again
             </Button>
           </div>
         </CardContent>
@@ -217,29 +209,19 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-orange-600" />
-                Active Weather Warnings & Watches
-                {selectedState !== 'all' && (
-                  <Badge variant="outline" className="ml-2">
-                    {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
-                  </Badge>
-                )}
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <CardTitle className="flex items-center gap-2 mb-2">
+                <Zap className="w-5 h-5 text-yellow-500" />
+                Interactive Weather Alerts Map
               </CardTitle>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="text-sm text-gray-600">
-                  {activeAlerts.length} active alert{activeAlerts.length !== 1 ? 's' : ''} 
-                  {selectedState !== 'all' 
-                    ? ` in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}` 
-                    : ' from NWS Multi-Feed System'
-                  }
-                  {severityFilter !== 'all' && ` (${severityFilter} severity only)`}
+                  Real-time monitoring of weather warnings and watches across the United States
                   {(selectedState !== 'all' || severityFilter !== 'all') && (
                     <button 
                       onClick={() => {
-                        handleStateClick('all');
+                        setSelectedState('all');
                         setSeverityFilter('all');
                       }}
                       className="ml-2 text-blue-600 hover:text-blue-800 text-xs underline"
@@ -262,22 +244,6 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
               </div>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant={viewMode === 'map' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('map')}
-              >
-                <MapPin className="w-4 h-4 mr-1" />
-                Map View
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                <Filter className="w-4 h-4 mr-1" />
-                List View
-              </Button>
               <Button onClick={() => refetch()} variant="outline" size="sm">
                 <RefreshCw className="w-4 h-4" />
               </Button>
@@ -316,208 +282,44 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Severities ({alerts.length})</SelectItem>
-                <SelectItem value="extreme">Extreme ({alerts.filter(a => a.severity.toLowerCase() === 'extreme').length})</SelectItem>
-                <SelectItem value="severe">Severe ({alerts.filter(a => a.severity.toLowerCase() === 'severe').length})</SelectItem>
-                <SelectItem value="moderate">Moderate ({alerts.filter(a => a.severity.toLowerCase() === 'moderate').length})</SelectItem>
-                <SelectItem value="minor">Minor ({alerts.filter(a => a.severity.toLowerCase() === 'minor').length})</SelectItem>
+                <SelectItem value="extreme">Extreme ({alerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'extreme').length})</SelectItem>
+                <SelectItem value="severe">Severe ({alerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'severe').length})</SelectItem>
+                <SelectItem value="moderate">Moderate ({alerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'moderate').length})</SelectItem>
+                <SelectItem value="minor">Minor ({alerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'minor').length})</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {viewMode === 'map' ? (
-            <div className="space-y-6">
-              {/* Interactive Map Representation */}
-              <div className="bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-6 border">
-                <h3 className="text-lg font-semibold mb-4 text-center">
-                  United States Weather Alert Map
-                  {selectedState !== 'all' && (
-                    <span className="block text-sm font-normal text-gray-600 mt-1">
-                      Filtered for: {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
-                    </span>
-                  )}
-                </h3>
-                
-                {Object.keys(statesWithAlerts).length === 0 ? (
-                  <div className="text-center py-8">
-                    <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-600">
-                      {selectedState === 'all' 
-                        ? 'No active weather warnings or watches' 
-                        : `No active alerts in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}`
-                      }
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {selectedState === 'all' 
-                        ? 'All clear across monitored regions' 
-                        : 'This state currently has no active weather warnings or watches'
-                      }
-                    </p>
-                    {selectedState !== 'all' && (
-                      <button 
-                        onClick={() => handleStateClick('all')}
-                        className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
-                      >
-                        View all states
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-                      {Object.entries(statesWithAlerts)
-                        .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
-                        .map(([stateCode, stateAlerts]) => {
-                        const state = US_STATES[stateCode as keyof typeof US_STATES];
-                        const maxSeverity = stateAlerts.reduce((max, alert) => {
-                          const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
-                          const alertLevel = severityOrder[alert.severity.toLowerCase() as keyof typeof severityOrder] || 0;
-                          const maxLevel = severityOrder[max.toLowerCase() as keyof typeof severityOrder] || 0;
-                          return alertLevel > maxLevel ? alert.severity : max;
-                        }, 'minor');
-
-                        return (
-                          <div
-                            key={stateCode}
-                            className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
-                              selectedState === stateCode 
-                                ? 'ring-4 ring-blue-500 shadow-lg scale-105' 
-                                : ''
-                            } ${getSeverityColor(maxSeverity)}`}
-                            onClick={() => {
-                              const newState = selectedState === stateCode ? 'all' : stateCode;
-                              handleStateClick(newState);
-                            }}
-                          >
-                            <div className="text-center">
-                              <div className="font-bold text-lg">{stateCode}</div>
-                              <div className="text-xs opacity-90">{state?.name}</div>
-                              <div className="text-xs font-semibold mt-1">
-                                {stateAlerts.length} alert{stateAlerts.length !== 1 ? 's' : ''}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Show detailed alerts when a specific state is selected */}
-                    {selectedState !== 'all' && activeAlerts.length > 0 && (
-                      <div className="mt-6 space-y-4">
-                        <h4 className="text-lg font-semibold text-gray-900">
-                          Active Alerts in {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
-                        </h4>
-                        <div className="grid gap-4 max-h-96 overflow-y-auto">
-                          {activeAlerts.map((alert: WeatherAlert) => (
-                            <Card key={alert.id} className="hover:shadow-md transition-shadow">
-                              <CardContent className="p-4">
-                                <div className="flex items-start justify-between gap-4">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <h5 className="font-semibold text-gray-900 text-sm">{alert.title}</h5>
-                                      <Badge className={getSeverityColor(alert.severity)}>
-                                        {alert.severity}
-                                      </Badge>
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
-                                      <div className="flex items-center gap-1">
-                                        <MapPin className="w-3 h-3" />
-                                        <span>{alert.location}</span>
-                                      </div>
-                                      <div className="flex items-center gap-1">
-                                        <Clock className="w-3 h-3" />
-                                        <span>{alert.sent ? new Date(alert.sent).toLocaleString() : 'Current Alert'}</span>
-                                      </div>
-                                    </div>
-                                    
-                                    <p className="text-sm text-gray-700 mb-3 line-clamp-3">
-                                      {alert.description}
-                                    </p>
-                                    
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xs text-gray-500">
-                                        {alert.senderName} • {alert.event}
-                                      </span>
-                                      {alert.web && (
-                                        <a
-                                          href={alert.web}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                                        >
-                                          View Details <ExternalLink className="w-3 h-3" />
-                                        </a>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
+          <div className="space-y-6">
+            {/* Interactive Map Representation */}
+            <div className="bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-6 border">
+              <h3 className="text-lg font-semibold mb-4 text-center">
+                United States Weather Alert Map
+                {selectedState !== 'all' && (
+                  <span className="block text-sm font-normal text-gray-600 mt-1">
+                    Filtered for: {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
+                  </span>
                 )}
-              </div>
-
-              {/* Summary Statistics */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-red-600">
-                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'extreme').length}
-                    </div>
-                    <div className="text-sm text-gray-600">Extreme</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-orange-600">
-                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'severe').length}
-                    </div>
-                    <div className="text-sm text-gray-600">Severe</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-yellow-600">
-                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'moderate').length}
-                    </div>
-                    <div className="text-sm text-gray-600">Moderate</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {activeAlerts.filter(a => a.severity.toLowerCase() === 'minor').length}
-                    </div>
-                    <div className="text-sm text-gray-600">Minor</div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          ) : (
-            /* List View */
-            <div className="space-y-4 max-h-[600px] overflow-y-auto">
-              {activeAlerts.length === 0 ? (
+              </h3>
+              
+              {Object.keys(statesWithAlerts).length === 0 ? (
                 <div className="text-center py-8">
-                  <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                   <p className="text-gray-600">
                     {selectedState === 'all' 
-                      ? 'No active alerts matching your filters' 
+                      ? 'No active weather warnings or watches' 
                       : `No active alerts in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}`
                     }
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
                     {selectedState === 'all' 
-                      ? 'Try adjusting your search criteria' 
+                      ? 'All clear across monitored regions' 
                       : 'This state currently has no active weather warnings or watches'
                     }
                   </p>
                   {selectedState !== 'all' && (
                     <button 
-                      onClick={() => setSelectedState('all')}
+                      onClick={() => handleStateClick('all')}
                       className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
                     >
                       View all states
@@ -526,74 +328,140 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                 </div>
               ) : (
                 <>
-                  {selectedState !== 'all' && (
-                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h3 className="font-semibold text-blue-900 mb-1">
-                        Showing {activeAlerts.length} alert{activeAlerts.length !== 1 ? 's' : ''} for {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
-                      </h3>
-                      <p className="text-sm text-blue-700">
-                        Active weather warnings and watches only • Updates every 5 minutes
-                      </p>
-                    </div>
-                  )}
-                  
-                  {activeAlerts.map((alert: WeatherAlert) => (
-                    <Card key={alert.id} className="hover:shadow-md transition-shadow border-l-4 border-l-orange-500">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-gray-900">{alert.title}</h3>
-                              <Badge className={getSeverityColor(alert.severity)}>
-                                {alert.severity}
-                              </Badge>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
-                              <div className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" />
-                                <span className="font-medium">{alert.location}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                <span>{alert.sent ? new Date(alert.sent).toLocaleString() : 'Current Alert'}</span>
-                              </div>
-                            </div>
-                            
-                            <div className="mb-3">
-                              <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
-                                {alert.event || alert.alertType || 'Weather Alert'}
-                              </span>
-                            </div>
-                            
-                            <p className="text-sm text-gray-700 mb-3 leading-relaxed">
-                              {alert.description}
-                            </p>
-                            
-                            <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                              <span className="text-xs text-gray-500">
-                                Source: {alert.senderName}
-                              </span>
-                              {alert.web && (
-                                <a
-                                  href={alert.web}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
-                                >
-                                  View Full Alert <ExternalLink className="w-3 h-3" />
-                                </a>
-                              )}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {Object.entries(statesWithAlerts)
+                      .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
+                      .map(([stateCode, stateAlerts]) => {
+                      const state = US_STATES[stateCode as keyof typeof US_STATES];
+                      const maxSeverity = stateAlerts.reduce((max, alert) => {
+                        const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
+                        const alertLevel = severityOrder[alert.severity.toLowerCase() as keyof typeof severityOrder] || 0;
+                        const maxLevel = severityOrder[max.toLowerCase() as keyof typeof severityOrder] || 0;
+                        return alertLevel > maxLevel ? alert.severity : max;
+                      }, 'minor');
+
+                      return (
+                        <div
+                          key={stateCode}
+                          className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
+                            selectedState === stateCode 
+                              ? 'ring-4 ring-blue-500 shadow-lg scale-105' 
+                              : ''
+                          } ${getSeverityColor(maxSeverity)}`}
+                          onClick={() => {
+                            const newState = selectedState === stateCode ? 'all' : stateCode;
+                            handleStateClick(newState);
+                          }}
+                        >
+                          <div className="text-center">
+                            <div className="font-bold text-lg">{stateCode}</div>
+                            <div className="text-xs opacity-90">{state?.name}</div>
+                            <div className="text-xs font-semibold mt-1">
+                              {stateAlerts.length} alert{stateAlerts.length !== 1 ? 's' : ''}
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                      );
+                    })}
+                  </div>
+
+                  {/* Show detailed alerts when a specific state is selected */}
+                  {selectedState !== 'all' && activeAlerts.length > 0 && (
+                    <div className="mt-6 space-y-4">
+                      <h4 className="text-lg font-semibold text-gray-900">
+                        Active Alerts in {US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}
+                      </h4>
+                      <div className="grid gap-4 max-h-96 overflow-y-auto">
+                        {activeAlerts.map((alert: WeatherAlert) => (
+                          <Card key={alert.id} className="hover:shadow-md transition-shadow">
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h5 className="font-semibold text-gray-900 text-sm">{alert.title}</h5>
+                                    <Badge className={getSeverityColor(alert.severity)}>
+                                      {alert.severity}
+                                    </Badge>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="w-3 h-3" />
+                                      <span>{alert.location}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="w-3 h-3" />
+                                      <span>{alert.sent ? new Date(alert.sent).toLocaleString() : 'Current Alert'}</span>
+                                    </div>
+                                  </div>
+                                  
+                                  <p className="text-sm text-gray-700 mb-3 line-clamp-3">
+                                    {alert.description}
+                                  </p>
+                                  
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-gray-500">
+                                      {alert.senderName} • {alert.event}
+                                    </span>
+                                    {alert.web && (
+                                      <a
+                                        href={alert.web}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
+                                      >
+                                        View Full Alert <ExternalLink className="w-3 h-3" />
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
+
+              {/* Summary Statistics */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-6">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-red-600">
+                      {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'extreme').length}
+                    </div>
+                    <div className="text-sm text-gray-600">Extreme</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'severe').length}
+                    </div>
+                    <div className="text-sm text-gray-600">Severe</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'moderate').length}
+                    </div>
+                    <div className="text-sm text-gray-600">Moderate</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'minor').length}
+                    </div>
+                    <div className="text-sm text-gray-600">Minor</div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
       
