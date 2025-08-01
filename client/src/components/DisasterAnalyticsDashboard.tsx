@@ -10,7 +10,7 @@ import { CompactTimeline } from "./CompactTimeline";
 import { FemaDataInsights } from "./FemaDataInsights";
 import { DataEnhancementRecommendations } from "./DataEnhancementRecommendations";
 import { NasaEonetEvents } from "./NasaEonetEvents";
-import { NoaaStormEvents } from "./NoaaStormEvents";
+
 
 interface FemaDisasterItem {
   guid: string;
@@ -433,8 +433,8 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
           {/* NASA EONET Natural Events - Phase 1 Implementation */}
           <NasaEonetEvents />
 
-          {/* NOAA Storm Events Database - Phase 2 Implementation */}
-          <NoaaStormEvents />
+
+
 
           {/* FEMA Data Insights */}
           <FemaDataInsights />
