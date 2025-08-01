@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, ArrowLeft, Layers, Globe, CloudRain, Flame, Zap, BarChart3, Database, Shield } from "lucide-react";
+import { MapPin, ArrowLeft, Layers, Globe, CloudRain, Flame, Zap, BarChart3, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import { WildfireIncidents } from "@/components/WildfireIncidents";
 import { EarthquakeIncidents } from "@/components/EarthquakeIncidents";
 import { DisasterAnalyticsDashboard } from "@/components/DisasterAnalyticsDashboard";
 import { DataSourcesOverview } from "@/components/DataSourcesOverview";
-import StatesUnderEmergency from "@/components/StatesUnderEmergency";
+
 
 // State name mapping for display
 const stateNames: { [key: string]: string } = {
@@ -119,10 +119,7 @@ export default function InteractiveMap() {
         <div className="mb-8">
           <div className="flex flex-wrap gap-3 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
             <h3 className="text-sm font-semibold text-gray-700 mr-4">Quick Navigation:</h3>
-            <a href="#emergency-states" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors">
-              <Shield className="w-4 h-4 mr-1" />
-              Emergency States
-            </a>
+
             <a href="#weather" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
               <CloudRain className="w-4 h-4 mr-1" />
               Weather Alerts
@@ -147,11 +144,6 @@ export default function InteractiveMap() {
         </div>
 
         <div className="space-y-8">
-          {/* States Under Emergency - Real-time Emergency Status */}
-          <div id="emergency-states" className="w-full">
-            <StatesUnderEmergency />
-          </div>
-          
           {/* Interactive Weather Alerts Map */}
           <div id="weather" className="w-full">
             <InteractiveWeatherMap 
