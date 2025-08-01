@@ -33,6 +33,18 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [activeAnalysis, setActiveAnalysis] = useState<'overview' | 'trends' | 'geographic' | 'impact'>('overview');
 
+  // Get data range info
+  const dataRange = useMemo(() => {
+    if (disasters.length === 0) return { start: null, end: null, years: 0 };
+    
+    const dates = disasters.map(d => new Date(d.declarationDate)).sort((a, b) => a.getTime() - b.getTime());
+    const start = dates[0];
+    const end = dates[dates.length - 1];
+    const years = Math.ceil((end.getTime() - start.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    
+    return { start, end, years };
+  }, [disasters]);
+
   // Filter disasters based on selected filters
   const filteredDisasters = useMemo(() => {
     return disasters.filter(disaster => {
@@ -40,16 +52,16 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
       const declarationDate = new Date(disaster.declarationDate);
       
       // Time filter
-      if (timeFilter === '30days') {
-        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        if (declarationDate < thirtyDaysAgo) return false;
-      } else if (timeFilter === '90days') {
-        const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-        if (declarationDate < ninetyDaysAgo) return false;
+      if (timeFilter === 'recent') {
+        // Last 12 months
+        const twelveMonthsAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        if (declarationDate < twelveMonthsAgo) return false;
       } else if (timeFilter === '2024') {
         if (declarationDate.getFullYear() !== 2024) return false;
       } else if (timeFilter === '2025') {
         if (declarationDate.getFullYear() !== 2025) return false;
+      } else if (timeFilter === 'since2022') {
+        if (declarationDate.getFullYear() < 2022) return false;
       }
       
       // State filter
@@ -167,18 +179,33 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
             </CardTitle>
             <div className="space-y-2">
               <p className="text-sm text-gray-600">
-                Comprehensive analysis of {disasters.length} FEMA disaster declarations
+                Analysis of {disasters.length} FEMA disaster declarations
+                {dataRange.start && dataRange.end && (
+                  <span className="block text-xs text-gray-500 mt-1">
+                    Data Range: {dataRange.start.toLocaleDateString()} to {dataRange.end.toLocaleDateString()} ({dataRange.years} years)
+                  </span>
+                )}
               </p>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <h4 className="text-sm font-semibold text-yellow-800 flex items-center gap-2 mb-2">
+                  <InfoIcon className="w-4 h-4" />
+                  Data Coverage Limitation
+                </h4>
+                <p className="text-xs text-yellow-700 leading-relaxed">
+                  <strong>Important:</strong> This dataset contains recent FEMA declarations from {dataRange.start?.getFullYear()} to {dataRange.end?.getFullYear()}, 
+                  not the complete historical record back to 1953. Rankings shown reflect only this recent period and may not represent 
+                  long-term disaster patterns. California typically leads in total historical disasters but may appear lower in recent-only data.
+                </p>
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
                 <h4 className="text-sm font-semibold text-green-800 flex items-center gap-2 mb-2">
                   <InfoIcon className="w-4 h-4" />
-                  About FEMA Disaster Data
+                  About FEMA Disaster Types
                 </h4>
                 <p className="text-xs text-green-700 leading-relaxed">
-                  This data comes from <strong>FEMA's OpenData API</strong> and includes all official disaster declarations. 
-                  <strong> Major Disasters</strong> trigger federal aid for individuals and communities, while <strong>Emergency Declarations</strong> 
-                  provide immediate federal assistance. <strong>Fire Management Assistance</strong> helps states fight wildfires. 
-                  Data is updated regularly and includes historical records back to 1953.
+                  <strong>Major Disasters (DR)</strong> trigger federal aid for individuals and communities, 
+                  <strong> Emergency Declarations (EM)</strong> provide immediate federal assistance, and 
+                  <strong>Fire Management Assistance (FM)</strong> helps states fight wildfires.
                 </p>
               </div>
             </div>
@@ -191,11 +218,11 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 <SelectValue placeholder="Time Period" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="30days">Last 30 Days</SelectItem>
-                <SelectItem value="90days">Last 90 Days</SelectItem>
-                <SelectItem value="2025">2025</SelectItem>
-                <SelectItem value="2024">2024</SelectItem>
+                <SelectItem value="all">All Available Data</SelectItem>
+                <SelectItem value="recent">Last 12 Months</SelectItem>
+                <SelectItem value="2025">2025 Only</SelectItem>
+                <SelectItem value="2024">2024 Only</SelectItem>
+                <SelectItem value="since2022">Since 2022</SelectItem>
               </SelectContent>
             </Select>
 
@@ -774,6 +801,203 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                           </div>
                         );
                       })}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="impact" className="space-y-6">
+          {/* Recommendations and Data Improvement Section */}
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
+                Dashboard Recommendations & Data Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Data Quality Assessment */}
+              <div className="bg-white rounded-lg p-4 border border-purple-200">
+                <h4 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
+                  <InfoIcon className="w-4 h-4" />
+                  Current Data Quality Assessment
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Data Coverage:</span>
+                      <span className="font-medium text-purple-600">
+                        {dataRange.start?.getFullYear()} - {dataRange.end?.getFullYear()} ({dataRange.years} years)
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Total Records:</span>
+                      <span className="font-medium">{disasters.length} declarations</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Data Completeness:</span>
+                      <span className="font-medium text-yellow-600">Partial (Recent Only)</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Historical Coverage:</span>
+                      <span className="font-medium text-red-600">Missing 1953-2021</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Update Frequency:</span>
+                      <span className="font-medium text-green-600">Real-time</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Reliability:</span>
+                      <span className="font-medium text-green-600">High (Official FEMA)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Insights for Current Data */}
+              <div className="bg-white rounded-lg p-4 border border-purple-200">
+                <h4 className="font-semibold text-purple-800 mb-3">Key Insights from Available Data</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-3">
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="font-medium text-blue-800">Most Active States (Recent Period)</div>
+                      <div className="mt-2 space-y-1">
+                        {analytics.topStates.slice(0, 3).map(([state, count], index) => (
+                          <div key={state} className="flex justify-between text-xs">
+                            <span>#{index + 1} {state}</span>
+                            <span className="font-medium">{count} declarations</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="font-medium text-green-800">Declaration Types Distribution</div>
+                      <div className="mt-2 space-y-1 text-xs">
+                        <div className="flex justify-between">
+                          <span>Major Disasters (DR):</span>
+                          <span className="font-medium">{analytics.majorDisasters} ({((analytics.majorDisasters / analytics.total) * 100).toFixed(1)}%)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Emergencies (EM):</span>
+                          <span className="font-medium">{analytics.emergencies} ({((analytics.emergencies / analytics.total) * 100).toFixed(1)}%)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Fire Management (FM):</span>
+                          <span className="font-medium">{analytics.fireManagement} ({((analytics.fireManagement / analytics.total) * 100).toFixed(1)}%)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                      <div className="font-medium text-orange-800">Most Common Disaster Types</div>
+                      <div className="mt-2 space-y-1">
+                        {analytics.topTypes.slice(0, 4).map(([type, count]) => (
+                          <div key={type} className="flex justify-between text-xs">
+                            <span className="truncate">{type}</span>
+                            <span className="font-medium">{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                      <div className="font-medium text-purple-800">Temporal Pattern</div>
+                      <div className="mt-2 text-xs">
+                        <div className="flex justify-between">
+                          <span>Avg per Month:</span>
+                          <span className="font-medium">{(analytics.total / (dataRange.years * 12)).toFixed(1)} declarations</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Peak Activity:</span>
+                          <span className="font-medium">
+                            {Object.entries(analytics.monthlyStats)
+                              .sort(([,a], [,b]) => b - a)[0]?.[0]?.split('-')[1] || 'N/A'} 
+                            ({Object.entries(analytics.monthlyStats)
+                              .sort(([,a], [,b]) => b - a)[0]?.[1] || 0} declarations)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommendations for Improvement */}
+              <div className="bg-white rounded-lg p-4 border border-purple-200">
+                <h4 className="font-semibold text-purple-800 mb-3">Recommendations for Enhanced Analytics</h4>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div className="font-medium text-yellow-800 mb-2">Data Enhancement Priorities</div>
+                        <ul className="text-xs text-yellow-700 space-y-1">
+                          <li>• Access complete FEMA historical data (1953-present)</li>
+                          <li>• Include individual assistance and public assistance data</li>
+                          <li>• Add economic impact metrics (damage estimates)</li>
+                          <li>• Integrate county-level geographic data</li>
+                        </ul>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div className="font-medium text-green-800 mb-2">Analysis Improvements</div>
+                        <ul className="text-xs text-green-700 space-y-1">
+                          <li>• Seasonal pattern analysis</li>
+                          <li>• Multi-year trend comparisons</li>
+                          <li>• Population-adjusted disaster rates</li>
+                          <li>• Recovery time analytics</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="font-medium text-blue-800 mb-2">Visualization Enhancements</div>
+                        <ul className="text-xs text-blue-700 space-y-1">
+                          <li>• Interactive geographic heat maps</li>
+                          <li>• Timeline slider for historical exploration</li>
+                          <li>• Disaster correlation analysis</li>
+                          <li>• Predictive modeling indicators</li>
+                        </ul>
+                      </div>
+                      <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div className="font-medium text-red-800 mb-2">Data Integration Opportunities</div>
+                        <ul className="text-xs text-red-700 space-y-1">
+                          <li>• Climate data correlation</li>
+                          <li>• Infrastructure vulnerability mapping</li>
+                          <li>• Social vulnerability indices</li>
+                          <li>• Real-time disaster monitoring feeds</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* User Guidance */}
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4 border border-indigo-200">
+                <h4 className="font-semibold text-indigo-800 mb-3">How to Use This Dashboard Effectively</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="font-medium text-indigo-700 mb-2">Current Capabilities:</div>
+                    <ul className="text-indigo-600 space-y-1 text-xs">
+                      <li>✓ Recent disaster activity monitoring ({dataRange.start?.getFullYear()}-{dataRange.end?.getFullYear()})</li>
+                      <li>✓ State-level comparative analysis</li>
+                      <li>✓ Disaster type categorization</li>
+                      <li>✓ Real-time declaration tracking</li>
+                      <li>✓ Monthly pattern identification</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <div className="font-medium text-indigo-700 mb-2">Best Practices:</div>
+                    <ul className="text-indigo-600 space-y-1 text-xs">
+                      <li>• Use filters to focus on specific regions/timeframes</li>
+                      <li>• Compare recent patterns to identify emerging trends</li>
+                      <li>• Consider seasonal variations in disaster frequency</li>
+                      <li>• Remember: Rankings reflect recent data only</li>
+                      <li>• Cross-reference with other emergency data sources</li>
+                    </ul>
                   </div>
                 </div>
               </div>
