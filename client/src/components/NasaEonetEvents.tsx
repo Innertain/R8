@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,9 @@ import {
   Calendar,
   Zap,
   Sun,
-  Thermometer
+  Thermometer,
+  ChevronDown,
+  Loader2
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -103,25 +105,65 @@ const getCategoryColor = (categoryId: string) => {
 
 export function NasaEonetEvents() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [limitEvents, setLimitEvents] = useState<number>(20);
+  const [visibleCount, setVisibleCount] = useState<number>(10);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const observerRef = useRef<HTMLDivElement>(null);
 
-  // Build query URL with filters
+  // Build query URL with filters (fetch more data initially for infinite scroll)
   const buildApiUrl = () => {
     const params = new URLSearchParams();
     if (selectedCategory !== "all") {
       params.append('category', selectedCategory);
     }
-    params.append('limit', limitEvents.toString());
+    params.append('limit', '100'); // Fetch more data for smooth scrolling
     
     return `/api/nasa-eonet-events${params.toString() ? '?' + params.toString() : ''}`;
   };
 
   const { data, isLoading, error, refetch } = useQuery<EonetResponse>({
-    queryKey: ['/api/nasa-eonet-events', selectedCategory, limitEvents],
+    queryKey: ['/api/nasa-eonet-events', selectedCategory],
     queryFn: () => fetch(buildApiUrl()).then(res => res.json()),
     refetchInterval: 30 * 60 * 1000, // Refetch every 30 minutes
     staleTime: 15 * 60 * 1000 // Consider data stale after 15 minutes
   });
+
+  const filteredEvents = selectedCategory === "all" 
+    ? data?.events || []
+    : data?.events.filter(event => event.category?.id === selectedCategory) || [];
+
+  // Infinite scroll functionality
+  const loadMore = useCallback(() => {
+    if (!data || visibleCount >= filteredEvents.length) return;
+    
+    setIsLoadingMore(true);
+    setTimeout(() => {
+      setVisibleCount(prev => Math.min(prev + 10, filteredEvents.length));
+      setIsLoadingMore(false);
+    }, 300); // Small delay for smooth UX
+  }, [data, visibleCount]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [loadMore, isLoadingMore]);
+
+  // Reset visible count when category changes
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [selectedCategory]);
 
   if (isLoading) {
     return (
@@ -175,11 +217,7 @@ export function NasaEonetEvents() {
     );
   }
 
-  const filteredEvents = selectedCategory === "all" 
-    ? data.events 
-    : data.events.filter(event => event.category?.id === selectedCategory);
-
-  const categories = Array.from(new Set(data.events.map(e => e.category?.id).filter(Boolean)));
+  const categories = Array.from(new Set(data?.events.map(e => e.category?.id).filter(Boolean) || []));
 
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -202,7 +240,7 @@ export function NasaEonetEvents() {
         
         <div className="flex flex-col sm:flex-row gap-3 mt-4">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-64">
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
             <SelectContent>
@@ -221,77 +259,78 @@ export function NasaEonetEvents() {
               })}
             </SelectContent>
           </Select>
-
-          <Select value={limitEvents.toString()} onValueChange={(value) => setLimitEvents(parseInt(value))}>
-            <SelectTrigger className="w-full sm:w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">Show 10</SelectItem>
-              <SelectItem value="20">Show 20</SelectItem>
-              <SelectItem value="50">Show 50</SelectItem>
-              <SelectItem value="100">Show 100</SelectItem>
-            </SelectContent>
-          </Select>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span>Showing {Math.min(visibleCount, filteredEvents.length)} of {filteredEvents.length}</span>
+            {filteredEvents.length > visibleCount && (
+              <Badge variant="outline" className="text-xs">
+                Scroll for more
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
 
       <CardContent>
-        <div className="space-y-3">
-          {filteredEvents.slice(0, limitEvents).map((event) => {
+        <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+          {filteredEvents.slice(0, visibleCount).map((event, index) => {
             const Icon = getCategoryIcon(event.category?.id || '');
             const categoryColor = getCategoryColor(event.category?.id || '');
             
             return (
               <div
                 key={event.id}
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+                className="border rounded-lg p-4 hover:shadow-lg transition-all duration-200 bg-white hover:bg-gray-50 hover:border-blue-200"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Icon className="w-4 h-4 text-gray-600" />
-                    <h3 className="font-semibold text-gray-800 text-sm">{event.title}</h3>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className={`p-2 rounded-full ${categoryColor.replace('border-', 'bg-').replace('text-', 'text-white bg-')}`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 text-sm leading-tight mb-1">{event.title}</h3>
+                      {event.category && (
+                        <Badge className={`text-xs ${categoryColor} mb-2`}>
+                          {event.category.title}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  {event.category && (
-                    <Badge className={`text-xs ${categoryColor}`}>
-                      {event.category.title}
-                    </Badge>
-                  )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600">
-                  <div className="space-y-1">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs text-gray-600">
+                  <div className="space-y-2">
                     {event.date && (
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>{format(new Date(event.date || new Date()), 'MMM dd, yyyy HH:mm')}</span>
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                        <Calendar className="w-4 h-4 text-blue-600" />
+                        <span className="font-medium">{format(new Date(event.date || new Date()), 'MMM dd, yyyy HH:mm')}</span>
                       </div>
                     )}
                     
                     {(event.latitude && event.longitude) && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{event.latitude.toFixed(3)}, {event.longitude.toFixed(3)}</span>
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                        <MapPin className="w-4 h-4 text-green-600" />
+                        <span className="font-mono">{event.latitude.toFixed(4)}, {event.longitude.toFixed(4)}</span>
                       </div>
                     )}
                     
                     {event.magnitude && (
-                      <div className="flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3" />
-                        <span>Magnitude: {event.magnitude} {event.magnitudeUnit}</span>
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                        <AlertTriangle className="w-4 h-4 text-orange-600" />
+                        <span>Magnitude: <strong>{event.magnitude} {event.magnitudeUnit}</strong></span>
                       </div>
                     )}
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {event.source && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
                         <span className="text-gray-500">Source:</span>
                         <a 
                           href={event.source.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium"
                         >
                           {event.source.id}
                           <ExternalLink className="w-3 h-3" />
@@ -299,35 +338,48 @@ export function NasaEonetEvents() {
                       </div>
                     )}
                     
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-500">Tracking points:</span>
-                      <span>{event.geometry.length}</span>
+                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                      <Globe className="w-4 h-4 text-purple-600" />
+                      <span>Tracking points: <strong>{event.geometry.length}</strong></span>
                     </div>
                   </div>
                 </div>
 
                 {event.description && (
-                  <div className="mt-2 pt-2 border-t">
-                    <p className="text-xs text-gray-600 line-clamp-2">{event.description}</p>
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-xs text-gray-600 leading-relaxed">{event.description}</p>
                   </div>
                 )}
               </div>
             );
           })}
+          
+          {/* Infinite scroll trigger */}
+          {filteredEvents.length > visibleCount && (
+            <div 
+              ref={observerRef}
+              className="flex items-center justify-center py-6"
+            >
+              {isLoadingMore ? (
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Loading more events...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-gray-400">
+                  <ChevronDown className="w-4 h-4" />
+                  <span>Scroll to load more</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {filteredEvents.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <Globe className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>No events found for the selected category</p>
-          </div>
-        )}
-
-        {filteredEvents.length > limitEvents && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-500">
-              Showing {limitEvents} of {filteredEvents.length} events
-            </p>
+          <div className="text-center py-12 text-gray-500">
+            <Globe className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-lg font-medium mb-2">No events found</h3>
+            <p className="text-sm">No natural disaster events found for the selected category</p>
           </div>
         )}
       </CardContent>
