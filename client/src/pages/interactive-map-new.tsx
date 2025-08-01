@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, ArrowLeft, Layers, Globe } from "lucide-react";
+import { MapPin, ArrowLeft, Layers, Globe, CloudRain, Flame, Zap, BarChart3, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -116,14 +116,36 @@ export default function InteractiveMap() {
           </p>
         </div>
 
-        <div className="space-y-8">
-          {/* Disaster Analytics Dashboard */}
-          <div className="w-full">
-            <DisasterAnalyticsDashboard disasters={femaData?.items || []} />
+        {/* Quick Navigation */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-3 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-semibold text-gray-700 mr-4">Quick Navigation:</h3>
+            <a href="#weather" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
+              <CloudRain className="w-4 h-4 mr-1" />
+              Weather Alerts
+            </a>
+            <a href="#wildfire" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors">
+              <Flame className="w-4 h-4 mr-1" />
+              Wildfire Incidents
+            </a>
+            <a href="#earthquake" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition-colors">
+              <Zap className="w-4 h-4 mr-1" />
+              Earthquake Activity
+            </a>
+            <a href="#analytics" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors">
+              <BarChart3 className="w-4 h-4 mr-1" />
+              Disaster Analytics
+            </a>
+            <a href="#data-sources" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+              <Database className="w-4 h-4 mr-1" />
+              Data Sources
+            </a>
           </div>
+        </div>
 
+        <div className="space-y-8">
           {/* Interactive Weather Alerts Map */}
-          <div className="w-full">
+          <div id="weather" className="w-full">
             <InteractiveWeatherMap 
               stateFilter={getFilterLocation() || undefined} 
               onStateFilterChange={handleStateFilterChange}
@@ -131,7 +153,7 @@ export default function InteractiveMap() {
           </div>
           
           {/* Wildfire Incidents */}
-          <div className="w-full">
+          <div id="wildfire" className="w-full">
             <WildfireIncidents 
               stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
               onStateFilterChange={handleStateFilterChange}
@@ -139,11 +161,16 @@ export default function InteractiveMap() {
           </div>
           
           {/* Earthquake Incidents */}
-          <div className="w-full">
+          <div id="earthquake" className="w-full">
             <EarthquakeIncidents 
               stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
               onStateFilterChange={handleStateFilterChange}
             />
+          </div>
+
+          {/* Disaster Analytics Dashboard */}
+          <div id="analytics" className="w-full">
+            <DisasterAnalyticsDashboard disasters={femaData?.items || []} />
           </div>
           
           {/* Disaster Analytics Dashboard */}
@@ -158,7 +185,7 @@ export default function InteractiveMap() {
           </div>
           
           {/* Data Sources Overview */}
-          <div className="w-full">
+          <div id="data-sources" className="w-full">
             <DataSourcesOverview />
           </div>
         </div>
