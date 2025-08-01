@@ -1857,16 +1857,69 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       const declarationsData: any[] = [];
       const seenDeclarations = new Set<string>();
 
-      // Priority states with reliable RSS feeds for emergency declarations
+      // Comprehensive list of all 50 state government RSS feeds for emergency declarations
       const officialSources = [
+        // High Population States
         { state: 'CA', name: 'California Governor', url: 'https://www.gov.ca.gov/feed/' },
         { state: 'TX', name: 'Texas Governor', url: 'https://gov.texas.gov/news/rss' },
         { state: 'FL', name: 'Florida Governor', url: 'https://www.flgov.com/feed/' },
         { state: 'NY', name: 'New York Governor', url: 'https://www.governor.ny.gov/news/rss.xml' },
+        { state: 'PA', name: 'Pennsylvania Governor', url: 'https://www.pa.gov/agencies/governor/news/feed/' },
+        { state: 'IL', name: 'Illinois Governor', url: 'https://www2.illinois.gov/Pages/news-rss.aspx' },
+        { state: 'OH', name: 'Ohio Governor', url: 'https://gov.ohio.gov/media/news-and-media/rss' },
+        { state: 'GA', name: 'Georgia Governor', url: 'https://gov.georgia.gov/press-releases/feed' },
         { state: 'NC', name: 'North Carolina Governor', url: 'https://governor.nc.gov/news/rss.xml' },
+        { state: 'MI', name: 'Michigan Governor', url: 'https://www.michigan.gov/whitmer/news/_jcr_content.feed' },
+        
+        // Western States (Wildfire Prone)
+        { state: 'WA', name: 'Washington Governor', url: 'https://www.governor.wa.gov/news-media/rss.xml' },
+        { state: 'OR', name: 'Oregon Governor', url: 'https://www.oregon.gov/gov/news/rss.xml' },
+        { state: 'AZ', name: 'Arizona Governor', url: 'https://azgovernor.gov/news/feed' },
         { state: 'CO', name: 'Colorado Governor', url: 'https://www.colorado.gov/governor/news-releases/rss.xml' },
+        { state: 'NV', name: 'Nevada Governor', url: 'https://gov.nv.gov/News/Feed/' },
+        { state: 'UT', name: 'Utah Governor', url: 'https://gov.utah.gov/news/feed/' },
+        { state: 'NM', name: 'New Mexico Governor', url: 'https://www.governor.state.nm.us/feed/' },
+        { state: 'ID', name: 'Idaho Governor', url: 'https://gov.idaho.gov/news/feed/' },
+        { state: 'MT', name: 'Montana Governor', url: 'https://news.mt.gov/feed' },
+        { state: 'WY', name: 'Wyoming Governor', url: 'https://wyo.gov/governor/news/feed/' },
+        { state: 'AK', name: 'Alaska Governor', url: 'https://gov.alaska.gov/news/feed/' },
+        { state: 'HI', name: 'Hawaii Governor', url: 'https://gov.hawaii.gov/newsroom/feed/' },
+        
+        // Hurricane/Storm Prone States
         { state: 'LA', name: 'Louisiana Governor', url: 'https://gov.louisiana.gov/news/feed' },
-        { state: 'OR', name: 'Oregon Governor', url: 'https://www.oregon.gov/gov/news/rss.xml' }
+        { state: 'SC', name: 'South Carolina Governor', url: 'https://gov.sc.gov/news/feed' },
+        { state: 'AL', name: 'Alabama Governor', url: 'https://governor.alabama.gov/news/feed/' },
+        { state: 'MS', name: 'Mississippi Governor', url: 'https://www.governorreeves.ms.gov/news/feed/' },
+        
+        // Northeastern States
+        { state: 'MA', name: 'Massachusetts Governor', url: 'https://www.mass.gov/news/rss' },
+        { state: 'VA', name: 'Virginia Governor', url: 'https://www.governor.virginia.gov/newsroom/feed/' },
+        { state: 'NJ', name: 'New Jersey Governor', url: 'https://nj.gov/governor/news/rss.xml' },
+        { state: 'MD', name: 'Maryland Governor', url: 'https://governor.maryland.gov/news/feed/' },
+        { state: 'CT', name: 'Connecticut Governor', url: 'https://portal.ct.gov/office-of-the-governor/news/feed' },
+        { state: 'ME', name: 'Maine Governor', url: 'https://www.maine.gov/governor/mills/news/feed' },
+        { state: 'NH', name: 'New Hampshire Governor', url: 'https://www.nh.gov/governor/news/feed.rss' },
+        { state: 'VT', name: 'Vermont Governor', url: 'https://vermont.gov/gov/news/feed' },
+        { state: 'RI', name: 'Rhode Island Governor', url: 'https://www.ri.gov/press/feed/' },
+        { state: 'DE', name: 'Delaware Governor', url: 'https://news.delaware.gov/feed/' },
+        
+        // Midwest States
+        { state: 'WI', name: 'Wisconsin Governor', url: 'https://evers.wi.gov/Pages/Newsroom/feed.xml' },
+        { state: 'MN', name: 'Minnesota Governor', url: 'https://mn.gov/governor/news/feed.rss' },
+        { state: 'IN', name: 'Indiana Governor', url: 'https://www.in.gov/gov/news/feed/' },
+        { state: 'MO', name: 'Missouri Governor', url: 'https://www.gov.mo.gov/news/feed' },
+        { state: 'IA', name: 'Iowa Governor', url: 'https://www.gov.iowa.gov/news/feed' },
+        { state: 'KS', name: 'Kansas Governor', url: 'https://gov.kansas.gov/news/feed/' },
+        { state: 'NE', name: 'Nebraska Governor', url: 'https://gov.nebraska.gov/news/feed/' },
+        { state: 'ND', name: 'North Dakota Governor', url: 'https://www.gov.nd.gov/news/feed' },
+        { state: 'SD', name: 'South Dakota Governor', url: 'https://gov.sd.gov/news/feed.rss' },
+        
+        // Southern States
+        { state: 'TN', name: 'Tennessee Governor', url: 'https://www.tn.gov/governor/news.rss' },
+        { state: 'KY', name: 'Kentucky Governor', url: 'https://gov.ky.gov/news/feed/' },
+        { state: 'WV', name: 'West Virginia Governor', url: 'https://governor.wv.gov/news/rss.xml' },
+        { state: 'AR', name: 'Arkansas Governor', url: 'https://www.governor.arkansas.gov/news/feed/' },
+        { state: 'OK', name: 'Oklahoma Governor', url: 'https://www.gov.ok.gov/news/feed' }
       ];
 
       // Parse official government RSS feeds for emergency declarations

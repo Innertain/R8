@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Search, RefreshCw } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Search, RefreshCw, Map } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { InteractiveStateMap } from "./InteractiveStateMap";
 
 interface EmergencyDeclaration {
   id: string;
@@ -208,107 +210,126 @@ export function StateEmergencyDeclarations() {
       </CardHeader>
 
       <CardContent>
-        {filteredDeclarations.length === 0 ? (
-          <div className="text-center py-8">
-            <AlertTriangle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Emergency Declarations</h3>
-            <p className="text-gray-600 mb-4">
-              Great news! Currently monitoring {data?.totalStatesMonitored || 0} state government sources and no active emergency declarations found.
-            </p>
-            <div className="text-sm text-gray-500 space-y-1">
-              <p>✓ Live RSS parsing from official government sources</p>
-              <p>✓ {data?.sources?.[0] || 'Official Government RSS Feeds Only'}</p>
-              <p>✓ Last updated: {data?.lastUpdated ? formatDistanceToNow(new Date(data.lastUpdated), { addSuffix: true }) : 'recently'}</p>
-            </div>
-            {(searchTerm || stateFilter !== "all" || typeFilter !== "all") && (
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={() => {
-                  setSearchTerm("");
-                  setStateFilter("all");
-                  setTypeFilter("all");
-                }}
-              >
-                Clear Filters
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredDeclarations.map((declaration) => (
-              <Card key={declaration.id} className="border-l-4 border-l-red-500">
-                <CardContent className="p-4">
-                  <div className="flex flex-col lg:flex-row lg:items-start gap-4">
-                    {declaration.urlToImage && (
-                      <img
-                        src={declaration.urlToImage}
-                        alt="News"
-                        className="w-full lg:w-32 h-24 object-cover rounded-md"
-                      />
-                    )}
-                    
-                    <div className="flex-1 space-y-3">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="outline" className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
-                              {declaration.stateName}
-                            </Badge>
-                            <Badge className={getTypeColor(declaration.emergencyType)}>
-                              {declaration.emergencyType}
-                            </Badge>
-                          </div>
-                          
-                          <h3 className="font-semibold text-lg leading-tight">
-                            {declaration.title}
-                          </h3>
-                        </div>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="shrink-0"
-                        >
-                          <a 
-                            href={declaration.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                            Read Full Article
-                          </a>
-                        </Button>
-                      </div>
-
-                      {declaration.description && (
-                        <p className="text-gray-600 leading-relaxed">
-                          {declaration.description}
-                        </p>
-                      )}
-
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-gray-500">
-                        <div className="flex items-center gap-4">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {formatDistanceToNow(new Date(declaration.publishedAt), { addSuffix: true })}
-                          </span>
-                          <span>Source: {declaration.source}</span>
-                        </div>
-                        {declaration.author && (
-                          <span>By {declaration.author}</span>
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              List View
+            </TabsTrigger>
+            <TabsTrigger value="map" className="flex items-center gap-2">
+              <Map className="w-4 h-4" />
+              Interactive Map
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="map" className="mt-4">
+            <InteractiveStateMap declarations={declarations} />
+          </TabsContent>
+          
+          <TabsContent value="list" className="mt-4">
+            {filteredDeclarations.length === 0 ? (
+              <div className="text-center py-8">
+                <AlertTriangle className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Emergency Declarations</h3>
+                <p className="text-gray-600 mb-4">
+                  Great news! Currently monitoring {data?.totalStatesMonitored || 0} state government sources and no active emergency declarations found.
+                </p>
+                <div className="text-sm text-gray-500 space-y-1">
+                  <p>✓ Live RSS parsing from official government sources</p>
+                  <p>✓ {data?.sources?.[0] || 'Official Government RSS Feeds Only'}</p>
+                  <p>✓ Last updated: {data?.lastUpdated ? formatDistanceToNow(new Date(data.lastUpdated), { addSuffix: true }) : 'recently'}</p>
+                </div>
+                {(searchTerm || stateFilter !== "all" || typeFilter !== "all") && (
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setStateFilter("all");
+                      setTypeFilter("all");
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredDeclarations.map((declaration) => (
+                  <Card key={declaration.id} className="border-l-4 border-l-red-500">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                        {declaration.urlToImage && (
+                          <img
+                            src={declaration.urlToImage}
+                            alt="News"
+                            className="w-full lg:w-32 h-24 object-cover rounded-md"
+                          />
                         )}
+                        
+                        <div className="flex-1 space-y-3">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="outline" className="flex items-center gap-1">
+                                  <MapPin className="w-3 h-3" />
+                                  {declaration.stateName}
+                                </Badge>
+                                <Badge className={getTypeColor(declaration.emergencyType)}>
+                                  {declaration.emergencyType}
+                                </Badge>
+                              </div>
+                              
+                              <h3 className="font-semibold text-lg leading-tight">
+                                {declaration.title}
+                              </h3>
+                            </div>
+                            
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              asChild
+                              className="shrink-0"
+                            >
+                              <a 
+                                href={declaration.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                Read Full Article
+                              </a>
+                            </Button>
+                          </div>
+
+                          {declaration.description && (
+                            <p className="text-gray-600 leading-relaxed">
+                              {declaration.description}
+                            </p>
+                          )}
+
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-gray-500">
+                            <div className="flex items-center gap-4">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" />
+                                {formatDistanceToNow(new Date(declaration.publishedAt), { addSuffix: true })}
+                              </span>
+                              <span>Source: {declaration.source}</span>
+                            </div>
+                            {declaration.author && (
+                              <span>By {declaration.author}</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
         {data?.lastUpdated && (
           <div className="mt-6 pt-4 border-t text-center text-sm text-gray-500">
