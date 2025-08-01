@@ -822,7 +822,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                               {/* Expandable Details */}
                               <div className="mt-3 pt-3 border-t border-white/50">
                                 <div className="text-xs text-gray-700 leading-relaxed">
-                                  {disaster.declarationTitle || disaster.title}
+                                  {disaster.description || disaster.title}
                                 </div>
                               </div>
                             </div>
