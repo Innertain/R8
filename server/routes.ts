@@ -1778,19 +1778,47 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
 
-      // Enhanced FEMA query to get more diverse and interesting disasters
-      // Include 2020-2025 to capture major hurricanes, wildfires, and diverse disasters
-      const femaUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(fyDeclared ge 2020) and (declarationType eq 'DR' or declarationType eq 'EM')&$orderby=declarationDate desc&$top=300&$format=json`;
+      // Comprehensive FEMA query to get diverse disasters from all states 
+      // Use multiple queries to capture different disaster types and time periods
+      const recentUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(declarationType eq 'DR' or declarationType eq 'EM') and (declarationDate ge 2022-01-01T00:00:00.000Z)&$orderby=declarationDate desc&$top=200&$format=json`;
+      const hurricaneUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentType eq 'Hurricane'&$orderby=declarationDate desc&$top=100&$format=json`;
+      const wildfireUrl = `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(incidentType eq 'Fire' or incidentType eq 'Wildfire')&$orderby=declarationDate desc&$top=100&$format=json`;
       
-      console.log('Fetching FEMA disaster declarations from OpenData API...');
-      const response = await fetch(femaUrl);
+      console.log('Fetching comprehensive FEMA disaster data (recent + hurricanes + wildfires)...');
       
-      if (!response.ok) {
-        throw new Error(`FEMA API failed: ${response.status}`);
+      // Fetch all datasets simultaneously for maximum coverage
+      const [recentResponse, hurricaneResponse, wildfireResponse] = await Promise.all([
+        fetch(recentUrl),
+        fetch(hurricaneUrl),
+        fetch(wildfireUrl)
+      ]);
+      
+      if (!recentResponse.ok) {
+        throw new Error(`FEMA recent disasters API failed: ${recentResponse.status}`);
       }
       
-      const femaData = await response.json();
-      const declarations = femaData.DisasterDeclarationsSummaries || [];
+      const recentData = await recentResponse.json();
+      const hurricaneData = hurricaneResponse.ok ? await hurricaneResponse.json() : { DisasterDeclarationsSummaries: [] };
+      const wildfireData = wildfireResponse.ok ? await wildfireResponse.json() : { DisasterDeclarationsSummaries: [] };
+      
+      // Combine all declarations and remove duplicates
+      const allDeclarations = [
+        ...(recentData.DisasterDeclarationsSummaries || []),
+        ...(hurricaneData.DisasterDeclarationsSummaries || []),
+        ...(wildfireData.DisasterDeclarationsSummaries || [])
+      ];
+      
+      // Remove duplicates based on disaster number
+      const uniqueDeclarations = allDeclarations.filter((declaration, index, self) => 
+        index === self.findIndex(d => d.disasterNumber === declaration.disasterNumber)
+      );
+      
+      console.log(`✓ FEMA data loaded: ${recentData.DisasterDeclarationsSummaries?.length || 0} recent, ${hurricaneData.DisasterDeclarationsSummaries?.length || 0} hurricanes, ${wildfireData.DisasterDeclarationsSummaries?.length || 0} wildfires`);
+      console.log(`✓ Total unique disasters: ${uniqueDeclarations.length}`);
+      
+      const declarations = uniqueDeclarations;
+      
+
       
       // Transform FEMA data to our format
       const transformedDeclarations = declarations.map((declaration: any, index: number) => ({
@@ -1830,7 +1858,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         success: true,
         items: transformedDeclarations,
         source: 'FEMA OpenData API',
-        dataUrl: femaUrl,
+        dataUrl: recentUrl,
         lastUpdated: new Date().toISOString(),
         totalRecords: declarations.length,
         cached: false
