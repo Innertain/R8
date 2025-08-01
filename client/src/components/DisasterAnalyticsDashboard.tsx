@@ -8,7 +8,7 @@ import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, W
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CompactTimeline } from "./CompactTimeline";
 
-import { DataEnhancementRecommendations } from "./DataEnhancementRecommendations";
+
 import { NasaEonetEvents } from "./NasaEonetEvents";
 import { RealtimeApiDebugger } from "./RealtimeApiDebugger";
 
@@ -399,9 +399,6 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
 
           {/* FEMA Disaster Declaration Timeline */}
           <CompactTimeline disasters={disasters} />
-
-          {/* Data Enhancement Roadmap */}
-          <DataEnhancementRecommendations />
 
           {/* NASA EONET Natural Events - Phase 1 Implementation */}
           <NasaEonetEvents />
