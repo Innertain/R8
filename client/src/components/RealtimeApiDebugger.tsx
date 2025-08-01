@@ -168,7 +168,7 @@ export function RealtimeApiDebugger() {
           className="bg-blue-600 text-white border-blue-600 shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-300 animate-pulse"
         >
           <Activity className="w-4 h-4 mr-2" />
-          Watch Center ({connectedCount}/{totalCount})
+          System Status
         </Button>
       </div>
     );
@@ -181,9 +181,9 @@ export function RealtimeApiDebugger() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-blue-600" />
-              Watch Center
+              System Status Monitor
               <Badge variant="outline" className={`text-xs ${connectedCount === totalCount ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>
-                {connectedCount}/{totalCount} Online
+                {connectedCount}/{totalCount} Sources Online
               </Badge>
             </CardTitle>
             <div className="flex items-center gap-2">
