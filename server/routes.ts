@@ -1492,6 +1492,100 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
+  // Wildfire Incidents RSS Feed endpoint
+  app.get('/api/wildfire-incidents', async (req, res) => {
+    try {
+      console.log('Fetching wildfire incidents from InciWeb RSS feed...');
+      
+      const response = await fetch('https://inciweb.wildfire.gov/incidents/rss.xml', {
+        headers: { 'User-Agent': 'DisasterApp/1.0 (wildfire-monitoring@example.com)' }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const xmlText = await response.text();
+      
+      // Parse XML manually since we don't have DOMParser in Node.js
+      const parseXMLItem = (itemText: string) => {
+        const getTagContent = (tag: string): string => {
+          const regex = new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'is');
+          const match = itemText.match(regex);
+          return match ? match[1].trim() : '';
+        };
+        
+        return {
+          title: getTagContent('title'),
+          description: getTagContent('description'),
+          link: getTagContent('link'),
+          pubDate: getTagContent('pubDate'),
+          guid: getTagContent('guid')
+        };
+      };
+      
+      // Extract items from XML
+      const itemMatches = xmlText.match(/<item[^>]*>(.*?)<\/item>/gis) || [];
+      
+      const incidents = itemMatches.map((itemXml, index) => {
+        const item = parseXMLItem(itemXml);
+        
+        // Extract state and location from title/description
+        const stateMatch = item.title.match(/\b([A-Z]{2})\b/) || item.description.match(/\b([A-Z]{2})\b/);
+        const state = stateMatch ? stateMatch[1] : '';
+        
+        // Extract fire size if available
+        const sizeMatch = item.description.match(/(\d+(?:,\d+)*)\s*acres/i);
+        const acres = sizeMatch ? parseInt(sizeMatch[1].replace(/,/g, '')) : null;
+        
+        // Extract status from description
+        let status = 'Active';
+        const desc = item.description.toLowerCase();
+        if (desc.includes('contained')) status = 'Contained';
+        else if (desc.includes('controlled')) status = 'Controlled';
+        else if (desc.includes('suppressed')) status = 'Suppressed';
+        else if (desc.includes('out')) status = 'Out';
+        
+        // Extract incident type
+        let incidentType = 'Wildfire';
+        if (desc.includes('prescribed')) incidentType = 'Prescribed Fire';
+        else if (desc.includes('structure')) incidentType = 'Structure Fire';
+        else if (desc.includes('grass')) incidentType = 'Grass Fire';
+        
+        return {
+          id: item.guid || `incident-${index}`,
+          title: item.title.trim(),
+          description: item.description.trim(),
+          link: item.link,
+          pubDate: item.pubDate,
+          state,
+          acres,
+          status,
+          incidentType,
+          source: 'InciWeb',
+          severity: acres && acres > 1000 ? 'severe' : acres && acres > 100 ? 'moderate' : 'minor'
+        };
+      });
+      
+      console.log(`✓ Wildfire incidents processed: ${incidents.length} incidents found`);
+      
+      res.json({
+        success: true,
+        incidents,
+        count: incidents.length,
+        lastUpdated: new Date().toISOString(),
+        source: 'InciWeb Wildfire RSS'
+      });
+    } catch (error: any) {
+      console.error('Error fetching wildfire incidents:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch wildfire incidents',
+        details: error.message || 'Unknown error'
+      });
+    }
+  });
+
   // Enhanced Weather Alerts from Multiple National Weather Service RSS Feeds
   app.get("/api/weather-alerts-rss", async (req, res) => {
     try {

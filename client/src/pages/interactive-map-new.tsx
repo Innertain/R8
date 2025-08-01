@@ -9,6 +9,7 @@ import RealTimeAlerts from "@/components/RealTimeAlerts";
 import EnhancedRssFeed from "@/components/EnhancedRssFeed";
 import ActiveDisastersDashboard from "@/components/ActiveDisastersDashboard";
 import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
+import { WildfireIncidents } from "@/components/WildfireIncidents";
 
 // State name mapping for display
 const stateNames: { [key: string]: string } = {
@@ -88,6 +89,11 @@ export default function InteractiveMap() {
           {/* Interactive Weather Alerts Map */}
           <div className="w-full">
             <InteractiveWeatherMap stateFilter={getFilterLocation() || undefined} />
+          </div>
+          
+          {/* Wildfire Incidents */}
+          <div className="w-full">
+            <WildfireIncidents stateFilter={getFilterLocation() || undefined} />
           </div>
           
           {/* Enhanced Emergency Data Feed */}
