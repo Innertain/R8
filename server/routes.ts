@@ -1774,10 +1774,10 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         }
       }
 
-      // If no state found, try to determine from coordinates (basic US/Canada check)
+      // If no state found, try basic geographic mapping for US/Canada only
       if (!state) {
-        if (latitude >= 25 && latitude <= 71 && longitude >= -180 && longitude <= -50) {
-          // Rough bounds for US/Canada/Alaska
+        // Only check US/Canada coordinates (negative longitudes for North America)
+        if (longitude < 0 && latitude >= 25 && latitude <= 71 && longitude >= -180 && longitude <= -50) {
           if (latitude >= 60 && longitude <= -130) {
             state = 'AK'; // Alaska
           } else if (latitude >= 19 && latitude <= 23 && longitude >= -161 && longitude <= -154) {
@@ -1797,9 +1797,23 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         }
       }
 
-      // Skip if not in valid locations
+      // If no state found, assign based on region or mark as international
       if (!state) {
-        return null;
+        // Try to extract country or region for international earthquakes
+        if (place.includes('Russia')) state = 'RU';
+        else if (place.includes('Japan')) state = 'JP';
+        else if (place.includes('Chile')) state = 'CL';
+        else if (place.includes('Peru')) state = 'PERU';
+        else if (place.includes('Indonesia')) state = 'IND';
+        else if (place.includes('Philippines')) state = 'PH';
+        else if (place.includes('Turkey')) state = 'TR';
+        else if (place.includes('Greece')) state = 'GR';
+        else if (place.includes('Iran')) state = 'IR';
+        else if (place.includes('Mexico')) state = 'MX';
+        else if (place.includes('Guatemala')) state = 'GT';
+        else if (place.includes('New Zealand')) state = 'NZ';
+        else if (place.includes('Pacific Ocean') || place.includes('Atlantic Ocean') || place.includes('Ocean')) state = 'OCEAN';
+        else state = 'INTL'; // International/Other
       }
 
       const magnitude = props.mag || 0;

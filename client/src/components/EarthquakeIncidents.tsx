@@ -47,7 +47,7 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
     refetchInterval: 10 * 60 * 1000, // Refresh every 10 minutes
   });
 
-  // State names mapping including Canadian provinces
+  // State names mapping including Canadian provinces and countries
   const stateNames: Record<string, string> = {
     // US States
     'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
@@ -65,7 +65,11 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
     // Canadian Provinces
     'AB': 'Alberta', 'BC': 'British Columbia', 'MB': 'Manitoba', 'NB': 'New Brunswick', 'NL': 'Newfoundland and Labrador',
     'NS': 'Nova Scotia', 'NT': 'Northwest Territories', 'NU': 'Nunavut', 'ON': 'Ontario', 'PE': 'Prince Edward Island',
-    'QC': 'Quebec', 'SK': 'Saskatchewan', 'YT': 'Yukon'
+    'QC': 'Quebec', 'SK': 'Saskatchewan', 'YT': 'Yukon',
+    // International Countries
+    'RU': 'Russia', 'JP': 'Japan', 'CL': 'Chile', 'PERU': 'Peru', 'IND': 'Indonesia', 'PH': 'Philippines',
+    'TR': 'Turkey', 'GR': 'Greece', 'IR': 'Iran', 'MX': 'Mexico', 'GT': 'Guatemala', 'NZ': 'New Zealand',
+    'OCEAN': 'Ocean', 'INTL': 'International'
   };
 
   const incidents = (incidentsData as any)?.incidents || [];
@@ -78,7 +82,8 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
     'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
     'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
     'PR', 'VI', 'GU', 'AS', 'MP', // US Territories
-    'AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT' // Canada
+    'AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT', // Canada
+    'RU', 'JP', 'CL', 'PERU', 'IND', 'PH', 'TR', 'GR', 'IR', 'MX', 'GT', 'NZ', 'OCEAN', 'INTL' // International
   ]);
 
   // Filter incidents by state if specified
