@@ -369,7 +369,7 @@ export function NoaaStormEvents() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-800">{event.eventType}</h3>
+                        <h3 className="font-semibold text-gray-800">{event.stormName || event.eventType}</h3>
                         <Badge className={`text-xs ${eventTypeColor}`}>
                           {event.state}
                         </Badge>
