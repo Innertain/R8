@@ -103,8 +103,37 @@ const getCategoryColor = (categoryId: string) => {
   return colorMap[categoryId] || 'bg-gray-100 text-gray-700 border-gray-200';
 };
 
+// Function to get readable location from coordinates
+const getLocationName = (lat: number, lon: number): string => {
+  // Simple region mapping based on coordinates
+  if (lat >= 25 && lat <= 49 && lon >= -125 && lon <= -66) {
+    // United States
+    if (lat >= 25 && lat <= 31 && lon >= -117 && lon <= -80) return "Southern US";
+    if (lat >= 32 && lat <= 42 && lon >= -125 && lon <= -100) return "Western US";
+    if (lat >= 32 && lat <= 42 && lon >= -100 && lon <= -80) return "Central US";
+    if (lat >= 39 && lat <= 49 && lon >= -125 && lon <= -100) return "Northwestern US";
+    if (lat >= 39 && lat <= 49 && lon >= -100 && lon <= -66) return "Northern US";
+    return "United States";
+  }
+  if (lat >= 49 && lat <= 85 && lon >= -141 && lon <= -52) return "Canada";
+  if (lat >= 14 && lat <= 33 && lon >= -118 && lon <= -86) return "Mexico/Central America";
+  if (lat >= -60 && lat <= 15 && lon >= -82 && lon <= -35) return "South America";
+  if (lat >= 35 && lat <= 75 && lon >= -10 && lon <= 50) return "Europe";
+  if (lat >= -35 && lat <= 40 && lon >= -20 && lon <= 55) return "Africa";
+  if (lat >= -50 && lat <= 80 && lon >= 25 && lon <= 180) return "Asia";
+  if (lat >= -50 && lat <= -10 && lon >= 110 && lon <= 180) return "Australia/Oceania";
+  
+  // Ocean regions
+  if (lon >= -180 && lon <= -30) return "Pacific Ocean";
+  if (lon >= -30 && lon <= 40) return "Atlantic Ocean";
+  if (lon >= 40 && lon <= 120) return "Indian Ocean";
+  
+  return "Remote Location";
+};
+
 export function NasaEonetEvents() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedIncidentType, setSelectedIncidentType] = useState<string>("all");
   const [visibleCount, setVisibleCount] = useState<number>(10);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const observerRef = useRef<HTMLDivElement>(null);
@@ -127,9 +156,31 @@ export function NasaEonetEvents() {
     staleTime: 15 * 60 * 1000 // Consider data stale after 15 minutes
   });
 
-  const filteredEvents = selectedCategory === "all" 
-    ? data?.events || []
-    : data?.events.filter(event => event.category?.id === selectedCategory) || [];
+  const filteredEvents = data?.events.filter(event => {
+    // Filter by category
+    if (selectedCategory !== 'all' && event.category?.id !== selectedCategory) return false;
+    
+    // Filter by incident type
+    if (selectedIncidentType !== 'all') {
+      const eventTitle = event.title.toLowerCase();
+      switch (selectedIncidentType) {
+        case 'wildfires':
+          return eventTitle.includes('fire') || event.category?.id === 'wildfires';
+        case 'storms':
+          return eventTitle.includes('storm') || eventTitle.includes('cyclone') || eventTitle.includes('hurricane') || event.category?.id === 'severeStorms';
+        case 'volcanoes':
+          return eventTitle.includes('volcano') || event.category?.id === 'volcanoes';
+        case 'earthquakes':
+          return eventTitle.includes('earthquake') || event.category?.id === 'earthquakes';
+        case 'floods':
+          return eventTitle.includes('flood') || event.category?.id === 'floods';
+        default:
+          return true;
+      }
+    }
+    
+    return true;
+  }) || [];
 
   // Infinite scroll functionality
   const loadMore = useCallback(() => {
@@ -160,10 +211,10 @@ export function NasaEonetEvents() {
     return () => observer.disconnect();
   }, [loadMore, isLoadingMore]);
 
-  // Reset visible count when category changes
+  // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(10);
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedIncidentType]);
 
   if (isLoading) {
     return (
@@ -274,6 +325,46 @@ export function NasaEonetEvents() {
               })}
             </SelectContent>
           </Select>
+
+          {/* Incident Type Filter */}
+          <Select value={selectedIncidentType} onValueChange={setSelectedIncidentType}>
+            <SelectTrigger className="w-full sm:w-64">
+              <SelectValue placeholder="Filter by type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="wildfires">
+                <div className="flex items-center gap-2">
+                  <Flame className="w-4 h-4" />
+                  Wildfires
+                </div>
+              </SelectItem>
+              <SelectItem value="storms">
+                <div className="flex items-center gap-2">
+                  <Wind className="w-4 h-4" />
+                  Storms & Hurricanes
+                </div>
+              </SelectItem>
+              <SelectItem value="volcanoes">
+                <div className="flex items-center gap-2">
+                  <Mountain className="w-4 h-4" />
+                  Volcanoes
+                </div>
+              </SelectItem>
+              <SelectItem value="earthquakes">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  Earthquakes
+                </div>
+              </SelectItem>
+              <SelectItem value="floods">
+                <div className="flex items-center gap-2">
+                  <Waves className="w-4 h-4" />
+                  Floods
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
           
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <span>Showing {Math.min(visibleCount, filteredEvents.length)} of {filteredEvents.length}</span>
@@ -329,13 +420,15 @@ export function NasaEonetEvents() {
                     {(event.latitude && event.longitude) && (
                       <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
                         <MapPin className="w-5 h-5 text-green-600" />
-                        <div>
+                        <div className="flex-1">
                           <div className="font-medium text-green-900">Location</div>
-                          <div className="text-green-700">
+                          <div className="text-green-700 font-semibold">
+                            {getLocationName(event.latitude, event.longitude)}
+                          </div>
+                          <div className="text-xs text-green-600 mt-1">
                             {event.latitude > 0 ? `${event.latitude.toFixed(2)}°N` : `${Math.abs(event.latitude).toFixed(2)}°S`}, {' '}
                             {event.longitude > 0 ? `${event.longitude.toFixed(2)}°E` : `${Math.abs(event.longitude).toFixed(2)}°W`}
                           </div>
-                          <div className="text-xs text-green-600">Satellite detected</div>
                         </div>
                       </div>
                     )}
