@@ -1,6 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { alertRules, alertDeliveries, userNotificationSettings, insertAlertRuleSchema, insertNotificationSettingsSchema } from "@shared/schema";
+import { eq, desc, and, gte } from "drizzle-orm";
+import { alertEngine, type EmergencyEvent } from "./alerting/alertEngine";
 import { fetchShiftsFromAirtableServer } from "./airtable";
 
 // Server-side cache for stats data
@@ -2897,6 +2901,204 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         error: 'Unable to fetch NFIP claims data',
         lastUpdated: new Date().toISOString()
       });
+    }
+  });
+
+  // Alert Management Routes
+
+  // Get user's alert rules
+  app.get('/api/alerts/rules', async (req, res) => {
+    try {
+      // For demo purposes, use a default user ID (in production, get from auth)
+      const userId = 'demo-user';
+      
+      const rules = await db
+        .select()
+        .from(alertRules)
+        .where(eq(alertRules.userId, userId))
+        .orderBy(desc(alertRules.createdAt));
+
+      res.json({ success: true, rules });
+    } catch (error) {
+      console.error('Error fetching alert rules:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch alert rules' });
+    }
+  });
+
+  // Create new alert rule
+  app.post('/api/alerts/rules', async (req, res) => {
+    try {
+      const userId = 'demo-user'; // Demo user ID
+      
+      // Validate the request body
+      const validatedData = insertAlertRuleSchema.parse({
+        ...req.body,
+        userId
+      });
+
+      const [rule] = await db
+        .insert(alertRules)
+        .values(validatedData)
+        .returning();
+
+      res.json({ success: true, rule });
+    } catch (error) {
+      console.error('Error creating alert rule:', error);
+      res.status(400).json({ success: false, error: error.message || 'Failed to create alert rule' });
+    }
+  });
+
+  // Update alert rule
+  app.put('/api/alerts/rules/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = 'demo-user';
+
+      // Verify ownership
+      const existingRules = await db
+        .select()
+        .from(alertRules)
+        .where(and(eq(alertRules.id, id), eq(alertRules.userId, userId)));
+
+      if (existingRules.length === 0) {
+        return res.status(404).json({ success: false, error: 'Alert rule not found' });
+      }
+
+      const validatedData = insertAlertRuleSchema.partial().parse(req.body);
+
+      const [rule] = await db
+        .update(alertRules)
+        .set({ ...validatedData, updatedAt: new Date() })
+        .where(eq(alertRules.id, id))
+        .returning();
+
+      res.json({ success: true, rule });
+    } catch (error) {
+      console.error('Error updating alert rule:', error);
+      res.status(400).json({ success: false, error: error.message || 'Failed to update alert rule' });
+    }
+  });
+
+  // Delete alert rule
+  app.delete('/api/alerts/rules/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = 'demo-user';
+
+      await db
+        .delete(alertRules)
+        .where(and(eq(alertRules.id, id), eq(alertRules.userId, userId)));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting alert rule:', error);
+      res.status(500).json({ success: false, error: 'Failed to delete alert rule' });
+    }
+  });
+
+  // Get alert delivery history
+  app.get('/api/alerts/history', async (req, res) => {
+    try {
+      const userId = 'demo-user';
+      const { limit = 50, offset = 0 } = req.query;
+
+      const deliveries = await db
+        .select()
+        .from(alertDeliveries)
+        .where(eq(alertDeliveries.userId, userId))
+        .orderBy(desc(alertDeliveries.createdAt))
+        .limit(Number(limit))
+        .offset(Number(offset));
+
+      res.json({ success: true, deliveries });
+    } catch (error) {
+      console.error('Error fetching alert history:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch alert history' });
+    }
+  });
+
+  // Get/Update notification settings
+  app.get('/api/alerts/settings', async (req, res) => {
+    try {
+      const userId = 'demo-user';
+      
+      const settings = await db
+        .select()
+        .from(userNotificationSettings)
+        .where(eq(userNotificationSettings.userId, userId));
+
+      if (settings.length === 0) {
+        // Create default settings
+        const [newSettings] = await db
+          .insert(userNotificationSettings)
+          .values({ userId })
+          .returning();
+        return res.json({ success: true, settings: newSettings });
+      }
+
+      res.json({ success: true, settings: settings[0] });
+    } catch (error) {
+      console.error('Error fetching notification settings:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch notification settings' });
+    }
+  });
+
+  app.put('/api/alerts/settings', async (req, res) => {
+    try {
+      const userId = 'demo-user';
+      const validatedData = insertNotificationSettingsSchema.parse(req.body);
+
+      // Upsert notification settings
+      const [settings] = await db
+        .insert(userNotificationSettings)
+        .values({ ...validatedData, userId })
+        .onConflictDoUpdate({
+          target: userNotificationSettings.userId,
+          set: { ...validatedData, updatedAt: new Date() }
+        })
+        .returning();
+
+      res.json({ success: true, settings });
+    } catch (error) {
+      console.error('Error updating notification settings:', error);
+      res.status(400).json({ success: false, error: error.message || 'Failed to update notification settings' });
+    }
+  });
+
+  // Test alert endpoint
+  app.post('/api/alerts/test/:ruleId', async (req, res) => {
+    try {
+      const { ruleId } = req.params;
+      
+      // Create a test event
+      const testEvent: EmergencyEvent = {
+        id: 'test-' + Date.now(),
+        type: 'weather',
+        title: 'Test Weather Alert',
+        description: 'This is a test alert to verify your notification settings.',
+        severity: 'medium',
+        location: 'Test Location, CA',
+        state: 'CA',
+        coordinates: { lat: 37.7749, lng: -122.4194 },
+        timestamp: new Date(),
+        sourceData: { test: true }
+      };
+
+      const wouldTrigger = await alertEngine.testAlert(ruleId, testEvent);
+      
+      if (wouldTrigger) {
+        // Actually trigger the alert for testing
+        await alertEngine.processEvent(testEvent);
+      }
+
+      res.json({ 
+        success: true, 
+        wouldTrigger,
+        message: wouldTrigger ? 'Test alert sent!' : 'Alert would not trigger with current conditions'
+      });
+    } catch (error) {
+      console.error('Error testing alert:', error);
+      res.status(500).json({ success: false, error: 'Failed to test alert' });
     }
   });
 

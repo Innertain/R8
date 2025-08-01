@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, json, jsonb, real, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -97,3 +97,126 @@ export type Availability = typeof volunteerAvailability.$inferSelect;
 
 export type InsertShiftAssignment = z.infer<typeof insertShiftAssignmentSchema>;
 export type ShiftAssignment = typeof shiftAssignments.$inferSelect;
+
+// Session storage table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Alert rules defined by users
+export const alertRules = pgTable("alert_rules", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true),
+  
+  // Alert conditions
+  alertType: varchar("alert_type", { length: 50 }).notNull(), // 'weather', 'wildfire', 'earthquake', 'disaster'
+  conditions: jsonb("conditions").notNull(), // Store complex conditions as JSON
+  
+  // Geographic filters
+  states: text("states").array(), // Array of state codes
+  regions: text("regions").array(), // Array of regions
+  
+  // Notification preferences
+  notificationMethods: text("notification_methods").array().notNull(), // ['email', 'sms', 'webhook']
+  webhookUrl: varchar("webhook_url"),
+  
+  // Frequency controls
+  cooldownMinutes: integer("cooldown_minutes").default(60), // Prevent spam
+  maxAlertsPerDay: integer("max_alerts_per_day").default(10),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Alert history and delivery tracking
+export const alertDeliveries = pgTable("alert_deliveries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  alertRuleId: varchar("alert_rule_id").references(() => alertRules.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  
+  // Alert content
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  severity: varchar("severity", { length: 20 }).notNull(), // 'low', 'medium', 'high', 'critical'
+  alertType: varchar("alert_type", { length: 50 }).notNull(),
+  
+  // Source data
+  sourceData: jsonb("source_data"), // Original event data that triggered alert
+  location: varchar("location"),
+  coordinates: jsonb("coordinates"), // {lat, lng}
+  
+  // Delivery tracking
+  deliveryMethod: varchar("delivery_method", { length: 20 }).notNull(),
+  deliveryStatus: varchar("delivery_status", { length: 20 }).default("pending"), // 'pending', 'sent', 'failed'
+  deliveredAt: timestamp("delivered_at"),
+  errorMessage: text("error_message"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User notification preferences
+export const userNotificationSettings = pgTable("user_notification_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).unique(),
+  
+  // Contact methods
+  email: varchar("email"),
+  phoneNumber: varchar("phone_number"),
+  
+  // Global preferences
+  emailEnabled: boolean("email_enabled").default(true),
+  smsEnabled: boolean("sms_enabled").default(false),
+  webhookEnabled: boolean("webhook_enabled").default(false),
+  
+  // Quiet hours (local time)
+  quietHoursEnabled: boolean("quiet_hours_enabled").default(false),
+  quietHoursStart: varchar("quiet_hours_start"), // "22:00"
+  quietHoursEnd: varchar("quiet_hours_end"), // "08:00"
+  timezone: varchar("timezone").default("America/New_York"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type AlertRule = typeof alertRules.$inferSelect;
+export type InsertAlertRule = typeof alertRules.$inferInsert;
+
+export type AlertDelivery = typeof alertDeliveries.$inferSelect;
+export type InsertAlertDelivery = typeof alertDeliveries.$inferInsert;
+
+export type UserNotificationSettings = typeof userNotificationSettings.$inferSelect;
+export type InsertUserNotificationSettings = typeof userNotificationSettings.$inferInsert;
+
+// Zod schemas for validation
+export const insertAlertRuleSchema = createInsertSchema(alertRules, {
+  name: z.string().min(1, "Alert name is required").max(255),
+  alertType: z.enum(["weather", "wildfire", "earthquake", "disaster"]),
+  notificationMethods: z.array(z.enum(["email", "sms", "webhook"])).min(1, "At least one notification method required"),
+  cooldownMinutes: z.number().min(1).max(1440), // 1 minute to 24 hours
+  maxAlertsPerDay: z.number().min(1).max(100),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertNotificationSettingsSchema = createInsertSchema(userNotificationSettings, {
+  email: z.string().email().optional().or(z.literal("")),
+  phoneNumber: z.string().regex(/^\+?[\d\s\-\(\)]+$/, "Invalid phone number").optional().or(z.literal("")),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAlertRuleType = z.infer<typeof insertAlertRuleSchema>;
+export type InsertNotificationSettingsType = z.infer<typeof insertNotificationSettingsSchema>;
