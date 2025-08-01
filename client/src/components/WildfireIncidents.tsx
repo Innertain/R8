@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2 } from 'lucide-react';
+import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2, Info as InfoIcon } from 'lucide-react';
 
 interface WildfireIncident {
   id: string;
@@ -177,18 +177,31 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
               </Badge>
             )}
           </CardTitle>
-          <p className="text-sm text-gray-600">
-            {filteredIncidents.length} incident{filteredIncidents.length !== 1 ? 's' : ''} 
-            {stateFilter && stateFilter !== 'all' 
-              ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
-              : ' nationwide'
-            } from InciWeb
-            {stateFilter && stateFilter !== 'all' && (
-              <span className="text-blue-600 ml-2 text-xs">
-                • Filtered by weather alert selection
-              </span>
-            )}
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600">
+              {filteredIncidents.length} incident{filteredIncidents.length !== 1 ? 's' : ''} 
+              {stateFilter && stateFilter !== 'all' 
+                ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
+                : ' nationwide'
+              } from InciWeb
+              {stateFilter && stateFilter !== 'all' && (
+                <span className="text-blue-600 ml-2 text-xs">
+                  • Filtered by weather alert selection
+                </span>
+              )}
+            </p>
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <h4 className="text-sm font-semibold text-orange-800 flex items-center gap-2 mb-2">
+                <InfoIcon className="w-4 h-4" />
+                About Wildfire Data
+              </h4>
+              <p className="text-xs text-orange-700 leading-relaxed">
+                This data comes from <strong>InciWeb (Incident Information System)</strong>, the interagency wildfire information system used by federal, state, and local emergency management agencies. 
+                Incident statuses include <strong>Active</strong> (currently burning), <strong>Contained</strong> (firefighters have control lines), and <strong>Controlled</strong> (fire is out but still monitored). 
+                Data is updated in real-time as field crews report progress.
+              </p>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {/* Wildfire Incidents Map View */}

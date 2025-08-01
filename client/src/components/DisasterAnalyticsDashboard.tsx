@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock } from "lucide-react";
+import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock, Info as InfoIcon } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface FemaDisasterItem {
@@ -166,9 +166,23 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 <BarChart3 className="w-5 h-5 text-blue-600" />
                 Disaster Analytics Dashboard
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
-                Comprehensive analysis of {disasters.length} FEMA disaster declarations
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">
+                  Comprehensive analysis of {disasters.length} FEMA disaster declarations
+                </p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-green-800 flex items-center gap-2 mb-2">
+                    <InfoIcon className="w-4 h-4" />
+                    About FEMA Disaster Data
+                  </h4>
+                  <p className="text-xs text-green-700 leading-relaxed">
+                    This data comes from <strong>FEMA's OpenData API</strong> and includes all official disaster declarations. 
+                    <strong> Major Disasters</strong> trigger federal aid for individuals and communities, while <strong>Emergency Declarations</strong> 
+                    provide immediate federal assistance. <strong>Fire Management Assistance</strong> helps states fight wildfires. 
+                    Data is updated regularly and includes historical records back to 1953.
+                  </p>
+                </div>
+              </div>
             </div>
             <Button onClick={exportAnalytics} size="sm" variant="outline">
               <Download className="w-4 h-4 mr-2" />

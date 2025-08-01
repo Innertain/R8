@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, MapPin, Clock, ExternalLink, RefreshCw, Filter, Zap } from 'lucide-react';
+import { AlertTriangle, MapPin, Clock, ExternalLink, RefreshCw, Filter, Zap, Info as InfoIcon } from 'lucide-react';
 
 interface WeatherAlert {
   id: string;
@@ -227,25 +227,38 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                   </Badge>
                 )}
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
-                {activeAlerts.length} active alert{activeAlerts.length !== 1 ? 's' : ''} 
-                {selectedState !== 'all' 
-                  ? ` in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}` 
-                  : ' from NWS Multi-Feed System'
-                }
-                {severityFilter !== 'all' && ` (${severityFilter} severity only)`}
-                {(selectedState !== 'all' || severityFilter !== 'all') && (
-                  <button 
-                    onClick={() => {
-                      handleStateClick('all');
-                      setSeverityFilter('all');
-                    }}
-                    className="ml-2 text-blue-600 hover:text-blue-800 text-xs underline"
-                  >
-                    (Clear Filters)
-                  </button>
-                )}
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">
+                  {activeAlerts.length} active alert{activeAlerts.length !== 1 ? 's' : ''} 
+                  {selectedState !== 'all' 
+                    ? ` in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}` 
+                    : ' from NWS Multi-Feed System'
+                  }
+                  {severityFilter !== 'all' && ` (${severityFilter} severity only)`}
+                  {(selectedState !== 'all' || severityFilter !== 'all') && (
+                    <button 
+                      onClick={() => {
+                        handleStateClick('all');
+                        setSeverityFilter('all');
+                      }}
+                      className="ml-2 text-blue-600 hover:text-blue-800 text-xs underline"
+                    >
+                      (Clear Filters)
+                    </button>
+                  )}
+                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-blue-800 flex items-center gap-2 mb-2">
+                    <InfoIcon className="w-4 h-4" />
+                    About Weather Alert Data
+                  </h4>
+                  <p className="text-xs text-blue-700 leading-relaxed">
+                    This data comes from three official sources: <strong>National Weather Service (NWS)</strong> provides detailed local warnings and watches, 
+                    <strong> National Hurricane Center</strong> issues tropical storm alerts, and <strong>Storm Prediction Center</strong> handles severe weather forecasts. 
+                    Only active warnings and watches are shown - advisories are filtered out. Alerts are updated every few minutes and include severity levels from Minor to Extreme.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="flex gap-2">
               <Button

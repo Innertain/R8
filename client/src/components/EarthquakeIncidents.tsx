@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Activity, MapPin, Calendar, ExternalLink, Loader2, Map, List } from 'lucide-react';
+import { AlertTriangle, Activity, MapPin, Calendar, ExternalLink, Loader2, Map, List, Info as InfoIcon } from 'lucide-react';
 
 interface EarthquakeIncident {
   id: string;
@@ -187,18 +187,32 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
             </Badge>
           )}
         </CardTitle>
-        <p className="text-sm text-gray-600">
-          {filteredIncidents.length} earthquake{filteredIncidents.length !== 1 ? 's' : ''} 
-          {stateFilter && stateFilter !== 'all' 
-            ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
-            : ' nationwide'
-          } from USGS
-          {stateFilter && stateFilter !== 'all' && (
-            <span className="text-blue-600 ml-2 text-xs">
-              • Filtered by weather alert selection
-            </span>
-          )}
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-gray-600">
+            {filteredIncidents.length} earthquake{filteredIncidents.length !== 1 ? 's' : ''} 
+            {stateFilter && stateFilter !== 'all' 
+              ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
+              : ' nationwide'
+            } from USGS
+            {stateFilter && stateFilter !== 'all' && (
+              <span className="text-blue-600 ml-2 text-xs">
+                • Filtered by weather alert selection
+              </span>
+            )}
+          </p>
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+            <h4 className="text-sm font-semibold text-purple-800 flex items-center gap-2 mb-2">
+              <InfoIcon className="w-4 h-4" />
+              About Earthquake Data
+            </h4>
+            <p className="text-xs text-purple-700 leading-relaxed">
+              This data comes from the <strong>U.S. Geological Survey (USGS)</strong> real-time earthquake feed. 
+              Earthquakes are measured on the <strong>Richter scale</strong> (magnitude 1-10+), with alerts based on impact and population exposure. 
+              <strong>Alert levels</strong> include Green (minimal impact), Yellow (local damage possible), Orange (regional impact), and Red (widespread damage expected). 
+              Data updates within minutes of seismic detection.
+            </p>
+          </div>
+        </div>
         
         {/* View Mode Toggle */}
         <div className="flex items-center gap-2 pt-2">
