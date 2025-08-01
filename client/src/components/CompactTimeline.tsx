@@ -30,6 +30,25 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // State abbreviation to full name mapping
+  const getStateName = (abbreviation: string) => {
+    const stateMap: Record<string, string> = {
+      'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+      'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+      'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+      'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+      'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
+      'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
+      'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
+      'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+      'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+      'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming',
+      'DC': 'District of Columbia', 'PR': 'Puerto Rico', 'VI': 'U.S. Virgin Islands', 
+      'GU': 'Guam', 'AS': 'American Samoa', 'MP': 'Northern Mariana Islands'
+    };
+    return stateMap[abbreviation] || abbreviation;
+  };
+
   // Filter out fire management incidents and apply filters
   const filteredDisasters = disasters
     .filter(d => d.declarationType !== 'FM') // Remove fire incidents
@@ -159,7 +178,7 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-bold text-gray-900 text-base leading-tight mb-1">
-                            {disaster.state} {disaster.incidentType}
+                            {getStateName(disaster.state)} {disaster.incidentType}
                           </div>
                           <div className="flex items-center gap-2 mb-1">
                             <Badge variant="outline" className={`${typeColor} font-semibold text-xs`}>
