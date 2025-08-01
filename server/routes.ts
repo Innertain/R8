@@ -58,6 +58,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       recentUpdatesCache = null;
       recentUpdatesCacheTime = 0;
       
+      // Clear FEMA disasters cache
+      femaDisastersCache = null;
+      femaDisastersCacheTime = 0;
+      
       // Clear Airtable cache if available
       try {
         const { clearAirtableCache } = await import('./airtable');
@@ -2315,7 +2319,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   // Cache for FEMA disaster data
   let femaDisastersCache: any = null;
   let femaDisastersCacheTime: number = 0;
-  const FEMA_CACHE_DURATION = 60 * 60 * 1000; // 1 hour cache
+  const FEMA_CACHE_DURATION = 5 * 60 * 1000; // 5 minute cache for testing
 
   // FEMA OpenData API - Real Disaster Declarations (with caching)
   app.get("/api/fema-disasters", async (req, res) => {
@@ -2331,23 +2335,18 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
 
-      // Enhanced FEMA query for comprehensive disaster coverage across all types and years
-      // Query multiple disaster categories to get maximum coverage
+      // COMPREHENSIVE FEMA query - get ALL declaration types for complete accuracy
       const queries = [
-        // Recent disasters (2020+) - all types
-        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(declarationType eq 'DR' or declarationType eq 'EM') and (declarationDate ge 2020-01-01T00:00:00.000Z)&$orderby=declarationDate desc&$top=300&$format=json`,
-        // All hurricanes (any year)
-        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentType eq 'Hurricane'&$orderby=declarationDate desc&$top=150&$format=json`,
-        // All floods (any year)
-        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentType eq 'Flood'&$orderby=declarationDate desc&$top=200&$format=json`,
-        // Tropical storms
-        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentType eq 'Tropical Storm'&$orderby=declarationDate desc&$top=100&$format=json`,
-        // All fires/wildfires (any year)
-        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=(incidentType eq 'Fire' or incidentType eq 'Wildfire')&$orderby=declarationDate desc&$top=150&$format=json`,
-        // Tornadoes
-        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentType eq 'Tornado'&$orderby=declarationDate desc&$top=100&$format=json`,
-        // Severe storms
-        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentType eq 'Severe Storm'&$orderby=declarationDate desc&$top=150&$format=json`
+        // 2023 - Split into multiple queries to get ALL declarations
+        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=declarationDate ge 2023-01-01T00:00:00.000Z and declarationDate le 2023-06-30T23:59:59.000Z&$orderby=declarationDate desc&$top=1000&$format=json`,
+        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=declarationDate ge 2023-07-01T00:00:00.000Z and declarationDate le 2023-12-31T23:59:59.000Z&$orderby=declarationDate desc&$top=1000&$format=json`,
+        // 2024 - Split into halves
+        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=declarationDate ge 2024-01-01T00:00:00.000Z and declarationDate le 2024-06-30T23:59:59.000Z&$orderby=declarationDate desc&$top=1000&$format=json`,
+        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=declarationDate ge 2024-07-01T00:00:00.000Z and declarationDate le 2024-12-31T23:59:59.000Z&$orderby=declarationDate desc&$top=1000&$format=json`,
+        // 2025 - Current year
+        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=declarationDate ge 2025-01-01T00:00:00.000Z&$orderby=declarationDate desc&$top=1000&$format=json`,
+        // Historical context (2021-2022) 
+        `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=declarationDate ge 2021-01-01T00:00:00.000Z and declarationDate le 2022-12-31T23:59:59.000Z&$orderby=declarationDate desc&$top=1000&$format=json`
       ];
       
       console.log('Fetching comprehensive FEMA disaster data across all disaster types and years...');
@@ -2366,7 +2365,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             const declarations = data.DisasterDeclarationsSummaries || [];
             allDeclarations.push(...declarations);
             
-            const queryTypes = ['Recent (2020+)', 'Hurricanes', 'Floods', 'Tropical Storms', 'Fires/Wildfires', 'Tornadoes', 'Severe Storms'];
+            const queryTypes = ['2023 H1', '2023 H2', '2024 H1', '2024 H2', '2025 Current', '2021-2022 Historical'];
             queryCounts.push(`${queryTypes[i]}: ${declarations.length}`);
           } catch (e) {
             console.log(`Query ${i} failed to parse:`, e);
