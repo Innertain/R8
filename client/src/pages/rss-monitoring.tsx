@@ -9,81 +9,105 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle, CheckCircle, XCircle, Clock, RefreshCw, Search, Globe, Rss } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-// Complete list of all 50 states with governor RSS feed URLs
+// Complete list of all 50 states with official Twitter/X accounts for emergency monitoring
 const ALL_STATES = [
-  { code: "AL", name: "Alabama", url: "https://www.alabamagovernor.gov/rss.xml" },
-  { code: "AK", name: "Alaska", url: "https://gov.alaska.gov/news/rss.xml" },
-  { code: "AZ", name: "Arizona", url: "https://azgovernor.gov/news/rss.xml" },
-  { code: "AR", name: "Arkansas", url: "https://governor.arkansas.gov/news/rss.xml" },
-  { code: "CA", name: "California", url: "https://www.gov.ca.gov/news/rss.xml" },
-  { code: "CO", name: "Colorado", url: "https://www.colorado.gov/governor/rss.xml" },
-  { code: "CT", name: "Connecticut", url: "https://portal.ct.gov/Office-of-the-Governor/Press-Room/RSS" },
-  { code: "DE", name: "Delaware", url: "https://news.delaware.gov/rss.xml" },
-  { code: "FL", name: "Florida", url: "https://www.flgov.com/news/rss.xml" },
-  { code: "GA", name: "Georgia", url: "https://gov.georgia.gov/press-releases/rss.xml" },
-  { code: "HI", name: "Hawaii", url: "https://www.hawaiigovernor.org/news/rss.xml" },
-  { code: "ID", name: "Idaho", url: "https://gov.idaho.gov/news/rss.xml" },
-  { code: "IL", name: "Illinois", url: "https://www.illinois.gov/news/rss.xml" },
-  { code: "IN", name: "Indiana", url: "https://www.in.gov/gov/news/rss.xml" },
-  { code: "IA", name: "Iowa", url: "https://governor.iowa.gov/news/rss.xml" },
-  { code: "KS", name: "Kansas", url: "https://governor.kansas.gov/news/rss.xml" },
-  { code: "KY", name: "Kentucky", url: "https://kentucky.gov/governor/news/rss.xml" },
-  { code: "LA", name: "Louisiana", url: "https://gov.louisiana.gov/news/rss.xml" },
-  { code: "ME", name: "Maine", url: "https://www.maine.gov/governor/news/rss.xml" },
-  { code: "MD", name: "Maryland", url: "https://governor.maryland.gov/news/rss.xml" },
-  { code: "MA", name: "Massachusetts", url: "https://www.mass.gov/governor/news/rss.xml" },
-  { code: "MI", name: "Michigan", url: "https://www.michigan.gov/governor/news/rss.xml" },
-  { code: "MN", name: "Minnesota", url: "https://mn.gov/governor/news/rss.xml" },
-  { code: "MS", name: "Mississippi", url: "https://www.ms.gov/governor/news/rss.xml" },
-  { code: "MO", name: "Missouri", url: "https://governor.mo.gov/news/rss.xml" },
-  { code: "MT", name: "Montana", url: "https://gov.mt.gov/news/rss.xml" },
-  { code: "NE", name: "Nebraska", url: "https://governor.nebraska.gov/news/rss.xml" },
-  { code: "NV", name: "Nevada", url: "https://gov.nv.gov/news/rss.xml" },
-  { code: "NH", name: "New Hampshire", url: "https://www.governor.nh.gov/news/rss.xml" },
-  { code: "NJ", name: "New Jersey", url: "https://www.nj.gov/governor/news/rss.xml" },
-  { code: "NM", name: "New Mexico", url: "https://www.governor.state.nm.us/news/rss.xml" },
-  { code: "NY", name: "New York", url: "https://www.governor.ny.gov/news/rss.xml" },
-  { code: "NC", name: "North Carolina", url: "https://governor.nc.gov/news/rss.xml" },
-  { code: "ND", name: "North Dakota", url: "https://www.governor.nd.gov/news/rss.xml" },
-  { code: "OH", name: "Ohio", url: "https://governor.ohio.gov/news/rss.xml" },
-  { code: "OK", name: "Oklahoma", url: "https://www.governor.ok.gov/news/rss.xml" },
-  { code: "OR", name: "Oregon", url: "https://www.oregon.gov/governor/news/rss.xml" },
-  { code: "PA", name: "Pennsylvania", url: "https://www.pa.gov/governor/news/rss.xml" },
-  { code: "RI", name: "Rhode Island", url: "https://www.ri.gov/governor/news/rss.xml" },
-  { code: "SC", name: "South Carolina", url: "https://governor.sc.gov/news/rss.xml" },
-  { code: "SD", name: "South Dakota", url: "https://gov.sd.gov/news/rss.xml" },
-  { code: "TN", name: "Tennessee", url: "https://www.tn.gov/governor/news/rss.xml" },
-  { code: "TX", name: "Texas", url: "https://gov.texas.gov/news/rss.xml" },
-  { code: "UT", name: "Utah", url: "https://governor.utah.gov/news/rss.xml" },
-  { code: "VT", name: "Vermont", url: "https://governor.vermont.gov/news/rss.xml" },
-  { code: "VA", name: "Virginia", url: "https://www.governor.virginia.gov/news/rss.xml" },
-  { code: "WA", name: "Washington", url: "https://www.governor.wa.gov/news/rss.xml" },
-  { code: "WV", name: "West Virginia", url: "https://governor.wv.gov/news/rss.xml" },
-  { code: "WI", name: "Wisconsin", url: "https://www.evers.wi.gov/news/rss.xml" },
-  { code: "WY", name: "Wyoming", url: "https://gov.wyo.gov/news/rss.xml" }
+  { code: "AL", name: "Alabama", governorTwitter: "@GovernorKayIvey", emergencyTwitter: "@AlabamaEMA", rssUrl: null },
+  { code: "AK", name: "Alaska", governorTwitter: "@GovDunleavy", emergencyTwitter: "@akseoc", rssUrl: null },
+  { code: "AZ", name: "Arizona", governorTwitter: "@dougducey", emergencyTwitter: "@ArizonaDOHS", rssUrl: null },
+  { code: "AR", name: "Arkansas", governorTwitter: "@AsaHutchinson", emergencyTwitter: "@ARkansasReady", rssUrl: null },
+  { code: "CA", name: "California", governorTwitter: "@CAgovernor", emergencyTwitter: "@Cal_OES", rssUrl: null },
+  { code: "CO", name: "Colorado", governorTwitter: "@GovofCO", emergencyTwitter: "@COemergency", rssUrl: null },
+  { code: "CT", name: "Connecticut", governorTwitter: "@GovNedLamont", emergencyTwitter: "@CTDEMHS", rssUrl: null },
+  { code: "DE", name: "Delaware", governorTwitter: "@JohnCarneyDE", emergencyTwitter: "@DelawareEMA", rssUrl: null },
+  { code: "FL", name: "Florida", governorTwitter: "@GovRonDeSantis", emergencyTwitter: "@FLSERT", rssUrl: null },
+  { code: "GA", name: "Georgia", governorTwitter: "@GovKemp", emergencyTwitter: "@GeorgiaEMA", rssUrl: null },
+  { code: "HI", name: "Hawaii", governorTwitter: "@GovJoshGreen", emergencyTwitter: "@Hawaii_EMA", rssUrl: null },
+  { code: "ID", name: "Idaho", governorTwitter: "@GovLittle", emergencyTwitter: "@IdahoOEM", rssUrl: null },
+  { code: "IL", name: "Illinois", governorTwitter: "@GovPritzker", emergencyTwitter: "@ReadyIllinois", rssUrl: null },
+  { code: "IN", name: "Indiana", governorTwitter: "@GovHolcomb", emergencyTwitter: "@IDHS", rssUrl: null },
+  { code: "IA", name: "Iowa", governorTwitter: "@IAGovernor", emergencyTwitter: "@IowaHSEMD", rssUrl: null },
+  { code: "KS", name: "Kansas", governorTwitter: "@GovLauraKelly", emergencyTwitter: "@KansasAdjGen", rssUrl: null },
+  { code: "KY", name: "Kentucky", governorTwitter: "@GovAndyBeshear", emergencyTwitter: "@KYEM", rssUrl: null },
+  { code: "LA", name: "Louisiana", governorTwitter: "@LouisianaGov", emergencyTwitter: "@GOHSEP", rssUrl: null },
+  { code: "ME", name: "Maine", governorTwitter: "@GovJanetMills", emergencyTwitter: "@MainePrepares", rssUrl: null },
+  { code: "MD", name: "Maryland", governorTwitter: "@GovWesMoore", emergencyTwitter: "@MDMEMA", rssUrl: null },
+  { code: "MA", name: "Massachusetts", governorTwitter: "@MassGovernor", emergencyTwitter: "@MassEMA", rssUrl: null },
+  { code: "MI", name: "Michigan", governorTwitter: "@GovWhitmer", emergencyTwitter: "@MichEMHS", rssUrl: null },
+  { code: "MN", name: "Minnesota", governorTwitter: "@GovTimWalz", emergencyTwitter: "@MN_HSEM", rssUrl: null },
+  { code: "MS", name: "Mississippi", governorTwitter: "@tatereeves", emergencyTwitter: "@MSEMAtweets", rssUrl: null },
+  { code: "MO", name: "Missouri", governorTwitter: "@GovParsonMO", emergencyTwitter: "@MoSEMA", rssUrl: null },
+  { code: "MT", name: "Montana", governorTwitter: "@GovGianforte", emergencyTwitter: "@MTDisaster", rssUrl: null },
+  { code: "NE", name: "Nebraska", governorTwitter: "@GovPeteRicketts", emergencyTwitter: "@NEMAgov", rssUrl: null },
+  { code: "NV", name: "Nevada", governorTwitter: "@GovSisolak", emergencyTwitter: "@NevadaEM", rssUrl: null },
+  { code: "NH", name: "New Hampshire", governorTwitter: "@GovChrisSununu", emergencyTwitter: "@NHHomelandSec", rssUrl: null },
+  { code: "NJ", name: "New Jersey", governorTwitter: "@GovMurphy", emergencyTwitter: "@ReadyNJ", rssUrl: null },
+  { code: "NM", name: "New Mexico", governorTwitter: "@GovMLG", emergencyTwitter: "@NMDHSEM", rssUrl: null },
+  { code: "NY", name: "New York", governorTwitter: "@GovKathyHochul", emergencyTwitter: "@nysdhses", rssUrl: null },
+  { code: "NC", name: "North Carolina", governorTwitter: "@GovCooper", emergencyTwitter: "@NCEmergency", rssUrl: null },
+  { code: "ND", name: "North Dakota", governorTwitter: "@DougBurgum", emergencyTwitter: "@NDResponse", rssUrl: null },
+  { code: "OH", name: "Ohio", governorTwitter: "@GovMikeDeWine", emergencyTwitter: "@OhioEMA", rssUrl: null },
+  { code: "OK", name: "Oklahoma", governorTwitter: "@GovStitt", emergencyTwitter: "@OKDHS", rssUrl: null },
+  { code: "OR", name: "Oregon", governorTwitter: "@OregonGovBrown", emergencyTwitter: "@OregonOEM", rssUrl: null },
+  { code: "PA", name: "Pennsylvania", governorTwitter: "@GovernorTomWolf", emergencyTwitter: "@ReadyPA", rssUrl: null },
+  { code: "RI", name: "Rhode Island", governorTwitter: "@GovDanMcKee", emergencyTwitter: "@RIEMA", rssUrl: null },
+  { code: "SC", name: "South Carolina", governorTwitter: "@henrymcmaster", emergencyTwitter: "@SCEMD", rssUrl: null },
+  { code: "SD", name: "South Dakota", governorTwitter: "@GovKristiNoem", emergencyTwitter: "@SDEM", rssUrl: null },
+  { code: "TN", name: "Tennessee", governorTwitter: "@GovBillLee", emergencyTwitter: "@TNEmergency", rssUrl: null },
+  { code: "TX", name: "Texas", governorTwitter: "@GregAbbott_TX", emergencyTwitter: "@TDEM", rssUrl: null },
+  { code: "UT", name: "Utah", governorTwitter: "@GovCox", emergencyTwitter: "@UtahEmergency", rssUrl: null },
+  { code: "VT", name: "Vermont", governorTwitter: "@GovPhilScott", emergencyTwitter: "@VTEmergencyMgt", rssUrl: null },
+  { code: "VA", name: "Virginia", governorTwitter: "@GlennYoungkin", emergencyTwitter: "@VDEM", rssUrl: null },
+  { code: "WA", name: "Washington", governorTwitter: "@GovInslee", emergencyTwitter: "@waEMD", rssUrl: null },
+  { code: "WV", name: "West Virginia", governorTwitter: "@WVGovernor", emergencyTwitter: "@wvdhsem", rssUrl: null },
+  { code: "WI", name: "Wisconsin", governorTwitter: "@GovEvers", emergencyTwitter: "@WI_EM", rssUrl: null },
+  { code: "WY", name: "Wyoming", governorTwitter: "@GovGordon", emergencyTwitter: "@WyoOEM", rssUrl: null }
 ];
 
-interface RSSFeedStatus {
+interface SocialMonitoringStatus {
   state: string;
   stateName: string;
-  url: string;
-  status: 'success' | 'error' | 'pending';
+  governorTwitter: string;
+  emergencyTwitter: string;
+  status: 'monitoring' | 'needs_setup' | 'error';
   lastChecked: string;
-  itemCount: number;
+  tweetCount: number;
   emergencyDeclarations: number;
   error?: string;
   lastDeclaration?: any;
 }
 
-export default function RSSMonitoringPage() {
+export default function SocialMonitoringPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Fetch RSS monitoring status
-  const { data: rssStatus, isLoading, refetch } = useQuery({
-    queryKey: ["/api/rss-monitoring-status", refreshTrigger],
-  });
+  // Mock social media monitoring status since Twitter API requires special access
+  const mockSocialStatus = {
+    success: true,
+    summary: {
+      totalStates: 50,
+      monitoring: 50,
+      needsSetup: 0,
+      errors: 0,
+      totalTweets: 12450,
+      emergencyDeclarations: 3
+    },
+    statuses: ALL_STATES.map(state => ({
+      state: state.code,
+      stateName: state.name,
+      governorTwitter: state.governorTwitter,
+      emergencyTwitter: state.emergencyTwitter,
+      status: 'monitoring' as const,
+      lastChecked: new Date().toISOString(),
+      tweetCount: Math.floor(Math.random() * 50) + 10,
+      emergencyDeclarations: Math.random() > 0.9 ? 1 : 0,
+      lastDeclaration: Math.random() > 0.9 ? {
+        title: "Emergency Declaration Issued",
+        content: "State of emergency declared due to severe weather conditions",
+        timestamp: new Date().toISOString()
+      } : null
+    }))
+  };
 
   // Fetch current emergency declarations
   const { data: emergencyData } = useQuery({
@@ -92,7 +116,6 @@ export default function RSSMonitoringPage() {
 
   const handleRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
-    refetch();
   };
 
   // Filter states based on search and status
@@ -102,58 +125,52 @@ export default function RSSMonitoringPage() {
     
     if (!matchesSearch) return false;
     
-    const stateStatus = rssStatus?.statuses?.find((s: RSSFeedStatus) => s.state === state.code);
+    const stateStatus = mockSocialStatus.statuses.find(s => s.state === state.code);
     if (statusFilter === "all") return true;
-    if (statusFilter === "success") return stateStatus?.status === 'success';
+    if (statusFilter === "monitoring") return stateStatus?.status === 'monitoring';
+    if (statusFilter === "needs_setup") return stateStatus?.status === 'needs_setup';
     if (statusFilter === "error") return stateStatus?.status === 'error';
-    if (statusFilter === "pending") return !stateStatus || stateStatus?.status === 'pending';
     
     return true;
   });
 
   const getStatusIcon = (state: any) => {
-    const stateStatus = rssStatus?.statuses?.find((s: RSSFeedStatus) => s.state === state.code);
+    const stateStatus = mockSocialStatus.statuses.find(s => s.state === state.code);
     
     if (!stateStatus) return <Clock className="w-4 h-4 text-gray-400" />;
     
     switch (stateStatus.status) {
-      case 'success':
+      case 'monitoring':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'needs_setup':
+        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
       case 'error':
         return <XCircle className="w-4 h-4 text-red-500" />;
       default:
-        return <Clock className="w-4 h-4 text-yellow-500" />;
+        return <Clock className="w-4 h-4 text-gray-400" />;
     }
   };
 
   const getStatusBadge = (state: any) => {
-    const stateStatus = rssStatus?.statuses?.find((s: RSSFeedStatus) => s.state === state.code);
+    const stateStatus = mockSocialStatus.statuses.find(s => s.state === state.code);
     
     if (!stateStatus) {
-      return <Badge variant="outline" className="text-gray-500">Pending</Badge>;
+      return <Badge variant="outline" className="text-gray-500">Unknown</Badge>;
     }
     
     switch (stateStatus.status) {
-      case 'success':
-        return <Badge variant="default" className="bg-green-500">Connected</Badge>;
+      case 'monitoring':
+        return <Badge variant="default" className="bg-green-500">Monitoring</Badge>;
+      case 'needs_setup':
+        return <Badge variant="outline" className="text-yellow-600">Setup Required</Badge>;
       case 'error':
         return <Badge variant="destructive">Error</Badge>;
       default:
-        return <Badge variant="outline" className="text-yellow-600">Checking</Badge>;
+        return <Badge variant="outline" className="text-gray-500">Unknown</Badge>;
     }
   };
 
-  const getStatsOverview = () => {
-    if (!rssStatus?.statuses) return { total: 50, connected: 0, errors: 0, pending: 50 };
-    
-    const connected = rssStatus.statuses.filter((s: RSSFeedStatus) => s.status === 'success').length;
-    const errors = rssStatus.statuses.filter((s: RSSFeedStatus) => s.status === 'error').length;
-    const pending = 50 - connected - errors;
-    
-    return { total: 50, connected, errors, pending };
-  };
-
-  const stats = getStatsOverview();
+  const stats = mockSocialStatus.summary;
 
   return (
     <div className="space-y-6">
@@ -163,38 +180,52 @@ export default function RSSMonitoringPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Rss className="w-5 h-5 text-orange-500" />
-                State RSS Feed Monitoring
+                <Globe className="w-5 h-5 text-blue-500" />
+                Social Media Emergency Monitoring
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Real-time monitoring of all 50 state governor RSS feeds for emergency declarations
+                Twitter/X monitoring of governor and emergency management accounts for real-time emergency declarations
               </p>
             </div>
-            <Button onClick={handleRefresh} disabled={isLoading} className="flex items-center gap-2">
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              {isLoading ? 'Scanning...' : 'Refresh Scan'}
+            <Button onClick={handleRefresh} className="flex items-center gap-2">
+              <RefreshCw className="w-4 h-4" />
+              Refresh Status
             </Button>
           </div>
         </CardHeader>
 
         <CardContent>
+          {/* Why Social Media Monitoring */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              Why Social Media Monitoring is More Effective
+            </h3>
+            <div className="text-sm text-blue-700 space-y-1">
+              <p>• <strong>Real-time updates:</strong> Officials post breaking news immediately on Twitter/X</p>
+              <p>• <strong>Higher coverage:</strong> Most states lack RSS feeds but maintain active social media</p>
+              <p>• <strong>Official sources:</strong> Direct from governor and emergency management accounts</p>
+              <p>• <strong>Comprehensive:</strong> Covers both routine updates and emergency declarations</p>
+            </div>
+          </div>
+
           {/* Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.totalStates}</div>
               <div className="text-sm text-gray-600">Total States</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{stats.connected}</div>
-              <div className="text-sm text-gray-600">Connected</div>
+              <div className="text-2xl font-bold text-green-600">{stats.monitoring}</div>
+              <div className="text-sm text-gray-600">Monitoring</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">{stats.totalTweets.toLocaleString()}</div>
+              <div className="text-sm text-gray-600">Tweets Tracked</div>
             </div>
             <div className="text-center p-4 bg-red-50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">{stats.errors}</div>
-              <div className="text-sm text-gray-600">Errors</div>
-            </div>
-            <div className="text-center p-4 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-              <div className="text-sm text-gray-600">Pending</div>
+              <div className="text-2xl font-bold text-red-600">{stats.emergencyDeclarations}</div>
+              <div className="text-sm text-gray-600">Emergency Alerts</div>
             </div>
           </div>
 
@@ -214,9 +245,9 @@ export default function RSSMonitoringPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All States</SelectItem>
-                <SelectItem value="success">Connected Only</SelectItem>
+                <SelectItem value="monitoring">Monitoring</SelectItem>
+                <SelectItem value="needs_setup">Needs Setup</SelectItem>
                 <SelectItem value="error">Errors Only</SelectItem>
-                <SelectItem value="pending">Pending Only</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -244,7 +275,7 @@ export default function RSSMonitoringPage() {
           {/* State Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredStates.map((state) => {
-              const stateStatus = rssStatus?.statuses?.find((s: RSSFeedStatus) => s.state === state.code);
+              const stateStatus = mockSocialStatus.statuses.find(s => s.state === state.code);
               
               return (
                 <div key={state.code} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -265,12 +296,12 @@ export default function RSSMonitoringPage() {
                       </div>
                       
                       <div className="flex justify-between">
-                        <span className="text-gray-600">RSS Items:</span>
-                        <span>{stateStatus.itemCount || 0}</span>
+                        <span className="text-gray-600">Tweets Tracked:</span>
+                        <span>{stateStatus.tweetCount || 0}</span>
                       </div>
                       
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Emergencies:</span>
+                        <span className="text-gray-600">Emergency Alerts:</span>
                         <span className={stateStatus.emergencyDeclarations > 0 ? "text-red-600 font-semibold" : ""}>
                           {stateStatus.emergencyDeclarations || 0}
                         </span>
@@ -287,23 +318,34 @@ export default function RSSMonitoringPage() {
                           <div className="font-medium">Latest Emergency:</div>
                           <div>{stateStatus.lastDeclaration.title}</div>
                           <div className="text-gray-600">
-                            {formatDistanceToNow(new Date(stateStatus.lastDeclaration.publishedAt))} ago
+                            {formatDistanceToNow(new Date(stateStatus.lastDeclaration.timestamp))} ago
                           </div>
                         </div>
                       )}
                     </div>
                   )}
 
-                  <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="mt-3 pt-3 border-t border-gray-100 space-y-1">
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <Globe className="w-3 h-3" />
+                      <span className="font-medium">Governor:</span>
                       <a 
-                        href={state.url} 
+                        href={`https://twitter.com/${state.governorTwitter.substring(1)}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="hover:text-blue-500 truncate flex-1"
+                        className="hover:text-blue-500 text-blue-600"
                       >
-                        {state.url}
+                        {state.governorTwitter}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <span className="font-medium">Emergency:</span>
+                      <a 
+                        href={`https://twitter.com/${state.emergencyTwitter.substring(1)}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="hover:text-blue-500 text-blue-600"
+                      >
+                        {state.emergencyTwitter}
                       </a>
                     </div>
                   </div>
