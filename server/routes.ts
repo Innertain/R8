@@ -1833,21 +1833,116 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
 
-      // Search for recent emergency declarations from news sources
+      // Enhanced search queries for comprehensive coverage
       const searchQueries = [
         'governor declares emergency',
         'state of emergency declared',
         'emergency declaration governor',
-        'governor emergency order'
+        'governor emergency order',
+        '"state of emergency" governor flooding',
+        '"state of emergency" governor wildfire',
+        '"state of emergency" governor storm',
+        '"state of emergency" governor hurricane',
+        'governor proclaims emergency',
+        'executive order emergency declaration',
+        'Kathy Hochul state emergency',
+        'governor declares disaster emergency',
+        'state emergency proclamation',
+        'governor activates emergency'
       ];
 
       const emergencyDeclarations = [];
       const seenDeclarations = new Set();
 
+      // Also check RSS feeds from government sources for official proclamations
+      const governmentRssFeeds = [
+        'https://www.governor.ny.gov/news.rss', // New York Governor
+        'https://gov.texas.gov/news/rss', // Texas Governor
+        'https://www.gov.ca.gov/feed/', // California Governor
+        'https://www.pa.gov/agencies/governor/news/rss/', // Pennsylvania Governor
+        'https://www.governor.state.mn.us/feed/', // Minnesota Governor
+      ];
+
+      // Check government RSS feeds first
+      for (const rssUrl of governmentRssFeeds) {
+        try {
+          const rssResponse = await fetch(rssUrl, {
+            headers: { 'User-Agent': 'DisasterWatchCenter/1.0' }
+          });
+          
+          if (rssResponse.ok) {
+            const rssText = await rssResponse.text();
+            
+            // Simple RSS parsing for emergency declarations
+            const itemMatches = rssText.match(/<item>([\s\S]*?)<\/item>/g) || [];
+            
+            itemMatches.slice(0, 10).forEach(item => { // Check recent 10 items
+              const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+              const linkMatch = item.match(/<link>(.*?)<\/link>/);
+              const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+              const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+              
+              if (titleMatch && linkMatch) {
+                const title = titleMatch[1]?.toLowerCase() || '';
+                const description = descMatch?.[1]?.toLowerCase() || '';
+                const fullText = `${title} ${description}`;
+                
+                // Check for emergency keywords
+                const hasEmergencyKeywords = [
+                  'emergency declaration', 'state of emergency', 'emergency order',
+                  'disaster declaration', 'declares emergency', 'proclaims emergency'
+                ].some(keyword => fullText.includes(keyword));
+                
+                if (hasEmergencyKeywords) {
+                  // Determine state from RSS URL
+                  let state = '';
+                  if (rssUrl.includes('governor.ny.gov')) state = 'NY';
+                  else if (rssUrl.includes('gov.texas.gov')) state = 'TX';
+                  else if (rssUrl.includes('gov.ca.gov')) state = 'CA';
+                  else if (rssUrl.includes('pa.gov')) state = 'PA';
+                  else if (rssUrl.includes('governor.state.mn.us')) state = 'MN';
+                  
+                  if (state) {
+                    const pubDate = pubDateMatch ? new Date(pubDateMatch[1]).toISOString() : new Date().toISOString();
+                    const declarationKey = `${state}-rss-${pubDate}`;
+                    
+                    if (!seenDeclarations.has(declarationKey)) {
+                      seenDeclarations.add(declarationKey);
+                      
+                      // Extract emergency type
+                      let emergencyType = 'General Emergency';
+                      if (fullText.includes('flood')) emergencyType = 'Flooding';
+                      else if (fullText.includes('fire') || fullText.includes('wildfire')) emergencyType = 'Wildfire';
+                      else if (fullText.includes('hurricane') || fullText.includes('storm')) emergencyType = 'Storm/Hurricane';
+                      else if (fullText.includes('winter') || fullText.includes('snow')) emergencyType = 'Winter Weather';
+                      
+                      emergencyDeclarations.push({
+                        id: `rss-${state}-${Date.parse(pubDate)}`,
+                        state,
+                        stateName: getStateName(state),
+                        title: titleMatch[1],
+                        description: descMatch?.[1] || '',
+                        emergencyType,
+                        publishedAt: pubDate,
+                        source: 'Official Government RSS',
+                        url: linkMatch[1],
+                        author: `${getStateName(state)} Governor's Office`
+                      });
+                    }
+                  }
+                }
+              }
+            });
+          }
+        } catch (rssError) {
+          console.error(`Error fetching RSS from ${rssUrl}:`, rssError);
+        }
+      }
+
       for (const query of searchQueries) {
         try {
           const response = await fetch(
-            `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&from=${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}&apiKey=${process.env.NEWS_API_KEY}`,
+            `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&from=${new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}&apiKey=${process.env.NEWS_API_KEY}`,
             {
               headers: {
                 'User-Agent': 'DisasterWatchCenter/1.0'
@@ -1865,19 +1960,59 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
               const content = article.content?.toLowerCase() || '';
               const fullText = `${title} ${description} ${content}`;
 
-              // State detection patterns
+              // Enhanced state detection patterns with governor names and cities
               const statePatterns = {
-                'AL': ['alabama'], 'AK': ['alaska'], 'AZ': ['arizona'], 'AR': ['arkansas'], 'CA': ['california'],
-                'CO': ['colorado'], 'CT': ['connecticut'], 'DE': ['delaware'], 'FL': ['florida'], 'GA': ['georgia'],
-                'HI': ['hawaii'], 'ID': ['idaho'], 'IL': ['illinois'], 'IN': ['indiana'], 'IA': ['iowa'],
-                'KS': ['kansas'], 'KY': ['kentucky'], 'LA': ['louisiana'], 'ME': ['maine'], 'MD': ['maryland'],
-                'MA': ['massachusetts'], 'MI': ['michigan'], 'MN': ['minnesota'], 'MS': ['mississippi'], 'MO': ['missouri'],
-                'MT': ['montana'], 'NE': ['nebraska'], 'NV': ['nevada'], 'NH': ['new hampshire'], 'NJ': ['new jersey'],
-                'NM': ['new mexico'], 'NY': ['new york'], 'NC': ['north carolina'], 'ND': ['north dakota'], 'OH': ['ohio'],
-                'OK': ['oklahoma'], 'OR': ['oregon'], 'PA': ['pennsylvania'], 'RI': ['rhode island'], 'SC': ['south carolina'],
-                'SD': ['south dakota'], 'TN': ['tennessee'], 'TX': ['texas'], 'UT': ['utah'], 'VT': ['vermont'],
-                'VA': ['virginia'], 'WA': ['washington'], 'WV': ['west virginia'], 'WI': ['wisconsin'], 'WY': ['wyoming'],
-                'DC': ['washington dc', 'district of columbia']
+                'AL': ['alabama', 'kay ivey'],
+                'AK': ['alaska', 'mike dunleavy'],
+                'AZ': ['arizona', 'katie hobbs'],
+                'AR': ['arkansas', 'sarah sanders'],
+                'CA': ['california', 'gavin newsom'],
+                'CO': ['colorado', 'jared polis'],
+                'CT': ['connecticut', 'ned lamont'],
+                'DE': ['delaware', 'john carney'],
+                'FL': ['florida', 'ron desantis'],
+                'GA': ['georgia', 'brian kemp'],
+                'HI': ['hawaii', 'josh green'],
+                'ID': ['idaho', 'brad little'],
+                'IL': ['illinois', 'j.b. pritzker'],
+                'IN': ['indiana', 'eric holcomb'],
+                'IA': ['iowa', 'kim reynolds'],
+                'KS': ['kansas', 'laura kelly'],
+                'KY': ['kentucky', 'andy beshear'],
+                'LA': ['louisiana', 'jeff landry'],
+                'ME': ['maine', 'janet mills'],
+                'MD': ['maryland', 'wes moore'],
+                'MA': ['massachusetts', 'maura healey'],
+                'MI': ['michigan', 'gretchen whitmer'],
+                'MN': ['minnesota', 'tim walz'],
+                'MS': ['mississippi', 'tate reeves'],
+                'MO': ['missouri', 'mike parson'],
+                'MT': ['montana', 'greg gianforte'],
+                'NE': ['nebraska', 'pete ricketts'],
+                'NV': ['nevada', 'joe lombardo'],
+                'NH': ['new hampshire', 'chris sununu'],
+                'NJ': ['new jersey', 'phil murphy'],
+                'NM': ['new mexico', 'michelle lujan grisham'],
+                'NY': ['new york', 'kathy hochul', 'new york city', 'long island', 'hudson valley'],
+                'NC': ['north carolina', 'roy cooper'],
+                'ND': ['north dakota', 'doug burgum'],
+                'OH': ['ohio', 'mike dewine'],
+                'OK': ['oklahoma', 'kevin stitt'],
+                'OR': ['oregon', 'tina kotek'],
+                'PA': ['pennsylvania', 'josh shapiro'],
+                'RI': ['rhode island', 'dan mckee'],
+                'SC': ['south carolina', 'henry mcmaster'],
+                'SD': ['south dakota', 'kristi noem'],
+                'TN': ['tennessee', 'bill lee'],
+                'TX': ['texas', 'greg abbott'],
+                'UT': ['utah', 'spencer cox'],
+                'VT': ['vermont', 'phil scott'],
+                'VA': ['virginia', 'glenn youngkin'],
+                'WA': ['washington', 'jay inslee'],
+                'WV': ['west virginia', 'jim justice'],
+                'WI': ['wisconsin', 'tony evers'],
+                'WY': ['wyoming', 'mark gordon'],
+                'DC': ['washington dc', 'district of columbia', 'muriel bowser']
               };
 
               // Find matching states
@@ -1888,10 +2023,13 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                 }
               }
 
-              // Emergency keywords validation
+              // Enhanced emergency keywords validation
               const emergencyKeywords = [
                 'emergency declaration', 'state of emergency', 'emergency order',
-                'disaster declaration', 'governor declares', 'emergency proclaimed'
+                'disaster declaration', 'governor declares', 'emergency proclaimed',
+                'declares emergency', 'proclaims emergency', 'activates emergency',
+                'emergency executive order', 'disaster emergency', 'state emergency',
+                'emergency proclamation', 'emergency response', 'declares disaster'
               ];
 
               const hasEmergencyKeywords = emergencyKeywords.some(keyword => 
@@ -1952,7 +2090,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         declarations: recentDeclarations,
         count: recentDeclarations.length,
         lastUpdated: new Date().toISOString(),
-        sources: ['NewsAPI.org'],
+        sources: ['NewsAPI.org', 'Official Government RSS Feeds'],
         searchQueries
       });
 
