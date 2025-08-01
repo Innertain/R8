@@ -195,8 +195,8 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
           <Activity className="w-5 h-5 text-blue-600" />
           Recent Earthquake Activity
           {stateFilter && stateFilter !== 'all' && (
-            <Badge variant="outline" className="bg-blue-50">
-              {stateNames[stateFilter.toUpperCase()] || stateFilter}
+            <Badge variant="outline" className="bg-orange-100 border-orange-300 text-orange-800">
+              ⚠️ Filtered: {stateNames[stateFilter.toUpperCase()] || stateFilter}
             </Badge>
           )}
         </CardTitle>
@@ -208,9 +208,17 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
               : ' worldwide'
             } from USGS
             {stateFilter && stateFilter !== 'all' && (
-              <span className="text-blue-600 ml-2 text-xs">
-                • Filtered by weather alert selection
-              </span>
+              <div className="bg-orange-50 border border-orange-200 rounded px-2 py-1 mt-2">
+                <span className="text-orange-700 text-xs font-medium">
+                  ⚠️ Filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter} selection from another section
+                </span>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
+                >
+                  Clear filter & show all earthquakes
+                </button>
+              </div>
             )}
           </p>
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
@@ -263,6 +271,28 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
                   </span>
                 )}
               </h3>
+              
+              {/* Cross-Component Filter Warning */}
+              {stateFilter && stateFilter !== 'all' && stateFilter !== selectedState && (
+                <div className="bg-orange-100 border-2 border-orange-300 rounded-lg p-3 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-orange-700 font-medium text-sm">
+                        ⚠️ Currently filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter} from another section
+                      </span>
+                    </div>
+                    <button 
+                      onClick={() => window.location.reload()}
+                      className="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
+                    >
+                      Clear Filter
+                    </button>
+                  </div>
+                  <p className="text-orange-600 text-xs mt-1">
+                    This is hiding {incidents.length - filteredIncidents.length} earthquakes from other regions
+                  </p>
+                </div>
+              )}
               
               {Object.keys(incidentsByState).length === 0 ? (
                 <div className="text-center py-8">
