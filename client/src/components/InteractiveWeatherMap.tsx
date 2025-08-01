@@ -79,12 +79,21 @@ const US_STATES = {
 
 interface InteractiveWeatherMapProps {
   stateFilter?: string;
+  onStateFilterChange?: (stateCode: string) => void;
 }
 
-export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProps) {
+export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: InteractiveWeatherMapProps) {
   const [selectedState, setSelectedState] = useState<string>(stateFilter || 'all');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+
+  // Function to handle state selection and notify parent
+  const handleStateClick = (stateCode: string) => {
+    setSelectedState(stateCode);
+    if (onStateFilterChange) {
+      onStateFilterChange(stateCode);
+    }
+  };
 
   const { data: alertsData, isLoading, error, refetch } = useQuery({
     queryKey: ['/api/weather-alerts-rss'],
@@ -217,7 +226,7 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                 {(selectedState !== 'all' || severityFilter !== 'all') && (
                   <button 
                     onClick={() => {
-                      setSelectedState('all');
+                      handleStateClick('all');
                       setSeverityFilter('all');
                     }}
                     className="ml-2 text-blue-600 hover:text-blue-800 text-xs underline"
@@ -320,7 +329,7 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                     </p>
                     {selectedState !== 'all' && (
                       <button 
-                        onClick={() => setSelectedState('all')}
+                        onClick={() => handleStateClick('all')}
                         className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
                       >
                         View all states
@@ -350,7 +359,8 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                                 : ''
                             } ${getSeverityColor(maxSeverity)}`}
                             onClick={() => {
-                              setSelectedState(selectedState === stateCode ? 'all' : stateCode);
+                              const newState = selectedState === stateCode ? 'all' : stateCode;
+                              handleStateClick(newState);
                             }}
                           >
                             <div className="text-center">

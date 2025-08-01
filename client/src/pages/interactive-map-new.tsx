@@ -30,6 +30,7 @@ export default function InteractiveMap() {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedRegionName, setSelectedRegionName] = useState<string | null>(null);
   const [selectedRegionType, setSelectedRegionType] = useState<'state' | 'bioregion' | null>(null);
+  const [globalStateFilter, setGlobalStateFilter] = useState<string>('all');
 
   const handleRegionClick = (regionId: string, regionName: string, regionType: 'state' | 'bioregion') => {
     setSelectedRegion(regionId);
@@ -45,6 +46,12 @@ export default function InteractiveMap() {
 
   const getFilterLocation = () => {
     return selectedRegionType === 'state' ? selectedRegionName : null;
+  };
+
+  // Function to handle state filter changes from weather map
+  const handleStateFilterChange = (stateCode: string) => {
+    console.log('State filter changed to:', stateCode);
+    setGlobalStateFilter(stateCode);
   };
 
   return (
@@ -88,12 +95,17 @@ export default function InteractiveMap() {
         <div className="max-w-full space-y-8">
           {/* Interactive Weather Alerts Map */}
           <div className="w-full">
-            <InteractiveWeatherMap stateFilter={getFilterLocation() || undefined} />
+            <InteractiveWeatherMap 
+              stateFilter={getFilterLocation() || undefined} 
+              onStateFilterChange={handleStateFilterChange}
+            />
           </div>
           
           {/* Wildfire Incidents */}
           <div className="w-full">
-            <WildfireIncidents stateFilter={getFilterLocation() || undefined} />
+            <WildfireIncidents 
+              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter} 
+            />
           </div>
           
           {/* Enhanced Emergency Data Feed */}

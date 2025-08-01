@@ -30,11 +30,44 @@ export function WildfireIncidents({ stateFilter }: WildfireIncidentsProps) {
 
   const incidents = (incidentsData as any)?.incidents || [];
   
+  // State mapping for better filtering
+  const stateNames: { [key: string]: string } = {
+    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+    "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+    "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+    "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+    "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+    "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+    "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+    "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+    "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+    "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+  };
+
   // Filter incidents by state if specified
   const filteredIncidents = stateFilter && stateFilter !== 'all' 
-    ? incidents.filter((incident: WildfireIncident) => 
-        incident.state === stateFilter || incident.title.includes(stateFilter)
-      )
+    ? incidents.filter((incident: WildfireIncident) => {
+        const titleLower = incident.title.toLowerCase();
+        const descLower = incident.description.toLowerCase();
+        const stateLower = incident.state?.toLowerCase() || '';
+        const filterLower = stateFilter.toLowerCase();
+        
+        // Check if state matches directly
+        if (stateLower === filterLower) return true;
+        
+        // Check if state name is in title or description
+        const fullStateName = stateNames[stateFilter.toUpperCase()]?.toLowerCase();
+        if (fullStateName && (titleLower.includes(fullStateName) || descLower.includes(fullStateName))) {
+          return true;
+        }
+        
+        // Check if state abbreviation is in title or description
+        if (titleLower.includes(filterLower) || descLower.includes(filterLower)) {
+          return true;
+        }
+        
+        return false;
+      })
     : incidents;
 
   const getStatusColor = (status: string) => {
@@ -113,13 +146,21 @@ export function WildfireIncidents({ stateFilter }: WildfireIncidentsProps) {
             Active Wildfire Incidents
             {stateFilter && stateFilter !== 'all' && (
               <Badge variant="outline" className="ml-2">
-                {stateFilter}
+                {stateNames[stateFilter.toUpperCase()] || stateFilter}
               </Badge>
             )}
           </CardTitle>
           <p className="text-sm text-gray-600">
             {filteredIncidents.length} active incident{filteredIncidents.length !== 1 ? 's' : ''} 
-            {stateFilter && stateFilter !== 'all' ? ` in ${stateFilter}` : ' nationwide'} from InciWeb
+            {stateFilter && stateFilter !== 'all' 
+              ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
+              : ' nationwide'
+            } from InciWeb
+            {stateFilter && stateFilter !== 'all' && (
+              <span className="text-blue-600 ml-2 text-xs">
+                • Filtered by weather alert selection
+              </span>
+            )}
           </p>
         </CardHeader>
         <CardContent>
