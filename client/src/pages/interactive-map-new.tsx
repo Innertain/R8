@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, ArrowLeft, Layers, Globe, CloudRain, Flame, Zap, BarChart3, Database } from "lucide-react";
+import { MapPin, ArrowLeft, Layers, Globe, CloudRain, Flame, Zap, BarChart3, Database, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { WildfireIncidents } from "@/components/WildfireIncidents";
 import { EarthquakeIncidents } from "@/components/EarthquakeIncidents";
 import { DisasterAnalyticsDashboard } from "@/components/DisasterAnalyticsDashboard";
 import { DataSourcesOverview } from "@/components/DataSourcesOverview";
+import SocialMediaEmergencyMonitor from "@/components/SocialMediaEmergencyMonitor";
 
 
 // State name mapping for display
@@ -132,6 +133,10 @@ export default function InteractiveMap() {
               <Zap className="w-4 h-4 mr-1" />
               Earthquake Activity
             </a>
+            <a href="#social-media" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-sky-100 text-sky-700 hover:bg-sky-200 transition-colors">
+              <Twitter className="w-4 h-4 mr-1" />
+              Social Media Monitor
+            </a>
             <a href="#analytics" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors">
               <BarChart3 className="w-4 h-4 mr-1" />
               Disaster Analytics
@@ -166,6 +171,11 @@ export default function InteractiveMap() {
               stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
               onStateFilterChange={handleStateFilterChange}
             />
+          </div>
+
+          {/* Social Media Emergency Monitor */}
+          <div id="social-media" className="w-full">
+            <SocialMediaEmergencyMonitor />
           </div>
 
           {/* Disaster Analytics Dashboard */}
