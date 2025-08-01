@@ -225,9 +225,9 @@ export function NasaEonetEvents() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Globe className="w-5 h-5 text-blue-600" />
-            NASA EONET Natural Events
+            Live Natural Disasters
             <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-              Global Real-Time
+              NASA Satellite Data
             </Badge>
           </CardTitle>
           <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -235,6 +235,21 @@ export function NasaEonetEvents() {
               <Badge variant="outline" className="text-xs">Cached</Badge>
             )}
             <span>Updated: {format(new Date(data.lastUpdated || new Date()), 'HH:mm')}</span>
+          </div>
+        </div>
+
+        {/* Explanation Box */}
+        <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+          <div className="flex items-start gap-3">
+            <Globe className="w-6 h-6 text-blue-600 mt-0.5" />
+            <div>
+              <h4 className="font-semibold text-blue-900 mb-1">What you're seeing</h4>
+              <p className="text-sm text-blue-800 leading-relaxed">
+                These are real natural disasters happening right now around the world, detected by NASA satellites. 
+                Each event shows when it started, where it's located, and how big it is. The data comes directly from 
+                official government agencies like the US Forest Service, Geological Survey, and military weather services.
+              </p>
+            </div>
           </div>
         </div>
         
@@ -298,56 +313,93 @@ export function NasaEonetEvents() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs text-gray-600">
-                  <div className="space-y-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-3">
                     {event.date && (
-                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                        <Calendar className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium">{format(new Date(event.date || new Date()), 'MMM dd, yyyy HH:mm')}</span>
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                        <Calendar className="w-5 h-5 text-blue-600" />
+                        <div>
+                          <div className="font-medium text-blue-900">When</div>
+                          <div className="text-blue-700">{format(new Date(event.date || new Date()), 'MMM dd, yyyy')}</div>
+                          <div className="text-xs text-blue-600">{format(new Date(event.date || new Date()), 'h:mm a')}</div>
+                        </div>
                       </div>
                     )}
                     
                     {(event.latitude && event.longitude) && (
-                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                        <MapPin className="w-4 h-4 text-green-600" />
-                        <span className="font-mono">{event.latitude.toFixed(4)}, {event.longitude.toFixed(4)}</span>
+                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
+                        <MapPin className="w-5 h-5 text-green-600" />
+                        <div>
+                          <div className="font-medium text-green-900">Location</div>
+                          <div className="text-green-700">
+                            {event.latitude > 0 ? `${event.latitude.toFixed(2)}°N` : `${Math.abs(event.latitude).toFixed(2)}°S`}, {' '}
+                            {event.longitude > 0 ? `${event.longitude.toFixed(2)}°E` : `${Math.abs(event.longitude).toFixed(2)}°W`}
+                          </div>
+                          <div className="text-xs text-green-600">Satellite detected</div>
+                        </div>
                       </div>
                     )}
                     
                     {event.magnitude && (
-                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                        <AlertTriangle className="w-4 h-4 text-orange-600" />
-                        <span>Magnitude: <strong>{event.magnitude} {event.magnitudeUnit}</strong></span>
+                      <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                        <AlertTriangle className="w-5 h-5 text-orange-600" />
+                        <div>
+                          <div className="font-medium text-orange-900">Size/Intensity</div>
+                          <div className="text-orange-700 font-semibold">{event.magnitude} {event.magnitudeUnit}</div>
+                          <div className="text-xs text-orange-600">
+                            {event.magnitudeUnit === 'acres' ? 'Burned area' : 
+                             event.magnitudeUnit === 'kts' ? 'Wind speed' : 
+                             'Measured intensity'}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {event.source && (
-                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                        <span className="text-gray-500">Source:</span>
-                        <a 
-                          href={event.source.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium"
-                        >
-                          {event.source.id}
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
+                      <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                        <ExternalLink className="w-5 h-5 text-purple-600" />
+                        <div>
+                          <div className="font-medium text-purple-900">Data Source</div>
+                          <a 
+                            href={event.source.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-purple-700 hover:text-purple-800 font-medium"
+                          >
+                            {event.source.id === 'IRWIN' ? 'US Forest Service' :
+                             event.source.id === 'JTWC' ? 'Military Weather' :
+                             event.source.id === 'USGS' ? 'US Geological Survey' :
+                             event.source.id}
+                          </a>
+                          <div className="text-xs text-purple-600">Official agency data</div>
+                        </div>
                       </div>
                     )}
                     
-                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                      <Globe className="w-4 h-4 text-purple-600" />
-                      <span>Tracking points: <strong>{event.geometry.length}</strong></span>
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <Globe className="w-5 h-5 text-gray-600" />
+                      <div>
+                        <div className="font-medium text-gray-900">Satellite Updates</div>
+                        <div className="text-gray-700">{event.geometry.length} tracking points</div>
+                        <div className="text-xs text-gray-600">
+                          {event.geometry.length === 1 ? 'Single location' : 
+                           event.geometry.length < 5 ? 'Few updates' : 
+                           event.geometry.length < 20 ? 'Regular monitoring' : 
+                           'Highly monitored'}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {event.description && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <p className="text-xs text-gray-600 leading-relaxed">{event.description}</p>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                      <div className="font-medium text-blue-900 text-sm mb-2">Additional Details</div>
+                      <p className="text-sm text-blue-800 leading-relaxed">{event.description}</p>
+                    </div>
                   </div>
                 )}
               </div>
