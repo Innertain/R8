@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3, CloudRain, CloudSnow, CloudLightning, Thermometer } from "lucide-react";
 import DisasterAnalyticsDashboard from "./DisasterAnalyticsDashboard";
 import ActiveDisastersDashboard from "./ActiveDisastersDashboard";
+import StateAnalysisDashboard from "./StateAnalysisDashboard";
 
 interface EmergencyAlert {
   id: string;
@@ -719,7 +720,10 @@ export function EnhancedRssFeed({
           </TabsContent>
 
           <TabsContent value="analytics" className="mt-6">
-            <ActiveDisastersDashboard disasters={femaDisasters} loading={loading} />
+            <div className="space-y-8">
+              <ActiveDisastersDashboard disasters={femaDisasters} loading={loading} />
+              <StateAnalysisDashboard disasters={femaDisasters} />
+            </div>
           </TabsContent>
 
           <TabsContent value="global" className="mt-6">
