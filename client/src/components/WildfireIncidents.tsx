@@ -358,13 +358,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-red-600">
-                        {(() => {
-                          const activeCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').length;
-                          if (stateFilter === 'WY') {
-                            console.log('Active incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').map(i => ({ title: i.title, status: i.status, state: i.state })));
-                          }
-                          return activeCount;
-                        })()}
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').length}
                       </div>
                       <div className="text-sm text-gray-600">Active</div>
                     </CardContent>
@@ -372,13 +366,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-yellow-600">
-                        {(() => {
-                          const containedCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').length;
-                          if (stateFilter === 'WY') {
-                            console.log('Contained incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').map(i => ({ title: i.title, status: i.status, state: i.state })));
-                          }
-                          return containedCount;
-                        })()}
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').length}
                       </div>
                       <div className="text-sm text-gray-600">Contained</div>
                     </CardContent>
@@ -386,13 +374,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-blue-600">
-                        {(() => {
-                          const controlledCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').length;
-                          if (stateFilter === 'WY') {
-                            console.log('Controlled incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').map(i => ({ title: i.title, status: i.status, state: i.state })));
-                          }
-                          return controlledCount;
-                        })()}
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').length}
                       </div>
                       <div className="text-sm text-gray-600">Controlled</div>
                     </CardContent>
@@ -400,15 +382,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {(() => {
-                          const outCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Out' || i.status === 'Suppressed').length;
-                          if (stateFilter === 'WY') {
-                            console.log('Out/Suppressed incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Out' || i.status === 'Suppressed').map(i => ({ title: i.title, status: i.status, state: i.state })));
-                            console.log('Total filtered incidents for WY:', filteredIncidents.length);
-                            console.log('All WY incidents:', filteredIncidents.map(i => ({ title: i.title, status: i.status, state: i.state })));
-                          }
-                          return outCount;
-                        })()}
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Out' || i.status === 'Suppressed').length}
                       </div>
                       <div className="text-sm text-gray-600">Out</div>
                     </CardContent>

@@ -235,6 +235,18 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                                       month: 'short', 
                                       day: 'numeric' 
                                     })}
+                                    <div className="text-xs mt-1 text-blue-600">
+                                      {(() => {
+                                        const incidentDate = new Date(disaster.incidentBeginDate);
+                                        const daysSinceIncident = Math.floor((currentTime - incidentDate.getTime()) / (1000 * 60 * 60 * 24));
+                                        return daysSinceIncident === 0 ? 'Incident today' : 
+                                               daysSinceIncident === 1 ? 'Incident yesterday' : 
+                                               daysSinceIncident < 7 ? `Incident ${daysSinceIncident} days ago` :
+                                               daysSinceIncident < 30 ? `Incident ${Math.floor(daysSinceIncident / 7)} weeks ago` :
+                                               daysSinceIncident < 365 ? `Incident ${Math.floor(daysSinceIncident / 30)} months ago` :
+                                               `Incident ${Math.floor(daysSinceIncident / 365)} years ago`;
+                                      })()}
+                                    </div>
                                     {disaster.incidentEndDate && (
                                       <div className="text-xs mt-1">
                                         Until {new Date(disaster.incidentEndDate).toLocaleDateString('en-US', { 
