@@ -275,7 +275,10 @@ export function NasaEonetEvents() {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-600" />
+            <div className="relative">
+              <Globe className="w-6 h-6 text-blue-600" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-white"></div>
+            </div>
             Live Natural Disasters
             <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
               NASA Satellite Data
@@ -292,7 +295,12 @@ export function NasaEonetEvents() {
         {/* Explanation Box */}
         <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
           <div className="flex items-start gap-3">
-            <Globe className="w-6 h-6 text-blue-600 mt-0.5" />
+            <div className="relative mt-0.5">
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <Globe className="w-5 h-5 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse border-2 border-white"></div>
+            </div>
             <div>
               <h4 className="font-semibold text-blue-900 mb-1">What you're seeing</h4>
               <p className="text-sm text-blue-800 leading-relaxed">
@@ -390,8 +398,8 @@ export function NasaEonetEvents() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start gap-3 flex-1">
-                    <div className={`p-2 rounded-full ${categoryColor.replace('border-', 'bg-').replace('text-', 'text-white bg-')}`}>
-                      <Icon className="w-4 h-4" />
+                    <div className={`p-3 rounded-full shadow-sm ${categoryColor.replace('border-', 'bg-').replace('text-', 'text-white bg-')}`}>
+                      <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-800 text-sm leading-tight mb-1">{event.title}</h3>
