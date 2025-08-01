@@ -111,13 +111,17 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
       const stateName = US_STATES[selectedState as keyof typeof US_STATES]?.name;
       const locationText = alert.location.toLowerCase();
       const selectedStateUpper = selectedState.toUpperCase();
+      const selectedStateLower = selectedState.toLowerCase();
       
-      matchesState = 
-        locationText.includes(selectedState.toLowerCase()) ||
-        locationText.includes(selectedStateUpper) ||
-        (stateName && locationText.includes(stateName.toLowerCase())) ||
-        alert.location.includes(selectedStateUpper) ||
-        alert.location.includes(selectedState);
+      // More precise state matching - look for state code in various formats
+      const statePatterns = [
+        new RegExp(`\\b${selectedStateUpper}\\b`), // Exact state code (e.g., "NC")
+        new RegExp(`\\b${selectedStateLower}\\b`), // Lowercase state code
+        new RegExp(`\\(${selectedStateUpper}\\)`), // State code in parentheses (e.g., "(NC)")
+        new RegExp(`\\b${stateName?.toLowerCase()}\\b`), // Full state name
+      ].filter(Boolean);
+      
+      matchesState = statePatterns.some(pattern => pattern.test(alert.location));
     }
     
     // Severity filtering
