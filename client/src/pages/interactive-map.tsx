@@ -407,6 +407,243 @@ export default function InteractiveMapPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Comprehensive Disaster Watch Center Components */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* State Emergency Declarations */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              State Emergency Declarations
+            </CardTitle>
+            <p className="text-sm text-gray-600">Real-time emergency declarations from official government RSS feeds</p>
+          </CardHeader>
+          <CardContent>
+            {disasterData.emergencyDeclarations.length > 0 ? (
+              <div className="space-y-3">
+                {disasterData.emergencyDeclarations.slice(0, 5).map((declaration: any, index: number) => (
+                  <div key={index} className="border border-red-200 rounded-lg p-3 bg-red-50">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-red-800">{declaration.stateName}</h4>
+                      <Badge variant="destructive" className="text-xs">Emergency</Badge>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-2">{declaration.title}</p>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>Source: {declaration.source}</span>
+                      <span>•</span>
+                      <span>{formatDistanceToNow(new Date(declaration.publishedAt))} ago</span>
+                    </div>
+                  </div>
+                ))}
+                {disasterData.emergencyDeclarations.length > 5 && (
+                  <div className="text-center">
+                    <Badge variant="outline">+{disasterData.emergencyDeclarations.length - 5} more declarations</Badge>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No emergency declarations found</p>
+                <p className="text-sm">All states currently normal</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Weather Alerts */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CloudRain className="w-5 h-5 text-blue-500" />
+              Active Weather Alerts
+            </CardTitle>
+            <p className="text-sm text-gray-600">National Weather Service and Hurricane Center alerts</p>
+          </CardHeader>
+          <CardContent>
+            {disasterData.weatherAlerts.length > 0 ? (
+              <div className="space-y-3">
+                {disasterData.weatherAlerts.slice(0, 5).map((alert: any, index: number) => (
+                  <div key={index} className="border border-blue-200 rounded-lg p-3 bg-blue-50">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-blue-800">{alert.event}</h4>
+                      <Badge 
+                        variant={alert.severity === 'severe' ? 'destructive' : 'secondary'} 
+                        className="text-xs"
+                      >
+                        {alert.severity}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-2">{alert.headline}</p>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>Area: {alert.areaDesc}</span>
+                      <span>•</span>
+                      <span>{alert.senderName}</span>
+                    </div>
+                  </div>
+                ))}
+                {disasterData.weatherAlerts.length > 5 && (
+                  <div className="text-center">
+                    <Badge variant="outline">+{disasterData.weatherAlerts.length - 5} more alerts</Badge>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <CloudRain className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No active weather alerts</p>
+                <p className="text-sm">Weather conditions normal</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Wildfire Incidents */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Flame className="w-5 h-5 text-orange-500" />
+              Active Wildfire Incidents
+            </CardTitle>
+            <p className="text-sm text-gray-600">InciWeb wildfire tracking data</p>
+          </CardHeader>
+          <CardContent>
+            {disasterData.wildfireIncidents.length > 0 ? (
+              <div className="space-y-3">
+                {disasterData.wildfireIncidents.slice(0, 5).map((fire: any, index: number) => (
+                  <div key={index} className="border border-orange-200 rounded-lg p-3 bg-orange-50">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-orange-800">{fire.title}</h4>
+                      <Badge 
+                        variant={fire.status === 'Active' ? 'destructive' : 'secondary'} 
+                        className="text-xs"
+                      >
+                        {fire.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-gray-700 mb-2">
+                      <span>State: {fire.state}</span>
+                      {fire.acres && <span>Size: {fire.acres.toLocaleString()} acres</span>}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>Type: {fire.incidentType}</span>
+                      <span>•</span>
+                      <span>Source: {fire.source}</span>
+                    </div>
+                  </div>
+                ))}
+                {disasterData.wildfireIncidents.length > 5 && (
+                  <div className="text-center">
+                    <Badge variant="outline">+{disasterData.wildfireIncidents.length - 5} more incidents</Badge>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Flame className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No active wildfire incidents</p>
+                <p className="text-sm">Fire conditions normal</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Earthquake Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-purple-500" />
+              Recent Earthquake Activity
+            </CardTitle>
+            <p className="text-sm text-gray-600">USGS significant earthquake monitoring</p>
+          </CardHeader>
+          <CardContent>
+            {disasterData.earthquakeIncidents.length > 0 ? (
+              <div className="space-y-3">
+                {disasterData.earthquakeIncidents.slice(0, 5).map((quake: any, index: number) => (
+                  <div key={index} className="border border-purple-200 rounded-lg p-3 bg-purple-50">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-purple-800">{quake.title}</h4>
+                      <Badge 
+                        variant={quake.magnitude >= 5.0 ? 'destructive' : 'secondary'} 
+                        className="text-xs"
+                      >
+                        M{quake.magnitude}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-gray-700 mb-2">
+                      <span>Location: {quake.location}</span>
+                      <span>Depth: {quake.depth}km</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>Alert: {quake.alertLevel}</span>
+                      <span>•</span>
+                      <span>{formatDistanceToNow(new Date(quake.pubDate))} ago</span>
+                    </div>
+                  </div>
+                ))}
+                {disasterData.earthquakeIncidents.length > 5 && (
+                  <div className="text-center">
+                    <Badge variant="outline">+{disasterData.earthquakeIncidents.length - 5} more earthquakes</Badge>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Zap className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No significant earthquakes</p>
+                <p className="text-sm">Seismic activity normal</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* FEMA Disasters - Full Width */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="w-5 h-5 text-gray-500" />
+            FEMA Disaster Declarations
+          </CardTitle>
+          <p className="text-sm text-gray-600">Federal Emergency Management Agency disaster information</p>
+        </CardHeader>
+        <CardContent>
+          {disasterData.femaDisasters.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {disasterData.femaDisasters.slice(0, 6).map((disaster: any, index: number) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="font-semibold text-gray-800">{disaster.title}</h4>
+                    <Badge variant="outline" className="text-xs">
+                      #{disaster.disasterNumber}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-700 mb-2">
+                    <span>State: {disaster.state}</span>
+                    <span>Type: {disaster.incidentType}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <span>Declared: {formatDistanceToNow(new Date(disaster.declarationDate))} ago</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Info className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>No FEMA disasters</p>
+              <p className="text-sm">No federal disaster declarations</p>
+            </div>
+          )}
+          {disasterData.femaDisasters.length > 6 && (
+            <div className="text-center mt-4">
+              <Badge variant="outline">+{disasterData.femaDisasters.length - 6} more FEMA disasters</Badge>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
