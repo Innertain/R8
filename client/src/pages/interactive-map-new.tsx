@@ -73,15 +73,7 @@ export default function InteractiveMap() {
     setSelectedRegionType(null);
   };
 
-  // Restore scroll position after reload (for clear filter buttons)
-  useEffect(() => {
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition) {
-      const scrollY = parseInt(savedScrollPosition, 10);
-      window.scrollTo(0, scrollY);
-      sessionStorage.removeItem('scrollPosition');
-    }
-  }, []);
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -186,6 +178,7 @@ export default function InteractiveMap() {
             <WildfireIncidents 
               stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
               onStateFilterChange={handleStateFilterChange}
+              onClearFilter={handleClearGlobalFilter}
             />
           </div>
           
@@ -194,6 +187,7 @@ export default function InteractiveMap() {
             <EarthquakeIncidents 
               stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
               onStateFilterChange={handleStateFilterChange}
+              onClearFilter={handleClearGlobalFilter}
             />
           </div>
 

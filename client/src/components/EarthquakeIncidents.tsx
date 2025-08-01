@@ -27,9 +27,10 @@ interface EarthquakeIncident {
 interface EarthquakeIncidentsProps {
   stateFilter?: string;
   onStateFilterChange?: (stateCode: string) => void;
+  onClearFilter?: () => void;
 }
 
-export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: EarthquakeIncidentsProps) {
+export function EarthquakeIncidents({ stateFilter, onStateFilterChange, onClearFilter }: EarthquakeIncidentsProps) {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [selectedState, setSelectedState] = useState<string>(stateFilter || 'all');
 
@@ -216,10 +217,11 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
               <button 
                 onClick={(e) => {
                   e.preventDefault();
-                  // Store current scroll position
-                  const scrollY = window.scrollY;
-                  sessionStorage.setItem('scrollPosition', scrollY.toString());
-                  window.location.reload();
+                  if (onClearFilter) {
+                    onClearFilter();
+                  } else if (onStateFilterChange) {
+                    onStateFilterChange('all');
+                  }
                 }}
                 className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
               >

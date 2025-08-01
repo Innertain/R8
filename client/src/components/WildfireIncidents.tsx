@@ -23,9 +23,10 @@ interface WildfireIncident {
 interface WildfireIncidentsProps {
   stateFilter?: string;
   onStateFilterChange?: (stateCode: string) => void;
+  onClearFilter?: () => void;
 }
 
-export function WildfireIncidents({ stateFilter, onStateFilterChange }: WildfireIncidentsProps) {
+export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFilter }: WildfireIncidentsProps) {
   const [selectedState, setSelectedState] = useState<string>(stateFilter || 'all');
 
   // Function to handle state selection and notify parent
@@ -191,10 +192,11 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                 <button 
                   onClick={(e) => {
                     e.preventDefault();
-                    // Store current scroll position
-                    const scrollY = window.scrollY;
-                    sessionStorage.setItem('scrollPosition', scrollY.toString());
-                    window.location.reload();
+                    if (onClearFilter) {
+                      onClearFilter();
+                    } else if (onStateFilterChange) {
+                      onStateFilterChange('all');
+                    }
                   }}
                   className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
                 >
@@ -257,10 +259,11 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                         <button 
                           onClick={(e) => {
                             e.preventDefault();
-                            // Store current scroll position
-                            const scrollY = window.scrollY;
-                            sessionStorage.setItem('scrollPosition', scrollY.toString());
-                            window.location.reload();
+                            if (onClearFilter) {
+                              onClearFilter();
+                            } else if (onStateFilterChange) {
+                              onStateFilterChange('all');
+                            }
                           }}
                           className="mt-2 px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
                         >
