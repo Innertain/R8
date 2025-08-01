@@ -10,6 +10,7 @@ import { CompactTimeline } from "./CompactTimeline";
 import { FemaDataInsights } from "./FemaDataInsights";
 import { DataEnhancementRecommendations } from "./DataEnhancementRecommendations";
 import { NasaEonetEvents } from "./NasaEonetEvents";
+import { RealtimeApiDebugger } from "./RealtimeApiDebugger";
 
 
 interface FemaDisasterItem {
@@ -1256,6 +1257,9 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Real-time API Debugger */}
+      <RealtimeApiDebugger />
     </div>
   );
 }
