@@ -1145,54 +1145,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 </div>
               </div>
 
-              {/* Recommendations for Improvement */}
-              <div className="bg-white rounded-lg p-4 border border-purple-200">
-                <h4 className="font-semibold text-purple-800 mb-3">Recommendations for Enhanced Analytics</h4>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                        <div className="font-medium text-yellow-800 mb-2">Data Enhancement Priorities</div>
-                        <ul className="text-xs text-yellow-700 space-y-1">
-                          <li>• Access complete FEMA historical data (1953-present)</li>
-                          <li>• Include individual assistance and public assistance data</li>
-                          <li>• Add economic impact metrics (damage estimates)</li>
-                          <li>• Integrate county-level geographic data</li>
-                        </ul>
-                      </div>
-                      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                        <div className="font-medium text-green-800 mb-2">Analysis Improvements</div>
-                        <ul className="text-xs text-green-700 space-y-1">
-                          <li>• Seasonal pattern analysis</li>
-                          <li>• Multi-year trend comparisons</li>
-                          <li>• Population-adjusted disaster rates</li>
-                          <li>• Recovery time analytics</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="font-medium text-blue-800 mb-2">Visualization Enhancements</div>
-                        <ul className="text-xs text-blue-700 space-y-1">
-                          <li>• Interactive geographic heat maps</li>
-                          <li>• Timeline slider for historical exploration</li>
-                          <li>• Disaster correlation analysis</li>
-                          <li>• Predictive modeling indicators</li>
-                        </ul>
-                      </div>
-                      <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                        <div className="font-medium text-red-800 mb-2">Data Integration Opportunities</div>
-                        <ul className="text-xs text-red-700 space-y-1">
-                          <li>• Climate data correlation</li>
-                          <li>• Infrastructure vulnerability mapping</li>
-                          <li>• Social vulnerability indices</li>
-                          <li>• Real-time disaster monitoring feeds</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
 
               {/* User Guidance */}
               <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4 border border-indigo-200">
