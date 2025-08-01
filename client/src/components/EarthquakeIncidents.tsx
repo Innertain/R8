@@ -415,28 +415,7 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
                 </Card>
               </div>
               
-              {/* Color Legend */}
-              <div className="mt-6 p-4 bg-white rounded-lg border">
-                <h4 className="text-sm font-semibold mb-3 text-gray-700">Magnitude Colors</h4>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-600 rounded border"></div>
-                    <span>Major (7.0+)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-orange-600 rounded border"></div>
-                    <span>Strong (5.0-6.9)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-yellow-500 rounded border"></div>
-                    <span>Moderate (3.0-4.9)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500 rounded border"></div>
-                    <span>Light (&lt;3.0)</span>
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
         ) : (
