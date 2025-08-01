@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock, Info as InfoIcon } from "lucide-react";
+import { getDisasterIcon } from '@/utils/disasterIcons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CompactTimeline } from "./CompactTimeline";
 
@@ -339,12 +340,16 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <CardContent>
                 <div className="space-y-3">
                   {analytics.topTypes.map(([type, count]) => {
-                    const Icon = getDisasterIcon(type);
+                    const iconUrl = getDisasterIcon(type);
                     const percentage = ((count / analytics.total) * 100).toFixed(1);
                     return (
                       <div key={type} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Icon className="w-4 h-4 text-gray-600" />
+                          {iconUrl ? (
+                            <img src={iconUrl} alt={type} className="w-4 h-4 object-contain" />
+                          ) : (
+                            <AlertTriangle className="w-4 h-4 text-gray-600" />
+                          )}
                           <span className="text-sm font-medium">{type}</span>
                         </div>
                         <div className="flex items-center gap-2">

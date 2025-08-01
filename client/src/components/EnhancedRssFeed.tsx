@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3, CloudRain, CloudSnow, CloudLightning, Thermometer } from "lucide-react";
+import { getWeatherAlertIcon } from '@/utils/disasterIcons';
 import DisasterAnalyticsDashboard from "./DisasterAnalyticsDashboard";
 import ActiveDisastersDashboard from "./ActiveDisastersDashboard";
 import StateAnalysisDashboard from "./StateAnalysisDashboard";
@@ -123,6 +124,14 @@ export function EnhancedRssFeed({
   // Function to get appropriate icon for alert type with enhanced weather icons
   const getAlertIcon = (alertType: string) => {
     if (!alertType) return AlertTriangle;
+    
+    // Try custom disaster icons first
+    const customIcon = getWeatherAlertIcon(alertType);
+    if (customIcon) {
+      return customIcon;
+    }
+    
+    // Fallback to lucide icons
     const type = alertType.toLowerCase();
     if (type.includes('fire')) return Flame;
     if (type.includes('flood')) return Waves;
@@ -415,7 +424,8 @@ export function EnhancedRssFeed({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredAlerts.map((alert, index) => {
-                  const AlertIcon = getAlertIcon(alert.alertType);
+                  const AlertIconComponent = getAlertIcon(alert.alertType);
+                  const customIconUrl = getWeatherAlertIcon(alert.alertType);
                   const severityColors = {
                     'extreme': 'bg-red-100 border-red-300 text-red-800',
                     'severe': 'bg-orange-100 border-orange-300 text-orange-800',
@@ -431,7 +441,11 @@ export function EnhancedRssFeed({
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2">
                           <div className="p-2 rounded-full bg-white/70 shadow-sm border border-white/30">
-                            <AlertIcon className="w-5 h-5" />
+                            {customIconUrl ? (
+                              <img src={customIconUrl} alt={alert.alertType} className="w-5 h-5 object-contain" />
+                            ) : (
+                              <AlertIconComponent className="w-5 h-5" />
+                            )}
                           </div>
                           <h3 className="font-semibold text-sm leading-tight flex-1">
                             {alert.title}

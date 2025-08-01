@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2, Info as InfoIcon } from 'lucide-react';
+import { getDisasterIcon } from '@/utils/disasterIcons';
 import { RealtimeApiDebugger } from './RealtimeApiDebugger';
 
 interface WildfireIncident {
@@ -168,7 +169,11 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-orange-600" />
+            {getDisasterIcon('wildfire') ? (
+              <img src={getDisasterIcon('wildfire')!} alt="Wildfire" className="w-5 h-5 object-contain" />
+            ) : (
+              <Flame className="w-5 h-5 text-orange-600" />
+            )}
             Active Wildfire Incidents
             {stateFilter && stateFilter !== 'all' && (
               <Badge variant="outline" className="bg-orange-100 border-orange-300 text-orange-800 ml-2">

@@ -23,6 +23,7 @@ import {
   Loader2
 } from "lucide-react";
 import { format } from "date-fns";
+import { getNasaEonetIcon } from '@/utils/disasterIcons';
 
 interface EonetEvent {
   id: string;
@@ -346,13 +347,29 @@ export function NasaEonetEvents() {
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="wildfires">
                 <div className="flex items-center gap-2">
-                  <Flame className="w-4 h-4" />
+                  {getNasaEonetIcon('wildfires') ? (
+                    <img 
+                      src={getNasaEonetIcon('wildfires')!} 
+                      alt="Wildfires" 
+                      className="w-4 h-4 object-contain" 
+                    />
+                  ) : (
+                    <Flame className="w-4 h-4" />
+                  )}
                   Wildfires
                 </div>
               </SelectItem>
               <SelectItem value="storms">
                 <div className="flex items-center gap-2">
-                  <Wind className="w-4 h-4" />
+                  {getNasaEonetIcon('storm') ? (
+                    <img 
+                      src={getNasaEonetIcon('storm')!} 
+                      alt="Storms" 
+                      className="w-4 h-4 object-contain" 
+                    />
+                  ) : (
+                    <Wind className="w-4 h-4" />
+                  )}
                   Storms & Hurricanes
                 </div>
               </SelectItem>
@@ -370,7 +387,15 @@ export function NasaEonetEvents() {
               </SelectItem>
               <SelectItem value="floods">
                 <div className="flex items-center gap-2">
-                  <Waves className="w-4 h-4" />
+                  {getNasaEonetIcon('flood') ? (
+                    <img 
+                      src={getNasaEonetIcon('flood')!} 
+                      alt="Floods" 
+                      className="w-4 h-4 object-contain" 
+                    />
+                  ) : (
+                    <Waves className="w-4 h-4" />
+                  )}
                   Floods
                 </div>
               </SelectItem>
@@ -404,7 +429,15 @@ export function NasaEonetEvents() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`p-3 rounded-full shadow-sm ${categoryColor.replace('border-', 'bg-').replace('text-', 'text-white bg-')}`}>
-                      <Icon className="w-5 h-5" />
+                      {getNasaEonetIcon(event.category?.title || '') ? (
+                        <img 
+                          src={getNasaEonetIcon(event.category?.title || '')!} 
+                          alt={event.category?.title || 'Event'} 
+                          className="w-5 h-5 object-contain" 
+                        />
+                      ) : (
+                        <Icon className="w-5 h-5" />
+                      )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-800 text-base leading-tight">{event.title}</h3>
