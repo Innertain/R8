@@ -725,111 +725,112 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
           </Card>
         </TabsContent>
 
-        <TabsContent value="geographic" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+        <TabsContent value="geographic" className="space-y-6">
+          {/* Enhanced Geographic Impact Analysis */}
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <MapPin className="w-5 h-5 text-green-600" />
                 Geographic Impact Analysis
-                <Badge variant="destructive" className="text-xs">Recent Data Only</Badge>
+                <Badge variant="outline" className="text-xs bg-green-50 text-green-700">Enhanced Data Coverage</Badge>
               </CardTitle>
               <p className="text-sm text-gray-600">
-                Regional disaster patterns for 2024-2025 period only • Does not reflect historical patterns
+                Regional disaster patterns from enhanced FEMA data (2022-2025)
               </p>
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mt-2">
-                <p className="text-xs text-orange-700">
-                  <strong>Note:</strong> California leads historically with 300+ disasters since 1953, but ranks #3 here due to missing historical data. 
-                  Oklahoma's #1 ranking reflects recent wildfire activity only.
-                </p>
-              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* State Vulnerability Ranking */}
-                <div>
-                  <h4 className="font-medium mb-4">State Vulnerability Ranking</h4>
-                  <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto">
-                    {analytics.topStates.map(([state, count], index) => {
-                      // Get most common disaster type for this state
-                      const stateDisasters = filteredDisasters.filter(d => d.state === state);
-                      const typeCount = stateDisasters.reduce((acc, d) => {
-                        const type = d.incidentType || 'Unknown';
-                        acc[type] = (acc[type] || 0) + 1;
-                        return acc;
-                      }, {} as Record<string, number>);
-                      const topType = Object.entries(typeCount).sort(([,a], [,b]) => b - a)[0];
-                      const Icon = getDisasterIcon(topType?.[0] || '');
-                      
-                      return (
-                        <div key={state} className={`relative p-4 rounded-lg border-2 transition-all hover:shadow-lg ${
-                          index < 3 ? 'bg-red-50 border-red-200 hover:border-red-300' : 
-                          index < 6 ? 'bg-orange-50 border-orange-200 hover:border-orange-300' : 
-                          'bg-yellow-50 border-yellow-200 hover:border-yellow-300'
-                        }`}>
-                          {/* Ranking Badge */}
-                          <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                            index < 3 ? 'bg-red-500' : index < 6 ? 'bg-orange-500' : 'bg-yellow-500'
+              {/* Top States Section */}
+              <div className="mb-8">
+                <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                  Most Impacted States (2022-2025)
+                </h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {analytics.topStates.slice(0, 4).map(([state, count], index) => {
+                    // Get most common disaster type for this state
+                    const stateDisasters = filteredDisasters.filter(d => d.state === state);
+                    const typeCount = stateDisasters.reduce((acc, d) => {
+                      const type = d.incidentType || 'Unknown';
+                      acc[type] = (acc[type] || 0) + 1;
+                      return acc;
+                    }, {} as Record<string, number>);
+                    const topType = Object.entries(typeCount).sort(([,a], [,b]) => b - a)[0];
+                    const Icon = getDisasterIcon(topType?.[0] || '');
+                    
+                    return (
+                      <div key={state} className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105">
+                        <div className="text-center">
+                          <div className={`inline-flex w-10 h-10 rounded-full items-center justify-center text-white font-bold text-lg mb-3 ${
+                            index === 0 ? 'bg-red-500' : 
+                            index === 1 ? 'bg-orange-500' : 
+                            index === 2 ? 'bg-yellow-500' : 'bg-blue-500'
                           }`}>
                             {index + 1}
                           </div>
-                          
-                          {/* State Name - Top */}
-                          <div className="text-center mb-3">
-                            <h3 className="text-xl font-bold text-gray-800">{state}</h3>
+                          <div className="font-bold text-2xl text-gray-800 mb-2">{state}</div>
+                          <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-3">
+                            <Icon className="w-4 h-4" />
+                            <span>{topType?.[0] || 'Mixed Types'}</span>
                           </div>
-                          
-                          {/* Disaster Type - Middle */}
-                          <div className="flex items-center justify-center gap-2 mb-3">
-                            <Icon className="w-5 h-5 text-gray-600" />
-                            <span className="text-sm font-medium text-gray-700">
-                              {topType?.[0] || 'Mixed Types'}
-                            </span>
-                          </div>
-                          
-                          {/* Count - Bottom */}
-                          <div className="text-center">
-                            <div className={`text-2xl font-bold ${
-                              index < 3 ? 'text-red-600' : index < 6 ? 'text-orange-600' : 'text-yellow-600'
-                            }`}>
-                              {count}
-                            </div>
-                            <div className="text-xs text-gray-600">declarations</div>
-                          </div>
+                          <div className="text-3xl font-bold text-red-600">{count}</div>
+                          <div className="text-xs text-gray-500">declarations</div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
+              </div>
 
-                {/* Regional Analysis */}
-                <div>
-                  <h4 className="font-medium mb-4">Disaster Type by Region</h4>
-                  <div className="space-y-3">
-                    {analytics.topTypes.slice(0, 6).map(([type, count]) => {
-                      const statesWithType = filteredDisasters
-                        .filter(d => d.incidentType === type)
-                        .reduce((acc, d) => {
-                          acc[d.state] = (acc[d.state] || 0) + 1;
-                          return acc;
-                        }, {} as Record<string, number>);
-                      
-                      const topState = Object.entries(statesWithType).sort(([,a], [,b]) => b - a)[0];
-                      const Icon = getDisasterIcon(type);
-                      
-                      return (
-                        <div key={type} className="p-3 border rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Icon className="w-4 h-4 text-gray-600" />
-                            <span className="font-medium">{type}</span>
-                            <Badge variant="outline">{count} total</Badge>
+              {/* Disaster Types Overview */}
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-blue-500" />
+                  Disaster Types & Regional Impact
+                </h4>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {analytics.topTypes.slice(0, 6).map(([type, count]) => {
+                    const statesWithType = filteredDisasters
+                      .filter(d => d.incidentType === type)
+                      .reduce((acc, d) => {
+                        acc[d.state] = (acc[d.state] || 0) + 1;
+                        return acc;
+                      }, {} as Record<string, number>);
+                    
+                    const topState = Object.entries(statesWithType).sort(([,a], [,b]) => b - a)[0];
+                    const Icon = getDisasterIcon(type);
+                    
+                    return (
+                      <div key={type} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-50 rounded-lg">
+                              <Icon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <span className="font-semibold text-gray-800 text-lg">{type}</span>
+                              <div className="text-xs text-gray-500">{count} total incidents</div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-600">
-                            Most affected: <span className="font-medium">{topState?.[0]}</span> ({topState?.[1]} incidents)
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-blue-600">{count}</div>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <div className="text-sm text-gray-700">
+                            <span className="font-medium">Most affected:</span> {topState?.[0] || 'N/A'} ({topState?.[1] || 0} incidents)
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
+              </div>
+
+              {/* Data Source Note */}
+              <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs text-blue-700">
+                  <strong>Data Source:</strong> Enhanced FEMA API queries covering 2022-2025 period with {filteredDisasters.length} total declarations. This represents recent disaster activity patterns and may not reflect complete historical trends.
+                </p>
               </div>
             </CardContent>
           </Card>
