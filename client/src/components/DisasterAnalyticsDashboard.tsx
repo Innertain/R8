@@ -9,6 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { CompactTimeline } from "./CompactTimeline";
 import { FemaDataInsights } from "./FemaDataInsights";
 import { DataEnhancementRecommendations } from "./DataEnhancementRecommendations";
+import { NasaEonetEvents } from "./NasaEonetEvents";
 
 interface FemaDisasterItem {
   guid: string;
@@ -427,6 +428,9 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
 
           {/* Data Enhancement Roadmap */}
           <DataEnhancementRecommendations />
+
+          {/* NASA EONET Natural Events - Phase 1 Implementation */}
+          <NasaEonetEvents />
 
           {/* FEMA Data Insights */}
           <FemaDataInsights />

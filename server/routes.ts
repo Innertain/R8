@@ -2321,6 +2321,11 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   let femaDisastersCacheTime: number = 0;
   const FEMA_CACHE_DURATION = 5 * 60 * 1000; // 5 minute cache for testing
 
+  // Cache for NASA EONET natural events
+  let eonetEventsCache: any = null;
+  let eonetEventsCacheTime: number = 0;
+  const EONET_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
   // FEMA OpenData API - Real Disaster Declarations (with caching)
   app.get("/api/fema-disasters", async (req, res) => {
     try {
@@ -2442,6 +2447,143 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         items: [],
         source: 'FEMA OpenData API',
         error: 'Unable to fetch disaster declarations',
+        lastUpdated: new Date().toISOString()
+      });
+    }
+  });
+
+  // NASA EONET API - Global Natural Events Tracker
+  app.get("/api/nasa-eonet-events", async (req, res) => {
+    try {
+      // Check cache first
+      const now = Date.now();
+      if (eonetEventsCache && (now - eonetEventsCacheTime) < EONET_CACHE_DURATION) {
+        console.log('✓ Returning cached NASA EONET events');
+        return res.json({
+          ...eonetEventsCache,
+          cached: true,
+          lastUpdated: new Date(eonetEventsCacheTime).toISOString()
+        });
+      }
+
+      console.log('Fetching NASA EONET natural events...');
+      
+      // Get query parameters for filtering
+      const { category, limit, days } = req.query;
+      
+      // Build URL with filters
+      let url = 'https://eonet.gsfc.nasa.gov/api/v3/events';
+      const params = new URLSearchParams();
+      
+      if (category) params.append('category', category.toString());
+      if (limit) params.append('limit', limit.toString());
+      if (days) params.append('days', days.toString());
+      
+      if (params.toString()) {
+        url += '?' + params.toString();
+      }
+
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        console.error('NASA EONET API failed:', response.status, response.statusText);
+        throw new Error(`NASA EONET API failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const events = data.events || [];
+      
+      console.log(`✓ NASA EONET events processed: ${events.length} events found`);
+
+      // Process events for better frontend consumption
+      const processedEvents = events.map((event: any) => {
+        // Get latest geometry (most recent coordinates)
+        const latestGeometry = event.geometry && event.geometry.length > 0 
+          ? event.geometry[event.geometry.length - 1] 
+          : null;
+
+        // Extract coordinate data
+        let latitude: number | null = null;
+        let longitude: number | null = null;
+        let coordinates: [number, number] | null = null;
+
+        if (latestGeometry && latestGeometry.coordinates) {
+          if (latestGeometry.type === 'Point') {
+            longitude = latestGeometry.coordinates[0];
+            latitude = latestGeometry.coordinates[1];
+            coordinates = [longitude, latitude];
+          } else if (latestGeometry.type === 'Polygon' && latestGeometry.coordinates[0]) {
+            // For polygons, use the first coordinate of the first ring
+            longitude = latestGeometry.coordinates[0][0][0];
+            latitude = latestGeometry.coordinates[0][0][1];
+            coordinates = [longitude, latitude];
+          }
+        }
+
+        return {
+          id: event.id,
+          title: event.title,
+          description: event.description || '',
+          link: event.link,
+          category: event.categories && event.categories[0] ? {
+            id: event.categories[0].id,
+            title: event.categories[0].title
+          } : null,
+          source: event.sources && event.sources[0] ? {
+            id: event.sources[0].id,
+            url: event.sources[0].url
+          } : null,
+          date: latestGeometry ? latestGeometry.date : null,
+          latitude,
+          longitude,
+          coordinates,
+          magnitude: latestGeometry ? latestGeometry.magnitudeValue : null,
+          magnitudeUnit: latestGeometry ? latestGeometry.magnitudeUnit : null,
+          geometry: event.geometry || []
+        };
+      });
+
+      // Group events by category for easier consumption
+      const eventsByCategory = processedEvents.reduce((acc: any, event: any) => {
+        const categoryId = event.category?.id || 'unknown';
+        if (!acc[categoryId]) {
+          acc[categoryId] = {
+            id: categoryId,
+            title: event.category?.title || 'Unknown',
+            events: []
+          };
+        }
+        acc[categoryId].events.push(event);
+        return acc;
+      }, {});
+
+      const responseData = {
+        success: true,
+        events: processedEvents,
+        eventsByCategory: Object.values(eventsByCategory),
+        totalEvents: processedEvents.length,
+        categories: Object.keys(eventsByCategory),
+        source: 'NASA EONET v3',
+        apiUrl: url,
+        lastUpdated: new Date().toISOString(),
+        cached: false
+      };
+
+      // Cache the response
+      eonetEventsCache = responseData;
+      eonetEventsCacheTime = now;
+      
+      res.json(responseData);
+    } catch (error) {
+      console.error('NASA EONET API error:', error);
+      res.json({
+        success: false,
+        events: [],
+        eventsByCategory: [],
+        totalEvents: 0,
+        categories: [],
+        error: 'Unable to fetch NASA EONET events',
+        source: 'NASA EONET v3',
         lastUpdated: new Date().toISOString()
       });
     }
