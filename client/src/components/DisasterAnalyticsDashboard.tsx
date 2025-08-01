@@ -186,16 +186,37 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                   </span>
                 )}
               </p>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <h4 className="text-sm font-semibold text-yellow-800 flex items-center gap-2 mb-2">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <h4 className="text-sm font-semibold text-red-800 flex items-center gap-2 mb-2">
                   <InfoIcon className="w-4 h-4" />
-                  Data Coverage Limitation
+                  Critical Data Limitation - READ THIS FIRST
                 </h4>
-                <p className="text-xs text-yellow-700 leading-relaxed">
-                  <strong>Important:</strong> This dataset contains recent FEMA declarations from {dataRange.start?.getFullYear()} to {dataRange.end?.getFullYear()}, 
-                  not the complete historical record back to 1953. Rankings shown reflect only this recent period and may not represent 
-                  long-term disaster patterns. California typically leads in total historical disasters but may appear lower in recent-only data.
-                </p>
+                <div className="text-xs text-red-700 space-y-2">
+                  <p><strong>This is NOT complete historical data!</strong></p>
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <p className="font-medium mb-1">What we have:</p>
+                      <ul className="space-y-0.5">
+                        <li>• 164 declarations total</li>
+                        <li>• Dec 2021 - July 2025 only</li>
+                        <li>• Heavy focus on 2024-2025</li>
+                        <li>• Mostly recent wildfire events</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-medium mb-1">What we're missing:</p>
+                      <ul className="space-y-0.5">
+                        <li>• 1953-2021 historical data</li>
+                        <li>• Major CA earthquakes</li>
+                        <li>• Hurricane seasons</li>
+                        <li>• Thousands of declarations</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <p className="font-medium">
+                    <strong>California historically has the most disasters</strong> - it only ranks #3 here because we're missing decades of data.
+                  </p>
+                </div>
               </div>
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
                 <h4 className="text-sm font-semibold text-green-800 flex items-center gap-2 mb-2">
@@ -654,10 +675,19 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
         <TabsContent value="geographic" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Geographic Impact Analysis</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Geographic Impact Analysis
+                <Badge variant="destructive" className="text-xs">Recent Data Only</Badge>
+              </CardTitle>
               <p className="text-sm text-gray-600">
-                Regional disaster patterns and state-level vulnerability assessment
+                Regional disaster patterns for 2024-2025 period only • Does not reflect historical patterns
               </p>
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mt-2">
+                <p className="text-xs text-orange-700">
+                  <strong>Note:</strong> California leads historically with 300+ disasters since 1953, but ranks #3 here due to missing historical data. 
+                  Oklahoma's #1 ranking reflects recent wildfire activity only.
+                </p>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -838,7 +868,11 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Data Completeness:</span>
-                      <span className="font-medium text-yellow-600">Partial (Recent Only)</span>
+                      <span className="font-medium text-red-600">Severely Limited</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Year Distribution:</span>
+                      <span className="font-medium text-purple-600">2024: 80, 2025: 78, Earlier: 6</span>
                     </div>
                   </div>
                   <div className="space-y-2">
