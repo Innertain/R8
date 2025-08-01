@@ -694,20 +694,56 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 {/* State Vulnerability Ranking */}
                 <div>
                   <h4 className="font-medium mb-4">State Vulnerability Ranking</h4>
-                  <div className="space-y-2 max-h-80 overflow-y-auto">
-                    {analytics.topStates.map(([state, count], index) => (
-                      <div key={state} className="flex items-center gap-3 p-2 bg-gray-50 rounded">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                          index < 3 ? 'bg-red-500' : index < 8 ? 'bg-orange-500' : 'bg-yellow-500'
+                  <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto">
+                    {analytics.topStates.map(([state, count], index) => {
+                      // Get most common disaster type for this state
+                      const stateDisasters = filteredDisasters.filter(d => d.state === state);
+                      const typeCount = stateDisasters.reduce((acc, d) => {
+                        const type = d.incidentType || 'Unknown';
+                        acc[type] = (acc[type] || 0) + 1;
+                        return acc;
+                      }, {} as Record<string, number>);
+                      const topType = Object.entries(typeCount).sort(([,a], [,b]) => b - a)[0];
+                      const Icon = getDisasterIcon(topType?.[0] || '');
+                      
+                      return (
+                        <div key={state} className={`relative p-4 rounded-lg border-2 transition-all hover:shadow-lg ${
+                          index < 3 ? 'bg-red-50 border-red-200 hover:border-red-300' : 
+                          index < 6 ? 'bg-orange-50 border-orange-200 hover:border-orange-300' : 
+                          'bg-yellow-50 border-yellow-200 hover:border-yellow-300'
                         }`}>
-                          {index + 1}
+                          {/* Ranking Badge */}
+                          <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                            index < 3 ? 'bg-red-500' : index < 6 ? 'bg-orange-500' : 'bg-yellow-500'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          
+                          {/* State Name - Top */}
+                          <div className="text-center mb-3">
+                            <h3 className="text-xl font-bold text-gray-800">{state}</h3>
+                          </div>
+                          
+                          {/* Disaster Type - Middle */}
+                          <div className="flex items-center justify-center gap-2 mb-3">
+                            <Icon className="w-5 h-5 text-gray-600" />
+                            <span className="text-sm font-medium text-gray-700">
+                              {topType?.[0] || 'Mixed Types'}
+                            </span>
+                          </div>
+                          
+                          {/* Count - Bottom */}
+                          <div className="text-center">
+                            <div className={`text-2xl font-bold ${
+                              index < 3 ? 'text-red-600' : index < 6 ? 'text-orange-600' : 'text-yellow-600'
+                            }`}>
+                              {count}
+                            </div>
+                            <div className="text-xs text-gray-600">declarations</div>
+                          </div>
                         </div>
-                        <span className="font-medium">{state}</span>
-                        <div className="flex-1 text-right">
-                          <span className="text-sm text-gray-600">{count} declarations</span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
