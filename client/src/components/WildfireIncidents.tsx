@@ -198,7 +198,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
               </h4>
               <p className="text-xs text-orange-700 leading-relaxed">
                 This data comes from <strong>InciWeb (Incident Information System)</strong>, the interagency wildfire information system used by federal, state, and local emergency management agencies. 
-                Incident statuses include <strong>Active</strong> (currently burning), <strong>Contained</strong> (firefighters have control lines), and <strong>Controlled</strong> (fire is out but still monitored). 
+                Incident statuses include <strong>Active</strong> (currently burning), <strong>Contained</strong> (firefighters have control lines), <strong>Controlled</strong> (fire is out but still monitored), and <strong>Out</strong> (fire completely extinguished). 
                 Data is updated in real-time as field crews report progress.
               </p>
             </div>
@@ -357,7 +357,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                 )}
                 
                 {/* Summary Statistics Cards - same as list view */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mt-6">
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-red-600">
@@ -380,6 +380,14 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                         {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').length}
                       </div>
                       <div className="text-sm text-gray-600">Controlled</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Out' || i.status === 'Suppressed').length}
+                      </div>
+                      <div className="text-sm text-gray-600">Out</div>
                     </CardContent>
                   </Card>
                   <Card>
