@@ -96,16 +96,29 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
   
   // Filter alerts based on selected state and severity
   const activeAlerts = alerts.filter((alert: WeatherAlert) => {
+    // State filtering
     let matchesState = selectedState === 'all';
-    
     if (!matchesState) {
-      // Check if the alert location contains the selected state code or name
       const stateName = US_STATES[selectedState as keyof typeof US_STATES]?.name;
-      matchesState = alert.location.includes(selectedState) || 
-                   (stateName && alert.location.toLowerCase().includes(stateName.toLowerCase()));
+      const locationText = alert.location.toLowerCase();
+      const selectedStateUpper = selectedState.toUpperCase();
+      
+      matchesState = 
+        locationText.includes(selectedState.toLowerCase()) ||
+        locationText.includes(selectedStateUpper) ||
+        (stateName && locationText.includes(stateName.toLowerCase())) ||
+        alert.location.includes(selectedStateUpper) ||
+        alert.location.includes(selectedState);
     }
     
-    const matchesSeverity = severityFilter === 'all' || alert.severity.toLowerCase() === severityFilter.toLowerCase();
+    // Severity filtering
+    let matchesSeverity = severityFilter === 'all';
+    if (!matchesSeverity) {
+      const alertSeverity = (alert.severity || '').toLowerCase().trim();
+      const filterSeverity = severityFilter.toLowerCase().trim();
+      matchesSeverity = alertSeverity === filterSeverity;
+    }
+    
     return matchesState && matchesSeverity;
   });
 
@@ -200,12 +213,16 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
                   ? ` in ${US_STATES[selectedState as keyof typeof US_STATES]?.name || selectedState}` 
                   : ' from NWS Multi-Feed System'
                 }
-                {selectedState !== 'all' && (
+                {severityFilter !== 'all' && ` (${severityFilter} severity only)`}
+                {(selectedState !== 'all' || severityFilter !== 'all') && (
                   <button 
-                    onClick={() => setSelectedState('all')}
+                    onClick={() => {
+                      setSelectedState('all');
+                      setSeverityFilter('all');
+                    }}
                     className="ml-2 text-blue-600 hover:text-blue-800 text-xs underline"
                   >
-                    (View All States)
+                    (Clear Filters)
                   </button>
                 )}
               </p>
@@ -236,30 +253,39 @@ export function InteractiveWeatherMap({ stateFilter }: InteractiveWeatherMapProp
         <CardContent>
           {/* Filters */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <Select value={selectedState} onValueChange={setSelectedState}>
+            <Select value={selectedState} onValueChange={(value) => {
+              console.log('State filter changed to:', value);
+              setSelectedState(value);
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Filter by State" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All States</SelectItem>
-                {Object.entries(US_STATES).map(([code, state]) => (
-                  <SelectItem key={code} value={code}>
-                    {state.name} ({code})
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">All States ({Object.keys(statesWithAlerts).length} active)</SelectItem>
+                {Object.entries(US_STATES).map(([code, state]) => {
+                  const alertCount = statesWithAlerts[code]?.length || 0;
+                  return (
+                    <SelectItem key={code} value={code} disabled={alertCount === 0}>
+                      {state.name} ({code}) {alertCount > 0 ? `- ${alertCount} alerts` : '- no alerts'}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
 
-            <Select value={severityFilter} onValueChange={setSeverityFilter}>
+            <Select value={severityFilter} onValueChange={(value) => {
+              console.log('Severity filter changed to:', value);
+              setSeverityFilter(value);
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Filter by Severity" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Severities</SelectItem>
-                <SelectItem value="extreme">Extreme</SelectItem>
-                <SelectItem value="severe">Severe</SelectItem>
-                <SelectItem value="moderate">Moderate</SelectItem>
-                <SelectItem value="minor">Minor</SelectItem>
+                <SelectItem value="all">All Severities ({alerts.length})</SelectItem>
+                <SelectItem value="extreme">Extreme ({alerts.filter(a => a.severity.toLowerCase() === 'extreme').length})</SelectItem>
+                <SelectItem value="severe">Severe ({alerts.filter(a => a.severity.toLowerCase() === 'severe').length})</SelectItem>
+                <SelectItem value="moderate">Moderate ({alerts.filter(a => a.severity.toLowerCase() === 'moderate').length})</SelectItem>
+                <SelectItem value="minor">Minor ({alerts.filter(a => a.severity.toLowerCase() === 'minor').length})</SelectItem>
               </SelectContent>
             </Select>
           </div>
