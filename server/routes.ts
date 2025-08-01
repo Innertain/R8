@@ -2912,7 +2912,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         if (latitude && longitude) {
           try {
             // Use Esri World Imagery tiles - highly reliable satellite imagery service
-            const zoom = 12; // Good detail level for disaster areas
+            const zoom = 14; // Higher zoom for better detail (was 12)
             
             // Convert lat/lng to tile coordinates
             const tileX = Math.floor((longitude + 180) / 360 * Math.pow(2, zoom));
