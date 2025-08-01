@@ -9,7 +9,7 @@ import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
-import InteractiveMap from "@/pages/interactive-map-new";
+import InteractiveMapPage from "@/pages/interactive-map";
 import AirtableTest from "@/pages/airtable-test";
 import StatsDashboard from "@/pages/stats-dashboard";
 import AlertsPage from "@/pages/alerts";
@@ -197,7 +197,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/volunteer" component={VolunteerPortal} />
-        <Route path="/map" component={InteractiveMap} />
+        <Route path="/map" component={InteractiveMapPage} />
         <Route path="/stats" component={StatsDashboard} />
         <Route path="/alerts" component={AlertsPage} />
 
