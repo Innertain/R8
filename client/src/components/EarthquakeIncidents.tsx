@@ -197,7 +197,7 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
             {filteredIncidents.length} earthquake{filteredIncidents.length !== 1 ? 's' : ''} 
             {stateFilter && stateFilter !== 'all' 
               ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
-              : ' nationwide'
+              : ' worldwide'
             } from USGS
             {stateFilter && stateFilter !== 'all' && (
               <span className="text-blue-600 ml-2 text-xs">
@@ -248,7 +248,7 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
             {/* Interactive Map Representation */}
             <div className="bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg p-6 border">
               <h3 className="text-lg font-semibold mb-4 text-center">
-                US & Canada Earthquake Activity Map
+                Global Earthquake Activity Map
                 {selectedState !== 'all' && (
                   <span className="block text-sm font-normal text-gray-600 mt-1">
                     Filtered for: {stateNames[selectedState as keyof typeof stateNames] || selectedState}
