@@ -7,9 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { RealtimeApiDebugger } from "@/components/RealtimeApiDebugger";
 
-import RealTimeAlerts from "@/components/RealTimeAlerts";
-import EnhancedRssFeed from "@/components/EnhancedRssFeed";
-import ActiveDisastersDashboard from "@/components/ActiveDisastersDashboard";
+
 import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
 import { WildfireIncidents } from "@/components/WildfireIncidents";
 import { EarthquakeIncidents } from "@/components/EarthquakeIncidents";
@@ -170,17 +168,12 @@ export default function InteractiveMap() {
 
           {/* Disaster Analytics Dashboard */}
           <div id="analytics" className="w-full">
-            <DisasterAnalyticsDashboard disasters={femaData?.items || []} />
-          </div>
-          
-          {/* Disaster Analytics Dashboard */}
-          <div className="w-full">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-lg text-gray-600">Loading disaster data...</div>
               </div>
             ) : (
-              <DisasterAnalyticsDashboard disasters={(femaData as any)?.items || []} />
+              <DisasterAnalyticsDashboard disasters={femaData?.items || []} />
             )}
           </div>
           
