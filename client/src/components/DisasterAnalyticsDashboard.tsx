@@ -409,65 +409,189 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
           </Card>
         </TabsContent>
 
-        <TabsContent value="trends" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Temporal Trends Analysis</CardTitle>
-              <p className="text-sm text-gray-600">
-                Disaster patterns and frequency analysis over time
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Monthly Distribution */}
+        <TabsContent value="trends" className="space-y-6">
+          {/* Enhanced Header with Summary Stats */}
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium mb-3">Monthly Declaration Distribution</h4>
-                  <div className="grid grid-cols-6 lg:grid-cols-12 gap-2">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <TrendingUp className="w-6 h-6 text-blue-600" />
+                    Temporal Trends Analysis
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Disaster patterns and frequency analysis over time • {analytics.total} total declarations
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <div className="text-2xl font-bold text-red-600">{analytics.majorDisasters}</div>
+                    <div className="text-xs text-gray-600">Major Disasters</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <div className="text-2xl font-bold text-orange-600">{analytics.emergencies}</div>
+                    <div className="text-xs text-gray-600">Emergencies</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <div className="text-2xl font-bold text-yellow-600">{analytics.fireManagement}</div>
+                    <div className="text-xs text-gray-600">Fire Management</div>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Enhanced Monthly Distribution Chart */}
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                  Monthly Declaration Distribution
+                </CardTitle>
+                <p className="text-sm text-gray-600">
+                  Last 12 months of disaster activity
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-end justify-between gap-1 h-32 mb-4">
                     {Object.entries(analytics.monthlyStats)
                       .sort(([a], [b]) => a.localeCompare(b))
                       .slice(-12)
                       .map(([month, count]) => {
                         const maxCount = Math.max(...Object.values(analytics.monthlyStats));
-                        const height = Math.max(20, (count / maxCount) * 80);
+                        const heightPercent = Math.max(15, (count / maxCount) * 100);
                         return (
-                          <div key={month} className="flex flex-col items-center">
-                            <div 
-                              className="bg-blue-500 rounded-t"
-                              style={{ height: `${height}px`, width: '20px' }}
-                            />
-                            <span className="text-xs text-gray-600 mt-1">{month.split('-')[1]}/{month.split('-')[0].slice(-2)}</span>
-                            <span className="text-xs font-medium">{count}</span>
+                          <div key={month} className="flex flex-col items-center flex-1 group">
+                            <div className="relative w-full">
+                              <div 
+                                className="bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm transition-all duration-300 group-hover:from-blue-700 group-hover:to-blue-500 cursor-pointer shadow-sm"
+                                style={{ height: `${heightPercent}%`, minHeight: '20px' }}
+                                title={`${month}: ${count} declarations`}
+                              />
+                              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                {count}
+                              </div>
+                            </div>
                           </div>
                         );
                       })}
                   </div>
-                </div>
-
-                {/* Declaration Type Trends */}
-                <div>
-                  <h4 className="font-medium mb-3">Declaration Type Distribution</h4>
-                  <div className="space-y-3">
-                    {Object.entries(analytics.declarationTypeStats).map(([type, count]) => {
-                      const percentage = ((count / analytics.total) * 100).toFixed(1);
-                      const label = type === 'DR' ? 'Major Disasters' : type === 'EM' ? 'Emergencies' : 'Fire Management';
-                      return (
-                        <div key={type} className="flex items-center gap-4">
-                          <span className="w-24 text-sm font-medium">{label}</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-3">
-                            <div 
-                              className={`h-3 rounded-full ${
-                                type === 'DR' ? 'bg-red-500' : 
-                                type === 'EM' ? 'bg-orange-500' : 'bg-yellow-500'
-                              }`}
-                              style={{ width: `${percentage}%` }}
-                            />
-                          </div>
-                          <span className="text-sm text-gray-600 w-16">{count} ({percentage}%)</span>
+                  <div className="grid grid-cols-12 gap-1 text-center">
+                    {Object.entries(analytics.monthlyStats)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .slice(-12)
+                      .map(([month, count]) => (
+                        <div key={month} className="text-xs text-gray-600">
+                          <div className="font-medium">{month.split('-')[1]}/{month.split('-')[0].slice(-2)}</div>
+                          <div className="text-gray-800 font-semibold">{count}</div>
                         </div>
-                      );
-                    })}
+                      ))}
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Enhanced Declaration Type Distribution */}
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <BarChart3 className="w-5 h-5 text-purple-600" />
+                  Declaration Type Distribution
+                </CardTitle>
+                <p className="text-sm text-gray-600">
+                  Breakdown by disaster classification
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(analytics.declarationTypeStats).map(([type, count]) => {
+                    const percentage = ((count / analytics.total) * 100).toFixed(1);
+                    const label = type === 'DR' ? 'Major Disasters' : type === 'EM' ? 'Emergencies' : 'Fire Management';
+                    const color = type === 'DR' ? 'red' : type === 'EM' ? 'orange' : 'yellow';
+                    const bgColor = type === 'DR' ? 'bg-red-50' : type === 'EM' ? 'bg-orange-50' : 'bg-yellow-50';
+                    const borderColor = type === 'DR' ? 'border-red-200' : type === 'EM' ? 'border-orange-200' : 'border-yellow-200';
+                    
+                    return (
+                      <div key={type} className={`p-4 rounded-lg border ${bgColor} ${borderColor} hover:shadow-sm transition-shadow`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${
+                              type === 'DR' ? 'bg-red-500' : 
+                              type === 'EM' ? 'bg-orange-500' : 'bg-yellow-500'
+                            }`} />
+                            <span className="font-medium text-gray-900">{label}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-gray-900">{count}</div>
+                            <div className="text-xs text-gray-600">{percentage}%</div>
+                          </div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-500 ${
+                              type === 'DR' ? 'bg-red-500' : 
+                              type === 'EM' ? 'bg-orange-500' : 'bg-yellow-500'
+                            }`}
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Enhanced Timeline Visualization */}
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Clock className="w-5 h-5 text-green-600" />
+                Recent Disaster Timeline
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Most recent 10 disaster declarations with incident details
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {analytics.recentDisasters.slice(0, 10).map((disaster, index) => {
+                  const Icon = getDisasterIcon(disaster.incidentType);
+                  const typeColor = disaster.declarationType === 'DR' ? 'text-red-600' : 
+                                  disaster.declarationType === 'EM' ? 'text-orange-600' : 'text-yellow-600';
+                  const typeBg = disaster.declarationType === 'DR' ? 'bg-red-50' : 
+                               disaster.declarationType === 'EM' ? 'bg-orange-50' : 'bg-yellow-50';
+                  
+                  return (
+                    <div key={disaster.disasterNumber} className={`flex items-center gap-4 p-3 rounded-lg border ${typeBg} hover:shadow-sm transition-shadow`}>
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className={`p-2 rounded-lg ${typeBg}`}>
+                          <Icon className={`w-4 h-4 ${typeColor}`} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900 text-sm">
+                            {disaster.title}
+                          </div>
+                          <div className="text-xs text-gray-600 mt-1">
+                            {disaster.state} • {disaster.incidentType}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-gray-900">
+                          {new Date(disaster.declarationDate).toLocaleDateString()}
+                        </div>
+                        <Badge variant="outline" className={`text-xs ${typeColor}`}>
+                          {disaster.declarationType === 'DR' ? 'Major' : 
+                           disaster.declarationType === 'EM' ? 'Emergency' : 'Fire Mgmt'}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
