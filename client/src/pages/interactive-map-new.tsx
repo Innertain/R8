@@ -141,16 +141,6 @@ export default function InteractiveMap() {
             )}
           </div>
           
-          {/* Enhanced Emergency Data Feed */}
-          <div className="w-full">
-            <EnhancedRssFeed 
-              maxItems={20} 
-              stateFilter={getFilterLocation() || undefined}
-              showFilters={true}
-              showAnalytics={true}
-            />
-          </div>
-          
           {/* Data Sources Overview */}
           <div className="w-full">
             <DataSourcesOverview />
