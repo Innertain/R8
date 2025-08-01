@@ -3436,12 +3436,35 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
-  // Social Media Emergency Monitoring endpoint
+  // Social Media Emergency Monitoring endpoint with intelligent caching
+  const socialMediaCache = new Map();
+  const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours - maximize API efficiency
+  const MAX_MONTHLY_REQUESTS = 100; // Twitter free plan limit
+  let monthlyRequestCount = 0;
+  let lastResetDate = new Date().getMonth();
+
   app.get("/api/social-media-emergency", async (req, res) => {
     try {
       console.log('Fetching social media emergency updates from state officials...');
       
-      // State officials' Twitter/X profiles for emergency monitoring
+      // Reset monthly counter if new month
+      const currentMonth = new Date().getMonth();
+      if (currentMonth !== lastResetDate) {
+        monthlyRequestCount = 0;
+        lastResetDate = currentMonth;
+        console.log('Monthly Twitter API request counter reset');
+      }
+
+      // Check cache first
+      const cacheKey = 'social_media_emergency';
+      const cached = socialMediaCache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        console.log('✓ Returning cached social media data');
+        return res.json(cached.data);
+      }
+      
+      // Priority state officials for targeted monitoring (governors + emergency mgmt)
+      const priorityStates = ['CA', 'FL', 'TX', 'NY', 'NC', 'LA', 'HI']; // High-risk states first
       const stateOfficials = {
         'AL': { governor: 'KayIveyAL', emergency: 'AlabamaEMA' },
         'AK': { governor: 'GovDunleavy', emergency: 'AKDisaster' },
@@ -3497,87 +3520,148 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       // Emergency-related keywords for filtering relevant content
       const emergencyKeywords = [
-        'emergency', 'disaster', 'evacuation', 'warning', 'alert', 'storm', 'hurricane', 
-        'tornado', 'flood', 'wildfire', 'earthquake', 'blizzard', 'drought', 'severe weather',
-        'state of emergency', 'FEMA', 'shelter', 'relief', 'response', 'recovery', 'rescue',
-        'damage', 'power outage', 'road closure', 'bridge closure', 'debris', 'cleanup',
-        'snow emergency', 'heat wave', 'cold snap', 'ice storm', 'thunderstorm', 'flash flood'
+        'emergency', 'alert', 'warning', 'evacuate', 'evacuation', 'shelter',
+        'storm', 'hurricane', 'tornado', 'flood', 'wildfire', 'fire',
+        'earthquake', 'disaster', 'crisis', 'urgent', 'immediate',
+        'safety', 'hazard', 'threat', 'severe weather', 'power outage',
+        'road closure', 'debris', 'damage', 'relief', 'assistance',
+        'state of emergency', 'declare', 'activated', 'response'
       ];
 
-      const socialMediaPosts = [];
+      const socialMediaPosts: any[] = [];
       let processedAccounts = 0;
-      const maxAccountsToProcess = 20; // Limit to prevent rate limiting
-
-      // Process state officials (governors and emergency management)
-      for (const [state, accounts] of Object.entries(stateOfficials)) {
-        if (processedAccounts >= maxAccountsToProcess) break;
+      const remainingRequests = MAX_MONTHLY_REQUESTS - monthlyRequestCount;
+      
+      // Smart account prioritization: focus on high-risk states and recent activity
+      const statesToProcess = priorityStates.concat(
+        Object.keys(stateOfficials).filter(s => !priorityStates.includes(s))
+      ).slice(0, Math.max(5, Math.floor(remainingRequests / 4))); // Reserve requests intelligently
+      
+      console.log(`Twitter API: ${remainingRequests} requests remaining this month. Processing ${statesToProcess.length} states.`);
+      
+      for (const state of statesToProcess) {
+        if (remainingRequests - monthlyRequestCount <= 5) break; // Reserve 5 for emergency use
+        
+        const accounts = stateOfficials[state as keyof typeof stateOfficials];
 
         for (const [role, username] of Object.entries(accounts)) {
-          if (processedAccounts >= maxAccountsToProcess) break;
+          if (remainingRequests - monthlyRequestCount <= 5) break;
 
           try {
-            // Note: In a real implementation, you would use Twitter API v2
-            // For this demo, we'll simulate the structure and suggest the implementation approach
-            
-            // Simulated Twitter API response structure for demonstration
-            const mockTweets = [
-              {
-                id: `${state}_${role}_1`,
-                text: `Weather alert: Severe thunderstorm warning issued for central ${state}. Take shelter immediately.`,
-                created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-                author: {
-                  username: username,
-                  name: role === 'governor' ? `Governor of ${state}` : `${state} Emergency Management`,
-                  verified: true
-                },
-                public_metrics: {
-                  retweet_count: 45,
-                  like_count: 123,
-                  reply_count: 8
+            // Real Twitter API v2 implementation with request tracking
+            const twitterBearerToken = process.env.TWITTER_BEARER_TOKEN;
+            if (!twitterBearerToken) {
+              // Fallback to simulated data structure when no API key
+              const mockTweets = [
+                {
+                  id: `${state}_${role}_sim_1`,
+                  text: `Emergency shelters have been opened in response to the ongoing storm. Visit our website for locations.`,
+                  created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+                  public_metrics: { retweet_count: 67, like_count: 234, reply_count: 12 }
                 }
-              },
-              {
-                id: `${state}_${role}_2`,
-                text: `Emergency shelters have been opened in response to the ongoing storm. Visit our website for locations.`,
-                created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-                author: {
+              ];
+              
+              const relevantTweets = mockTweets.filter((tweet: any) => {
+                const tweetText = tweet.text.toLowerCase();
+                return emergencyKeywords.some(keyword => tweetText.includes(keyword));
+              });
+
+              relevantTweets.forEach((tweet: any) => {
+                socialMediaPosts.push({
+                  id: tweet.id,
+                  state,
+                  stateFullName: getStateName(state),
+                  accountType: role,
                   username: username,
-                  name: role === 'governor' ? `Governor of ${state}` : `${state} Emergency Management`,
-                  verified: true
-                },
-                public_metrics: {
-                  retweet_count: 67,
-                  like_count: 234,
-                  reply_count: 12
-                }
+                  displayName: role === 'governor' ? `Governor of ${state}` : `${state} Emergency Management`,
+                  verified: true,
+                  text: tweet.text,
+                  createdAt: tweet.created_at,
+                  engagement: {
+                    retweets: tweet.public_metrics?.retweet_count || 0,
+                    likes: tweet.public_metrics?.like_count || 0,
+                    replies: tweet.public_metrics?.reply_count || 0
+                  },
+                  urgencyLevel: determineUrgencyLevel(tweet.text),
+                  url: `https://twitter.com/${username}/status/${tweet.id.split('_')[2] || '123'}`
+                });
+              });
+              
+              processedAccounts++;
+              continue;
+            }
+
+            // Track API usage
+            monthlyRequestCount += 2; // User lookup + tweets fetch
+            console.log(`Making Twitter API calls for ${username} (${monthlyRequestCount}/${MAX_MONTHLY_REQUESTS})`);
+
+            // Fetch user by username
+            const userResponse = await fetch(`https://api.twitter.com/2/users/by/username/${username}`, {
+              headers: {
+                'Authorization': `Bearer ${twitterBearerToken}`,
+                'User-Agent': 'DisasterMonitor/1.0'
               }
-            ];
+            });
+
+            if (!userResponse.ok) {
+              console.log(`Failed to fetch user ${username}: ${userResponse.status}`);
+              continue;
+            }
+
+            const userData = await userResponse.json();
+            if (!userData.data) {
+              console.log(`User not found: ${username}`);
+              continue;
+            }
+
+            // Fetch recent tweets for this user
+            const tweetsResponse = await fetch(
+              `https://api.twitter.com/2/users/${userData.data.id}/tweets?` +
+              new URLSearchParams({
+                'max_results': '10',
+                'tweet.fields': 'created_at,public_metrics,context_annotations',
+                'user.fields': 'verified,name,username',
+                'expansions': 'author_id'
+              }), {
+              headers: {
+                'Authorization': `Bearer ${twitterBearerToken}`,
+                'User-Agent': 'DisasterMonitor/1.0'
+              }
+            });
+
+            if (!tweetsResponse.ok) {
+              console.log(`Failed to fetch tweets for ${username}: ${tweetsResponse.status}`);
+              continue;
+            }
+
+            const tweetsData = await tweetsResponse.json();
+            const apiTweets = tweetsData.data || [];
 
             // Filter tweets for emergency content
-            const relevantTweets = mockTweets.filter(tweet => {
+            const relevantTweets = apiTweets.filter((tweet: any) => {
               const tweetText = tweet.text.toLowerCase();
               return emergencyKeywords.some(keyword => tweetText.includes(keyword));
             });
 
             // Add relevant tweets to results
-            relevantTweets.forEach(tweet => {
+            relevantTweets.forEach((tweet: any) => {
               socialMediaPosts.push({
                 id: tweet.id,
                 state,
                 stateFullName: getStateName(state),
                 accountType: role,
-                username: tweet.author.username,
-                displayName: tweet.author.name,
-                verified: tweet.author.verified,
+                username: username,
+                displayName: role === 'governor' ? `Governor of ${state}` : `${state} Emergency Management`,
+                verified: userData.data.verified || false,
                 text: tweet.text,
                 createdAt: tweet.created_at,
                 engagement: {
-                  retweets: tweet.public_metrics.retweet_count,
-                  likes: tweet.public_metrics.like_count,
-                  replies: tweet.public_metrics.reply_count
+                  retweets: tweet.public_metrics?.retweet_count || 0,
+                  likes: tweet.public_metrics?.like_count || 0,
+                  replies: tweet.public_metrics?.reply_count || 0
                 },
                 urgencyLevel: determineUrgencyLevel(tweet.text),
-                url: `https://twitter.com/${username}/status/${tweet.id.split('_')[2]}`
+                url: `https://twitter.com/${username}/status/${tweet.id}`
               });
             });
 
@@ -3588,26 +3672,45 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         }
       }
 
-      // Sort by urgency level and creation time
-      socialMediaPosts.sort((a, b) => {
-        const urgencyOrder = { 'critical': 3, 'high': 2, 'medium': 1, 'low': 0 };
+      // Sort posts by urgency and recency
+      socialMediaPosts.sort((a: any, b: any) => {
+        const urgencyOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
         const urgencyDiff = urgencyOrder[b.urgencyLevel] - urgencyOrder[a.urgencyLevel];
         if (urgencyDiff !== 0) return urgencyDiff;
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
 
-      console.log(`✓ Social media monitoring complete: ${socialMediaPosts.length} relevant posts found from ${processedAccounts} accounts`);
-
-      res.json({
+      // Calculate statistics
+      const totalRelevantPosts = socialMediaPosts.length;
+      const criticalCount = socialMediaPosts.filter((post: any) => post.urgencyLevel === 'critical').length;
+      
+      const responseData = {
         success: true,
         posts: socialMediaPosts.slice(0, 50), // Limit to most recent 50 posts
-        totalRelevantPosts: socialMediaPosts.length,
+        totalRelevantPosts,
+        criticalAlerts: criticalCount,
         accountsMonitored: processedAccounts,
         lastUpdated: new Date().toISOString(),
-        nextUpdate: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(), // 6 hours from now
+        nextUpdate: new Date(Date.now() + CACHE_DURATION).toISOString(),
         sources: ['State Governor Twitter/X Accounts', 'State Emergency Management Twitter/X Accounts'],
-        note: 'This feature requires Twitter API v2 access and proper authentication keys for production use'
+        apiUsage: {
+          requestsUsed: monthlyRequestCount,
+          requestsRemaining: MAX_MONTHLY_REQUESTS - monthlyRequestCount,
+          resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString()
+        },
+        note: process.env.TWITTER_BEARER_TOKEN ? 
+          `Live Twitter API integration active (${monthlyRequestCount}/${MAX_MONTHLY_REQUESTS} requests used this month). Consider upgrading to paid Twitter API plan for increased monitoring capacity.` : 
+          'Twitter API key required for live data - currently showing demo structure. Provide TWITTER_BEARER_TOKEN for real monitoring. Upgrade to paid Twitter API plan recommended for comprehensive coverage.'
+      };
+
+      // Cache the response
+      socialMediaCache.set(cacheKey, {
+        data: responseData,
+        timestamp: Date.now()
       });
+      
+      console.log(`✓ Social media monitoring complete: ${totalRelevantPosts} relevant posts found from ${processedAccounts} accounts. API requests: ${monthlyRequestCount}/${MAX_MONTHLY_REQUESTS}`);
+      res.json(responseData);
 
     } catch (error: any) {
       console.error('Error fetching social media emergency data:', error);
