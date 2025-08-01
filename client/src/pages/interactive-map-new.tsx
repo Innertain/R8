@@ -104,7 +104,8 @@ export default function InteractiveMap() {
           {/* Wildfire Incidents */}
           <div className="w-full">
             <WildfireIncidents 
-              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter} 
+              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
+              onStateFilterChange={handleStateFilterChange}
             />
           </div>
           

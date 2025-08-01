@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2, Map, List } from 'lucide-react';
 
 interface WildfireIncident {
   id: string;
@@ -19,9 +21,20 @@ interface WildfireIncident {
 
 interface WildfireIncidentsProps {
   stateFilter?: string;
+  onStateFilterChange?: (stateCode: string) => void;
 }
 
-export function WildfireIncidents({ stateFilter }: WildfireIncidentsProps) {
+export function WildfireIncidents({ stateFilter, onStateFilterChange }: WildfireIncidentsProps) {
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+  const [selectedState, setSelectedState] = useState<string>(stateFilter || 'all');
+
+  // Function to handle state selection and notify parent
+  const handleStateClick = (stateCode: string) => {
+    setSelectedState(stateCode);
+    if (onStateFilterChange) {
+      onStateFilterChange(stateCode);
+    }
+  };
   const { data: incidentsData, isLoading, error } = useQuery({
     queryKey: ['/api/wildfire-incidents'],
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -164,8 +177,132 @@ export function WildfireIncidents({ stateFilter }: WildfireIncidentsProps) {
           </p>
         </CardHeader>
         <CardContent>
-          {/* Summary Statistics */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+          {/* View Mode Toggle */}
+          <div className="flex justify-center mb-6">
+            <div className="bg-gray-100 rounded-lg p-1 flex">
+              <Button
+                variant={viewMode === 'map' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('map')}
+                className="flex items-center gap-2"
+              >
+                <Map className="w-4 h-4" />
+                Map View
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="flex items-center gap-2"
+              >
+                <List className="w-4 h-4" />
+                List View
+              </Button>
+            </div>
+          </div>
+
+          {viewMode === 'map' ? (
+            <div className="space-y-6">
+              {/* Interactive Map Representation */}
+              <div className="bg-gradient-to-b from-orange-50 to-orange-100 rounded-lg p-6 border">
+                <h3 className="text-lg font-semibold mb-4 text-center">
+                  United States Wildfire Incident Map
+                  {selectedState !== 'all' && (
+                    <span className="block text-sm font-normal text-gray-600 mt-1">
+                      Filtered for: {stateNames[selectedState as keyof typeof stateNames] || selectedState}
+                    </span>
+                  )}
+                </h3>
+                
+                {Object.keys(incidentsByState).length === 0 ? (
+                  <div className="text-center py-8">
+                    <Flame className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-600">
+                      {selectedState === 'all' 
+                        ? 'No active wildfire incidents' 
+                        : `No active incidents in ${stateNames[selectedState as keyof typeof stateNames] || selectedState}`
+                      }
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {selectedState === 'all' 
+                        ? 'All clear across monitored regions' 
+                        : 'This state currently has no active wildfire incidents'
+                      }
+                    </p>
+                    {selectedState !== 'all' && (
+                      <button 
+                        onClick={() => handleStateClick('all')}
+                        className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
+                      >
+                        View all states
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {Object.entries(incidentsByState)
+                        .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
+                        .map(([stateCode, stateIncidents]) => {
+                        const state = stateNames[stateCode as keyof typeof stateNames];
+                        const maxSeverity = (stateIncidents as WildfireIncident[]).reduce((max: string, incident: WildfireIncident) => {
+                          const severityOrder = { 'severe': 4, 'moderate': 3, 'minor': 2, 'low': 1 };
+                          const incidentLevel = severityOrder[incident.severity.toLowerCase() as keyof typeof severityOrder] || 0;
+                          const maxLevel = severityOrder[max.toLowerCase() as keyof typeof severityOrder] || 0;
+                          return incidentLevel > maxLevel ? incident.severity : max;
+                        }, 'low');
+
+                        const getSeverityColor = (severity: string) => {
+                          switch (severity.toLowerCase()) {
+                            case 'severe': return 'bg-red-500 text-white border-red-600';
+                            case 'moderate': return 'bg-orange-500 text-white border-orange-600';
+                            case 'minor': return 'bg-yellow-400 text-black border-yellow-500';
+                            default: return 'bg-orange-200 text-orange-800 border-orange-300';
+                          }
+                        };
+
+                        return (
+                          <div
+                            key={stateCode}
+                            className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
+                              selectedState === stateCode 
+                                ? 'ring-4 ring-orange-500 shadow-lg scale-105' 
+                                : ''
+                            } ${getSeverityColor(maxSeverity)}`}
+                            onClick={() => {
+                              const newState = selectedState === stateCode ? 'all' : stateCode;
+                              handleStateClick(newState);
+                            }}
+                          >
+                            <div className="text-center">
+                              <div className="font-bold text-lg">{stateCode}</div>
+                              <div className="text-xs opacity-90">{state || stateCode}</div>
+                              <div className="text-xs font-semibold mt-1">
+                                {(stateIncidents as WildfireIncident[]).length} incident{(stateIncidents as WildfireIncident[]).length !== 1 ? 's' : ''}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {selectedState !== 'all' && (
+                      <div className="text-center mt-4">
+                        <button 
+                          onClick={() => handleStateClick('all')}
+                          className="text-blue-600 hover:text-blue-800 text-sm underline"
+                        >
+                          View all states
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Summary Statistics */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-red-600">
@@ -284,6 +421,8 @@ export function WildfireIncidents({ stateFilter }: WildfireIncidentsProps) {
               ))
             )}
           </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
