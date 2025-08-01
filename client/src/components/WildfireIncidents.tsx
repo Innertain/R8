@@ -367,6 +367,42 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   </div>
                 )}
                 
+                {/* Summary Statistics Cards - same as list view */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-6">
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-red-600">
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').length}
+                      </div>
+                      <div className="text-sm text-gray-600">Active</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-yellow-600">
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').length}
+                      </div>
+                      <div className="text-sm text-gray-600">Contained</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').length}
+                      </div>
+                      <div className="text-sm text-gray-600">Controlled</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-orange-600">
+                        {Object.keys(incidentsByState).length}
+                      </div>
+                      <div className="text-sm text-gray-600">States Affected</div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
                 {/* Color Legend */}
                 <div className="mt-6 p-4 bg-white rounded-lg border">
                   <h4 className="text-sm font-semibold mb-3 text-gray-700">Incident Status Colors</h4>
