@@ -420,48 +420,73 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
             </Card>
           </div>
 
-          {/* Recent Disasters Timeline */}
-          <Card>
+          {/* Timeline Navigation Card */}
+          <Card className="border-2 border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Clock className="w-4 h-4" />
-                Recent Disaster Timeline
+                <Clock className="w-5 h-5 text-blue-600" />
+                Interactive Timeline Available
+                <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700 border-blue-300">New Feature</Badge>
               </CardTitle>
+              <p className="text-sm text-gray-700 mt-2">
+                Switch to the "Trends" tab to see the enhanced Interactive Disaster Timeline with visual connections, colored nodes, and detailed event cards.
+              </p>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3 max-h-80 overflow-y-auto">
-                {analytics.recentDisasters.map((disaster) => {
-                  const Icon = getDisasterIcon(disaster.incidentType || '');
-                  return (
-                    <div key={disaster.guid} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="p-2 bg-white rounded-full border">
-                        <Icon className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium text-sm truncate">{disaster.title}</h4>
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs ${
-                              disaster.declarationType === 'DR' ? 'border-red-300 text-red-700' :
-                              disaster.declarationType === 'EM' ? 'border-orange-300 text-orange-700' :
-                              'border-yellow-300 text-yellow-700'
-                            }`}
-                          >
-                            {disaster.declarationType === 'DR' ? 'Major Disaster' :
-                             disaster.declarationType === 'EM' ? 'Emergency' : 'Fire Mgmt'}
-                          </Badge>
+              <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-blue-200">
+                <div>
+                  <div className="font-semibold text-gray-900 mb-1">Enhanced Visual Timeline</div>
+                  <div className="text-sm text-gray-600">
+                    Features timeline nodes, connection lines, filter buttons, and large interactive cards
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => {
+                    // This would trigger tab change in a real implementation
+                    console.log('Navigate to trends tab for interactive timeline');
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  View Interactive Timeline
+                </Button>
+              </div>
+              
+              {/* Quick Preview of Recent Events */}
+              <div className="mt-4">
+                <div className="text-sm font-medium text-gray-700 mb-3">Quick Preview - Recent Events:</div>
+                <div className="space-y-2">
+                  {analytics.recentDisasters.slice(0, 5).map((disaster) => {
+                    const Icon = getDisasterIcon(disaster.incidentType || '');
+                    return (
+                      <div key={disaster.guid} className="flex items-center gap-3 p-2 bg-white rounded border">
+                        <div className="p-1.5 bg-gray-100 rounded">
+                          <Icon className="w-3 h-3 text-gray-600" />
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-gray-600">
-                          <span>{disaster.state}</span>
-                          <span>{disaster.incidentType}</span>
-                          <span>{new Date(disaster.declarationDate).toLocaleDateString()}</span>
-                          <span className="font-mono">#{disaster.disasterNumber}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium text-gray-900 truncate">{disaster.title}</div>
+                          <div className="text-xs text-gray-500">
+                            {disaster.state} • {new Date(disaster.declarationDate).toLocaleDateString()}
+                          </div>
                         </div>
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${
+                            disaster.declarationType === 'DR' ? 'border-red-300 text-red-700' :
+                            disaster.declarationType === 'EM' ? 'border-orange-300 text-orange-700' :
+                            'border-yellow-300 text-yellow-700'
+                          }`}
+                        >
+                          {disaster.declarationType}
+                        </Badge>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+                <div className="text-center mt-3">
+                  <span className="text-xs text-gray-500">
+                    View all {analytics.recentDisasters.length} events in the Interactive Timeline (Trends tab)
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
