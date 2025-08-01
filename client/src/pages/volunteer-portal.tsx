@@ -21,7 +21,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { RealtimeApiDebugger } from '@/components/RealtimeApiDebugger';
+
 import VolunteerCalendar from '@/components/VolunteerCalendar';
 import ShiftCard from '@/components/ShiftCard';
 
@@ -1662,8 +1662,8 @@ export default function VolunteerPortal() {
         </div>
       </footer>
       
-      {/* Real-time API Debugger */}
-      <RealtimeApiDebugger />
+
+
     </div>
   );
 }
