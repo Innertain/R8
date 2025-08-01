@@ -379,6 +379,42 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
                 </div>
               )}
               
+              {/* Summary Statistics Cards - same as list view */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-6">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-red-600">
+                      {filteredIncidents.filter((i: EarthquakeIncident) => i.magnitude >= 7.0).length}
+                    </div>
+                    <div className="text-sm text-gray-600">Major (7.0+)</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {filteredIncidents.filter((i: EarthquakeIncident) => i.magnitude >= 5.0 && i.magnitude < 7.0).length}
+                    </div>
+                    <div className="text-sm text-gray-600">Strong (5.0-6.9)</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {filteredIncidents.filter((i: EarthquakeIncident) => i.magnitude >= 3.0 && i.magnitude < 5.0).length}
+                    </div>
+                    <div className="text-sm text-gray-600">Moderate (3.0-4.9)</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {Object.keys(incidentsByState).length}
+                    </div>
+                    <div className="text-sm text-gray-600">Regions Affected</div>
+                  </CardContent>
+                </Card>
+              </div>
+              
               {/* Color Legend */}
               <div className="mt-6 p-4 bg-white rounded-lg border">
                 <h4 className="text-sm font-semibold mb-3 text-gray-700">Magnitude Colors</h4>
