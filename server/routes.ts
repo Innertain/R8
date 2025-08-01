@@ -1821,6 +1821,168 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   }
 
 
+  // State Emergency Declarations endpoint - News API integration
+  app.get("/api/state-emergency-declarations", async (req, res) => {
+    try {
+      console.log('Fetching state emergency declarations from news sources...');
+      
+      if (!process.env.NEWS_API_KEY) {
+        return res.status(500).json({
+          success: false,
+          error: 'NEWS_API_KEY not configured'
+        });
+      }
+
+      // Search for recent emergency declarations from news sources
+      const searchQueries = [
+        'governor declares emergency',
+        'state of emergency declared',
+        'emergency declaration governor',
+        'governor emergency order'
+      ];
+
+      const emergencyDeclarations = [];
+      const seenDeclarations = new Set();
+
+      for (const query of searchQueries) {
+        try {
+          const response = await fetch(
+            `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&from=${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}&apiKey=${process.env.NEWS_API_KEY}`,
+            {
+              headers: {
+                'User-Agent': 'DisasterWatchCenter/1.0'
+              }
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            data.articles?.forEach((article: any) => {
+              // Extract state information from article
+              const title = article.title?.toLowerCase() || '';
+              const description = article.description?.toLowerCase() || '';
+              const content = article.content?.toLowerCase() || '';
+              const fullText = `${title} ${description} ${content}`;
+
+              // State detection patterns
+              const statePatterns = {
+                'AL': ['alabama'], 'AK': ['alaska'], 'AZ': ['arizona'], 'AR': ['arkansas'], 'CA': ['california'],
+                'CO': ['colorado'], 'CT': ['connecticut'], 'DE': ['delaware'], 'FL': ['florida'], 'GA': ['georgia'],
+                'HI': ['hawaii'], 'ID': ['idaho'], 'IL': ['illinois'], 'IN': ['indiana'], 'IA': ['iowa'],
+                'KS': ['kansas'], 'KY': ['kentucky'], 'LA': ['louisiana'], 'ME': ['maine'], 'MD': ['maryland'],
+                'MA': ['massachusetts'], 'MI': ['michigan'], 'MN': ['minnesota'], 'MS': ['mississippi'], 'MO': ['missouri'],
+                'MT': ['montana'], 'NE': ['nebraska'], 'NV': ['nevada'], 'NH': ['new hampshire'], 'NJ': ['new jersey'],
+                'NM': ['new mexico'], 'NY': ['new york'], 'NC': ['north carolina'], 'ND': ['north dakota'], 'OH': ['ohio'],
+                'OK': ['oklahoma'], 'OR': ['oregon'], 'PA': ['pennsylvania'], 'RI': ['rhode island'], 'SC': ['south carolina'],
+                'SD': ['south dakota'], 'TN': ['tennessee'], 'TX': ['texas'], 'UT': ['utah'], 'VT': ['vermont'],
+                'VA': ['virginia'], 'WA': ['washington'], 'WV': ['west virginia'], 'WI': ['wisconsin'], 'WY': ['wyoming'],
+                'DC': ['washington dc', 'district of columbia']
+              };
+
+              // Find matching states
+              const detectedStates = [];
+              for (const [code, patterns] of Object.entries(statePatterns)) {
+                if (patterns.some(pattern => fullText.includes(pattern))) {
+                  detectedStates.push(code);
+                }
+              }
+
+              // Emergency keywords validation
+              const emergencyKeywords = [
+                'emergency declaration', 'state of emergency', 'emergency order',
+                'disaster declaration', 'governor declares', 'emergency proclaimed'
+              ];
+
+              const hasEmergencyKeywords = emergencyKeywords.some(keyword => 
+                fullText.includes(keyword)
+              );
+
+              if (detectedStates.length > 0 && hasEmergencyKeywords) {
+                detectedStates.forEach(state => {
+                  const declarationKey = `${state}-${article.publishedAt}`;
+                  
+                  if (!seenDeclarations.has(declarationKey)) {
+                    seenDeclarations.add(declarationKey);
+                    
+                    // Extract emergency type from content
+                    let emergencyType = 'General Emergency';
+                    if (fullText.includes('flood') || fullText.includes('flooding')) emergencyType = 'Flooding';
+                    else if (fullText.includes('fire') || fullText.includes('wildfire')) emergencyType = 'Wildfire';
+                    else if (fullText.includes('hurricane') || fullText.includes('storm')) emergencyType = 'Storm/Hurricane';
+                    else if (fullText.includes('winter') || fullText.includes('snow')) emergencyType = 'Winter Weather';
+                    else if (fullText.includes('earthquake')) emergencyType = 'Earthquake';
+                    else if (fullText.includes('tornado')) emergencyType = 'Tornado';
+
+                    emergencyDeclarations.push({
+                      id: `news-${state}-${Date.parse(article.publishedAt)}`,
+                      state,
+                      stateName: getStateName(state),
+                      title: article.title,
+                      description: article.description,
+                      emergencyType,
+                      publishedAt: article.publishedAt,
+                      source: article.source?.name || 'News Source',
+                      url: article.url,
+                      author: article.author,
+                      urlToImage: article.urlToImage
+                    });
+                  }
+                });
+              }
+            });
+          }
+        } catch (queryError) {
+          console.error(`Error searching for "${query}":`, queryError);
+        }
+      }
+
+      // Sort by most recent
+      emergencyDeclarations.sort((a, b) => 
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      );
+
+      // Limit to most recent 50 declarations
+      const recentDeclarations = emergencyDeclarations.slice(0, 50);
+
+      console.log(`✓ State emergency declarations processed: ${recentDeclarations.length} declarations found from news sources`);
+
+      res.json({
+        success: true,
+        declarations: recentDeclarations,
+        count: recentDeclarations.length,
+        lastUpdated: new Date().toISOString(),
+        sources: ['NewsAPI.org'],
+        searchQueries
+      });
+
+    } catch (error: any) {
+      console.error('Error fetching state emergency declarations:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch emergency declarations',
+        details: error.message || 'Unknown error'
+      });
+    }
+  });
+
+  function getStateName(code: string): string {
+    const stateNames: { [key: string]: string } = {
+      'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+      'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+      'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+      'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+      'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
+      'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
+      'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
+      'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+      'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+      'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming',
+      'DC': 'District of Columbia'
+    };
+    return stateNames[code] || code;
+  }
+
   // Basic Weather Alerts endpoint (alias for RSS endpoint)
   app.get("/api/weather-alerts", async (req, res) => {
     try {
