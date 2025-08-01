@@ -132,8 +132,14 @@ export function NoaaStormEvents() {
     queryKey: ['/api/noaa-storm-events', selectedEventType, selectedState],
     queryFn: () => fetch(buildApiUrl()).then(res => res.json()),
     refetchInterval: 30 * 60 * 1000, // Refetch every 30 minutes
-    staleTime: 15 * 60 * 1000 // Consider data stale after 15 minutes
+    staleTime: 15 * 60 * 1000, // Consider data stale after 15 minutes
+    retry: 3
   });
+
+  // Debug logging
+  console.log('NOAA Storm Events - data:', data);
+  console.log('NOAA Storm Events - isLoading:', isLoading);
+  console.log('NOAA Storm Events - error:', error);
 
   const filteredEvents = data?.events || [];
 
@@ -175,7 +181,7 @@ export function NoaaStormEvents() {
     return (
       <Card className="animate-pulse">
         <CardHeader>
-          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+          <CardTitle>Loading NOAA Storm Events...</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -189,6 +195,7 @@ export function NoaaStormEvents() {
   }
 
   if (error) {
+    console.error('NOAA Storm Events error:', error);
     return (
       <Card className="border-red-200">
         <CardHeader>
@@ -198,7 +205,7 @@ export function NoaaStormEvents() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-red-600 mb-4">Unable to load storm event data</p>
+          <p className="text-red-600 mb-4">Unable to load storm event data: {error?.message || 'Unknown error'}</p>
           <Button onClick={() => refetch()} variant="outline" size="sm">
             Try Again
           </Button>
@@ -239,6 +246,9 @@ export function NoaaStormEvents() {
             NOAA Storm Events Database
             <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
               Phase 2
+            </Badge>
+            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+              {filteredEvents.length} Events
             </Badge>
           </CardTitle>
           <div className="flex items-center gap-2 text-xs text-gray-500">
