@@ -3497,12 +3497,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         disabled: true,
         posts: [],
         note: "Social media monitoring is disabled and may be coming soon.",
-        totalRelevantPosts: 0,
-        apiUsage: {
-          requestsUsed: 96,
-          monthlyLimit: 100,
-          status: "near_limit"
-        }
+        totalRelevantPosts: 0
       });
     } catch (error) {
       console.error('Error in social media endpoint:', error);
