@@ -76,8 +76,8 @@ export function EnhancedRssFeed({
         setLoading(true);
         setError(null);
 
-        // Fetch emergency alerts
-        const alertsResponse = await fetch('/api/emergency-alerts');
+        // Fetch enhanced weather alerts from multiple RSS feeds
+        const alertsResponse = await fetch('/api/weather-alerts-rss');
         if (alertsResponse.ok) {
           const alertsData = await alertsResponse.json();
           if (alertsData.success) {
