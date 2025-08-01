@@ -135,18 +135,25 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
     return matchesState && matchesSeverity;
   });
 
-  // Extract states with active alerts for the map visualization
+  // Extract states with active alerts for the map visualization using same logic as activeAlerts
   const statesWithAlerts = alerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
-    // Try to extract state abbreviation from location
-    const stateMatch = alert.location.match(/\b([A-Z]{2})\b/g);
-    if (stateMatch) {
-      stateMatch.forEach(state => {
-        if (US_STATES[state as keyof typeof US_STATES]) {
-          if (!acc[state]) acc[state] = [];
-          acc[state].push(alert);
-        }
-      });
-    }
+    // Check all state codes to see which ones match this alert using the same logic as activeAlerts
+    Object.keys(US_STATES).forEach(stateCode => {
+      const stateName = US_STATES[stateCode as keyof typeof US_STATES]?.name;
+      const statePatterns = [
+        new RegExp(`\\b${stateCode.toUpperCase()}\\b`), // Exact state code (e.g., "WA")
+        new RegExp(`\\b${stateCode.toLowerCase()}\\b`), // Lowercase state code
+        new RegExp(`\\(${stateCode.toUpperCase()}\\)`), // State code in parentheses (e.g., "(WA)")
+        new RegExp(`\\b${stateName?.toLowerCase()}\\b`), // Full state name
+      ].filter(Boolean);
+      
+      const matchesState = statePatterns.some(pattern => pattern.test(alert.location));
+      
+      if (matchesState) {
+        if (!acc[stateCode]) acc[stateCode] = [];
+        acc[stateCode].push(alert);
+      }
+    });
     return acc;
   }, {});
 
