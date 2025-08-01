@@ -207,20 +207,20 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
               ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
               : ' worldwide'
             } from USGS
-            {stateFilter && stateFilter !== 'all' && (
-              <div className="bg-orange-50 border border-orange-200 rounded px-2 py-1 mt-2">
-                <span className="text-orange-700 text-xs font-medium">
-                  ⚠️ Filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter} selection from another section
-                </span>
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
-                >
-                  Clear filter & show all earthquakes
-                </button>
-              </div>
-            )}
           </p>
+          {stateFilter && stateFilter !== 'all' && (
+            <div className="bg-orange-50 border border-orange-200 rounded px-2 py-1 mt-2">
+              <span className="text-orange-700 text-xs font-medium">
+                ⚠️ Filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter} selection from another section
+              </span>
+              <button 
+                onClick={() => window.location.reload()}
+                className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
+              >
+                Clear filter & show all earthquakes
+              </button>
+            </div>
+          )}
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
             <h4 className="text-sm font-semibold text-purple-800 flex items-center gap-2 mb-2">
               <InfoIcon className="w-4 h-4" />

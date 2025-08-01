@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { RealtimeApiDebugger } from "@/components/RealtimeApiDebugger";
-
+import { GlobalFilterIndicator } from "@/components/GlobalFilterIndicator";
 
 import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
 import { WildfireIncidents } from "@/components/WildfireIncidents";
@@ -65,8 +65,22 @@ export default function InteractiveMap() {
     setGlobalStateFilter(stateCode);
   };
 
+  // Function to clear global filter
+  const handleClearGlobalFilter = () => {
+    setGlobalStateFilter('all');
+    setSelectedRegion(null);
+    setSelectedRegionName(null);
+    setSelectedRegionType(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Global Filter Indicator */}
+      <GlobalFilterIndicator 
+        stateFilter={globalStateFilter !== 'all' ? globalStateFilter : undefined}
+        onClearFilter={handleClearGlobalFilter}
+      />
+      
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
