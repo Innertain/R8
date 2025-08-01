@@ -57,7 +57,10 @@ export function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilt
           </div>
           
           <Button
-            onClick={onClearFilter}
+            onClick={(e) => {
+              e.preventDefault();
+              onClearFilter();
+            }}
             variant="outline"
             size="sm"
             className="bg-white text-orange-600 border-white hover:bg-gray-100 font-semibold shrink-0 ml-4"

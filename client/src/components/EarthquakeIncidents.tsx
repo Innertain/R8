@@ -214,7 +214,13 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
                 ⚠️ Filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter} selection from another section
               </span>
               <button 
-                onClick={() => window.location.reload()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Store current scroll position
+                  const scrollY = window.scrollY;
+                  sessionStorage.setItem('scrollPosition', scrollY.toString());
+                  window.location.reload();
+                }}
                 className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
               >
                 Clear filter & show all earthquakes

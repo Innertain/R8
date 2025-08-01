@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, ArrowLeft, Layers, Globe, CloudRain, Flame, Zap, BarChart3, Database, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -72,6 +72,16 @@ export default function InteractiveMap() {
     setSelectedRegionName(null);
     setSelectedRegionType(null);
   };
+
+  // Restore scroll position after reload (for clear filter buttons)
+  useEffect(() => {
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+    if (savedScrollPosition) {
+      const scrollY = parseInt(savedScrollPosition, 10);
+      window.scrollTo(0, scrollY);
+      sessionStorage.removeItem('scrollPosition');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">

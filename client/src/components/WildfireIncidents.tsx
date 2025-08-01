@@ -189,7 +189,13 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   ⚠️ Filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter} selection from another section
                 </span>
                 <button 
-                  onClick={() => window.location.reload()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Store current scroll position
+                    const scrollY = window.scrollY;
+                    sessionStorage.setItem('scrollPosition', scrollY.toString());
+                    window.location.reload();
+                  }}
                   className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
                 >
                   Clear filter & show all wildfires
@@ -249,7 +255,13 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                           There may be wildfires in other states. Clear the filter to see all incidents.
                         </p>
                         <button 
-                          onClick={() => window.location.reload()}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            // Store current scroll position
+                            const scrollY = window.scrollY;
+                            sessionStorage.setItem('scrollPosition', scrollY.toString());
+                            window.location.reload();
+                          }}
                           className="mt-2 px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
                         >
                           Show All Wildfires
