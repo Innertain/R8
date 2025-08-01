@@ -31,6 +31,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [stateFilter, setStateFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [timelineFilter, setTimelineFilter] = useState<string>('all');
   const [activeAnalysis, setActiveAnalysis] = useState<'overview' | 'trends' | 'geographic' | 'impact'>('overview');
 
   // Get data range info
@@ -675,51 +676,175 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
 
           {/* Enhanced Timeline Visualization */}
           <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Clock className="w-5 h-5 text-green-600" />
                 Recent Disaster Timeline
+                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">Live Updates</Badge>
               </CardTitle>
               <p className="text-sm text-gray-600">
-                Most recent 10 disaster declarations with incident details
+                Comprehensive timeline with incident periods and severity indicators
               </p>
+              
+              {/* Timeline Controls */}
+              <div className="flex flex-wrap gap-2 mt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setTimelineFilter('all')}
+                >
+                  All Types
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs text-red-600 hover:bg-red-50"
+                  onClick={() => setTimelineFilter('DR')}
+                >
+                  Major Disasters
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs text-orange-600 hover:bg-orange-50"
+                  onClick={() => setTimelineFilter('EM')}
+                >
+                  Emergencies
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs text-yellow-600 hover:bg-yellow-50"
+                  onClick={() => setTimelineFilter('FM')}
+                >
+                  Fire Management
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {analytics.recentDisasters.slice(0, 10).map((disaster, index) => {
-                  const Icon = getDisasterIcon(disaster.incidentType || 'Unknown');
-                  const typeColor = disaster.declarationType === 'DR' ? 'text-red-600' : 
-                                  disaster.declarationType === 'EM' ? 'text-orange-600' : 'text-yellow-600';
-                  const typeBg = disaster.declarationType === 'DR' ? 'bg-red-50' : 
-                               disaster.declarationType === 'EM' ? 'bg-orange-50' : 'bg-yellow-50';
-                  
-                  return (
-                    <div key={disaster.disasterNumber} className={`flex items-center gap-4 p-3 rounded-lg border ${typeBg} hover:shadow-sm transition-shadow`}>
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className={`p-2 rounded-lg ${typeBg}`}>
-                          <Icon className={`w-4 h-4 ${typeColor}`} />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900 text-sm">
-                            {disaster.title}
+              <div className="relative">
+                {/* Timeline Line */}
+                <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-purple-300 to-gray-300"></div>
+                
+                <div className="space-y-6">
+                  {analytics.recentDisasters
+                    .filter(disaster => timelineFilter === 'all' || disaster.declarationType === timelineFilter)
+                    .slice(0, 15)
+                    .map((disaster, index) => {
+                      const Icon = getDisasterIcon(disaster.incidentType || 'Unknown');
+                      const typeColor = disaster.declarationType === 'DR' ? 'text-red-600' : 
+                                      disaster.declarationType === 'EM' ? 'text-orange-600' : 'text-yellow-600';
+                      const typeBg = disaster.declarationType === 'DR' ? 'bg-red-50 border-red-200' : 
+                                   disaster.declarationType === 'EM' ? 'bg-orange-50 border-orange-200' : 'bg-yellow-50 border-yellow-200';
+                      const iconBg = disaster.declarationType === 'DR' ? 'bg-red-500' : 
+                                   disaster.declarationType === 'EM' ? 'bg-orange-500' : 'bg-yellow-500';
+                      
+                      const declarationDate = new Date(disaster.declarationDate);
+                      const incidentDate = disaster.incidentBeginDate ? new Date(disaster.incidentBeginDate) : null;
+                      const incidentEndDate = disaster.incidentEndDate ? new Date(disaster.incidentEndDate) : null;
+                      const daysSinceDeclaration = Math.floor((new Date().getTime() - declarationDate.getTime()) / (1000 * 60 * 60 * 24));
+                      
+                      return (
+                        <div key={disaster.disasterNumber} className="relative">
+                          {/* Timeline Node */}
+                          <div className={`absolute left-6 w-4 h-4 rounded-full ${iconBg} border-2 border-white shadow-md z-10`}></div>
+                          
+                          {/* Timeline Content */}
+                          <div className="ml-16 group">
+                            <div className={`border rounded-xl p-5 ${typeBg} hover:shadow-lg transition-all duration-200 hover:scale-[1.02]`}>
+                              {/* Header Row */}
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-start gap-3 flex-1">
+                                  <div className={`p-2.5 rounded-lg ${iconBg} shadow-sm`}>
+                                    <Icon className="w-5 h-5 text-white" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="font-semibold text-gray-900 text-base leading-tight">
+                                      {disaster.title}
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge variant="outline" className={`text-xs ${typeColor} font-medium`}>
+                                        {disaster.declarationType === 'DR' ? 'Major Disaster' : 
+                                         disaster.declarationType === 'EM' ? 'Emergency' : 'Fire Management'}
+                                      </Badge>
+                                      <span className="text-xs text-gray-500">#{disaster.disasterNumber}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {declarationDate.toLocaleDateString()}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {daysSinceDeclaration} days ago
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Details Grid */}
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                                <div className="bg-white/60 rounded-lg p-3">
+                                  <div className="text-xs text-gray-600 font-medium mb-1">Location</div>
+                                  <div className="text-sm font-semibold text-gray-800">{disaster.state}</div>
+                                  <div className="text-xs text-gray-600">{disaster.incidentType}</div>
+                                </div>
+                                
+                                {incidentDate && (
+                                  <div className="bg-white/60 rounded-lg p-3">
+                                    <div className="text-xs text-gray-600 font-medium mb-1">Incident Period</div>
+                                    <div className="text-sm font-semibold text-gray-800">
+                                      {incidentDate.toLocaleDateString()}
+                                    </div>
+                                    {incidentEndDate && (
+                                      <div className="text-xs text-gray-600">
+                                        to {incidentEndDate.toLocaleDateString()}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                                
+                                <div className="bg-white/60 rounded-lg p-3">
+                                  <div className="text-xs text-gray-600 font-medium mb-1">Status</div>
+                                  <div className="flex items-center gap-1">
+                                    <div className={`w-2 h-2 rounded-full ${
+                                      daysSinceDeclaration < 30 ? 'bg-green-500' : 
+                                      daysSinceDeclaration < 90 ? 'bg-yellow-500' : 'bg-gray-400'
+                                    }`}></div>
+                                    <span className="text-sm font-semibold text-gray-800">
+                                      {daysSinceDeclaration < 30 ? 'Active' : 
+                                       daysSinceDeclaration < 90 ? 'Recent' : 'Historical'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Expandable Details */}
+                              <div className="mt-3 pt-3 border-t border-white/50">
+                                <div className="text-xs text-gray-700 leading-relaxed">
+                                  {disaster.declarationTitle || disaster.title}
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            {disaster.state} • {disaster.incidentType}
-                          </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-medium text-gray-900">
-                          {new Date(disaster.declarationDate).toLocaleDateString()}
-                        </div>
-                        <Badge variant="outline" className={`text-xs ${typeColor}`}>
-                          {disaster.declarationType === 'DR' ? 'Major' : 
-                           disaster.declarationType === 'EM' ? 'Emergency' : 'Fire Mgmt'}
-                        </Badge>
-                      </div>
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                </div>
+                
+                {/* Load More Button */}
+                <div className="text-center mt-6">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => {
+                      // Could implement pagination here
+                    }}
+                  >
+                    Load More Events
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
