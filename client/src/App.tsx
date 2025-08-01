@@ -4,12 +4,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Rss } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
 import InteractiveMapPage from "@/pages/interactive-map";
+import RSSMonitoringPage from "@/pages/rss-monitoring";
 import AirtableTest from "@/pages/airtable-test";
 import StatsDashboard from "@/pages/stats-dashboard";
 import AlertsPage from "@/pages/alerts";
@@ -81,6 +82,16 @@ function Navigation() {
             >
               <Bell className="h-4 w-4" />
               Custom Alerts
+            </Button>
+          </Link>
+          <Link href="/rss-monitoring">
+            <Button 
+              variant={location === "/rss-monitoring" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Rss className="h-4 w-4" />
+              RSS Monitor
             </Button>
           </Link>
 
@@ -172,6 +183,17 @@ function Navigation() {
                 Custom Alerts
               </Button>
             </Link>
+            <Link href="/rss-monitoring">
+              <Button 
+                variant={location === "/rss-monitoring" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Rss className="h-4 w-4" />
+                RSS Monitor
+              </Button>
+            </Link>
 
             <Link href="/airtable-test">
               <Button 
@@ -200,6 +222,7 @@ function Router() {
         <Route path="/map" component={InteractiveMapPage} />
         <Route path="/stats" component={StatsDashboard} />
         <Route path="/alerts" component={AlertsPage} />
+        <Route path="/rss-monitoring" component={RSSMonitoringPage} />
 
         <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />

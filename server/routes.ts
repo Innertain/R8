@@ -1821,6 +1821,187 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   }
 
 
+  // RSS Monitoring Status endpoint - Check all 50 state RSS feeds
+  app.get("/api/rss-monitoring-status", async (req, res) => {
+    try {
+      console.log('Starting comprehensive RSS monitoring scan...');
+      
+      // Complete list of all 50 states with governor RSS feed URLs
+      const ALL_STATES = [
+        { code: "AL", name: "Alabama", url: "https://www.alabamagovernor.gov/rss.xml" },
+        { code: "AK", name: "Alaska", url: "https://gov.alaska.gov/news/rss.xml" },
+        { code: "AZ", name: "Arizona", url: "https://azgovernor.gov/news/rss.xml" },
+        { code: "AR", name: "Arkansas", url: "https://governor.arkansas.gov/news/rss.xml" },
+        { code: "CA", name: "California", url: "https://www.gov.ca.gov/news/rss.xml" },
+        { code: "CO", name: "Colorado", url: "https://www.colorado.gov/governor/rss.xml" },
+        { code: "CT", name: "Connecticut", url: "https://portal.ct.gov/Office-of-the-Governor/Press-Room/RSS" },
+        { code: "DE", name: "Delaware", url: "https://news.delaware.gov/rss.xml" },
+        { code: "FL", name: "Florida", url: "https://www.flgov.com/news/rss.xml" },
+        { code: "GA", name: "Georgia", url: "https://gov.georgia.gov/press-releases/rss.xml" },
+        { code: "HI", name: "Hawaii", url: "https://www.hawaiigovernor.org/news/rss.xml" },
+        { code: "ID", name: "Idaho", url: "https://gov.idaho.gov/news/rss.xml" },
+        { code: "IL", name: "Illinois", url: "https://www.illinois.gov/news/rss.xml" },
+        { code: "IN", name: "Indiana", url: "https://www.in.gov/gov/news/rss.xml" },
+        { code: "IA", name: "Iowa", url: "https://governor.iowa.gov/news/rss.xml" },
+        { code: "KS", name: "Kansas", url: "https://governor.kansas.gov/news/rss.xml" },
+        { code: "KY", name: "Kentucky", url: "https://kentucky.gov/governor/news/rss.xml" },
+        { code: "LA", name: "Louisiana", url: "https://gov.louisiana.gov/news/rss.xml" },
+        { code: "ME", name: "Maine", url: "https://www.maine.gov/governor/news/rss.xml" },
+        { code: "MD", name: "Maryland", url: "https://governor.maryland.gov/news/rss.xml" },
+        { code: "MA", name: "Massachusetts", url: "https://www.mass.gov/governor/news/rss.xml" },
+        { code: "MI", name: "Michigan", url: "https://www.michigan.gov/governor/news/rss.xml" },
+        { code: "MN", name: "Minnesota", url: "https://mn.gov/governor/news/rss.xml" },
+        { code: "MS", name: "Mississippi", url: "https://www.ms.gov/governor/news/rss.xml" },
+        { code: "MO", name: "Missouri", url: "https://governor.mo.gov/news/rss.xml" },
+        { code: "MT", name: "Montana", url: "https://gov.mt.gov/news/rss.xml" },
+        { code: "NE", name: "Nebraska", url: "https://governor.nebraska.gov/news/rss.xml" },
+        { code: "NV", name: "Nevada", url: "https://gov.nv.gov/news/rss.xml" },
+        { code: "NH", name: "New Hampshire", url: "https://www.governor.nh.gov/news/rss.xml" },
+        { code: "NJ", name: "New Jersey", url: "https://www.nj.gov/governor/news/rss.xml" },
+        { code: "NM", name: "New Mexico", url: "https://www.governor.state.nm.us/news/rss.xml" },
+        { code: "NY", name: "New York", url: "https://www.governor.ny.gov/news/rss.xml" },
+        { code: "NC", name: "North Carolina", url: "https://governor.nc.gov/news/rss.xml" },
+        { code: "ND", name: "North Dakota", url: "https://www.governor.nd.gov/news/rss.xml" },
+        { code: "OH", name: "Ohio", url: "https://governor.ohio.gov/news/rss.xml" },
+        { code: "OK", name: "Oklahoma", url: "https://www.governor.ok.gov/news/rss.xml" },
+        { code: "OR", name: "Oregon", url: "https://www.oregon.gov/governor/news/rss.xml" },
+        { code: "PA", name: "Pennsylvania", url: "https://www.pa.gov/governor/news/rss.xml" },
+        { code: "RI", name: "Rhode Island", url: "https://www.ri.gov/governor/news/rss.xml" },
+        { code: "SC", name: "South Carolina", url: "https://governor.sc.gov/news/rss.xml" },
+        { code: "SD", name: "South Dakota", url: "https://gov.sd.gov/news/rss.xml" },
+        { code: "TN", name: "Tennessee", url: "https://www.tn.gov/governor/news/rss.xml" },
+        { code: "TX", name: "Texas", url: "https://gov.texas.gov/news/rss.xml" },
+        { code: "UT", name: "Utah", url: "https://governor.utah.gov/news/rss.xml" },
+        { code: "VT", name: "Vermont", url: "https://governor.vermont.gov/news/rss.xml" },
+        { code: "VA", name: "Virginia", url: "https://www.governor.virginia.gov/news/rss.xml" },
+        { code: "WA", name: "Washington", url: "https://www.governor.wa.gov/news/rss.xml" },
+        { code: "WV", name: "West Virginia", url: "https://governor.wv.gov/news/rss.xml" },
+        { code: "WI", name: "Wisconsin", url: "https://www.evers.wi.gov/news/rss.xml" },
+        { code: "WY", name: "Wyoming", url: "https://gov.wyo.gov/news/rss.xml" }
+      ];
+      
+      const statuses = [];
+      
+      // Check each state's RSS feed
+      for (const state of ALL_STATES) {
+        try {
+          console.log(`Checking RSS feed for ${state.name}...`);
+          
+          const response = await fetch(state.url, {
+            headers: { 
+              'User-Agent': 'DisasterApp/1.0 (emergency-monitoring@example.com)',
+              'Accept': 'application/rss+xml, application/xml, text/xml' 
+            },
+            timeout: 10000 // 10 second timeout
+          });
+          
+          if (response.ok) {
+            const xmlText = await response.text();
+            
+            // Count RSS items
+            const itemMatches = xmlText.match(/<item[^>]*>.*?<\/item>/gis) || [];
+            const itemCount = itemMatches.length;
+            
+            // Look for emergency-related content
+            const emergencyKeywords = [
+              'emergency', 'disaster', 'evacuation', 'alert', 'warning', 
+              'flooding', 'wildfire', 'hurricane', 'tornado', 'blizzard',
+              'state of emergency', 'declares emergency', 'emergency declaration'
+            ];
+            
+            let emergencyDeclarations = 0;
+            let lastDeclaration = null;
+            
+            for (const itemXml of itemMatches) {
+              const titleMatch = itemXml.match(/<title[^>]*>(.*?)<\/title>/is);
+              const descMatch = itemXml.match(/<description[^>]*>(.*?)<\/description>/is);
+              const pubDateMatch = itemXml.match(/<pubDate[^>]*>(.*?)<\/pubDate>/is);
+              
+              const title = titleMatch ? titleMatch[1].trim() : '';
+              const description = descMatch ? descMatch[1].trim() : '';
+              const content = (title + ' ' + description).toLowerCase();
+              
+              const hasEmergencyKeyword = emergencyKeywords.some(keyword => 
+                content.includes(keyword.toLowerCase())
+              );
+              
+              if (hasEmergencyKeyword) {
+                emergencyDeclarations++;
+                if (!lastDeclaration) {
+                  lastDeclaration = {
+                    title: title,
+                    publishedAt: pubDateMatch ? pubDateMatch[1].trim() : new Date().toISOString()
+                  };
+                }
+              }
+            }
+            
+            statuses.push({
+              state: state.code,
+              stateName: state.name,
+              url: state.url,
+              status: 'success',
+              lastChecked: new Date().toISOString(),
+              itemCount,
+              emergencyDeclarations,
+              lastDeclaration
+            });
+            
+          } else {
+            console.log(`RSS feed error for ${state.name}: ${response.status}`);
+            statuses.push({
+              state: state.code,
+              stateName: state.name,
+              url: state.url,
+              status: 'error',
+              lastChecked: new Date().toISOString(),
+              itemCount: 0,
+              emergencyDeclarations: 0,
+              error: `HTTP ${response.status}: ${response.statusText}`
+            });
+          }
+          
+        } catch (error: any) {
+          console.log(`RSS fetch failed for ${state.name}:`, error.message);
+          statuses.push({
+            state: state.code,
+            stateName: state.name,
+            url: state.url,
+            status: 'error',
+            lastChecked: new Date().toISOString(),
+            itemCount: 0,
+            emergencyDeclarations: 0,
+            error: error.message || 'Fetch failed'
+          });
+        }
+      }
+      
+      const summary = {
+        total: ALL_STATES.length,
+        connected: statuses.filter(s => s.status === 'success').length,
+        errors: statuses.filter(s => s.status === 'error').length,
+        totalEmergencies: statuses.reduce((sum, s) => sum + s.emergencyDeclarations, 0)
+      };
+      
+      console.log(`✓ RSS monitoring complete: ${summary.connected}/${summary.total} feeds connected, ${summary.totalEmergencies} emergency declarations found`);
+      
+      res.json({
+        success: true,
+        statuses,
+        summary,
+        lastUpdated: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Error in RSS monitoring:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to complete RSS monitoring scan',
+        details: error.message
+      });
+    }
+  });
+
   // State Emergency Declarations endpoint - Official Government Sources Only
   app.get("/api/state-emergency-declarations", async (req, res) => {
     try {
