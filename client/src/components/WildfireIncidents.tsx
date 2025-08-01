@@ -170,8 +170,8 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
             <Flame className="w-5 h-5 text-orange-600" />
             Active Wildfire Incidents
             {stateFilter && stateFilter !== 'all' && (
-              <Badge variant="outline" className="ml-2">
-                {stateNames[stateFilter.toUpperCase()] || stateFilter}
+              <Badge variant="outline" className="bg-orange-100 border-orange-300 text-orange-800 ml-2">
+                ⚠️ Filtered: {stateNames[stateFilter.toUpperCase()] || stateFilter}
               </Badge>
             )}
           </CardTitle>
@@ -182,11 +182,21 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                 ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
                 : ' nationwide'
               } from InciWeb
-              {stateFilter && stateFilter !== 'all' && (
-                <span className="text-blue-600 ml-2 text-xs">
-                  • Filtered by weather alert selection
+            </p>
+            {stateFilter && stateFilter !== 'all' && (
+              <div className="bg-orange-50 border border-orange-200 rounded px-2 py-1 mt-2">
+                <span className="text-orange-700 text-xs font-medium">
+                  ⚠️ Filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter} selection from another section
                 </span>
-              )}
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="ml-2 text-orange-600 hover:text-orange-800 text-xs underline"
+                >
+                  Clear filter & show all wildfires
+                </button>
+              </div>
+            )}
+            <p className="text-sm text-gray-600 hidden">
             </p>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
               <h4 className="text-sm font-semibold text-orange-800 flex items-center gap-2 mb-2">
@@ -230,6 +240,22 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                         : 'This state currently has no active wildfire incidents'
                       }
                     </p>
+                    {stateFilter && stateFilter !== 'all' && selectedState !== 'all' && (
+                      <div className="bg-orange-100 border border-orange-300 rounded p-3 mt-4">
+                        <p className="text-orange-700 text-sm font-medium">
+                          ⚠️ Results filtered by {stateNames[stateFilter.toUpperCase()] || stateFilter}
+                        </p>
+                        <p className="text-orange-600 text-xs mt-1">
+                          There may be wildfires in other states. Clear the filter to see all incidents.
+                        </p>
+                        <button 
+                          onClick={() => window.location.reload()}
+                          className="mt-2 px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
+                        >
+                          Show All Wildfires
+                        </button>
+                      </div>
+                    )}
                     {selectedState !== 'all' && (
                       <button 
                         onClick={() => handleStateClick('all')}

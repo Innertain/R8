@@ -38,19 +38,21 @@ export function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilt
   const stateName = stateNames[stateFilter.toUpperCase()] || stateFilter;
 
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg border-b-2 border-orange-600">
-      <div className="max-w-7xl mx-auto px-4 py-3">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg border-b-2 border-orange-600">
+      <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 animate-pulse" />
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              <span className="font-semibold text-sm">
-                Global Filter Active: {stateName}
-              </span>
-            </div>
-            <div className="hidden sm:block text-xs opacity-90">
-              All sections are filtered to show only {stateName} data
+            <AlertTriangle className="w-6 h-6 animate-pulse" />
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4" />
+                <span className="font-bold text-base">
+                  🌍 GLOBAL FILTER: {stateName}
+                </span>
+              </div>
+              <div className="text-sm opacity-90">
+                Some sections may show no results - they're filtered by {stateName}
+              </div>
             </div>
           </div>
           
@@ -58,15 +60,16 @@ export function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilt
             onClick={onClearFilter}
             variant="outline"
             size="sm"
-            className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+            className="bg-white text-orange-600 border-white hover:bg-gray-100 font-semibold shrink-0 ml-4"
           >
             <X className="w-4 h-4 mr-1" />
-            Clear Filter
+            Show All Data
           </Button>
         </div>
         
-        <div className="text-xs opacity-75 mt-1 sm:hidden">
-          All sections filtered to show only {stateName} data
+        <div className="text-sm mt-2 bg-white/10 rounded px-3 py-2">
+          <strong>⚠️ Important:</strong> Weather alerts, wildfires, and other data from outside {stateName} are currently hidden. 
+          Click "Show All Data" to see everything.
         </div>
       </div>
     </div>
