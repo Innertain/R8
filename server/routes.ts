@@ -2705,9 +2705,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           endDate: '2024-09-28T00:00:00Z',
           injuriesDirect: 95,
           injuriesIndirect: 16,
-          deathsDirect: 95,
-          deathsIndirect: 81,
-          damageProperty: 47500000000, // $47.5B - Official NOAA estimate (7th costliest hurricane)
+          deathsDirect: 148,
+          deathsIndirect: 104,
+          damageProperty: 78700000000, // $78.7B - Official NOAA/NCEI estimate (7th costliest hurricane)
           damageCrops: 1200000000,
           source: 'NOAA/NHC Official Report',
           magnitude: 4,
@@ -2740,7 +2740,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           injuriesIndirect: 12,
           deathsDirect: 25,
           deathsIndirect: 8,
-          damageProperty: 15800000000, // Part of $78.7B total
+          damageProperty: 25200000000, // Part of $78.7B total (estimated GA portion)
           damageCrops: 890000000,
           source: 'NOAA/NHC Official Report',
           magnitude: 2,
@@ -2872,7 +2872,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           injuriesIndirect: 8,
           deathsDirect: 17,
           deathsIndirect: 7,
-          damageProperty: 55000000000, // $50-60B estimated insured losses
+          damageProperty: 34300000000, // $34.3B - Official NOAA estimate
           damageCrops: 420000000,
           source: 'NOAA/NHC Official Report',
           magnitude: 3,
@@ -2887,7 +2887,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           endLat: 27.4,
           endLon: -82.4,
           episodeNarrative: 'Hurricane Milton made landfall near Siesta Key, Florida as a Category 3 hurricane (120 mph winds). Peak intensity was Category 5 with 180 mph winds - tied with Rita 2005 as most intense Gulf of Mexico hurricane on record.',
-          eventNarrative: 'Hurricane Milton spawned 46 confirmed tornadoes in Florida (largest single-day tornado outbreak in state history). Estimated $50-60B in insured losses. Name "Milton" officially retired by WMO in April 2025.',
+          eventNarrative: 'Hurricane Milton spawned 46 confirmed tornadoes in Florida (largest single-day tornado outbreak in state history). Official damage cost: $34.3B (NOAA). Name "Milton" officially retired by WMO in April 2025.',
           dataSource: 'Official NOAA Storm Events Database / NHC Final Report'
         },
         // Additional recent significant storms
