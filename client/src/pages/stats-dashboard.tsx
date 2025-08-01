@@ -404,19 +404,26 @@ export default function StatsDashboard() {
 
       {/* Filters */}
       <div className="flex gap-4 mb-8">
-        <Select value={selectedState} onValueChange={setSelectedState}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select State" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All States</SelectItem>
-            {stateSummaries.map(state => (
-              <SelectItem key={state.state} value={state.state}>
-                {state.state}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="relative">
+          <Select value={selectedState} onValueChange={setSelectedState} disabled>
+            <SelectTrigger className="w-48 opacity-50">
+              <SelectValue placeholder="Select State (Not Active Yet)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All States</SelectItem>
+              {stateSummaries.map(state => (
+                <SelectItem key={state.state} value={state.state}>
+                  {state.state}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="absolute -top-2 -right-2">
+            <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-800">
+              Coming Soon
+            </Badge>
+          </div>
+        </div>
       </div>
 
       {/* Key Metrics Cards */}
