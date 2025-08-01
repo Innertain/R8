@@ -66,13 +66,13 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Clock className="w-5 h-5 text-green-600" />
-          Interactive Disaster Timeline
+          FEMA Disaster Declaration Timeline
           <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
             Scrollable • No Fire Incidents
           </Badge>
         </CardTitle>
         <p className="text-sm text-gray-600">
-          Compact scrollable timeline - scroll down to load more events
+          Official FEMA disaster declarations timeline - scroll down to load more events
         </p>
         
         {/* Filter Controls */}

@@ -397,6 +397,9 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
             </Card>
           </div>
 
+          {/* FEMA Disaster Declaration Timeline */}
+          <CompactTimeline disasters={disasters} />
+
           {/* Data Enhancement Roadmap */}
           <DataEnhancementRecommendations />
 
@@ -408,8 +411,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
 
 
 
-          {/* Compact Interactive Timeline */}
-          <CompactTimeline disasters={disasters} />
+
         </TabsContent>
 
         <TabsContent value="trends" className="space-y-6">
