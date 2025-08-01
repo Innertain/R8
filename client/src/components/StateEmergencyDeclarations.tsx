@@ -131,7 +131,7 @@ export function StateEmergencyDeclarations() {
               State Emergency Declarations
             </CardTitle>
             <p className="text-sm text-gray-600 mt-1">
-              Real-time emergency declarations from news sources ({data?.count || 0} declarations)
+              Real-time emergency declarations from official government RSS feeds ({data?.count || 0} declarations)
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -210,8 +210,16 @@ export function StateEmergencyDeclarations() {
       <CardContent>
         {filteredDeclarations.length === 0 ? (
           <div className="text-center py-8">
-            <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">No emergency declarations found matching your criteria</p>
+            <AlertTriangle className="w-12 h-12 text-green-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Emergency Declarations</h3>
+            <p className="text-gray-600 mb-4">
+              Great news! Currently monitoring {data?.totalStatesMonitored || 0} state government sources and no active emergency declarations found.
+            </p>
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>✓ Live RSS parsing from official government sources</p>
+              <p>✓ {data?.sources?.[0] || 'Official Government RSS Feeds Only'}</p>
+              <p>✓ Last updated: {data?.lastUpdated ? formatDistanceToNow(new Date(data.lastUpdated), { addSuffix: true }) : 'recently'}</p>
+            </div>
             {(searchTerm || stateFilter !== "all" || typeFilter !== "all") && (
               <Button
                 variant="outline"
