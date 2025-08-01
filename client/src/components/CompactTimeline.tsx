@@ -154,7 +154,7 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-bold text-gray-900 text-base leading-tight mb-1">
-                            {disaster.title || `${disaster.state} ${disaster.incidentType}`}
+                            {disaster.state} {disaster.incidentType}
                           </div>
                           <div className="flex items-center gap-2 mb-1">
                             <Badge variant="outline" className={`${typeColor} font-semibold text-xs`}>
@@ -162,44 +162,51 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                             </Badge>
                             <span className="text-xs text-gray-600">#{disaster.disasterNumber}</span>
                           </div>
-                          <div className="text-sm text-gray-700">
-                            {disaster.state} • {disaster.incidentType}
-                          </div>
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-bold text-gray-900">
-                            {declarationDate.toLocaleDateString()}
+                            {disaster.incidentBeginDate 
+                              ? new Date(disaster.incidentBeginDate).toLocaleDateString()
+                              : declarationDate.toLocaleDateString()
+                            }
                           </div>
                           <div className="text-xs text-gray-600">
-                            {daysSinceDeclaration === 0 ? 'Today' : 
-                             daysSinceDeclaration === 1 ? '1 day ago' : 
-                             daysSinceDeclaration < 7 ? `${daysSinceDeclaration} days ago` :
-                             daysSinceDeclaration < 30 ? `${Math.floor(daysSinceDeclaration / 7)} weeks ago` :
-                             `${Math.floor(daysSinceDeclaration / 30)} months ago`}
+                            {disaster.incidentBeginDate ? 'Incident Date' : 'Declaration Date'}
                           </div>
                         </div>
                       </div>
                       
-                      {/* Compact Status Info */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white/80 rounded-lg p-3">
-                          <div className="text-xs text-gray-600 font-bold mb-1">Status</div>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              daysSinceDeclaration < 30 ? 'bg-green-500 animate-pulse' : 
-                              daysSinceDeclaration < 90 ? 'bg-yellow-500' : 'bg-gray-400'
-                            }`}></div>
-                            <span className="text-xs font-bold text-gray-800">
-                              {daysSinceDeclaration < 30 ? 'ACTIVE' : 
-                               daysSinceDeclaration < 90 ? 'RECENT' : 'HISTORICAL'}
-                            </span>
+                      {/* Timeline Information */}
+                      <div className="bg-white/80 rounded-lg p-3">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <div className="text-xs text-gray-600 font-bold mb-1">Incident Period</div>
+                            <div className="text-xs text-gray-800">
+                              {disaster.incidentBeginDate ? (
+                                <>
+                                  {new Date(disaster.incidentBeginDate).toLocaleDateString()}
+                                  {disaster.incidentEndDate && (
+                                    <> - {new Date(disaster.incidentEndDate).toLocaleDateString()}</>
+                                  )}
+                                </>
+                              ) : (
+                                'Not specified'
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        
-                        <div className="bg-white/80 rounded-lg p-3">
-                          <div className="text-xs text-gray-600 font-bold mb-1">Region</div>
-                          <div className="text-xs font-bold text-gray-800">
-                            {disaster.femaRegion ? `Region ${disaster.femaRegion}` : disaster.state}
+                          
+                          <div>
+                            <div className="text-xs text-gray-600 font-bold mb-1">Declaration Date</div>
+                            <div className="text-xs text-gray-800">
+                              {declarationDate.toLocaleDateString()}
+                              <div className="text-xs text-gray-500 mt-1">
+                                {daysSinceDeclaration === 0 ? 'Today' : 
+                                 daysSinceDeclaration === 1 ? '1 day ago' : 
+                                 daysSinceDeclaration < 7 ? `${daysSinceDeclaration} days ago` :
+                                 daysSinceDeclaration < 30 ? `${Math.floor(daysSinceDeclaration / 7)} weeks ago` :
+                                 `${Math.floor(daysSinceDeclaration / 30)} months ago`}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
