@@ -179,7 +179,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
             )}
           </CardTitle>
           <p className="text-sm text-gray-600">
-            {filteredIncidents.length} active incident{filteredIncidents.length !== 1 ? 's' : ''} 
+            {filteredIncidents.length} incident{filteredIncidents.length !== 1 ? 's' : ''} 
             {stateFilter && stateFilter !== 'all' 
               ? ` in ${stateNames[stateFilter.toUpperCase()] || stateFilter}` 
               : ' nationwide'
@@ -312,6 +312,29 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                     )}
                   </>
                 )}
+                
+                {/* Color Legend */}
+                <div className="mt-6 p-4 bg-white rounded-lg border">
+                  <h4 className="text-sm font-semibold mb-3 text-gray-700">Incident Status Colors</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-red-500 rounded border"></div>
+                      <span>Severe (&gt;1000 acres)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-orange-500 rounded border"></div>
+                      <span>Moderate (100-1000 acres)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-yellow-400 rounded border"></div>
+                      <span>Minor (&lt;100 acres)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-orange-200 rounded border"></div>
+                      <span>Unknown size</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
