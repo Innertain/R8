@@ -112,6 +112,14 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
       })
     : incidents;
 
+  // Debug logging to help troubleshoot filtering issues
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Earthquake debug: Total incidents: ${incidents.length}, Filtered incidents: ${filteredIncidents.length}, State filter: ${stateFilter}`);
+    if (stateFilter && stateFilter !== 'all' && filteredIncidents.length === 0 && incidents.length > 0) {
+      console.log(`No earthquakes found for filter "${stateFilter}". Available states:`, [...new Set(incidents.map((i: any) => i.state))]);
+    }
+  }
+
   // Group incidents by state for summary stats - only include valid states
   const incidentsByState = filteredIncidents.reduce((acc: Record<string, EarthquakeIncident[]>, incident: EarthquakeIncident) => {
     let state = incident.state;
@@ -267,8 +275,10 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange }: Earthq
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
                     {selectedState === 'all' 
-                      ? 'All clear across monitored regions' 
-                      : 'This region currently has no recent significant earthquakes'
+                      ? (incidents.length === 0 
+                          ? 'Unable to load earthquake data from USGS. Please check your connection or try again.'
+                          : 'All clear across monitored regions')
+                      : `This region currently has no recent significant earthquakes. ${incidents.length} earthquakes available in other regions.`
                     }
                   </p>
                   {selectedState !== 'all' && (
