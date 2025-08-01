@@ -28,6 +28,7 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
   const [timelineFilter, setTimelineFilter] = useState('all');
   const [displayCount, setDisplayCount] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // State abbreviation to full name mapping
@@ -168,72 +169,139 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                   {/* Connection Line */}
                   <div className={`absolute left-11 top-3 w-8 h-0.5 ${connectionColor} border-t-2 border-dashed z-10`}></div>
                   
-                  {/* Compact Event Card */}
+                  {/* Expandable Event Card */}
                   <div className="ml-20">
-                    <div className={`border-2 rounded-xl p-4 ${typeBg} hover:shadow-xl transition-all duration-300 hover:scale-[1.01] hover:-translate-y-1 cursor-pointer`}>
-                      {/* Compact Header */}
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className={`p-2 rounded-lg ${nodeColor} shadow-lg`}>
-                          <Icon className="w-4 h-4 text-white" />
+                    <div 
+                      className={`border-2 rounded-xl p-4 ${typeBg} hover:shadow-xl transition-all duration-300 hover:scale-[1.01] hover:-translate-y-1 cursor-pointer`}
+                      onClick={() => setExpandedCard(expandedCard === disaster.disasterNumber ? null : disaster.disasterNumber)}
+                    >
+                      {/* Compact Summary Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${nodeColor} shadow-lg`}>
+                            <Icon className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <div className="font-bold text-gray-900 text-base leading-tight">
+                              {getStateName(disaster.state)} {disaster.incidentType}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className={`${typeColor} font-semibold text-xs`}>
+                                {disaster.declarationType === 'DR' ? 'MAJOR DISASTER' : 'EMERGENCY'}
+                              </Badge>
+                              <span className="text-xs text-gray-600">#{disaster.disasterNumber}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <div className="font-bold text-gray-900 text-base leading-tight mb-1">
-                            {getStateName(disaster.state)} {disaster.incidentType}
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="text-sm font-bold text-gray-900">
+                              {disaster.incidentBeginDate 
+                                ? new Date(disaster.incidentBeginDate).toLocaleDateString()
+                                : declarationDate.toLocaleDateString()
+                              }
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {disaster.incidentBeginDate ? 'Incident Date' : 'Declaration Date'}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="outline" className={`${typeColor} font-semibold text-xs`}>
-                              {disaster.declarationType === 'DR' ? 'MAJOR DISASTER' : 'EMERGENCY'}
-                            </Badge>
-                            <span className="text-xs text-gray-600">#{disaster.disasterNumber}</span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-gray-900">
-                            {disaster.incidentBeginDate 
-                              ? new Date(disaster.incidentBeginDate).toLocaleDateString()
-                              : declarationDate.toLocaleDateString()
-                            }
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            Incident Date
+                          
+                          {/* Expand/Collapse Indicator */}
+                          <div className={`transition-transform duration-200 ${expandedCard === disaster.disasterNumber ? 'rotate-180' : ''}`}>
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Timeline Information */}
-                      <div className="bg-white/80 rounded-lg p-3">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <div className="text-xs text-gray-600 font-bold mb-1">Incident Period</div>
-                            <div className="text-xs text-gray-800">
-                              {disaster.incidentBeginDate ? (
-                                <>
-                                  {new Date(disaster.incidentBeginDate).toLocaleDateString()}
-                                  {disaster.incidentEndDate && (
-                                    <> - {new Date(disaster.incidentEndDate).toLocaleDateString()}</>
-                                  )}
-                                </>
-                              ) : (
-                                'Not specified'
-                              )}
+                      {/* Expanded Details */}
+                      {expandedCard === disaster.disasterNumber && (
+                        <div className="mt-4 pt-4 border-t border-gray-200 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* When Section */}
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Calendar className="w-4 h-4 text-blue-600" />
+                                <span className="font-semibold text-blue-800 text-sm">When</span>
+                              </div>
+                              <div className="text-sm text-blue-700">
+                                {disaster.incidentBeginDate ? (
+                                  <>
+                                    {new Date(disaster.incidentBeginDate).toLocaleDateString('en-US', { 
+                                      weekday: 'short', 
+                                      year: 'numeric', 
+                                      month: 'short', 
+                                      day: 'numeric' 
+                                    })}
+                                    {disaster.incidentEndDate && (
+                                      <div className="text-xs mt-1">
+                                        Until {new Date(disaster.incidentEndDate).toLocaleDateString('en-US', { 
+                                          month: 'short', 
+                                          day: 'numeric' 
+                                        })}
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="text-blue-600">Date not specified</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          
-                          <div>
-                            <div className="text-xs text-gray-600 font-bold mb-1">Declaration Date</div>
-                            <div className="text-xs text-gray-800">
-                              {declarationDate.toLocaleDateString()}
-                              <div className="text-xs text-gray-500 mt-1">
-                                {daysSinceDeclaration === 0 ? 'Today' : 
-                                 daysSinceDeclaration === 1 ? '1 day ago' : 
-                                 daysSinceDeclaration < 7 ? `${daysSinceDeclaration} days ago` :
-                                 daysSinceDeclaration < 30 ? `${Math.floor(daysSinceDeclaration / 7)} weeks ago` :
-                                 `${Math.floor(daysSinceDeclaration / 30)} months ago`}
+
+                            {/* Declaration Info */}
+                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-purple-600" />
+                                <span className="font-semibold text-purple-800 text-sm">Declaration</span>
+                              </div>
+                              <div className="text-sm text-purple-700">
+                                {declarationDate.toLocaleDateString('en-US', { 
+                                  weekday: 'short', 
+                                  year: 'numeric', 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })}
+                                <div className="text-xs mt-1 text-purple-600">
+                                  {daysSinceDeclaration === 0 ? 'Declared today' : 
+                                   daysSinceDeclaration === 1 ? 'Declared yesterday' : 
+                                   daysSinceDeclaration < 7 ? `Declared ${daysSinceDeclaration} days ago` :
+                                   daysSinceDeclaration < 30 ? `Declared ${Math.floor(daysSinceDeclaration / 7)} weeks ago` :
+                                   daysSinceDeclaration < 365 ? `Declared ${Math.floor(daysSinceDeclaration / 30)} months ago` :
+                                   `Declared ${Math.floor(daysSinceDeclaration / 365)} years ago`}
+                                </div>
                               </div>
                             </div>
                           </div>
+
+                          {/* Additional Details */}
+                          {(disaster.femaRegion || disaster.designatedArea || disaster.description) && (
+                            <div className="bg-white/80 border border-gray-200 rounded-lg p-3">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                {disaster.femaRegion && (
+                                  <div>
+                                    <span className="font-semibold text-gray-700">FEMA Region:</span>
+                                    <div className="text-gray-600">{disaster.femaRegion}</div>
+                                  </div>
+                                )}
+                                {disaster.designatedArea && (
+                                  <div>
+                                    <span className="font-semibold text-gray-700">Designated Area:</span>
+                                    <div className="text-gray-600">{disaster.designatedArea}</div>
+                                  </div>
+                                )}
+                                {disaster.description && (
+                                  <div className="md:col-span-2">
+                                    <span className="font-semibold text-gray-700">Description:</span>
+                                    <div className="text-gray-600 mt-1">{disaster.description}</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
