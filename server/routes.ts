@@ -1833,22 +1833,14 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
 
-      // Enhanced search queries for comprehensive coverage
+      // Targeted search queries focusing on specific recent events
       const searchQueries = [
-        'governor declares emergency',
-        'state of emergency declared',
-        'emergency declaration governor',
-        'governor emergency order',
-        '"state of emergency" governor flooding',
-        '"state of emergency" governor wildfire',
-        '"state of emergency" governor storm',
-        '"state of emergency" governor hurricane',
-        'governor proclaims emergency',
-        'executive order emergency declaration',
-        'Kathy Hochul state emergency',
-        'governor declares disaster emergency',
-        'state emergency proclamation',
-        'governor activates emergency'
+        '"Kathy Hochul" "state of emergency" flooding NYC',
+        '"Kathy Hochul" "emergency declaration" flooding',
+        '"New York" governor "state of emergency" 2025',
+        '"Texas" governor emergency declaration 2025',
+        'governor declares emergency 2025',
+        'state of emergency declared 2025'
       ];
 
       const emergencyDeclarations = [];
@@ -2143,8 +2135,60 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         }
       }
 
+      // Deduplicate declarations by state and event
+      const uniqueDeclarations = [];
+      const seenByState = new Map();
+      
+      for (const declaration of emergencyDeclarations) {
+        const state = declaration.state;
+        const title = declaration.title.toLowerCase();
+        
+        // Check for duplicate events in the same state
+        let isDuplicate = false;
+        
+        if (seenByState.has(state)) {
+          const existingDeclarations = seenByState.get(state);
+          
+          // Check if this is about the same event (similar keywords)
+          for (const existing of existingDeclarations) {
+            const existingTitle = existing.title.toLowerCase();
+            
+            // Check for common keywords that indicate same event
+            const keywords = ['cyberattack', 'flooding', 'wildfire', 'hurricane', 'storm', 'emergency'];
+            const sharedKeywords = keywords.filter(keyword => 
+              title.includes(keyword) && existingTitle.includes(keyword)
+            );
+            
+            // If they share keywords and are within 7 days, consider duplicate
+            const timeDiff = Math.abs(
+              new Date(declaration.publishedAt).getTime() - 
+              new Date(existing.publishedAt).getTime()
+            ) / (1000 * 60 * 60 * 24); // Convert to days
+            
+            if (sharedKeywords.length > 0 && timeDiff <= 7) {
+              // Keep the one from official source, or the more recent one
+              if (declaration.priority === 'official' && existing.priority !== 'official') {
+                // Replace with official source
+                const index = existingDeclarations.indexOf(existing);
+                existingDeclarations[index] = declaration;
+              }
+              isDuplicate = true;
+              break;
+            }
+          }
+        }
+        
+        if (!isDuplicate) {
+          if (!seenByState.has(state)) {
+            seenByState.set(state, []);
+          }
+          seenByState.get(state).push(declaration);
+          uniqueDeclarations.push(declaration);
+        }
+      }
+
       // Sort by priority (official sources first) and then by date
-      emergencyDeclarations.sort((a, b) => {
+      uniqueDeclarations.sort((a, b) => {
         // Official sources get priority
         if (a.priority === 'official' && b.priority !== 'official') return -1;
         if (b.priority === 'official' && a.priority !== 'official') return 1;
@@ -2153,8 +2197,8 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
       });
 
-      // Limit to most recent 50 declarations
-      const recentDeclarations = emergencyDeclarations.slice(0, 50);
+      // Limit to most recent 50 unique declarations
+      const recentDeclarations = uniqueDeclarations.slice(0, 50);
 
       console.log(`✓ State emergency declarations processed: ${recentDeclarations.length} declarations found from news sources`);
 
