@@ -60,22 +60,19 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
   // Filter incidents by state if specified
   const filteredIncidents = stateFilter && stateFilter !== 'all' 
     ? incidents.filter((incident: WildfireIncident) => {
-        const titleLower = incident.title.toLowerCase();
-        const descLower = incident.description.toLowerCase();
-        const stateLower = incident.state?.toLowerCase() || '';
-        const filterLower = stateFilter.toLowerCase();
+        // Primary filter: match by the incident's state field
+        const incidentState = incident.state?.toUpperCase() || '';
+        const filterState = stateFilter.toUpperCase();
         
-        // Check if state matches directly
-        if (stateLower === filterLower) return true;
-        
-        // Check if state name is in title or description
-        const fullStateName = stateNames[stateFilter.toUpperCase()]?.toLowerCase();
-        if (fullStateName && (titleLower.includes(fullStateName) || descLower.includes(fullStateName))) {
+        // Direct state code match (most reliable)
+        if (incidentState === filterState) {
           return true;
         }
         
-        // Check if state abbreviation is in title or description
-        if (titleLower.includes(filterLower) || descLower.includes(filterLower)) {
+        // Fallback: check if state name appears in title (for edge cases)
+        const titleLower = incident.title.toLowerCase();
+        const fullStateName = stateNames[filterState]?.toLowerCase();
+        if (fullStateName && titleLower.includes(fullStateName)) {
           return true;
         }
         
@@ -361,7 +358,13 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-red-600">
-                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').length}
+                        {(() => {
+                          const activeCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').length;
+                          if (stateFilter === 'WY') {
+                            console.log('Active incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').map(i => ({ title: i.title, status: i.status, state: i.state })));
+                          }
+                          return activeCount;
+                        })()}
                       </div>
                       <div className="text-sm text-gray-600">Active</div>
                     </CardContent>
@@ -369,7 +372,13 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-yellow-600">
-                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').length}
+                        {(() => {
+                          const containedCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').length;
+                          if (stateFilter === 'WY') {
+                            console.log('Contained incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').map(i => ({ title: i.title, status: i.status, state: i.state })));
+                          }
+                          return containedCount;
+                        })()}
                       </div>
                       <div className="text-sm text-gray-600">Contained</div>
                     </CardContent>
@@ -377,7 +386,13 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-blue-600">
-                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').length}
+                        {(() => {
+                          const controlledCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').length;
+                          if (stateFilter === 'WY') {
+                            console.log('Controlled incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').map(i => ({ title: i.title, status: i.status, state: i.state })));
+                          }
+                          return controlledCount;
+                        })()}
                       </div>
                       <div className="text-sm text-gray-600">Controlled</div>
                     </CardContent>
@@ -385,7 +400,15 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Out' || i.status === 'Suppressed').length}
+                        {(() => {
+                          const outCount = filteredIncidents.filter((i: WildfireIncident) => i.status === 'Out' || i.status === 'Suppressed').length;
+                          if (stateFilter === 'WY') {
+                            console.log('Out/Suppressed incidents for WY:', filteredIncidents.filter((i: WildfireIncident) => i.status === 'Out' || i.status === 'Suppressed').map(i => ({ title: i.title, status: i.status, state: i.state })));
+                            console.log('Total filtered incidents for WY:', filteredIncidents.length);
+                            console.log('All WY incidents:', filteredIncidents.map(i => ({ title: i.title, status: i.status, state: i.state })));
+                          }
+                          return outCount;
+                        })()}
                       </div>
                       <div className="text-sm text-gray-600">Out</div>
                     </CardContent>
