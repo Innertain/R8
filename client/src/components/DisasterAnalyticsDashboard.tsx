@@ -209,7 +209,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
                 {uniqueTypes.map(type => (
-                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                  <SelectItem key={type} value={type || 'Unknown'}>{type || 'Unknown'}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -559,7 +559,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
             <CardContent>
               <div className="space-y-3">
                 {analytics.recentDisasters.slice(0, 10).map((disaster, index) => {
-                  const Icon = getDisasterIcon(disaster.incidentType);
+                  const Icon = getDisasterIcon(disaster.incidentType || 'Unknown');
                   const typeColor = disaster.declarationType === 'DR' ? 'text-red-600' : 
                                   disaster.declarationType === 'EM' ? 'text-orange-600' : 'text-yellow-600';
                   const typeBg = disaster.declarationType === 'DR' ? 'bg-red-50' : 

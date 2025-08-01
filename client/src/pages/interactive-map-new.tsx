@@ -4,13 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useQuery } from "@tanstack/react-query";
 
-import RealTimeAlerts from "@/components/RealTimeAlerts";
-import EnhancedRssFeed from "@/components/EnhancedRssFeed";
-import ActiveDisastersDashboard from "@/components/ActiveDisastersDashboard";
-import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
-import { WildfireIncidents } from "@/components/WildfireIncidents";
-import { EarthquakeIncidents } from "@/components/EarthquakeIncidents";
+import { DisasterAnalyticsDashboard } from "@/components/DisasterAnalyticsDashboard";
 
 // State name mapping for display
 const stateNames: { [key: string]: string } = {
@@ -32,6 +28,12 @@ export default function InteractiveMap() {
   const [selectedRegionName, setSelectedRegionName] = useState<string | null>(null);
   const [selectedRegionType, setSelectedRegionType] = useState<'state' | 'bioregion' | null>(null);
   const [globalStateFilter, setGlobalStateFilter] = useState<string>('all');
+
+  // Fetch FEMA disaster data
+  const { data: femaData, isLoading } = useQuery({
+    queryKey: ['/api/fema-disasters'],
+    enabled: true
+  });
 
   const handleRegionClick = (regionId: string, regionName: string, regionType: 'state' | 'bioregion') => {
     setSelectedRegion(regionId);
@@ -94,38 +96,15 @@ export default function InteractiveMap() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-full space-y-8">
-          {/* Interactive Weather Alerts Map */}
+          {/* Disaster Analytics Dashboard */}
           <div className="w-full">
-            <InteractiveWeatherMap 
-              stateFilter={getFilterLocation() || undefined} 
-              onStateFilterChange={handleStateFilterChange}
-            />
-          </div>
-          
-          {/* Wildfire Incidents */}
-          <div className="w-full">
-            <WildfireIncidents 
-              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
-              onStateFilterChange={handleStateFilterChange}
-            />
-          </div>
-          
-          {/* Earthquake Incidents */}
-          <div className="w-full">
-            <EarthquakeIncidents 
-              stateFilter={globalStateFilter === 'all' ? (getFilterLocation() || undefined) : globalStateFilter}
-              onStateFilterChange={handleStateFilterChange}
-            />
-          </div>
-          
-          {/* Enhanced Emergency Data Feed */}
-          <div className="w-full">
-            <EnhancedRssFeed 
-              maxItems={20} 
-              stateFilter={getFilterLocation() || undefined}
-              showFilters={true}
-              showAnalytics={true}
-            />
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-lg text-gray-600">Loading disaster data...</div>
+              </div>
+            ) : (
+              <DisasterAnalyticsDashboard disasters={(femaData as any)?.items || []} />
+            )}
           </div>
         </div>
       </main>
