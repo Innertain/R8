@@ -39,13 +39,19 @@ interface SocialMediaPost {
 
 interface SocialMediaResponse {
   success: boolean;
-  posts: SocialMediaPost[];
+  disabled?: boolean;
+  posts?: SocialMediaPost[];
   totalRelevantPosts: number;
-  accountsMonitored: number;
-  lastUpdated: string;
-  nextUpdate: string;
-  sources: string[];
+  accountsMonitored?: number;
+  lastUpdated?: string;
+  nextUpdate?: string;
+  sources?: string[];
   note?: string;
+  apiUsage?: {
+    requestsUsed: number;
+    monthlyLimit: number;
+    status: string;
+  };
 }
 
 export function SocialMediaEmergencyMonitor() {
@@ -85,11 +91,11 @@ export function SocialMediaEmergencyMonitor() {
     }
   };
 
-  const filteredPosts = data?.posts?.filter(post => {
+  const filteredPosts = (data?.posts || []).filter(post => {
     const urgencyMatch = filterUrgency === 'all' || post.urgencyLevel === filterUrgency;
     const accountMatch = filterAccount === 'all' || post.accountType === filterAccount;
     return urgencyMatch && accountMatch;
-  }) || [];
+  });
 
   if (isLoading) {
     return (
@@ -134,6 +140,36 @@ export function SocialMediaEmergencyMonitor() {
               <RefreshCw className="w-4 h-4 mr-2" />
               Retry
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Handle disabled state
+  if (data?.disabled) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Twitter className="w-5 h-5 text-blue-500" />
+            Social Media Emergency Monitor
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-yellow-800 mb-2">
+              <Shield className="w-4 h-4" />
+              Social Media Monitoring Temporarily Disabled
+            </div>
+            <p className="text-sm text-yellow-700 mb-3">
+              {data.note || "Live Twitter integration temporarily disabled to conserve API tokens."}
+            </p>
+            {data.apiUsage && (
+              <div className="text-xs text-yellow-600 bg-yellow-100 rounded p-2">
+                API Usage: {data.apiUsage.requestsUsed}/{data.apiUsage.monthlyLimit} requests used this month
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
