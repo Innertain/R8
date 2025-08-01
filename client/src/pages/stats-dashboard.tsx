@@ -17,6 +17,7 @@ import {
   Heart,
   Clock
 } from "lucide-react";
+import { RealtimeApiDebugger } from "@/components/RealtimeApiDebugger";
 
 // Color schemes for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -736,6 +737,9 @@ export default function StatsDashboard() {
           </div>
         </TabsContent>
       </Tabs>
+      
+      {/* Real-time API Debugger */}
+      <RealtimeApiDebugger />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertTriangle, MapPin, Clock, ExternalLink, RefreshCw, Filter, Zap, Info as InfoIcon } from 'lucide-react';
+import { RealtimeApiDebugger } from './RealtimeApiDebugger';
 
 interface WeatherAlert {
   id: string;
@@ -595,6 +596,9 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
           )}
         </CardContent>
       </Card>
+      
+      {/* Real-time API Debugger */}
+      <RealtimeApiDebugger />
     </div>
   );
 }

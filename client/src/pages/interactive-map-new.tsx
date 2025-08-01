@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
+import { RealtimeApiDebugger } from "@/components/RealtimeApiDebugger";
 
 import RealTimeAlerts from "@/components/RealTimeAlerts";
 import EnhancedRssFeed from "@/components/EnhancedRssFeed";
@@ -147,6 +148,9 @@ export default function InteractiveMap() {
           </div>
         </div>
       </main>
+      
+      {/* Real-time API Debugger */}
+      <RealtimeApiDebugger />
     </div>
   );
 }

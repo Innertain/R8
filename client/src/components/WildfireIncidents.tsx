@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2, Info as InfoIcon } from 'lucide-react';
+import { RealtimeApiDebugger } from './RealtimeApiDebugger';
 
 interface WildfireIncident {
   id: string;
@@ -417,6 +418,9 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
             </div>
         </CardContent>
       </Card>
+      
+      {/* Real-time API Debugger */}
+      <RealtimeApiDebugger />
     </div>
   );
 }

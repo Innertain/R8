@@ -26,6 +26,7 @@ import ShiftCard from "@/components/ShiftCard";
 import { fetchShiftsFromAirtable, type AirtableShift } from "@/lib/api";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { RealtimeApiDebugger } from "@/components/RealtimeApiDebugger";
 
 // Use AirtableShift type from API module
 
@@ -365,6 +366,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      
+      {/* Real-time API Debugger */}
+      <RealtimeApiDebugger />
     </div>
   );
 }
