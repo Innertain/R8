@@ -43,6 +43,7 @@ interface EonetEvent {
   coordinates: [number, number] | null;
   magnitude: number | null;
   magnitudeUnit: string | null;
+  satelliteImageUrl: string | null;
   geometry: any[];
 }
 
@@ -536,6 +537,35 @@ export function NasaEonetEvents() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Satellite Imagery Section */}
+                    {event.satelliteImageUrl && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div className="font-semibold text-blue-800 text-sm mb-3 flex items-center gap-2">
+                          <Globe className="w-4 h-4" />
+                          Live Satellite Imagery
+                        </div>
+                        <div className="relative">
+                          <img 
+                            src={event.satelliteImageUrl} 
+                            alt={`Satellite view of ${event.title}`}
+                            className="w-full h-64 object-cover rounded-lg border border-blue-300"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                              const parent = img.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="flex items-center justify-center h-64 bg-gray-100 rounded-lg border border-gray-300"><span class="text-gray-500 text-sm">Satellite imagery not available</span></div>';
+                              }
+                            }}
+                          />
+                          <div className="mt-2 text-xs text-blue-600">
+                            <div>Source: NASA GIBS (Global Imagery Browse Services)</div>
+                            <div>Data: MODIS satellite imagery from event date</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Additional Details */}
                     {event.description && (

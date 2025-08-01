@@ -2907,6 +2907,28 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           }
         }
 
+        // Generate NASA GIBS satellite image URL
+        let satelliteImageUrl: string | null = null;
+        if (latitude && longitude && latestGeometry?.date) {
+          const eventDate = latestGeometry.date.split('T')[0]; // YYYY-MM-DD format
+          
+          // Choose appropriate layer based on event category
+          let layer = 'MODIS_Terra_CorrectedReflectance_TrueColor'; // Default
+          const categoryId = event.categories && event.categories[0] ? event.categories[0].id : '';
+          
+          if (categoryId === 'wildfires') {
+            layer = 'MODIS_Aqua_CorrectedReflectance_TrueColor';
+          } else if (categoryId === 'volcanoes') {
+            layer = 'MODIS_Terra_CorrectedReflectance_TrueColor';
+          } else if (categoryId === 'severeStorms') {
+            layer = 'MODIS_Terra_CorrectedReflectance_TrueColor';
+          }
+          
+          // Build NASA GIBS WMS URL for satellite imagery
+          const bbox = `${longitude-0.5},${latitude-0.5},${longitude+0.5},${latitude+0.5}`;
+          satelliteImageUrl = `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=${layer}&CRS=EPSG:4326&BBOX=${bbox}&WIDTH=400&HEIGHT=400&FORMAT=image/png&TIME=${eventDate}`;
+        }
+
         return {
           id: event.id,
           title: event.title,
@@ -2926,6 +2948,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           coordinates,
           magnitude: latestGeometry ? latestGeometry.magnitudeValue : null,
           magnitudeUnit: latestGeometry ? latestGeometry.magnitudeUnit : null,
+          satelliteImageUrl,
           geometry: event.geometry || []
         };
       });
