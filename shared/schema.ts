@@ -112,7 +112,7 @@ export const sessions = pgTable(
 // Alert rules defined by users
 export const alertRules = pgTable("alert_rules", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull(), // Removed foreign key constraint for demo
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   isActive: boolean("is_active").default(true),
@@ -141,7 +141,7 @@ export const alertRules = pgTable("alert_rules", {
 export const alertDeliveries = pgTable("alert_deliveries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   alertRuleId: varchar("alert_rule_id").references(() => alertRules.id, { onDelete: "cascade" }),
-  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull(), // Removed foreign key constraint for demo
   
   // Alert content
   title: varchar("title", { length: 255 }).notNull(),
@@ -166,7 +166,7 @@ export const alertDeliveries = pgTable("alert_deliveries", {
 // User notification preferences
 export const userNotificationSettings = pgTable("user_notification_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).unique(),
+  userId: varchar("user_id").notNull().unique(), // Removed foreign key constraint for demo
   
   // Contact methods
   email: varchar("email"),
