@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2, Map, List } from 'lucide-react';
+import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2 } from 'lucide-react';
 
 interface WildfireIncident {
   id: string;
@@ -25,7 +25,6 @@ interface WildfireIncidentsProps {
 }
 
 export function WildfireIncidents({ stateFilter, onStateFilterChange }: WildfireIncidentsProps) {
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [selectedState, setSelectedState] = useState<string>(stateFilter || 'all');
 
   // Function to handle state selection and notify parent
@@ -192,31 +191,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
           </p>
         </CardHeader>
         <CardContent>
-          {/* View Mode Toggle */}
-          <div className="flex justify-center mb-6">
-            <div className="bg-gray-100 rounded-lg p-1 flex">
-              <Button
-                variant={viewMode === 'map' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('map')}
-                className="flex items-center gap-2"
-              >
-                <Map className="w-4 h-4" />
-                Map View
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="flex items-center gap-2"
-              >
-                <List className="w-4 h-4" />
-                List View
-              </Button>
-            </div>
-          </div>
-
-          {viewMode === 'map' ? (
+          {/* Wildfire Incidents Map View */}
             <div className="space-y-6">
               {/* Interactive Map Representation */}
               <div className="bg-gradient-to-b from-orange-50 to-orange-100 rounded-lg p-6 border">
@@ -427,130 +402,6 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange }: Wildfire
                 </div>
               </div>
             </div>
-          ) : (
-            <>
-              {/* Summary Statistics */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-red-600">
-                  {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Active').length}
-                </div>
-                <div className="text-sm text-gray-600">Active</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-yellow-600">
-                  {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Contained').length}
-                </div>
-                <div className="text-sm text-gray-600">Contained</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {filteredIncidents.filter((i: WildfireIncident) => i.status === 'Controlled').length}
-                </div>
-                <div className="text-sm text-gray-600">Controlled</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-orange-600">
-                  {Object.keys(incidentsByState).length}
-                </div>
-                <div className="text-sm text-gray-600">States Affected</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Incidents List */}
-          <div className="space-y-4 max-h-[600px] overflow-y-auto">
-            {filteredIncidents.length === 0 ? (
-              <div className="text-center py-8">
-                <Flame className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600">
-                  {stateFilter && stateFilter !== 'all' 
-                    ? `No wildfire incidents in ${stateFilter}` 
-                    : 'No wildfire incidents reported'
-                  }
-                </p>
-                <p className="text-sm text-gray-500 mt-1">Current data from InciWeb RSS</p>
-              </div>
-            ) : (
-              filteredIncidents.map((incident: WildfireIncident) => (
-                <Card key={incident.id} className="hover:shadow-md transition-shadow border-l-4 border-l-orange-500">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-gray-900">{incident.title}</h3>
-                          <Badge className={getStatusColor(incident.status)}>
-                            {incident.status}
-                          </Badge>
-                          {incident.severity && (
-                            <Badge className={getSeverityColor(incident.severity)}>
-                              {incident.severity}
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
-                          {incident.state && (
-                            <div className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              <span className="font-medium">{incident.state}</span>
-                            </div>
-                          )}
-                          {incident.acres && (
-                            <div className="flex items-center gap-1">
-                              <Flame className="w-4 h-4" />
-                              <span>{formatAcres(incident.acres)}</span>
-                            </div>
-                          )}
-                          {incident.pubDate && (
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              <span>{new Date(incident.pubDate).toLocaleDateString()}</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="mb-3">
-                          <span className="inline-block bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-semibold">
-                            {incident.incidentType}
-                          </span>
-                        </div>
-                        
-                        <p className="text-sm text-gray-700 mb-3 leading-relaxed">
-                          {incident.description}
-                        </p>
-                        
-                        <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                          <span className="text-xs text-gray-500">
-                            Source: {incident.source}
-                          </span>
-                          {incident.link && (
-                            <a
-                              href={incident.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
-                            >
-                              View Details <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-            </>
-          )}
         </CardContent>
       </Card>
     </div>
