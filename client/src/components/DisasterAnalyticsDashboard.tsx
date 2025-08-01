@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock, Info as InfoIcon } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CompactTimeline } from "./CompactTimeline";
+import { FemaDataInsights } from "./FemaDataInsights";
 
 interface FemaDisasterItem {
   guid: string;
@@ -422,6 +423,9 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               </CardContent>
             </Card>
           </div>
+
+          {/* FEMA Data Insights */}
+          <FemaDataInsights />
 
           {/* Compact Interactive Timeline */}
           <CompactTimeline disasters={disasters} />
