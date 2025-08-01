@@ -219,7 +219,7 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                       {/* Expanded Details */}
                       {expandedCard === disaster.disasterNumber && (
                         <div className="mt-4 pt-4 border-t border-gray-200 space-y-4 animate-in slide-in-from-top-2 duration-200">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* When Section */}
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                               <div className="flex items-center gap-2 mb-2">
@@ -235,18 +235,6 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                                       month: 'short', 
                                       day: 'numeric' 
                                     })}
-                                    <div className="text-xs mt-1 text-blue-600">
-                                      {(() => {
-                                        const incidentDate = new Date(disaster.incidentBeginDate);
-                                        const daysSinceIncident = Math.floor((currentTime - incidentDate.getTime()) / (1000 * 60 * 60 * 24));
-                                        return daysSinceIncident === 0 ? 'Incident today' : 
-                                               daysSinceIncident === 1 ? 'Incident yesterday' : 
-                                               daysSinceIncident < 7 ? `Incident ${daysSinceIncident} days ago` :
-                                               daysSinceIncident < 30 ? `Incident ${Math.floor(daysSinceIncident / 7)} weeks ago` :
-                                               daysSinceIncident < 365 ? `Incident ${Math.floor(daysSinceIncident / 30)} months ago` :
-                                               `Incident ${Math.floor(daysSinceIncident / 365)} years ago`;
-                                      })()}
-                                    </div>
                                     {disaster.incidentEndDate && (
                                       <div className="text-xs mt-1">
                                         Until {new Date(disaster.incidentEndDate).toLocaleDateString('en-US', { 
@@ -258,27 +246,6 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                                   </>
                                 ) : (
                                   <span className="text-blue-600">Date not specified</span>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Where Section */}
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <MapPin className="w-4 h-4 text-green-600" />
-                                <span className="font-semibold text-green-800 text-sm">Where</span>
-                              </div>
-                              <div className="text-sm text-green-700">
-                                <div className="font-semibold">{getStateName(disaster.state)}</div>
-                                {disaster.designatedArea && (
-                                  <div className="text-xs mt-1 text-green-600">
-                                    {disaster.designatedArea}
-                                  </div>
-                                )}
-                                {disaster.femaRegion && (
-                                  <div className="text-xs mt-1 text-green-600">
-                                    FEMA Region {disaster.femaRegion}
-                                  </div>
                                 )}
                               </div>
                             </div>
@@ -309,10 +276,28 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                           </div>
 
                           {/* Additional Details */}
-                          {disaster.description && (
+                          {(disaster.femaRegion || disaster.designatedArea || disaster.description) && (
                             <div className="bg-white/80 border border-gray-200 rounded-lg p-3">
-                              <div className="font-semibold text-gray-700 text-sm mb-2">Description</div>
-                              <div className="text-gray-600 text-sm">{disaster.description}</div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                {disaster.femaRegion && (
+                                  <div>
+                                    <span className="font-semibold text-gray-700">FEMA Region:</span>
+                                    <div className="text-gray-600">{disaster.femaRegion}</div>
+                                  </div>
+                                )}
+                                {disaster.designatedArea && (
+                                  <div>
+                                    <span className="font-semibold text-gray-700">Designated Area:</span>
+                                    <div className="text-gray-600">{disaster.designatedArea}</div>
+                                  </div>
+                                )}
+                                {disaster.description && (
+                                  <div className="md:col-span-2">
+                                    <span className="font-semibold text-gray-700">Description:</span>
+                                    <div className="text-gray-600 mt-1">{disaster.description}</div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
                         </div>
