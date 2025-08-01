@@ -2907,26 +2907,23 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           }
         }
 
-        // Generate NASA GIBS satellite image URL
+        // Generate satellite imagery using reliable tile service
         let satelliteImageUrl: string | null = null;
-        if (latitude && longitude && latestGeometry?.date) {
-          const eventDate = latestGeometry.date.split('T')[0]; // YYYY-MM-DD format
-          
-          // Choose appropriate layer based on event category
-          let layer = 'MODIS_Terra_CorrectedReflectance_TrueColor'; // Default
-          const categoryId = event.categories && event.categories[0] ? event.categories[0].id : '';
-          
-          if (categoryId === 'wildfires') {
-            layer = 'MODIS_Aqua_CorrectedReflectance_TrueColor';
-          } else if (categoryId === 'volcanoes') {
-            layer = 'MODIS_Terra_CorrectedReflectance_TrueColor';
-          } else if (categoryId === 'severeStorms') {
-            layer = 'MODIS_Terra_CorrectedReflectance_TrueColor';
+        if (latitude && longitude) {
+          try {
+            // Use Esri World Imagery tiles - highly reliable satellite imagery service
+            const zoom = 12; // Good detail level for disaster areas
+            
+            // Convert lat/lng to tile coordinates
+            const tileX = Math.floor((longitude + 180) / 360 * Math.pow(2, zoom));
+            const tileY = Math.floor((1 - Math.log(Math.tan(latitude * Math.PI / 180) + 1 / Math.cos(latitude * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+            
+            // Generate Esri World Imagery tile URL (free, reliable satellite imagery)
+            satelliteImageUrl = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${zoom}/${tileY}/${tileX}`;
+          } catch (error) {
+            console.log('Error generating satellite image URL:', error);
+            satelliteImageUrl = null;
           }
-          
-          // Build NASA GIBS WMS URL for satellite imagery
-          const bbox = `${longitude-0.5},${latitude-0.5},${longitude+0.5},${latitude+0.5}`;
-          satelliteImageUrl = `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=${layer}&CRS=EPSG:4326&BBOX=${bbox}&WIDTH=400&HEIGHT=400&FORMAT=image/png&TIME=${eventDate}`;
         }
 
         return {

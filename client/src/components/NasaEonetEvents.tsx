@@ -560,8 +560,8 @@ export function NasaEonetEvents() {
                             }}
                           />
                           <div className="mt-2 text-xs text-blue-600">
-                            <div>Source: NASA GIBS (Global Imagery Browse Services)</div>
-                            <div>Data: MODIS satellite imagery from event date</div>
+                            <div>Source: Esri World Imagery (High-Resolution Satellite Tiles)</div>
+                            <div>Data: Latest available satellite imagery for location</div>
                           </div>
                         </div>
                       </div>
