@@ -1,11 +1,16 @@
-// Custom disaster icon mappings with user's professional icons
-import FireIcon from "@assets/Fire_1754092576942.png";
-import FloodIcon from "@assets/FLOOD_1754092576943.png";
-import HurricaneIcon from "@assets/HURICAN_1754092576944.png";
-import IceStormIcon from "@assets/ICE _ WINTER STORM_1754092576945.png";
-import StormIcon from "@assets/STORM_1754092576946.png";
-import TornadoIcon from "@assets/TORNATOR_1754092576946.png";
-import WindIcon from "@assets/WIND_1754092576947.png";
+// Updated custom disaster icon mappings with user's latest professional icons
+import VolcanoIcon from "@assets/11_1754119781362.png";
+import EarthquakeIcon from "@assets/Earth Quake_1754119781363.png";
+import EarthquakeAltIcon from "@assets/Earth Quke_1754119781364.png";
+import FireIcon from "@assets/Fire_1754119781364.png";
+import FloodIcon from "@assets/FLOOD_1754119781365.png";
+import HeatwaveIcon from "@assets/Heatwave_1754119781366.png";
+import HurricaneIcon from "@assets/HURICAN_1754119781366.png";
+import IceStormIcon from "@assets/ICE _ WINTER STORM_1754119781367.png";
+import IcebergIcon from "@assets/Iceburg_1754119781367.png";
+import StormIcon from "@assets/STORM_1754119781368.png";
+import TornadoIcon from "@assets/TORNATOR_1754119781369.png";
+import TsunamiIcon from "@assets/tsunami_1754119781370.png";
 
 export const disasterIconMap: Record<string, string> = {
   // Fire-related
@@ -50,13 +55,34 @@ export const disasterIconMap: Record<string, string> = {
   'tornado watch': TornadoIcon,
   'tornado warning': TornadoIcon,
   
-  // Wind
-  'high wind': WindIcon,
-  'wind storm': WindIcon,
-  'straight-line winds': WindIcon,
-  'damaging winds': WindIcon,
-  'wind': WindIcon,
-  'gale': WindIcon,
+  // Earthquake-related
+  'earthquake': EarthquakeIcon,
+  'seismic': EarthquakeIcon,
+  'tremor': EarthquakeIcon,
+  'quake': EarthquakeAltIcon,
+  
+  // Volcano-related
+  'volcano': VolcanoIcon,
+  'volcanic': VolcanoIcon,
+  'eruption': VolcanoIcon,
+  'lava': VolcanoIcon,
+  
+  // Tsunami-related
+  'tsunami': TsunamiIcon,
+  'tidal wave': TsunamiIcon,
+  'seismic sea wave': TsunamiIcon,
+  
+  // Heat-related
+  'heatwave': HeatwaveIcon,
+  'heat wave': HeatwaveIcon,
+  'excessive heat': HeatwaveIcon,
+  'extreme heat': HeatwaveIcon,
+  'heat': HeatwaveIcon,
+  
+  // Ice/Iceberg
+  'iceberg': IcebergIcon,
+  'sea ice': IcebergIcon,
+  'glacial': IcebergIcon,
 };
 
 export function getDisasterIcon(disasterType: string): string | null {
@@ -92,14 +118,23 @@ export function getWeatherAlertIcon(alertType: string): string | null {
   if (normalizedType.includes('hurricane') || normalizedType.includes('tropical')) {
     return HurricaneIcon;
   }
+  if (normalizedType.includes('tsunami') || normalizedType.includes('tidal wave')) {
+    return TsunamiIcon;
+  }
   if (normalizedType.includes('flood') || normalizedType.includes('flash flood')) {
     return FloodIcon;
   }
+  if (normalizedType.includes('earthquake') || normalizedType.includes('seismic') || normalizedType.includes('quake')) {
+    return EarthquakeIcon;
+  }
+  if (normalizedType.includes('volcano') || normalizedType.includes('volcanic') || normalizedType.includes('eruption')) {
+    return VolcanoIcon;
+  }
+  if (normalizedType.includes('heat') || normalizedType.includes('excessive heat') || normalizedType.includes('extreme heat')) {
+    return HeatwaveIcon;
+  }
   if (normalizedType.includes('winter') || normalizedType.includes('ice') || normalizedType.includes('blizzard') || normalizedType.includes('snow')) {
     return IceStormIcon;
-  }
-  if (normalizedType.includes('wind') || normalizedType.includes('gale')) {
-    return WindIcon;
   }
   if (normalizedType.includes('storm') || normalizedType.includes('thunderstorm') || normalizedType.includes('severe')) {
     return StormIcon;
@@ -113,13 +148,16 @@ export function getWeatherAlertIcon(alertType: string): string | null {
 export function getNasaEonetIcon(eventCategory: string): string | null {
   const normalizedCategory = eventCategory.toLowerCase();
   
-  // NASA EONET category mappings
+  // NASA EONET category mappings with new icons
   if (normalizedCategory.includes('wildfire') || normalizedCategory.includes('fire')) return FireIcon;
   if (normalizedCategory.includes('flood')) return FloodIcon;
+  if (normalizedCategory.includes('volcano') || normalizedCategory.includes('volcanic')) return VolcanoIcon;
+  if (normalizedCategory.includes('earthquake') || normalizedCategory.includes('seismic')) return EarthquakeIcon;
   if (normalizedCategory.includes('storm') || normalizedCategory.includes('cyclone') || normalizedCategory.includes('hurricane')) return HurricaneIcon;
-  if (normalizedCategory.includes('ice') || normalizedCategory.includes('snow')) return IceStormIcon;
+  if (normalizedCategory.includes('ice') || normalizedCategory.includes('snow') || normalizedCategory.includes('iceberg')) return IceStormIcon;
   if (normalizedCategory.includes('tornado')) return TornadoIcon;
-  if (normalizedCategory.includes('wind')) return WindIcon;
+  if (normalizedCategory.includes('tsunami')) return TsunamiIcon;
+  if (normalizedCategory.includes('heat') || normalizedCategory.includes('temperature')) return HeatwaveIcon;
   
   return null;
 }
