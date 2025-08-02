@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, ExternalLink, Users, TreePine, AlertTriangle, Thermometer } from 'lucide-react';
 import SpeciesInfo from './SpeciesInfo';
+import WildlifeActivityFeed from './WildlifeActivityFeed';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
 
 interface BioregionDetailsProps {
@@ -178,44 +179,8 @@ const BioregionDetails: React.FC<BioregionDetailsProps> = ({ bioregion, isLoadin
         </CardContent>
       </Card>
 
-      {/* Species Information */}
-      {bioregion.id && (
-        <>
-          {speciesLoading && (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading species data...</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          
-          {speciesError && (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-8">
-                  <AlertTriangle className="w-8 h-8 text-yellow-600 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">Unable to load species data</p>
-                  <p className="text-sm text-gray-500">Species information will be available when cached data is refreshed</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          
-          {speciesData && (
-            <SpeciesInfo
-              bioregionId={speciesData.bioregionId}
-              bioregionName={speciesData.bioregionName}
-              species={speciesData.species}
-              conservationProjects={speciesData.conservationProjects}
-              lastUpdated={speciesData.lastUpdated}
-              isLoading={speciesLoading}
-            />
-          )}
-        </>
-      )}
+      {/* Live Wildlife Activity - This is what users actually want to see! */}
+      <WildlifeActivityFeed bioregionName={bioregion.name} />
     </div>
   );
 };

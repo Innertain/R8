@@ -12,7 +12,12 @@ import {
   BarChart3,
   Clock,
   Globe,
-  Info
+  Info,
+  Camera,
+  MapPin,
+  Calendar,
+  Eye,
+  HelpCircle
 } from 'lucide-react';
 
 interface SpeciesData {
@@ -21,6 +26,9 @@ interface SpeciesData {
   endemicSpecies: string[];
   threatenedSpecies: string[];
   topTaxa: Record<string, number>;
+  recentSightings: Array<{species: string, location: string, date: string, photo?: string, url: string}>;
+  seasonalTrends: Record<string, number>;
+  identificationNeeds: Array<{species: string, observations: number, url: string}>;
 }
 
 interface ConservationProject {
@@ -204,16 +212,117 @@ export default function SpeciesInfo({
         </Card>
       )}
 
+      {/* Recent Wildlife Sightings */}
+      {species.recentSightings && species.recentSightings.length > 0 && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Camera className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold">Recent Wildlife Sightings</h3>
+            </div>
+            <p className="text-sm text-gray-600 mt-1">
+              Latest wildlife observations from your bioregion (last 30 days)
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {species.recentSightings.slice(0, 8).map((sighting, index) => (
+                <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    {sighting.photo && (
+                      <img 
+                        src={sighting.photo} 
+                        alt={sighting.species}
+                        className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 truncate">{sighting.species}</h4>
+                      <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate">{sighting.location}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <Calendar className="w-3 h-3" />
+                        <span>{sighting.date}</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(sighting.url, '_blank')}
+                        className="mt-2 h-6 text-xs"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs text-blue-700">
+                💡 <strong>Tip:</strong> These are real observations from community scientists in your area. 
+                Click "View" to see full details, photos, and help with identifications!
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Help Identify Species */}
+      {species.identificationNeeds && species.identificationNeeds.length > 0 && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-semibold">Help Identify Species</h3>
+            </div>
+            <p className="text-sm text-gray-600 mt-1">
+              Local observations that need your expertise for identification
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {species.identificationNeeds.map((need, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-purple-50 transition-colors">
+                  <div>
+                    <div className="font-medium">{need.species}</div>
+                    <div className="text-sm text-gray-600">
+                      {need.observations} observation{need.observations !== 1 ? 's' : ''} need help
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(need.url, '_blank')}
+                    className="bg-purple-600 text-white hover:bg-purple-700"
+                  >
+                    Help ID
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+              <p className="text-xs text-purple-700">
+                🔬 <strong>Make a difference:</strong> Your local knowledge can help scientists and nature enthusiasts 
+                identify species in your bioregion. Every identification contributes to biodiversity research!
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Conservation Projects */}
       {conservationProjects.length > 0 && (
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-green-600" />
-              <h3 className="text-lg font-semibold">Conservation & Citizen Science</h3>
+              <h3 className="text-lg font-semibold">Get Involved Locally</h3>
             </div>
             <p className="text-sm text-gray-600 mt-1">
-              Get involved in local conservation efforts
+              Active citizen science projects in your bioregion
             </p>
           </CardHeader>
           <CardContent>
@@ -229,10 +338,10 @@ export default function SpeciesInfo({
                       variant="outline"
                       size="sm"
                       onClick={() => window.open(project.url, '_blank')}
-                      className="ml-4 flex items-center gap-1"
+                      className="ml-4 flex items-center gap-1 bg-green-600 text-white hover:bg-green-700"
                     >
                       <ExternalLink className="w-3 h-3" />
-                      View
+                      Join
                     </Button>
                   </div>
                 </div>

@@ -110,6 +110,9 @@ class INaturalistService {
     endemicSpecies: string[];
     threatenedSpecies: string[];
     topTaxa: Record<string, number>;
+    recentSightings: Array<{species: string, location: string, date: string, photo?: string, url: string}>;
+    seasonalTrends: Record<string, number>;
+    identificationNeeds: Array<{species: string, observations: number, url: string}>;
   }> {
     // Check if we have fresh cached data
     const cached = await db
@@ -128,6 +131,9 @@ class INaturalistService {
         endemicSpecies: cached[0].endemicSpecies || [],
         threatenedSpecies: cached[0].threatenedSpecies || [],
         topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
+        recentSightings: [],
+        seasonalTrends: {},
+        identificationNeeds: [],
       };
     }
 
@@ -145,6 +151,9 @@ class INaturalistService {
           endemicSpecies: cached[0].endemicSpecies || [],
           threatenedSpecies: cached[0].threatenedSpecies || [],
           topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
+          recentSightings: [],
+          seasonalTrends: {},
+          identificationNeeds: [],
         };
       }
       return {
@@ -153,6 +162,9 @@ class INaturalistService {
         endemicSpecies: [],
         threatenedSpecies: [],
         topTaxa: {},
+        recentSightings: [],
+        seasonalTrends: {},
+        identificationNeeds: [],
       };
     }
 
@@ -206,12 +218,21 @@ class INaturalistService {
       }
     }
 
+    // Get recent sightings (last 30 days)
+    const recentSightings = await this.getRecentSightings(bounds);
+    
+    // Get observations needing identification
+    const identificationNeeds = await this.getIdentificationNeeds(bounds);
+    
     return {
       totalSpecies: observationsResponse.total_results || 0,
-      flagshipSpecies: flagshipSpecies.slice(0, 10), // Limit to top 10
-      endemicSpecies, // Would need additional API calls to determine endemism
+      flagshipSpecies: flagshipSpecies.slice(0, 10),
+      endemicSpecies,
       threatenedSpecies: threatenedSpecies.slice(0, 10),
       topTaxa,
+      recentSightings: recentSightings || [],
+      seasonalTrends: {},
+      identificationNeeds: identificationNeeds || [],
     };
   }
 
@@ -253,8 +274,71 @@ class INaturalistService {
     }
   }
 
+  async getRecentSightings(bounds: {north: number, south: number, east: number, west: number}) {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const response = await this.makeApiRequest<any>('/observations', {
+      nelat: bounds.north,
+      nelng: bounds.east,
+      swlat: bounds.south,
+      swlng: bounds.west,
+      per_page: 20,
+      order: 'desc',
+      order_by: 'created_at',
+      created_d1: thirtyDaysAgo.toISOString().split('T')[0],
+      photos: true,
+      quality_grade: 'research',
+    });
+
+    if (!response?.results) return [];
+
+    return response.results.map((obs: any) => ({
+      species: obs.taxon?.preferred_common_name || obs.taxon?.name || 'Unknown',
+      location: obs.place_guess || 'Unknown location',
+      date: new Date(obs.created_at).toLocaleDateString(),
+      photo: obs.photos?.[0]?.url?.replace('square', 'medium'),
+      url: `https://www.inaturalist.org/observations/${obs.id}`,
+    }));
+  }
+
+  async getIdentificationNeeds(bounds: {north: number, south: number, east: number, west: number}) {
+    const response = await this.makeApiRequest<any>('/observations', {
+      nelat: bounds.north,
+      nelng: bounds.east,
+      swlat: bounds.south,
+      swlng: bounds.west,
+      per_page: 10,
+      iconic_taxa: 'Plantae,Aves,Mammalia,Insecta',
+      identified: false,
+      photos: true,
+      order: 'desc',
+      order_by: 'created_at',
+    });
+
+    if (!response?.results) return [];
+
+    const needsHelp = new Map<string, {count: number, url: string}>();
+    
+    response.results.forEach((obs: any) => {
+      const taxon = obs.taxon?.preferred_common_name || obs.taxon?.name || 'Unknown species';
+      if (!needsHelp.has(taxon)) {
+        needsHelp.set(taxon, {
+          count: 0,
+          url: `https://www.inaturalist.org/observations/identify?taxon_id=${obs.taxon?.id || ''}`
+        });
+      }
+      needsHelp.get(taxon)!.count++;
+    });
+
+    return Array.from(needsHelp.entries()).map(([species, data]) => ({
+      species,
+      observations: data.count,
+      url: data.url,
+    }));
+  }
+
   async getConservationProjects(bioregionName: string): Promise<Array<{name: string, url: string, description: string}>> {
-    // Search for projects related to this bioregion
     const projectsResponse = await this.makeApiRequest<any>('/projects', {
       q: bioregionName,
       type: 'collection,bioblitz',
@@ -266,7 +350,7 @@ class INaturalistService {
     return projectsResponse.results.map((project: any) => ({
       name: project.title,
       url: `https://www.inaturalist.org/projects/${project.slug}`,
-      description: project.description || 'Conservation project in this bioregion',
+      description: project.description || 'Active citizen science project in your area',
     }));
   }
 }
