@@ -76,9 +76,9 @@ function Navigation() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuItem asChild>
-                <Link href="/map" className="flex items-center gap-3 w-full p-3 hover:bg-red-50">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100">
-                    <MapPin className="h-6 w-6 text-red-600" />
+                <Link href="/map" className="flex items-center gap-3 w-full p-3 hover:bg-red-100">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-500">
+                    <MapPin className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">Disaster Watch Center</div>
@@ -87,9 +87,9 @@ function Navigation() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/stats" className="flex items-center gap-3 w-full p-3 hover:bg-red-50">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100">
-                    <BarChart3 className="h-6 w-6 text-red-600" />
+                <Link href="/stats" className="flex items-center gap-3 w-full p-3 hover:bg-red-100">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-500">
+                    <BarChart3 className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">Impact Stats</div>
@@ -98,9 +98,9 @@ function Navigation() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/alerts" className="flex items-center gap-3 w-full p-3 hover:bg-red-50">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100">
-                    <Bell className="h-6 w-6 text-red-600" />
+                <Link href="/alerts" className="flex items-center gap-3 w-full p-3 hover:bg-red-100">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-500">
+                    <Bell className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">Custom Alerts</div>
