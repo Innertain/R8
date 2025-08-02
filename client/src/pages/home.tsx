@@ -88,10 +88,10 @@ export default function Home() {
               />
               <h1 className="text-5xl font-bold text-gray-900">R8</h1>
             </div>
-            <p className="text-2xl text-gray-600 mb-4">Emergency Response Platform</p>
+            <p className="text-2xl text-gray-600 mb-4">Disaster Relief • Community Resiliency • Regeneration</p>
             <p className="text-lg text-gray-500 max-w-3xl mx-auto">
-              Comprehensive emergency management, volunteer coordination, and regeneration initiatives 
-              connecting communities to respond effectively to disasters and build resilience.
+              Connecting communities to respond to disasters, build resilience, and support regenerative practices 
+              that strengthen local ecosystems and community well-being.
             </p>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function Home() {
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Platform Modules</h2>
           <p className="text-lg text-gray-600">
-            Choose a module to access R8's comprehensive emergency response and regeneration tools
+            Choose a module to access R8's disaster relief, community resiliency, and regeneration tools
           </p>
         </div>
 
@@ -168,10 +168,10 @@ export default function Home() {
                 alt="R8 Logo" 
                 className="w-8 h-8 mr-2"
               />
-              <span className="text-lg font-semibold text-gray-900">R8 Emergency Response Platform</span>
+              <span className="text-lg font-semibold text-gray-900">R8</span>
             </div>
             <p className="text-gray-600">
-              Connecting communities • Coordinating response • Building resilience
+              Disaster Relief • Community Resiliency • Regeneration
             </p>
           </div>
         </div>
