@@ -374,24 +374,33 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                       </h4>
                       <div className="grid gap-4 max-h-96 overflow-y-auto">
                         {activeAlerts.map((alert: WeatherAlert) => (
-                          <Card key={alert.id} className="hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
+                          <Card key={alert.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500 bg-gradient-to-r from-white to-blue-50/30">
+                            <CardContent className="p-6">
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    {getWeatherAlertIcon(alert.event || alert.title) ? (
-                                      <img 
-                                        src={getWeatherAlertIcon(alert.event || alert.title)!} 
-                                        alt={alert.event || 'Weather Alert'} 
-                                        className="w-5 h-5 object-contain flex-shrink-0" 
-                                      />
-                                    ) : (
-                                      <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
-                                    )}
-                                    <h5 className="font-semibold text-gray-900 text-sm">{alert.title}</h5>
-                                    <Badge className={getSeverityColor(alert.severity)}>
-                                      {alert.severity}
-                                    </Badge>
+                                  <div className="flex items-start gap-4 mb-3">
+                                    <div className="flex-shrink-0 p-3 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 shadow-md">
+                                      {getWeatherAlertIcon(alert.event || alert.title) ? (
+                                        <img 
+                                          src={getWeatherAlertIcon(alert.event || alert.title)!} 
+                                          alt={alert.event || 'Weather Alert'} 
+                                          className="w-10 h-10 object-contain" 
+                                        />
+                                      ) : (
+                                        <AlertTriangle className="w-10 h-10 text-yellow-500" />
+                                      )}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <h5 className="font-bold text-gray-900 text-base">{alert.title}</h5>
+                                        <Badge className={`${getSeverityColor(alert.severity)} font-semibold px-3 py-1`}>
+                                          {alert.severity.toUpperCase()}
+                                        </Badge>
+                                      </div>
+                                      <div className="text-sm font-medium text-gray-700 mb-1">
+                                        {alert.event}
+                                      </div>
+                                    </div>
                                   </div>
                                   
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
