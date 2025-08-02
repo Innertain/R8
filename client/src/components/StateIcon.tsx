@@ -37,6 +37,20 @@ import WisconsinImg from '@assets/Wisconsin_1754172607638.png';
 import WyomingImg from '@assets/Wyoming_1754172607638.png';
 import NewMexicoImg from '@assets/New Mexico_1754172552870.png';
 import NorthCarolinaImg from '@assets/North Carolina_1754172552872.png';
+import IdahoImg from '@assets/Idaho_1754172085120.png';
+import IllinoisImg from '@assets/Illinois_1754172085121.png';
+import MontanaImg from '@assets/Montana_1754172506892.png';
+import NevadaImg from '@assets/Nevada_1754172552866.png';
+import NewHampshireImg from '@assets/New Hampshire_1754172552868.png';
+import NewJerseyImg from '@assets/New Jersey_1754172552869.png';
+import NewYorkImg from '@assets/New York State_1754172552871.png';
+import NorthDakotaImg from '@assets/North Dakota_1754172552872.png';
+import OhioImg from '@assets/Ohio_1754172552873.png';
+import OklahomaImg from '@assets/Oklahoma_1754172552874.png';
+import OregonImg from '@assets/Oregon_1754172552875.png';
+import PennsylvaniaImg from '@assets/Pennsylvania_1754172552875.png';
+import RhodeIslandImg from '@assets/Rhode Island_1754172552876.png';
+import SouthCarolinaImg from '@assets/South Carolina_1754172552865.png';
 
 interface StateIconProps {
   state: string;
@@ -83,6 +97,20 @@ const stateImages: Record<string, string> = {
   'WY': WyomingImg,
   'NM': NewMexicoImg,
   'NC': NorthCarolinaImg,
+  'ID': IdahoImg,
+  'IL': IllinoisImg,
+  'MT': MontanaImg,
+  'NV': NevadaImg,
+  'NH': NewHampshireImg,
+  'NJ': NewJerseyImg,
+  'NY': NewYorkImg,
+  'ND': NorthDakotaImg,
+  'OH': OhioImg,
+  'OK': OklahomaImg,
+  'OR': OregonImg,
+  'PA': PennsylvaniaImg,
+  'RI': RhodeIslandImg,
+  'SC': SouthCarolinaImg,
 };
 
 export function StateIcon({ state, size = 24, className = "", color = "currentColor" }: StateIconProps) {
