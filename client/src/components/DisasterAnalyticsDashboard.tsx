@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock, Info as InfoIcon } from "lucide-react";
 import { getDisasterIcon } from '@/utils/disasterIcons';
+import { StateIcon } from '@/components/StateIcon';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CompactTimeline } from "./CompactTimeline";
 
@@ -384,6 +385,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                     return (
                       <div key={state} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
+                          <StateIcon state={state} size={16} className="drop-shadow-sm" />
                           <span className="text-sm font-medium">{state}</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -671,7 +673,10 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                           }`}>
                             {index + 1}
                           </div>
-                          <div className="font-bold text-2xl text-gray-800 mb-2">{state}</div>
+                          <div className="flex items-center justify-center gap-2 mb-2">
+                            <StateIcon state={state} size={24} className="drop-shadow-sm" />
+                            <div className="font-bold text-2xl text-gray-800">{state}</div>
+                          </div>
                           <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-3">
                             <Icon className="w-4 h-4" />
                             <span>{topType?.[0] || 'Mixed Types'}</span>
