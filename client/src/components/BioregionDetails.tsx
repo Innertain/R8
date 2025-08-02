@@ -1,0 +1,169 @@
+import React from 'react';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { MapPin, ExternalLink, Users, TreePine, AlertTriangle, Thermometer } from 'lucide-react';
+
+interface BioregionDetailsProps {
+  bioregion: any;
+  isLoading?: boolean;
+}
+
+const BioregionDetails: React.FC<BioregionDetailsProps> = ({ bioregion, isLoading }) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Analyzing bioregion...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!bioregion) {
+    return null;
+  }
+
+  const getConservationStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      'Relatively Stable': 'text-green-600 bg-green-50 border-green-200',
+      'Vulnerable': 'text-yellow-600 bg-yellow-50 border-yellow-200',
+      'Threatened': 'text-orange-600 bg-orange-50 border-orange-200',
+      'Critically Endangered': 'text-red-600 bg-red-50 border-red-200',
+      'Moderately Threatened': 'text-yellow-700 bg-yellow-100 border-yellow-300'
+    };
+    return colors[status] || 'text-gray-600 bg-gray-50 border-gray-200';
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <MapPin className="w-5 h-5" />
+          Your Bioregion: {bioregion.name}
+        </h3>
+        <div className={`inline-block px-3 py-1 rounded-full border text-sm font-medium ${getConservationStatusColor(bioregion.conservationStatus)}`}>
+          {bioregion.conservationStatus}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          <p className="text-gray-700 leading-relaxed">{bioregion.description}</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Characteristics */}
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <TreePine className="w-4 h-4" />
+                Ecological Characteristics
+              </h4>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <strong>Biome:</strong> 
+                  <span className="text-gray-600">{bioregion.biome}</span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>Area:</strong> 
+                  <span className="text-gray-600">{bioregion.area_km2?.toLocaleString()} km²</span>
+                </div>
+                <div className="flex justify-between">
+                  <strong>Countries:</strong> 
+                  <span className="text-gray-600">{bioregion.countries?.join(', ')}</span>
+                </div>
+                {bioregion.keySpecies && (
+                  <div>
+                    <strong>Key Species:</strong>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {bioregion.keySpecies.slice(0, 4).map((species: string, index: number) => (
+                        <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+                          {species}
+                        </span>
+                      ))}
+                      {bioregion.keySpecies.length > 4 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                          +{bioregion.keySpecies.length - 4} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Climate & Demographics */}
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Thermometer className="w-4 h-4" />
+                Climate & Population
+              </h4>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <strong>Climate:</strong>
+                  <p className="text-gray-600 mt-1">{bioregion.climate}</p>
+                </div>
+                {bioregion.population && (
+                  <div className="flex justify-between">
+                    <strong>Population:</strong> 
+                    <span className="text-gray-600 flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      {bioregion.population.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Conservation Status Details */}
+          {bioregion.conservationStatus && (
+            <div className={`p-4 rounded-lg border ${getConservationStatusColor(bioregion.conservationStatus)}`}>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                Conservation Status: {bioregion.conservationStatus}
+              </h4>
+              <p className="text-sm">
+                {bioregion.conservationStatus === 'Relatively Stable' && 
+                  'This bioregion maintains good ecological integrity with stable ecosystems and biodiversity.'}
+                {bioregion.conservationStatus === 'Vulnerable' && 
+                  'This bioregion faces moderate threats and requires ongoing conservation efforts.'}
+                {bioregion.conservationStatus === 'Threatened' && 
+                  'This bioregion is under significant pressure from human activities and environmental changes.'}
+                {bioregion.conservationStatus === 'Critically Endangered' && 
+                  'This bioregion has lost significant habitat and biodiversity, requiring urgent conservation action.'}
+                {bioregion.conservationStatus === 'Moderately Threatened' && 
+                  'This bioregion shows signs of stress but retains much of its natural character.'}
+              </p>
+            </div>
+          )}
+
+          {/* Action Links */}
+          <div className="pt-4 border-t">
+            <h4 className="font-semibold text-gray-800 mb-3">Learn More & Take Action</h4>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" className="text-xs">
+                <ExternalLink className="w-3 h-3 mr-1" />
+                One Earth Navigator
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs">
+                <ExternalLink className="w-3 h-3 mr-1" />
+                Native Species Guide
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs">
+                <ExternalLink className="w-3 h-3 mr-1" />
+                Conservation Projects
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs">
+                <ExternalLink className="w-3 h-3 mr-1" />
+                Climate Data
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default BioregionDetails;

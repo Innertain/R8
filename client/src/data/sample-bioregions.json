@@ -1,0 +1,179 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "na_pacific_northwest",
+      "properties": {
+        "name": "Pacific Northwest Coastal Forests",
+        "description": "Temperate rainforests and coastal ecosystems from Northern California to Southeast Alaska. Home to towering redwoods, Douglas firs, and rich marine ecosystems.",
+        "biome": "Temperate Broadleaf & Mixed Forests",
+        "area_km2": 463000,
+        "countries": ["United States", "Canada"],
+        "climate": "Oceanic climate with mild, wet winters and cool, dry summers",
+        "keySpecies": ["Douglas Fir", "Western Red Cedar", "Sitka Spruce", "Coho Salmon", "Orca Whale"],
+        "conservationStatus": "Moderately Threatened",
+        "population": 16000000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-125.0, 40.0], [-125.0, 49.0], [-120.0, 49.0], [-118.0, 46.0], 
+          [-117.0, 44.0], [-119.0, 42.0], [-122.0, 40.0], [-125.0, 40.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "na_great_plains",
+      "properties": {
+        "name": "Great Plains Mixed Grasslands",
+        "description": "Vast grassland ecosystem stretching from Canada to Texas, supporting diverse prairie wildlife and agricultural systems.",
+        "biome": "Temperate Grasslands, Savannas & Shrublands",
+        "area_km2": 780000,
+        "countries": ["United States", "Canada"],
+        "climate": "Continental climate with hot summers and cold winters",
+        "keySpecies": ["American Bison", "Prairie Dog", "Greater Prairie-Chicken", "Big Bluestem Grass"],
+        "conservationStatus": "Critically Endangered",
+        "population": 8500000
+      },
+      "geometry": {
+        "type": "Polygon", 
+        "coordinates": [[
+          [-104.0, 49.0], [-96.0, 49.0], [-94.0, 36.0], [-100.0, 25.0],
+          [-104.0, 32.0], [-108.0, 37.0], [-108.0, 45.0], [-104.0, 49.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "na_appalachian",
+      "properties": {
+        "name": "Appalachian Mixed Mesophytic Forests",
+        "description": "Ancient mountain forests with exceptional biodiversity, stretching from Georgia to Maine along the Appalachian Mountain chain.",
+        "biome": "Temperate Broadleaf & Mixed Forests", 
+        "area_km2": 245000,
+        "countries": ["United States"],
+        "climate": "Humid continental and subtropical climate",
+        "keySpecies": ["American Chestnut", "Eastern Hemlock", "Black Bear", "Brook Trout"],
+        "conservationStatus": "Relatively Stable",
+        "population": 25000000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-85.0, 35.0], [-75.0, 35.0], [-67.0, 45.0], [-71.0, 47.0],
+          [-80.0, 46.0], [-84.0, 42.0], [-87.0, 38.0], [-85.0, 35.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature", 
+      "id": "na_sonoran_desert",
+      "properties": {
+        "name": "Sonoran Desert",
+        "description": "Hot desert ecosystem known for saguaro cacti and unique desert biodiversity, spanning Arizona and northwestern Mexico.",
+        "biome": "Deserts & Xeric Shrublands",
+        "area_km2": 260000,
+        "countries": ["United States", "Mexico"],
+        "climate": "Hot desert climate with very hot summers and mild winters",
+        "keySpecies": ["Saguaro Cactus", "Gila Monster", "Desert Bighorn Sheep", "Palo Verde Tree"],
+        "conservationStatus": "Vulnerable",
+        "population": 4500000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-117.0, 35.0], [-109.0, 35.0], [-108.0, 29.0], [-114.0, 23.0],
+          [-117.0, 25.0], [-117.0, 35.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "na_california_chaparral", 
+      "properties": {
+        "name": "California Chaparral & Woodlands",
+        "description": "Mediterranean-climate ecosystem with fire-adapted shrublands and oak woodlands, supporting unique California flora and fauna.",
+        "biome": "Mediterranean Forests, Woodlands & Scrub",
+        "area_km2": 85000,
+        "countries": ["United States", "Mexico"],
+        "climate": "Mediterranean climate with dry summers and mild, wet winters",
+        "keySpecies": ["Coast Live Oak", "California Scrub Jay", "Mountain Lion", "California Poppy"],  
+        "conservationStatus": "Threatened",
+        "population": 39000000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-125.0, 40.0], [-119.0, 40.0], [-115.0, 35.0], [-117.0, 32.0],
+          [-121.0, 30.0], [-125.0, 32.0], [-125.0, 40.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "na_eastern_deciduous",
+      "properties": {
+        "name": "Eastern Deciduous Forests",
+        "description": "Temperate deciduous forests covering much of the eastern United States, known for spectacular fall colors and diverse wildlife.",
+        "biome": "Temperate Broadleaf & Mixed Forests",
+        "area_km2": 680000,
+        "countries": ["United States"],
+        "climate": "Humid continental climate with distinct seasons",
+        "keySpecies": ["White Oak", "Sugar Maple", "White-tailed Deer", "Wild Turkey"],
+        "conservationStatus": "Relatively Stable",
+        "population": 95000000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-100.0, 30.0], [-80.0, 30.0], [-75.0, 40.0], [-85.0, 45.0],
+          [-95.0, 45.0], [-100.0, 35.0], [-100.0, 30.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "na_boreal_forest",
+      "properties": {
+        "name": "North American Boreal Forest",
+        "description": "Vast coniferous forest spanning Canada and Alaska, one of the world's largest intact forest ecosystems.",
+        "biome": "Boreal Forests/Taiga",
+        "area_km2": 5500000,
+        "countries": ["United States", "Canada"],
+        "climate": "Subarctic climate with long, cold winters and short, warm summers",
+        "keySpecies": ["Black Spruce", "Balsam Fir", "Moose", "Gray Wolf", "Lynx"],
+        "conservationStatus": "Relatively Stable",
+        "population": 3200000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-170.0, 55.0], [-55.0, 55.0], [-60.0, 70.0], [-170.0, 70.0], [-170.0, 55.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "na_florida_everglades",
+      "properties": {
+        "name": "Florida Everglades",
+        "description": "Unique subtropical wetland ecosystem, known as the 'River of Grass', supporting diverse wildlife including alligators and wading birds.",
+        "biome": "Flooded Grasslands & Savannas", 
+        "area_km2": 15000,
+        "countries": ["United States"],
+        "climate": "Tropical and subtropical climate with wet and dry seasons",
+        "keySpecies": ["American Alligator", "Florida Panther", "Roseate Spoonbill", "Sawgrass"],
+        "conservationStatus": "Critically Endangered",
+        "population": 6500000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-82.0, 24.5], [-80.0, 24.5], [-80.5, 27.0], [-82.5, 27.0], [-82.0, 24.5]
+        ]]
+      }
+    }
+  ]
+}
