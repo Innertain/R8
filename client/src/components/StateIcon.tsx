@@ -25,6 +25,16 @@ import MinnesotaImg from '@assets/Minnesota_1754172506891.png';
 import MissouriImg from '@assets/Misouri_1754172506891.png';
 import MississippiImg from '@assets/Mississippi_1754172506892.png';
 import NebraskaImg from '@assets/Nebraska_1754172506886.png';
+import SouthDakotaImg from '@assets/South Dakota_1754172607630.png';
+import TennesseeImg from '@assets/Tennessee_1754172607631.png';
+import TexasImg from '@assets/TEXAS_1754172607632.png';
+import UtahImg from '@assets/Utah_1754172607633.png';
+import VermontImg from '@assets/Vermont_1754172607635.png';
+import VirginiaImg from '@assets/Virginia_1754172607636.png';
+import WashingtonImg from '@assets/Washington_1754172607637.png';
+import WestVirginiaImg from '@assets/West Virginia_1754172607637.png';
+import WisconsinImg from '@assets/Wisconsin_1754172607638.png';
+import WyomingImg from '@assets/Wyoming_1754172607638.png';
 
 interface StateIconProps {
   state: string;
@@ -59,6 +69,16 @@ const stateImages: Record<string, string> = {
   'MO': MissouriImg,
   'MS': MississippiImg,
   'NE': NebraskaImg,
+  'SD': SouthDakotaImg,
+  'TN': TennesseeImg,
+  'TX': TexasImg,
+  'UT': UtahImg,
+  'VT': VermontImg,
+  'VA': VirginiaImg,
+  'WA': WashingtonImg,
+  'WV': WestVirginiaImg,
+  'WI': WisconsinImg,
+  'WY': WyomingImg,
 };
 
 export function StateIcon({ state, size = 24, className = "", color = "currentColor" }: StateIconProps) {
