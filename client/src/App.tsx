@@ -73,23 +73,38 @@ function Navigation() {
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuItem asChild>
-                <Link href="/map" className="flex items-center gap-2 w-full">
-                  <MapPin className="h-4 w-4" />
-                  Disaster Watch Center
+                <Link href="/map" className="flex items-center gap-3 w-full p-3 hover:bg-red-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100">
+                    <MapPin className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">Disaster Watch Center</div>
+                    <div className="text-xs text-gray-500">Real-time monitoring</div>
+                  </div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/stats" className="flex items-center gap-2 w-full">
-                  <BarChart3 className="h-4 w-4" />
-                  Impact Stats
+                <Link href="/stats" className="flex items-center gap-3 w-full p-3 hover:bg-blue-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100">
+                    <BarChart3 className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">Impact Stats</div>
+                    <div className="text-xs text-gray-500">Analytics & metrics</div>
+                  </div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/alerts" className="flex items-center gap-2 w-full">
-                  <Bell className="h-4 w-4" />
-                  Custom Alerts
+                <Link href="/alerts" className="flex items-center gap-3 w-full p-3 hover:bg-yellow-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-100">
+                    <Bell className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">Custom Alerts</div>
+                    <div className="text-xs text-gray-500">Personalized notifications</div>
+                  </div>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -106,23 +121,38 @@ function Navigation() {
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuItem asChild>
-                <Link href="/bioregions" className="flex items-center gap-2 w-full">
-                  <Leaf className="h-4 w-4" />
-                  Bioregion Explorer
+                <Link href="/bioregions" className="flex items-center gap-3 w-full p-3 hover:bg-green-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100">
+                    <Leaf className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">Bioregion Explorer</div>
+                    <div className="text-xs text-gray-500">Global ecosystems</div>
+                  </div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/hawaii" className="flex items-center gap-2 w-full">
-                  <Mountain className="h-4 w-4" />
-                  Hawaiʻi Regeneration
+                <Link href="/hawaii" className="flex items-center gap-3 w-full p-3 hover:bg-blue-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100">
+                    <Mountain className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">Hawaiʻi Regeneration</div>
+                    <div className="text-xs text-gray-500">Island restoration</div>
+                  </div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/appalachian" className="flex items-center gap-2 w-full">
-                  <Mountain className="h-4 w-4" />
-                  Appalachian Regeneration
+                <Link href="/appalachian" className="flex items-center gap-3 w-full p-3 hover:bg-emerald-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-100">
+                    <Mountain className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">Appalachian Regeneration</div>
+                    <div className="text-xs text-gray-500">Mountain heritage</div>
+                  </div>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
