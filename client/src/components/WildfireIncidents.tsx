@@ -226,9 +226,9 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
         </CardHeader>
         <CardContent>
           {/* Wildfire Incidents Map View */}
-            <div className="space-y-6">
-              {/* Interactive Map Representation */}
-              <div className="bg-gradient-to-b from-orange-50 to-orange-100 rounded-lg p-6 border">
+          <div className="space-y-6">
+            {/* Interactive Map Representation */}
+            <div className="bg-gradient-to-b from-orange-50 to-orange-100 rounded-lg p-6 border">
                 <h3 className="text-lg font-semibold mb-4 text-center">
                   United States Wildfire Incident Map
                   {selectedState !== 'all' && (
@@ -240,7 +240,15 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
                 
                 {Object.keys(incidentsByState).length === 0 ? (
                   <div className="text-center py-8">
-                    <Flame className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    {getDisasterIcon('wildfire') ? (
+                      <img 
+                        src={getDisasterIcon('wildfire')!} 
+                        alt="Wildfire" 
+                        className="w-16 h-16 mx-auto mb-4 opacity-40" 
+                      />
+                    ) : (
+                      <Flame className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    )}
                     <p className="text-gray-600">
                       {selectedState === 'all' 
                         ? 'No active wildfire incidents' 
@@ -313,7 +321,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
                         return (
                           <div
                             key={stateCode}
-                            className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
+                            className={`p-4 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer relative ${
                               selectedState === stateCode 
                                 ? 'ring-4 ring-orange-500 shadow-lg scale-105' 
                                 : ''
@@ -323,6 +331,19 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
                               handleStateClick(newState);
                             }}
                           >
+                            {/* Fire Icon in Corner */}
+                            <div className="absolute top-2 right-2 opacity-60">
+                              {getDisasterIcon('wildfire') ? (
+                                <img 
+                                  src={getDisasterIcon('wildfire')!} 
+                                  alt="Wildfire" 
+                                  className="w-5 h-5 object-contain" 
+                                />
+                              ) : (
+                                <Flame className="w-4 h-4" />
+                              )}
+                            </div>
+                            
                             <div className="text-center">
                               <div className="font-bold text-lg">{stateCode}</div>
                               <div className="text-xs opacity-90">{state || stateCode}</div>
@@ -355,45 +376,59 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
                     </h4>
                     <div className="space-y-3 max-h-[400px] overflow-y-auto">
                       {(incidentsByState[selectedState] as WildfireIncident[]).map((incident: WildfireIncident) => (
-                        <div key={incident.id} className="p-3 bg-gray-50 rounded border-l-4 border-l-orange-500">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h5 className="font-semibold text-gray-900 text-sm">{incident.title}</h5>
-                                <Badge className={getStatusColor(incident.status)}>
-                                  {incident.status}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-gray-600 leading-relaxed mb-2">
-                                {incident.description}
-                              </p>
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                {incident.acres && (
-                                  <span className="flex items-center gap-1">
-                                    <MapPin className="w-3 h-3" />
-                                    {incident.acres.toLocaleString()} acres
-                                  </span>
+                        <div key={incident.id} className="p-4 bg-gray-50 rounded border-l-4 border-l-orange-500">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-start gap-3 flex-1">
+                              {/* Fire Icon */}
+                              <div className="flex-shrink-0 mt-1">
+                                {getDisasterIcon('wildfire') ? (
+                                  <img 
+                                    src={getDisasterIcon('wildfire')!} 
+                                    alt="Wildfire" 
+                                    className="w-8 h-8 object-contain" 
+                                  />
+                                ) : (
+                                  <Flame className="w-6 h-6 text-orange-600" />
                                 )}
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="w-3 h-3" />
-                                  {new Date(incident.pubDate).toLocaleDateString()}
-                                </span>
-                                <span className="text-orange-600">
-                                  {incident.incidentType}
-                                </span>
                               </div>
                               
-                              {/* Enhanced Location Links */}
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                <a 
-                                  href={incident.link} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1"
-                                >
-                                  <ExternalLink className="w-3 h-3" />
-                                  Official Details
-                                </a>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h5 className="font-semibold text-gray-900 text-sm">{incident.title}</h5>
+                                  <Badge className={getStatusColor(incident.status)}>
+                                    {incident.status}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                                  {incident.description}
+                                </p>
+                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                  {incident.acres && (
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="w-3 h-3" />
+                                      {incident.acres.toLocaleString()} acres
+                                    </span>
+                                  )}
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" />
+                                    {new Date(incident.pubDate).toLocaleDateString()}
+                                  </span>
+                                  <span className="text-orange-600">
+                                    {incident.incidentType}
+                                  </span>
+                                </div>
+                                
+                                {/* Enhanced Location Links */}
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  <a 
+                                    href={incident.link} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1"
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                    Official Details
+                                  </a>
                                 
                                 {/* Map links for state-based location */}
                                 {incident.state && (
@@ -418,6 +453,7 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
                                     </a>
                                   </>
                                 )}
+                                </div>
                               </div>
                             </div>
                           </div>
