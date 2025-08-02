@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Flame, MapPin, Calendar, ExternalLink, Loader2, Info as InfoIcon } from 'lucide-react';
+import { StateIcon } from '@/components/StateIcon';
 import { getDisasterIcon } from '@/utils/disasterIcons';
 import { RealtimeApiDebugger } from './RealtimeApiDebugger';
 
@@ -345,8 +346,11 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
                             </div>
                             
                             <div className="text-center">
-                              <div className="font-bold text-lg">{stateCode}</div>
-                              <div className="text-xs opacity-90">{state || stateCode}</div>
+                              <div className="mb-2 flex justify-center">
+                                <StateIcon state={stateCode} size={32} className="drop-shadow-sm" />
+                              </div>
+                              <div className="font-bold text-sm">{stateCode}</div>
+                              <div className="text-xs opacity-90 truncate">{state || stateCode}</div>
                               <div className="text-xs font-semibold mt-1">
                                 {(stateIncidents as WildfireIncident[]).length} incident{(stateIncidents as WildfireIncident[]).length !== 1 ? 's' : ''}
                               </div>

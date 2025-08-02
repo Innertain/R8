@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { StateIcon } from "@/components/StateIcon";
 import type { AlertRule } from "@shared/schema";
 
 const US_STATES = [
@@ -203,21 +204,23 @@ export function AlertRuleForm({ initialData, onSuccess }: AlertRuleFormProps) {
           <CardContent>
             <div>
               <FormLabel className="text-base">States (leave empty for all states)</FormLabel>
-              <div className="grid grid-cols-10 gap-2 mt-2">
+              <div className="grid grid-cols-5 gap-3 mt-2">
                 {US_STATES.map(state => (
-                  <div key={state} className="flex items-center space-x-1">
+                  <div key={state} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                     <Checkbox
                       checked={selectedStates.includes(state)}
                       onCheckedChange={() => handleStateToggle(state)}
                     />
-                    <label className="text-sm">{state}</label>
+                    <StateIcon state={state} size={16} className="drop-shadow-sm" />
+                    <label className="text-sm cursor-pointer" onClick={() => handleStateToggle(state)}>{state}</label>
                   </div>
                 ))}
               </div>
               {selectedStates.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {selectedStates.map(state => (
-                    <Badge key={state} variant="secondary" className="text-xs">
+                    <Badge key={state} variant="secondary" className="text-xs flex items-center gap-1">
+                      <StateIcon state={state} size={12} className="drop-shadow-sm" />
                       {state}
                     </Badge>
                   ))}

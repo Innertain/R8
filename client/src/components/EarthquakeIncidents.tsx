@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Activity, MapPin, Calendar, ExternalLink, Loader2, Map, List, Info as InfoIcon } from 'lucide-react';
+import { StateIcon } from '@/components/StateIcon';
 
 interface EarthquakeIncident {
   id: string;
@@ -349,7 +350,7 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange, onClearF
                       return (
                         <div
                           key={stateCode}
-                          className={`p-3 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
+                          className={`p-4 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer ${
                             selectedState === stateCode 
                               ? 'ring-4 ring-blue-500 shadow-lg scale-105' 
                               : ''
@@ -360,8 +361,11 @@ export function EarthquakeIncidents({ stateFilter, onStateFilterChange, onClearF
                           }}
                         >
                           <div className="text-center">
-                            <div className="font-bold text-lg">{stateCode}</div>
-                            <div className="text-xs opacity-90">{state || stateCode}</div>
+                            <div className="mb-2 flex justify-center">
+                              <StateIcon state={stateCode} size={32} className="drop-shadow-sm" />
+                            </div>
+                            <div className="font-bold text-sm">{stateCode}</div>
+                            <div className="text-xs opacity-90 truncate">{state || stateCode}</div>
                             <div className="text-xs font-semibold mt-1">
                               {(stateIncidents as EarthquakeIncident[]).length} earthquake{(stateIncidents as EarthquakeIncident[]).length !== 1 ? 's' : ''}
                             </div>

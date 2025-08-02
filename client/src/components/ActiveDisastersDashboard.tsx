@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { AlertTriangle, MapPin, Calendar, ExternalLink, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Home, Filter, TrendingUp, BarChart3 } from "lucide-react";
+import { StateIcon } from '@/components/StateIcon';
 import { getDisasterIcon as getCustomDisasterIcon } from '@/utils/disasterIcons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
@@ -254,7 +255,10 @@ export function ActiveDisastersDashboard({ disasters, loading }: ActiveDisasters
                 <SelectItem value="all">All States ({availableStates.length})</SelectItem>
                 {availableStates.map((state) => (
                   <SelectItem key={state} value={state}>
-                    {state}
+                    <div className="flex items-center gap-2">
+                      <StateIcon state={state} size={16} className="drop-shadow-sm" />
+                      {state}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -334,8 +338,8 @@ export function ActiveDisastersDashboard({ disasters, loading }: ActiveDisasters
                             </div>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-gray-600">
-                              <div className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" />
+                              <div className="flex items-center gap-2">
+                                <StateIcon state={disaster.state} size={16} className="drop-shadow-sm" />
                                 <span>{disaster.state}</span>
                                 {disaster.designatedArea && (
                                   <span className="text-gray-500">

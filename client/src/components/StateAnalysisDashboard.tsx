@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, AlertTriangle, MapPin } from 'lucide-react';
+import { StateIcon } from '@/components/StateIcon';
 
 interface StateAnalysisDashboardProps {
   disasters: any[];
@@ -94,9 +95,12 @@ export function StateAnalysisDashboard({ disasters }: StateAnalysisDashboardProp
                   key={state}
                   className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg"
                 >
-                  <div>
-                    <div className="font-semibold text-orange-900">{state}</div>
-                    <div className="text-sm text-orange-700">{STATE_NAMES[state]}</div>
+                  <div className="flex items-center gap-3">
+                    <StateIcon state={state} size={24} className="drop-shadow-sm" />
+                    <div>
+                      <div className="font-semibold text-orange-900">{state}</div>
+                      <div className="text-sm text-orange-700">{STATE_NAMES[state]}</div>
+                    </div>
                   </div>
                   <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                     {disasterCounts[state]} disaster{disasterCounts[state] !== 1 ? 's' : ''}
@@ -118,9 +122,12 @@ export function StateAnalysisDashboard({ disasters }: StateAnalysisDashboardProp
                   key={state}
                   className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
                 >
-                  <div>
-                    <div className="font-semibold text-green-900">{state}</div>
-                    <div className="text-sm text-green-700">{STATE_NAMES[state]}</div>
+                  <div className="flex items-center gap-3">
+                    <StateIcon state={state} size={24} className="drop-shadow-sm" />
+                    <div>
+                      <div className="font-semibold text-green-900">{state}</div>
+                      <div className="text-sm text-green-700">{STATE_NAMES[state]}</div>
+                    </div>
                   </div>
                   <CheckCircle className="w-4 h-4 text-green-600" />
                 </div>
