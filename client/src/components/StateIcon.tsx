@@ -35,6 +35,8 @@ import WashingtonImg from '@assets/Washington_1754172607637.png';
 import WestVirginiaImg from '@assets/West Virginia_1754172607637.png';
 import WisconsinImg from '@assets/Wisconsin_1754172607638.png';
 import WyomingImg from '@assets/Wyoming_1754172607638.png';
+import NewMexicoImg from '@assets/New Mexico_1754172552870.png';
+import NorthCarolinaImg from '@assets/North Carolina_1754172552872.png';
 
 interface StateIconProps {
   state: string;
@@ -79,6 +81,8 @@ const stateImages: Record<string, string> = {
   'WV': WestVirginiaImg,
   'WI': WisconsinImg,
   'WY': WyomingImg,
+  'NM': NewMexicoImg,
+  'NC': NorthCarolinaImg,
 };
 
 export function StateIcon({ state, size = 24, className = "", color = "currentColor" }: StateIconProps) {
