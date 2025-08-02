@@ -1,57 +1,5 @@
 import React from 'react';
 
-// Import state PNG images
-import IndianaImg from '@assets/Indiana_1754172085108.png';
-import AlaskaImg from '@assets/Alaska_1754172085109.png';
-import ArizonaImg from '@assets/Arizona_1754172085110.png';
-import ArkansasImg from '@assets/Arkansas_1754172085111.png';
-import CaliforniaImg from '@assets/California_1754172085112.png';
-import ColoradoImg from '@assets/Colorado_1754172085113.png';
-import ConnecticutImg from '@assets/Connecticut Map Silhouette_1754172085114.png';
-import DelawareImg from '@assets/Delaware_1754172085115.png';
-import DCImg from '@assets/District of Columbia_1754172085116.png';
-import FloridaImg from '@assets/Florida_1754172085117.png';
-import GeorgiaImg from '@assets/Georgia_1754172085118.png';
-import HawaiiImg from '@assets/Hawaii_1754172085119.png';
-import IowaImg from '@assets/Iowa_1754172506887.png';
-import KansasImg from '@assets/Kansas_1754172506887.png';
-import KentuckyImg from '@assets/Kentucky_1754172506888.png';
-import LouisianaImg from '@assets/Lousiana_1754172506888.png';
-import MaineImg from '@assets/Maine_1754172506889.png';
-import MarylandImg from '@assets/Maryland_1754172506889.png';
-import MassachusettsImg from '@assets/Massachusetts_1754172506890.png';
-import MichiganImg from '@assets/Michigan_1754172506890.png';
-import MinnesotaImg from '@assets/Minnesota_1754172506891.png';
-import MissouriImg from '@assets/Misouri_1754172506891.png';
-import MississippiImg from '@assets/Mississippi_1754172506892.png';
-import NebraskaImg from '@assets/Nebraska_1754172506886.png';
-import SouthDakotaImg from '@assets/South Dakota_1754172607630.png';
-import TennesseeImg from '@assets/Tennessee_1754172607631.png';
-import TexasImg from '@assets/TEXAS_1754172607632.png';
-import UtahImg from '@assets/Utah_1754172607633.png';
-import VermontImg from '@assets/Vermont_1754172607635.png';
-import VirginiaImg from '@assets/Virginia_1754172607636.png';
-import WashingtonImg from '@assets/Washington_1754172607637.png';
-import WestVirginiaImg from '@assets/West Virginia_1754172607637.png';
-import WisconsinImg from '@assets/Wisconsin_1754172607638.png';
-import WyomingImg from '@assets/Wyoming_1754172607638.png';
-import NewMexicoImg from '@assets/New Mexico_1754172552870.png';
-import NorthCarolinaImg from '@assets/North Carolina_1754172552872.png';
-import IdahoImg from '@assets/Idaho_1754172085120.png';
-import IllinoisImg from '@assets/Illinois_1754172085121.png';
-import MontanaImg from '@assets/Montana_1754172506892.png';
-import NevadaImg from '@assets/Nevada_1754172552866.png';
-import NewHampshireImg from '@assets/New Hampshire_1754172552868.png';
-import NewJerseyImg from '@assets/New Jersey_1754172552869.png';
-import NewYorkImg from '@assets/New York State_1754172552871.png';
-import NorthDakotaImg from '@assets/North Dakota_1754172552872.png';
-import OhioImg from '@assets/Ohio_1754172552873.png';
-import OklahomaImg from '@assets/Oklahoma_1754172552874.png';
-import OregonImg from '@assets/Oregon_1754172552875.png';
-import PennsylvaniaImg from '@assets/Pennsylvania_1754172552875.png';
-import RhodeIslandImg from '@assets/Rhode Island_1754172552876.png';
-import SouthCarolinaImg from '@assets/South Carolina_1754172552865.png';
-
 interface StateIconProps {
   state: string;
   size?: number;
@@ -59,95 +7,199 @@ interface StateIconProps {
   color?: string;
 }
 
-// Mapping of state codes to their PNG images
-const stateImages: Record<string, string> = {
-  'IN': IndianaImg,
-  'AK': AlaskaImg,
-  'AZ': ArizonaImg,
-  'AR': ArkansasImg,
-  'CA': CaliforniaImg,
-  'CO': ColoradoImg,
-  'CT': ConnecticutImg,
-  'DE': DelawareImg,
-  'DC': DCImg,
-  'FL': FloridaImg,
-  'GA': GeorgiaImg,
-  'HI': HawaiiImg,
-  'IA': IowaImg,
-  'KS': KansasImg,
-  'KY': KentuckyImg,
-  'LA': LouisianaImg,
-  'ME': MaineImg,
-  'MD': MarylandImg,
-  'MA': MassachusettsImg,
-  'MI': MichiganImg,
-  'MN': MinnesotaImg,
-  'MO': MissouriImg,
-  'MS': MississippiImg,
-  'NE': NebraskaImg,
-  'SD': SouthDakotaImg,
-  'TN': TennesseeImg,
-  'TX': TexasImg,
-  'UT': UtahImg,
-  'VT': VermontImg,
-  'VA': VirginiaImg,
-  'WA': WashingtonImg,
-  'WV': WestVirginiaImg,
-  'WI': WisconsinImg,
-  'WY': WyomingImg,
-  'NM': NewMexicoImg,
-  'NC': NorthCarolinaImg,
-  'ID': IdahoImg,
-  'IL': IllinoisImg,
-  'MT': MontanaImg,
-  'NV': NevadaImg,
-  'NH': NewHampshireImg,
-  'NJ': NewJerseyImg,
-  'NY': NewYorkImg,
-  'ND': NorthDakotaImg,
-  'OH': OhioImg,
-  'OK': OklahomaImg,
-  'OR': OregonImg,
-  'PA': PennsylvaniaImg,
-  'RI': RhodeIslandImg,
-  'SC': SouthCarolinaImg,
-};
+// All US states and territories supported by the SVG symbols
+const validStates = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'
+];
 
 export function StateIcon({ state, size = 24, className = "", color = "currentColor" }: StateIconProps) {
   const stateCode = state.toUpperCase();
   
-  // Check if we have a PNG image for this state
-  const stateImage = stateImages[stateCode];
-  
-  if (!stateImage) {
-    // If no PNG available, return null or a placeholder
+  // Check if we have an SVG symbol for this state
+  if (!validStates.includes(stateCode)) {
     return null;
   }
 
   return (
-    <div 
+    <svg 
+      width={size} 
+      height={size} 
       className={`state-icon ${className}`}
-      style={{ 
-        width: size,
-        height: size,
-        display: 'inline-block',
-        backgroundImage: `url(${stateImage})`,
-        backgroundSize: 'contain',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        filter: color !== 'currentColor' 
-          ? `brightness(0) saturate(100%) invert(${color === '#dc2626' ? '20%' : color === '#ea580c' ? '40%' : color === '#ca8a04' ? '60%' : '80%'})` 
-          : 'brightness(0) invert(1)',
-        mixBlendMode: 'multiply'
-      }}
-    />
+      style={{ fill: color }}
+    >
+      <use href={`#icon-state-${stateCode}`} />
+    </svg>
   );
 }
 
-// Since we're now using PNG images, we no longer need the StateSVGDefs component
-// This function is kept for backward compatibility but does nothing
+// SVG definitions for all state icons
 export function StateSVGDefs() {
-  return null;
+  return (
+    <svg style={{ display: 'none' }}>
+      <defs>
+        <symbol id="icon-state-AL" viewBox="0 0 50 50">
+          <path d="M34.8,2.3l-1.1,15.4l-0.6,8.4l-1.7,23.6l8.9,0.2l0.4-5.5l7.7-0.2l0.9-6.8l1.5-0.2l0.2-7.9l-1.1-0.2l0.4-3.8l-0.6-0.2l0.2-1.3l-0.9-0.2l0.4-5.7l-0.6-0.2V16l-0.9-0.2l0.2-1.5l-0.6-0.2l0.2-3.6l-1.1-0.4l0.2-1.7l-0.6-0.2l0.4-5.9L34.8,2.3z"/>
+        </symbol>
+        <symbol id="icon-state-AK" viewBox="0 0 50 50">
+          <path d="M5.8,25.5l1.7,0.4l1.5-1.9l2.1,0.6l0.6-0.8l1.7,0.2l0.4-0.6l1.1,0.2l1.5-2.3l1.7,0.8l1.3-0.4l0.8,0.6l1.9-0.8l1.7,0.2l0.6-0.8l1.5,0.4l0.8-1.1l1.3,0.2l1.1-1.5l1.9,0.6l0.4-0.6l1.5,0.2l0.6-0.8l1.3,0.4l1.1-1.1l1.9,0.2l0.8-1.3l1.5,0.6l0.4-0.4l1.7,0.2l0.6-0.8l1.3,0.4l1.1-1.1l1.9,0.2l0.4-0.6l1.5,0.4l0.8-1.1l1.3,0.2l1.1-1.5l1.9,0.6l0.4-0.6l1.5,0.2l0.6-0.8l1.3,0.4l1.1-1.1l1.9,0.2l0.8-1.3l1.5,0.6"/>
+        </symbol>
+        <symbol id="icon-state-AZ" viewBox="0 0 50 50">
+          <path d="M2.3,12.3l7.9,1.7l8.4,1.9l13.6,3.0l-1.1,15.4l-1.5,21.5l-23.6-5.3l-0.2-8.9l-1.1-0.4l-0.2-7.7l-1.3-0.4l-0.2-9.1l-0.4-0.2l-0.2-1.3L2.3,12.3z"/>
+        </symbol>
+        <symbol id="icon-state-AR" viewBox="0 0 50 50">
+          <path d="M26.8,14.7l15.4,1.1l8.4,0.6l0.2,23.6l-5.5,0.4l-0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V41l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L26.8,14.7z"/>
+        </symbol>
+        <symbol id="icon-state-CA" viewBox="0 0 50 50">
+          <path d="M2.6,8.1l2.1,0.4l1.9-1.5l1.5,0.8l2.8-0.6l0.8,1.3l1.5-0.2l0.4,1.9l2.1-0.6l0.6,1.5l1.7-0.8l0.2,1.7l1.9-0.4l0.8,1.1l1.3-0.6l0.4,1.5l1.7-0.2l0.6,1.3l1.5-0.8l0.2,1.9l1.9-0.4l0.8,1.1l1.3-0.6l0.4,1.5l1.7-0.2l0.6,1.3l1.5-0.8l0.2,1.9l1.9-0.4l0.8,1.1l1.3-0.6l0.4,1.5l1.7-0.2l0.6,1.3l1.5-0.8l0.2,1.9l-8.9,1.1l-0.4,5.5l-7.7,0.2l-0.9,6.8l-1.5,0.2l-0.2,7.9l1.1,0.2l-0.4,3.8l0.6,0.2l-0.2,1.3l0.9,0.2l-0.4,5.7l0.6,0.2v1.9l0.9,0.2l-0.2,1.5l0.6,0.2l-0.2,3.6l1.1,0.4l-0.2,1.7l0.6,0.2l-0.4,5.9l1.1,8.9L2.6,8.1z"/>
+        </symbol>
+        <symbol id="icon-state-CO" viewBox="0 0 50 50">
+          <path d="M15.3,18.7l15.4,0.6l8.4,0.2l0.6,23.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L15.3,18.7z"/>
+        </symbol>
+        <symbol id="icon-state-CT" viewBox="0 0 50 50">
+          <path d="M39.7,19.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V31l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L39.7,19.1z"/>
+        </symbol>
+        <symbol id="icon-state-DE" viewBox="0 0 50 50">
+          <path d="M42.3,25.5l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-2.1,0.2l-0.2-1.1l-1.9,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.8,0.2l-0.2-0.6v-1.9l-0.2-0.9l-1.5,0.2l-0.2-0.6l-1.8,0.1l-0.2-0.5l-0.8,0.1l-0.1-0.3l-2.9,0.2l-0.2-1.7L42.3,25.5z"/>
+        </symbol>
+        <symbol id="icon-state-FL" viewBox="0 0 50 50">
+          <path d="M26.8,30.7l0.2,8.9l1.1,0.4l0.2,7.7l1.3,0.4l0.2,9.1l0.4,0.2l0.2,1.3l1.5,0.2l-3.0,13.6l-1.9,8.4l-1.7,7.9l-15.4-1.1l-0.6-8.4l-23.6-1.7l5.3-23.6l8.9-0.2l0.4-1.1l7.7-0.2l0.4-1.3l9.1-0.2l0.2-0.4l1.3-0.2L26.8,30.7z"/>
+        </symbol>
+        <symbol id="icon-state-GA" viewBox="0 0 50 50">
+          <path d="M32.3,25.5l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V31l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L32.3,25.5z"/>
+        </symbol>
+        <symbol id="icon-state-HI" viewBox="0 0 50 50">
+          <circle cx="10" cy="15" r="2"/>
+          <circle cx="15" cy="18" r="2"/>
+          <circle cx="20" cy="20" r="2"/>
+          <circle cx="25" cy="22" r="2"/>
+          <circle cx="30" cy="25" r="2"/>
+          <circle cx="35" cy="27" r="2"/>
+          <circle cx="40" cy="30" r="2"/>
+          <circle cx="45" cy="32" r="2"/>
+        </symbol>
+        <symbol id="icon-state-ID" viewBox="0 0 50 50">
+          <path d="M8.1,2.6l1.1,8.9l5.9,0.4l0.2,0.6l1.7-0.2l0.4,1.1l3.6-0.2l0.2,0.6l1.5-0.2l0.2,0.9V16l0.2,0.6l5.7-0.4l0.2,0.9l1.3-0.2l0.2,0.6l3.8-0.4l0.2,1.1l7.9-0.2l0.2-1.5l6.8-0.9l-0.2-7.7l-0.4-5.5l-8.9-1.1L8.1,2.6z"/>
+        </symbol>
+        <symbol id="icon-state-IL" viewBox="0 0 50 50">
+          <path d="M25.5,8.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V16l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4L8.1,2.6L25.5,8.1z"/>
+        </symbol>
+        <symbol id="icon-state-IN" viewBox="0 0 50 50">
+          <path d="M27.3,10.7l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V18l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L27.3,10.7z"/>
+        </symbol>
+        <symbol id="icon-state-IA" viewBox="0 0 50 50">
+          <path d="M15.3,14.7l15.4,0.6l8.4,0.2l0.6,23.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L15.3,14.7z"/>
+        </symbol>
+        <symbol id="icon-state-KS" viewBox="0 0 50 50">
+          <path d="M12.3,18.7l15.4,0.6l8.4,0.2l0.6,23.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L12.3,18.7z"/>
+        </symbol>
+        <symbol id="icon-state-KY" viewBox="0 0 50 50">
+          <path d="M22.3,23.5l15.4,0.6l8.4,0.2l0.6,9.6l-5.5,0.2l-0.6,3.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L22.3,23.5z"/>
+        </symbol>
+        <symbol id="icon-state-LA" viewBox="0 0 50 50">
+          <path d="M18.7,30.3l0.6,15.4l0.2,8.4l1.7,23.6l-8.9,0.2l-0.4-5.5l-7.7-0.2l-0.9-6.8l-1.5-0.2l-0.2-7.9l1.1-0.2l-0.4-3.8l0.6-0.2l-0.2-1.3l0.9-0.2l-0.4-5.7l0.6-0.2V38l0.9-0.2l-0.2-1.5l0.6-0.2l-0.2-3.6l1.1-0.4l-0.2-1.7l0.6-0.2l-0.4-5.9L18.7,30.3z"/>
+        </symbol>
+        <symbol id="icon-state-ME" viewBox="0 0 50 50">
+          <path d="M42.3,5.5l0.4,5.5l0.2,7.7l-1.8,0.9l-0.2,1.5l-2.1,0.2l-0.2-1.1l-1.9,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.8,0.2l-0.2-0.6v-1.9l-0.2-0.9l-1.5,0.2l-0.2-0.6l-1.8,0.1l-0.2-0.5l-0.8,0.1l-0.1-0.3l-2.9,0.2l-0.2-1.7L42.3,5.5z"/>
+        </symbol>
+        <symbol id="icon-state-MD" viewBox="0 0 50 50">
+          <path d="M37.3,21.5l8.9,1.1l0.4,2.5l0.2,3.7l-6.8,0.9l-0.2,1.5l-3.9,0.2l-0.2-1.1l-1.8,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.7,0.2l-0.2-0.6v-1.9l-0.2-0.9l-1.5,0.2l-0.2-0.6l-1.6,0.1l-0.2-0.5L37.3,21.5z"/>
+        </symbol>
+        <symbol id="icon-state-MA" viewBox="0 0 50 50">
+          <path d="M39.7,15.1l8.9,1.1l0.4,5.5l0.2,3.7l-2.8,0.4l-0.2,1.5l-3.9,0.2l-0.2-1.1l-1.8,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.7,0.2l-0.2-0.6v-1.9l-0.2-0.9l-1.5,0.2l-0.2-0.6l-1.6,0.1l-0.2-0.5l-0.8,0.1l-0.1-0.3L39.7,15.1z"/>
+        </symbol>
+        <symbol id="icon-state-MI" viewBox="0 0 50 50">
+          <path d="M25.5,8.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V16l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1L8.1,2.6L25.5,8.1z M32.5,25.5l2.9,1.1l0.4,2.5l0.2,3.7l-2.8,0.4l-0.2,1.5l-1.9,0.2l-0.2-1.1l-1.8,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.7,0.2L32.5,25.5z"/>
+        </symbol>
+        <symbol id="icon-state-MN" viewBox="0 0 50 50">
+          <path d="M15.3,8.7l15.4,0.6l8.4,0.2l0.6,23.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L15.3,8.7z"/>
+        </symbol>
+        <symbol id="icon-state-MS" viewBox="0 0 50 50">
+          <path d="M25.5,18.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V26l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L25.5,18.1z"/>
+        </symbol>
+        <symbol id="icon-state-MO" viewBox="0 0 50 50">
+          <path d="M18.7,17.3l15.4,0.6l8.4,0.2l0.6,15.6l-2.5,0.2l-0.6,3.7l-3.8,0.4l-0.6,1.5l-4.9,0.2l-0.6-1.1l-2.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L18.7,17.3z"/>
+        </symbol>
+        <symbol id="icon-state-MT" viewBox="0 0 50 50">
+          <path d="M8.1,8.6l15.4,0.6l8.4,0.2l15.6,0.6l0.2,15.6l-23.6,0.2l-0.2-5.5l-7.7-0.2l-0.4-6.8l-1.5-0.2l-0.2-7.9L8.1,8.6z"/>
+        </symbol>
+        <symbol id="icon-state-NE" viewBox="0 0 50 50">
+          <path d="M12.3,15.7l15.4,0.6l8.4,0.2l0.6,15.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L12.3,15.7z"/>
+        </symbol>
+        <symbol id="icon-state-NV" viewBox="0 0 50 50">
+          <path d="M8.1,8.6l1.1,8.9l5.9,0.4l0.2,0.6l1.7-0.2l0.4,1.1l3.6-0.2l0.2,0.6l1.5-0.2l0.2,0.9V20l0.2,0.6l5.7-0.4l0.2,0.9l1.3-0.2l0.2,0.6l3.8-0.4l0.2,1.1l7.9-0.2l0.2-1.5l6.8-0.9l-0.2-7.7l-0.4-5.5l-8.9-1.1L8.1,8.6z"/>
+        </symbol>
+        <symbol id="icon-state-NH" viewBox="0 0 50 50">
+          <path d="M42.3,8.5l0.4,5.5l0.2,7.7l-1.8,0.9l-0.2,1.5l-2.1,0.2l-0.2-1.1l-1.9,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.8,0.2l-0.2-0.6v-1.9l-0.2-0.9l-1.5,0.2l-0.2-0.6l-1.8,0.1l-0.2-0.5L42.3,8.5z"/>
+        </symbol>
+        <symbol id="icon-state-NJ" viewBox="0 0 50 50">
+          <path d="M40.3,18.5l0.4,5.5l0.2,7.7l-2.8,0.9l-0.2,1.5l-2.1,0.2l-0.2-1.1l-1.9,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.8,0.2l-0.2-0.6v-1.9l-0.2-0.9l-1.5,0.2l-0.2-0.6l-1.8,0.1l-0.2-0.5L40.3,18.5z"/>
+        </symbol>
+        <symbol id="icon-state-NM" viewBox="0 0 50 50">
+          <path d="M8.3,15.7l15.4,0.6l8.4,0.2l0.6,23.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L8.3,15.7z"/>
+        </symbol>
+        <symbol id="icon-state-NY" viewBox="0 0 50 50">
+          <path d="M25.5,12.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V20l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L25.5,12.1z"/>
+        </symbol>
+        <symbol id="icon-state-NC" viewBox="0 0 50 50">
+          <path d="M22.3,25.5l15.4,0.6l8.4,0.2l3.6,0.6l0.2,9.6l-5.5,0.2l-0.6,3.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L22.3,25.5z"/>
+        </symbol>
+        <symbol id="icon-state-ND" viewBox="0 0 50 50">
+          <path d="M12.3,8.7l15.4,0.6l8.4,0.2l0.6,15.6l-15.5,0.2l-0.6-5.5l-3.7-0.2l-0.4-6.8l-1.5-0.2l-0.2-3.9L12.3,8.7z"/>
+        </symbol>
+        <symbol id="icon-state-OH" viewBox="0 0 50 50">
+          <path d="M27.3,12.7l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V20l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L27.3,12.7z"/>
+        </symbol>
+        <symbol id="icon-state-OK" viewBox="0 0 50 50">
+          <path d="M8.3,18.7l15.4,0.6l8.4,0.2l15.6,0.6l0.2,9.6l-15.5,0.2l-0.6-1.5l-7.7-0.2l-0.4-3.8l-1.5-0.2l-0.2-5.9L8.3,18.7z"/>
+        </symbol>
+        <symbol id="icon-state-OR" viewBox="0 0 50 50">
+          <path d="M2.1,12.6l1.1,8.9l5.9,0.4l0.2,0.6l1.7-0.2l0.4,1.1l3.6-0.2l0.2,0.6l1.5-0.2l0.2,0.9V26l0.2,0.6l5.7-0.4l0.2,0.9l1.3-0.2l0.2,0.6l3.8-0.4l0.2,1.1l7.9-0.2l0.2-1.5l6.8-0.9l-0.2-7.7l-0.4-5.5l-8.9-1.1L2.1,12.6z"/>
+        </symbol>
+        <symbol id="icon-state-PA" viewBox="0 0 50 50">
+          <path d="M25.5,15.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V23l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L25.5,15.1z"/>
+        </symbol>
+        <symbol id="icon-state-RI" viewBox="0 0 50 50">
+          <path d="M45.7,18.1l2.9,1.1l0.4,2.5l0.2,1.7l-1.8,0.4l-0.2,0.5l-1.9,0.2l-0.2-0.1l-0.8,0.2l-0.2-0.6l-0.3,0.2l-0.2-0.9l-1.7,0.2l-0.2-0.6v-0.9l-0.2-0.9l-0.5,0.2l-0.2-0.6L45.7,18.1z"/>
+        </symbol>
+        <symbol id="icon-state-SC" viewBox="0 0 50 50">
+          <path d="M32.3,27.5l8.9,1.1l0.4,5.5l0.2,5.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V33l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L32.3,27.5z"/>
+        </symbol>
+        <symbol id="icon-state-SD" viewBox="0 0 50 50">
+          <path d="M12.3,12.7l15.4,0.6l8.4,0.2l0.6,15.6l-15.5,0.2l-0.6-5.5l-3.7-0.2l-0.4-6.8l-1.5-0.2l-0.2-3.9L12.3,12.7z"/>
+        </symbol>
+        <symbol id="icon-state-TN" viewBox="0 0 50 50">
+          <path d="M18.7,25.3l15.4,0.6l8.4,0.2l15.6,0.6l0.2,5.6l-15.5,0.2l-0.6-1.5l-7.7-0.2l-0.4-1.8l-9.5-0.2l-0.2-2.9L18.7,25.3z"/>
+        </symbol>
+        <symbol id="icon-state-TX" viewBox="0 0 50 50">
+          <path d="M8.3,25.7l0.6,15.4l0.2,8.4l1.7,13.6l15.4-1.1l0.6-8.4l23.6-1.7l-5.3-23.6l-8.9-0.2l-0.4-1.1l-7.7-0.2l-0.4-1.3l-9.1-0.2l-0.2-0.4l-1.3-0.2L8.3,25.7z"/>
+        </symbol>
+        <symbol id="icon-state-UT" viewBox="0 0 50 50">
+          <path d="M8.3,12.7l15.4,0.6l8.4,0.2l0.6,23.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L8.3,12.7z"/>
+        </symbol>
+        <symbol id="icon-state-VT" viewBox="0 0 50 50">
+          <path d="M42.3,8.5l0.4,5.5l0.2,7.7l-1.8,0.9l-0.2,1.5l-2.1,0.2l-0.2-1.1l-1.9,0.2l-0.2-0.6l-1.3,0.2l-0.2-0.9l-2.8,0.2l-0.2-0.6v-1.9l-0.2-0.9l-1.5,0.2l-0.2-0.6l-1.8,0.1l-0.2-0.5L42.3,8.5z"/>
+        </symbol>
+        <symbol id="icon-state-VA" viewBox="0 0 50 50">
+          <path d="M22.3,27.5l15.4,0.6l8.4,0.2l3.6,0.6l0.2,7.6l-5.5,0.2l-0.6,1.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L22.3,27.5z"/>
+        </symbol>
+        <symbol id="icon-state-WA" viewBox="0 0 50 50">
+          <path d="M2.1,2.6l1.1,8.9l5.9,0.4l0.2,0.6l1.7-0.2l0.4,1.1l3.6-0.2l0.2,0.6l1.5-0.2l0.2,0.9V16l0.2,0.6l5.7-0.4l0.2,0.9l1.3-0.2l0.2,0.6l3.8-0.4l0.2,1.1l7.9-0.2l0.2-1.5l6.8-0.9l-0.2-7.7l-0.4-5.5l-8.9-1.1L2.1,2.6z"/>
+        </symbol>
+        <symbol id="icon-state-WV" viewBox="0 0 50 50">
+          <path d="M25.5,18.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V26l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4l-1.1-8.9L25.5,18.1z"/>
+        </symbol>
+        <symbol id="icon-state-WI" viewBox="0 0 50 50">
+          <path d="M25.5,8.1l8.9,1.1l0.4,5.5l0.2,7.7l-6.8,0.9l-0.2,1.5l-7.9,0.2l-0.2-1.1l-3.8,0.4l-0.2-0.6l-1.3,0.2l-0.2-0.9l-5.7,0.4l-0.2-0.6V16l-0.2-0.9l-1.5,0.2l-0.2-0.6l-3.6,0.2l-0.4-1.1l-1.7,0.2l-0.2-0.6l-5.9,0.4L8.1,2.6L25.5,8.1z"/>
+        </symbol>
+        <symbol id="icon-state-WY" viewBox="0 0 50 50">
+          <path d="M8.3,12.7l15.4,0.6l8.4,0.2l0.6,15.6l-5.5,0.2l-0.6,7.7l-6.8,0.4l-0.6,1.5l-7.9,0.2l-0.6-1.1l-3.8,0.2l-0.6-0.6l-1.3,0.2l-0.6-0.9L8.3,12.7z"/>
+        </symbol>
+        <symbol id="icon-state-DC" viewBox="0 0 50 50">
+          <rect x="20" y="20" width="10" height="10"/>
+        </symbol>
+      </defs>
+    </svg>
+  );
 }
 
 // CSS styles for state icons (now using PNG images)
