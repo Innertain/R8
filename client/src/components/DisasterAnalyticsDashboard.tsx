@@ -147,7 +147,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
     };
   }, [filteredDisasters]);
 
-  const getDisasterIcon = (type: string) => {
+  const getDisasterIconComponent = (type: string) => {
     const lowerType = type.toLowerCase();
     if (lowerType.includes('fire')) return Flame;
     if (lowerType.includes('flood')) return Waves;
@@ -341,16 +341,12 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <CardContent>
                 <div className="space-y-3">
                   {analytics.topTypes.map(([type, count]) => {
-                    const iconUrl = getDisasterIcon(type);
+                    const IconComponent = getDisasterIconComponent(type);
                     const percentage = ((count / analytics.total) * 100).toFixed(1);
                     return (
                       <div key={type} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          {iconUrl ? (
-                            <img src={iconUrl} alt={type} className="w-4 h-4 object-contain" />
-                          ) : (
-                            <AlertTriangle className="w-4 h-4 text-gray-600" />
-                          )}
+                          <IconComponent className="w-4 h-4 text-gray-600" />
                           <span className="text-sm font-medium">{type}</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -661,7 +657,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                       return acc;
                     }, {} as Record<string, number>);
                     const topType = Object.entries(typeCount).sort(([,a], [,b]) => b - a)[0];
-                    const Icon = getDisasterIcon(topType?.[0] || '');
+                    const Icon = getDisasterIconComponent(topType?.[0] || '');
                     
                     return (
                       <div key={state} className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105">
