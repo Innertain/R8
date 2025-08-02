@@ -8,6 +8,7 @@ import { MapPin, Globe, Search, Leaf, Info, ExternalLink } from 'lucide-react';
 import { geocodeLocation } from '../utils/geocode';
 import InteractiveMapView from './InteractiveMapView';
 import BioregionDetails from './BioregionDetails';
+import EnhancedBioregionMap from './EnhancedBioregionMap';
 import DatasetRecommendations from './DatasetRecommendations';
 import UserExperienceEnhancements from './UserExperienceEnhancements';
 
@@ -239,6 +240,11 @@ const BioregionExplorer: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Enhanced Global Bioregion Map */}
+      <div className="mb-6">
+        <EnhancedBioregionMap />
+      </div>
 
       <LocationForm onLocationSelect={handleLocationSelect} isLoading={isLoading} />
       

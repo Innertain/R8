@@ -1,0 +1,374 @@
+{
+  "version": "RESOLVE_2017",
+  "totalEcoregions": 846,
+  "biomes": [
+    {
+      "id": 1,
+      "name": "Tropical & Subtropical Moist Broadleaf Forests",
+      "color": "#004225",
+      "ecoregions": 232
+    },
+    {
+      "id": 2,
+      "name": "Tropical & Subtropical Dry Broadleaf Forests", 
+      "color": "#806633",
+      "ecoregions": 54
+    },
+    {
+      "id": 3,
+      "name": "Tropical & Subtropical Coniferous Forests",
+      "color": "#CC9900",
+      "ecoregions": 24
+    },
+    {
+      "id": 4,
+      "name": "Temperate Broadleaf & Mixed Forests",
+      "color": "#7BB857",
+      "ecoregions": 119
+    },
+    {
+      "id": 5,
+      "name": "Temperate Conifer Forests",
+      "color": "#6F9932",
+      "ecoregions": 64
+    },
+    {
+      "id": 6,
+      "name": "Boreal Forests/Taiga",
+      "color": "#507537",
+      "ecoregions": 33
+    },
+    {
+      "id": 7,
+      "name": "Tropical & Subtropical Grasslands, Savannas & Shrublands",
+      "color": "#C8B582",
+      "ecoregions": 123
+    },
+    {
+      "id": 8,
+      "name": "Temperate Grasslands, Savannas & Shrublands",
+      "color": "#BDB76B",
+      "ecoregions": 50
+    },
+    {
+      "id": 9,
+      "name": "Flooded Grasslands & Savannas",
+      "color": "#4169E1",
+      "ecoregions": 26
+    },
+    {
+      "id": 10,
+      "name": "Montane Grasslands & Shrublands",
+      "color": "#D2B48C",
+      "ecoregions": 49
+    },
+    {
+      "id": 11,
+      "name": "Tundra",
+      "color": "#A0A0A0",
+      "ecoregions": 11
+    },
+    {
+      "id": 12,
+      "name": "Mediterranean Forests, Woodlands & Scrub",
+      "color": "#B87333",
+      "ecoregions": 45
+    },
+    {
+      "id": 13,
+      "name": "Deserts & Xeric Shrublands",
+      "color": "#DEB887",
+      "ecoregions": 99
+    },
+    {
+      "id": 14,
+      "name": "Mangroves",
+      "color": "#228B22",
+      "ecoregions": 17
+    }
+  ],
+  "biogeographicRealms": [
+    {
+      "id": 1,
+      "name": "Nearctic",
+      "color": "#8B4513",
+      "description": "North America",
+      "ecoregions": 120
+    },
+    {
+      "id": 2,
+      "name": "Palearctic", 
+      "color": "#DEB887",
+      "description": "Europe, North Africa, most of Asia",
+      "ecoregions": 162
+    },
+    {
+      "id": 3,
+      "name": "Afrotropic",
+      "color": "#CD853F",
+      "description": "Sub-Saharan Africa",
+      "ecoregions": 119
+    },
+    {
+      "id": 4,
+      "name": "Indomalayan",
+      "color": "#F4A460",
+      "description": "South and Southeast Asia",
+      "ecoregions": 163
+    },
+    {
+      "id": 5,
+      "name": "Australasian",
+      "color": "#D2691E",
+      "description": "Australia, New Guinea, New Zealand",
+      "ecoregions": 153
+    },
+    {
+      "id": 6,
+      "name": "Neotropical",
+      "color": "#228B22",
+      "description": "South and Central America",
+      "ecoregions": 178
+    },
+    {
+      "id": 7,
+      "name": "Oceanic",
+      "color": "#4169E1",
+      "description": "Pacific Islands",
+      "ecoregions": 13
+    },
+    {
+      "id": 8,
+      "name": "Antarctic",
+      "color": "#F0F8FF",
+      "description": "Antarctica",
+      "ecoregions": 3
+    }
+  ],
+  "sampleEcoregions": [
+    {
+      "id": 1,
+      "name": "California Central Valley grasslands",
+      "realm": "Nearctic",
+      "biome": "Temperate Grasslands, Savannas & Shrublands",
+      "coordinates": [-121.0, 37.0],
+      "area_km2": 42140,
+      "countries": ["United States"],
+      "threatLevel": "Critical/Endangered",
+      "protectionStatus": "0-5% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Yokuts",
+          "description": "The Yokuts people traditionally managed valley grasslands through controlled burns and sustainable hunting practices.",
+          "traditionalKnowledge": "Seasonal burning cycles maintained oak savannas and prevented large wildfires."
+        },
+        {
+          "name": "Miwok",
+          "description": "Northern valley tribes who practiced sophisticated ecological management including acorn processing and wetland stewardship.",
+          "traditionalKnowledge": "Developed complex food systems utilizing over 500 native plant species."
+        }
+      ],
+      "keySpecies": ["San Joaquin kit fox", "Blunt-nosed leopard lizard", "Valley elderberry longhorn beetle"],
+      "threatFactors": ["Agriculture conversion", "Urban development", "Invasive species"],
+      "conservationEfforts": ["Habitat restoration", "Wildlife corridors", "Native seed banking"]
+    },
+    {
+      "id": 2,
+      "name": "Amazon Basin",
+      "realm": "Neotropical",
+      "biome": "Tropical & Subtropical Moist Broadleaf Forests",
+      "coordinates": [-60.0, -3.0],
+      "area_km2": 5500000,
+      "countries": ["Brazil", "Peru", "Colombia", "Venezuela", "Ecuador", "Bolivia", "Guyana", "Suriname", "French Guiana"],
+      "threatLevel": "Vulnerable",
+      "protectionStatus": "10-25% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Kayapo",
+          "description": "One of the largest indigenous groups maintaining traditional forest management practices across 28 territories.",
+          "traditionalKnowledge": "Forest islands creation, fire management, and biodiversity enhancement through traditional farming."
+        },
+        {
+          "name": "Yanomami",
+          "description": "Largest indigenous territory in Brazil, maintaining traditional rainforest lifestyle and serving as biodiversity guardians.",
+          "traditionalKnowledge": "Sustainable hunting rotations, medicinal plant cultivation, and forest succession management."
+        },
+        {
+          "name": "Tikuna",
+          "description": "Riverine peoples with extensive knowledge of aquatic ecosystems and floodplain management.",
+          "traditionalKnowledge": "Fish farming in natural lakes, flood cycle agriculture, and riparian forest conservation."
+        }
+      ],
+      "keySpecies": ["Jaguar", "Giant otter", "Harpy eagle", "Brazil nut tree", "Rubber tree"],
+      "threatFactors": ["Deforestation", "Cattle ranching", "Mining", "Dam construction"],
+      "conservationEfforts": ["Indigenous territory protection", "REDD+ programs", "Sustainable forestry"]
+    },
+    {
+      "id": 3,
+      "name": "Sahara Desert",
+      "realm": "Palearctic",
+      "biome": "Deserts & Xeric Shrublands",
+      "coordinates": [2.0, 23.0],
+      "area_km2": 9000000,
+      "countries": ["Algeria", "Chad", "Egypt", "Libya", "Mali", "Mauritania", "Morocco", "Niger", "Sudan", "Tunisia"],
+      "threatLevel": "Stable",
+      "protectionStatus": "0-5% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Tuareg",
+          "description": "Nomadic Berber people with centuries of desert navigation and resource management knowledge.",
+          "traditionalKnowledge": "Water source identification, seasonal migration routes, and drought-resistant animal husbandry."
+        },
+        {
+          "name": "Toubou",
+          "description": "Desert dwellers of the central Sahara with expertise in extreme environment survival.",
+          "traditionalKnowledge": "Date palm cultivation, salt trade routes, and desert weather prediction."
+        }
+      ],
+      "keySpecies": ["Fennec fox", "Addax antelope", "Desert hedgehog", "Date palm"],
+      "threatFactors": ["Desertification", "Overgrazing", "Climate change"],
+      "conservationEfforts": ["Desert restoration", "Sustainable grazing", "Renewable energy development"]
+    },
+    {
+      "id": 4,
+      "name": "Great Barrier Reef Marine Park",
+      "realm": "Australasian",
+      "biome": "Marine (Coral Reefs)",
+      "coordinates": [145.0, -16.0],
+      "area_km2": 344400,
+      "countries": ["Australia"],
+      "threatLevel": "Critical/Endangered",
+      "protectionStatus": "75-90% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Traditional Owners (70+ groups)",
+          "description": "Aboriginal and Torres Strait Islander peoples with 60,000+ years of reef stewardship.",
+          "traditionalKnowledge": "Seasonal fishing calendars, sea country management, and coral spawning predictions."
+        },
+        {
+          "name": "Yirrganydji",
+          "description": "Traditional owners of the Port Douglas region with extensive marine knowledge.",
+          "traditionalKnowledge": "Sustainable fishing practices, turtle nesting protection, and reef restoration techniques."
+        }
+      ],
+      "keySpecies": ["Green sea turtle", "Giant clam", "Dugong", "Coral trout"],
+      "threatFactors": ["Climate change", "Ocean acidification", "Water pollution", "Crown-of-thorns starfish"],
+      "conservationEfforts": ["Marine protected areas", "Water quality improvement", "Coral restoration"]
+    },
+    {
+      "id": 5,
+      "name": "Congo Basin",
+      "realm": "Afrotropic",
+      "biome": "Tropical & Subtropical Moist Broadleaf Forests",
+      "coordinates": [18.0, -1.0],
+      "area_km2": 3700000,
+      "countries": ["Democratic Republic of Congo", "Cameroon", "Central African Republic", "Republic of Congo", "Equatorial Guinea", "Gabon"],
+      "threatLevel": "Vulnerable",
+      "protectionStatus": "5-25% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Ba'Aka (Pygmy peoples)",
+          "description": "Forest-dependent peoples with intimate knowledge of Central African rainforests.",
+          "traditionalKnowledge": "Non-timber forest product harvesting, animal behavior tracking, and forest navigation."
+        },
+        {
+          "name": "Baka",
+          "description": "Hunter-gatherer communities maintaining traditional forest lifestyle in Cameroon and Central African Republic.",
+          "traditionalKnowledge": "Medicinal plant identification, sustainable hunting techniques, and forest regeneration practices."
+        }
+      ],
+      "keySpecies": ["Mountain gorilla", "Forest elephant", "Okapi", "African grey parrot"],
+      "threatFactors": ["Commercial logging", "Bushmeat hunting", "Mining", "Agricultural expansion"],
+      "conservationEfforts": ["Transboundary protected areas", "Community-based conservation", "Sustainable logging certification"]
+    },
+    {
+      "id": 6,
+      "name": "Himalayas",
+      "realm": "Indomalayan",
+      "biome": "Montane Grasslands & Shrublands",
+      "coordinates": [84.0, 28.0],
+      "area_km2": 595000,
+      "countries": ["Nepal", "India", "Bhutan", "China", "Pakistan", "Afghanistan"],
+      "threatLevel": "Vulnerable",
+      "protectionStatus": "25-50% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Sherpa",
+          "description": "High-altitude peoples of the Everest region with expertise in mountain ecosystem management.",
+          "traditionalKnowledge": "Alpine agriculture, yak husbandry, and high-altitude forest conservation."
+        },
+        {
+          "name": "Gurung",
+          "description": "Mountain communities practicing traditional agro-pastoralism and forest stewardship.",
+          "traditionalKnowledge": "Terraced farming, community forest management, and medicinal plant cultivation."
+        },
+        {
+          "name": "Tibetan peoples",
+          "description": "Plateau dwellers with traditional knowledge of high-altitude ecosystem management.",
+          "traditionalKnowledge": "Cordyceps harvesting, grazing rotation systems, and sacred grove protection."
+        }
+      ],
+      "keySpecies": ["Snow leopard", "Red panda", "Himalayan black bear", "Blue poppy"],
+      "threatFactors": ["Climate change", "Glacial retreat", "Tourism pressure", "Overgrazing"],
+      "conservationEfforts": ["Transboundary conservation areas", "Community-based tourism", "Climate adaptation programs"]
+    },
+    {
+      "id": 7,
+      "name": "Arctic Tundra",
+      "realm": "Nearctic/Palearctic",
+      "biome": "Tundra",
+      "coordinates": [-100.0, 70.0],
+      "area_km2": 11700000,
+      "countries": ["Canada", "United States (Alaska)", "Russia", "Norway", "Finland", "Sweden", "Denmark (Greenland)", "Iceland"],
+      "threatLevel": "Vulnerable",
+      "protectionStatus": "10-25% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Inuit",
+          "description": "Arctic peoples with millennia of experience in polar ecosystem management and climate observation.",
+          "traditionalKnowledge": "Sea ice prediction, wildlife migration tracking, and sustainable marine mammal hunting."
+        },
+        {
+          "name": "Sami",
+          "description": "Indigenous reindeer herders of northern Scandinavia and Russia with traditional tundra management practices.",
+          "traditionalKnowledge": "Reindeer husbandry, lichen management, and seasonal migration coordination."
+        },
+        {
+          "name": "Nenets",
+          "description": "Nomadic reindeer herders of the Russian Arctic with traditional knowledge of tundra ecosystems.",
+          "traditionalKnowledge": "Weather forecasting, reindeer breeding, and permafrost understanding."
+        }
+      ],
+      "keySpecies": ["Polar bear", "Arctic fox", "Caribou/Reindeer", "Snowy owl", "Arctic tern"],
+      "threatFactors": ["Climate change", "Permafrost thaw", "Industrial development", "Pollution"],
+      "conservationEfforts": ["Circumpolar protected area networks", "Indigenous co-management", "Climate research stations"]
+    },
+    {
+      "id": 8,
+      "name": "Madagascar Forests",
+      "realm": "Afrotropic",
+      "biome": "Tropical & Subtropical Moist Broadleaf Forests",
+      "coordinates": [47.0, -18.5],
+      "area_km2": 117000,
+      "countries": ["Madagascar"],
+      "threatLevel": "Critical/Endangered",
+      "protectionStatus": "25-50% protected",
+      "indigenousTerritories": [
+        {
+          "name": "Malagasy peoples",
+          "description": "18 distinct ethnic groups with traditional forest management systems and sacred forest practices.",
+          "traditionalKnowledge": "Sacred forest (fady) protection, traditional medicine from endemic plants, and sustainable lemur coexistence."
+        }
+      ],
+      "keySpecies": ["Ring-tailed lemur", "Fossa", "Madagascar hissing cockroach", "Baobab tree"],
+      "threatFactors": ["Slash-and-burn agriculture", "Charcoal production", "Logging", "Mining"],
+      "conservationEfforts": ["National park expansion", "Community-based conservation", "Reforestation programs"]
+    }
+  ],
+  "metadata": {
+    "source": "WWF/RESOLVE Ecoregions 2017",
+    "citation": "Dinerstein, E., et al. (2017). An Ecoregion-Based Approach to Protecting Half the Terrestrial Realm. BioScience, 67(6), 534–545.",
+    "lastUpdated": "2025-02-02",
+    "license": "CC-BY 4.0"
+  }
+}
