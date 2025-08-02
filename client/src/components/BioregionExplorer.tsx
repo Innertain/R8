@@ -8,7 +8,8 @@ import { MapPin, Globe, Search, Leaf, Info, ExternalLink } from 'lucide-react';
 import { geocodeLocation } from '../utils/geocode';
 import InteractiveMapView from './InteractiveMapView';
 import BioregionDetails from './BioregionDetails';
-// import DataSourcesOverview from './DataSourcesOverview';
+import DatasetRecommendations from './DatasetRecommendations';
+import UserExperienceEnhancements from './UserExperienceEnhancements';
 
 // Sample bioregion data (in a real app, this would come from data/bioregions.geojson)
 const SAMPLE_BIOREGIONS = [
@@ -308,6 +309,25 @@ const BioregionExplorer: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Expansion Roadmap */}
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-blue-800 mb-3">🚀 Next Enhancement Opportunities</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <div className="font-semibold text-blue-700 mb-2">Real-Time Species Data</div>
+                <div>• Live wildlife sightings via iNaturalist API</div>
+                <div>• Bird migration tracking via eBird</div>
+                <div>• GBIF global species occurrence overlay</div>
+              </div>
+              <div>
+                <div className="font-semibold text-blue-700 mb-2">Climate & Environmental</div>
+                <div>• NOAA climate trends and projections</div>
+                <div>• NASA satellite vegetation indices</div>
+                <div>• EPA ecosystem health indicators</div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -414,6 +434,9 @@ const BioregionExplorer: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      <DatasetRecommendations />
+      <UserExperienceEnhancements />
     </div>
   );
 };
