@@ -137,7 +137,7 @@ export default function Home() {
         {/* Quick Stats */}
         <div className="mt-16 bg-stormy-dark/80 backdrop-blur-sm rounded-lg border border-stormy-light/30 p-8">
           <h3 className="text-2xl font-bold text-white mb-6 text-center">Platform Overview</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-blue-600 mb-1">7</div>
               <div className="text-sm text-stormy-light/80">Active Modules</div>
@@ -147,8 +147,24 @@ export default function Home() {
               <div className="text-sm text-stormy-light/80">Monitoring</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600 mb-1">∞</div>
+              <div className="text-3xl font-bold text-red-500 mb-1">350+</div>
+              <div className="text-sm text-stormy-light/80">Active Alerts</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-teal-500 mb-1">97K+</div>
+              <div className="text-sm text-stormy-light/80">Food Boxes</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-purple-600 mb-1">8+</div>
               <div className="text-sm text-stormy-light/80">Data Sources</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-orange-500 mb-1">422</div>
+              <div className="text-sm text-stormy-light/80">Supply Sites</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-indigo-500 mb-1">208</div>
+              <div className="text-sm text-stormy-light/80">Drivers</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-amber-600 mb-1">🌍</div>
