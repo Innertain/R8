@@ -21,6 +21,7 @@ import AlertsPage from "@/pages/alerts";
 import BioregionExplorerPage from "@/pages/bioregion-explorer";
 import HawaiiRegenerationPage from "@/pages/hawaii-regeneration";
 import AppalachianRegenerationPage from "@/pages/appalachian-regeneration";
+import { StateSVGDefs } from "@/components/StateIcon";
 
 
 function Navigation() {
@@ -312,6 +313,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        <StateSVGDefs />
         <Router />
       </TooltipProvider>
     </QueryClientProvider>

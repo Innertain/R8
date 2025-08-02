@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertTriangle, MapPin, Clock, ExternalLink, RefreshCw, Zap, Info as InfoIcon } from 'lucide-react';
 import { RealtimeApiDebugger } from './RealtimeApiDebugger';
 import { getWeatherAlertIcon } from '@/utils/disasterIcons';
+import { StateIcon } from '@/components/StateIcon';
 
 interface WeatherAlert {
   id: string;
@@ -355,8 +356,18 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                           }}
                         >
                           <div className="text-center">
-                            <div className="font-bold text-lg">{stateCode}</div>
-                            <div className="text-xs opacity-90">{state?.name}</div>
+                            <div className="flex justify-center mb-2">
+                              <StateIcon 
+                                state={stateCode} 
+                                size={48} 
+                                className="hover:scale-110 transition-transform" 
+                                color={maxSeverity.toLowerCase() === 'extreme' ? '#dc2626' : 
+                                       maxSeverity.toLowerCase() === 'severe' ? '#ea580c' : 
+                                       maxSeverity.toLowerCase() === 'moderate' ? '#ca8a04' : '#2563eb'} 
+                              />
+                            </div>
+                            <div className="font-bold text-sm">{stateCode}</div>
+                            <div className="text-xs opacity-90 leading-tight">{state?.name}</div>
                             <div className="text-xs font-semibold mt-1">
                               {(stateAlerts as WeatherAlert[]).length} alert{(stateAlerts as WeatherAlert[]).length !== 1 ? 's' : ''}
                             </div>
