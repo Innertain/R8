@@ -125,15 +125,20 @@ export function StateIcon({ state, size = 24, className = "", color = "currentCo
   }
 
   return (
-    <img 
-      src={stateImage}
-      alt={`${stateCode} state outline`}
-      width={size} 
-      height={size} 
+    <div 
       className={`state-icon ${className}`}
       style={{ 
-        filter: color !== 'currentColor' ? `brightness(0) saturate(100%) invert(${color === '#dc2626' ? '20%' : color === '#ea580c' ? '40%' : color === '#ca8a04' ? '60%' : '80%'})` : undefined,
-        objectFit: 'contain'
+        width: size,
+        height: size,
+        display: 'inline-block',
+        backgroundImage: `url(${stateImage})`,
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        filter: color !== 'currentColor' 
+          ? `brightness(0) saturate(100%) invert(${color === '#dc2626' ? '20%' : color === '#ea580c' ? '40%' : color === '#ca8a04' ? '60%' : '80%'})` 
+          : 'brightness(0) invert(1)',
+        mixBlendMode: 'multiply'
       }}
     />
   );
