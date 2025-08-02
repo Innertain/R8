@@ -4,7 +4,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -85,36 +91,39 @@ function Navigation() {
               Custom Alerts
             </Button>
           </Link>
-          <Link href="/bioregions">
-            <Button 
-              variant={location === "/bioregions" ? "default" : "outline"} 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Leaf className="h-4 w-4" />
-              Bioregion Explorer
-            </Button>
-          </Link>
-          <Link href="/hawaii">
-            <Button 
-              variant={location === "/hawaii" ? "default" : "outline"} 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Mountain className="h-4 w-4" />
-              Hawaiʻi Regeneration
-            </Button>
-          </Link>
-          <Link href="/appalachian">
-            <Button 
-              variant={location === "/appalachian" ? "default" : "outline"} 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Mountain className="h-4 w-4" />
-              Appalachian Regeneration
-            </Button>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant={['/bioregions', '/hawaii', '/appalachian'].includes(location) ? "default" : "outline"} 
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Leaf className="h-4 w-4" />
+                Regeneration
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/bioregions" className="flex items-center gap-2 w-full">
+                  <Leaf className="h-4 w-4" />
+                  Bioregion Explorer
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/hawaii" className="flex items-center gap-2 w-full">
+                  <Mountain className="h-4 w-4" />
+                  Hawaiʻi Regeneration
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/appalachian" className="flex items-center gap-2 w-full">
+                  <Mountain className="h-4 w-4" />
+                  Appalachian Regeneration
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
         </div>
 
@@ -196,11 +205,15 @@ function Navigation() {
               </Button>
             </Link>
 
+            {/* Regeneration Section */}
+            <div className="text-xs font-medium text-gray-500 px-2 py-1 uppercase tracking-wide">
+              Regeneration
+            </div>
             <Link href="/bioregions">
               <Button 
                 variant={location === "/bioregions" ? "default" : "outline"} 
                 size="sm"
-                className="w-full flex items-center gap-2 justify-start"
+                className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Leaf className="h-4 w-4" />
@@ -211,7 +224,7 @@ function Navigation() {
               <Button 
                 variant={location === "/hawaii" ? "default" : "outline"} 
                 size="sm"
-                className="w-full flex items-center gap-2 justify-start"
+                className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Mountain className="h-4 w-4" />
@@ -222,7 +235,7 @@ function Navigation() {
               <Button 
                 variant={location === "/appalachian" ? "default" : "outline"} 
                 size="sm"
-                className="w-full flex items-center gap-2 justify-start"
+                className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Mountain className="h-4 w-4" />
