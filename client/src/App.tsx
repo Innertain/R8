@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -14,6 +14,7 @@ import AirtableTest from "@/pages/airtable-test";
 import StatsDashboard from "@/pages/stats-dashboard";
 import AlertsPage from "@/pages/alerts";
 import BioregionExplorerPage from "@/pages/bioregion-explorer";
+import HawaiiRegenerationPage from "@/pages/hawaii-regeneration";
 
 
 function Navigation() {
@@ -92,6 +93,16 @@ function Navigation() {
             >
               <Leaf className="h-4 w-4" />
               Bioregion Explorer
+            </Button>
+          </Link>
+          <Link href="/hawaii">
+            <Button 
+              variant={location === "/hawaii" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Mountain className="h-4 w-4" />
+              Hawaiʻi Regeneration
             </Button>
           </Link>
 
@@ -195,6 +206,17 @@ function Navigation() {
                 Bioregion Explorer
               </Button>
             </Link>
+            <Link href="/hawaii">
+              <Button 
+                variant={location === "/hawaii" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Mountain className="h-4 w-4" />
+                Hawaiʻi Regeneration
+              </Button>
+            </Link>
 
             <Link href="/airtable-test">
               <Button 
@@ -224,6 +246,7 @@ function Router() {
         <Route path="/stats" component={StatsDashboard} />
         <Route path="/alerts" component={AlertsPage} />
         <Route path="/bioregions" component={BioregionExplorerPage} />
+        <Route path="/hawaii" component={HawaiiRegenerationPage} />
 
         <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />
