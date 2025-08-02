@@ -90,15 +90,15 @@ const US_STATES = {
 const getSeverityColor = (severity: string) => {
   switch (severity?.toLowerCase()) {
     case 'extreme':
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-red-600 text-white border-red-700 shadow-lg';
     case 'severe':
-      return 'bg-orange-100 text-orange-800 border-orange-200';
+      return 'bg-orange-600 text-white border-orange-700 shadow-lg';
     case 'moderate':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return 'bg-yellow-600 text-white border-yellow-700 shadow-md';
     case 'minor':
-      return 'bg-blue-100 text-blue-800 border-blue-200';
+      return 'bg-blue-600 text-white border-blue-700 shadow-md';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-gray-600 text-white border-gray-700 shadow-md';
   }
 };
 
@@ -465,7 +465,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                     <div className="text-2xl font-bold text-red-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'extreme').length}
                     </div>
-                    <div className="text-sm text-gray-600">Extreme</div>
+                    <div className="text-sm text-white">Extreme</div>
                   </CardContent>
                 </Card>
                 <Card>
@@ -476,7 +476,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                     <div className="text-2xl font-bold text-orange-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'severe').length}
                     </div>
-                    <div className="text-sm text-gray-600">Severe</div>
+                    <div className="text-sm text-white">Severe</div>
                   </CardContent>
                 </Card>
                 <Card>
@@ -487,7 +487,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                     <div className="text-2xl font-bold text-yellow-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'moderate').length}
                     </div>
-                    <div className="text-sm text-gray-600">Moderate</div>
+                    <div className="text-sm text-white">Moderate</div>
                   </CardContent>
                 </Card>
                 <Card>
@@ -498,7 +498,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                     <div className="text-2xl font-bold text-blue-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'minor').length}
                     </div>
-                    <div className="text-sm text-gray-600">Minor</div>
+                    <div className="text-sm text-white">Minor</div>
                   </CardContent>
                 </Card>
               </div>
