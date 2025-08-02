@@ -587,7 +587,7 @@ export function NasaEonetEvents() {
                                 src={event.satelliteImageUrl} 
                                 alt={`Satellite view of ${event.title}`}
                                 className="w-full h-48 object-cover rounded-lg border border-blue-300 cursor-pointer transition-all hover:shadow-lg"
-                                onClick={() => window.open(event.satelliteImageUrl, '_blank')}
+                                onClick={() => event.satelliteImageUrl && window.open(event.satelliteImageUrl, '_blank')}
                                 onError={(e) => {
                                   const img = e.target as HTMLImageElement;
                                   const parent = img.parentElement;

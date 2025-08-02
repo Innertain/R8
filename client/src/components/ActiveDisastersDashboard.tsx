@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { AlertTriangle, MapPin, Calendar, ExternalLink, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Home, Filter, TrendingUp, BarChart3 } from "lucide-react";
+import { getDisasterIcon as getCustomDisasterIcon } from '@/utils/disasterIcons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 interface FemaDisasterItem {
@@ -30,18 +31,24 @@ interface ActiveDisastersDashboardProps {
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'];
 
-// Get appropriate icon for disaster type
-const getDisasterIcon = (type?: string) => {
-  if (!type) return AlertTriangle;
+// Get appropriate icon for disaster type - returns custom icon URL or fallback
+const getDisasterIconComponent = (type?: string): { type: 'custom'; url: string } | { type: 'lucide'; component: React.ElementType } => {
+  const customIcon = getCustomDisasterIcon(type || '');
+  if (customIcon) {
+    return { type: 'custom', url: customIcon };
+  }
+  
+  // Fallback to Lucide icons
+  if (!type) return { type: 'lucide', component: AlertTriangle };
   const lowerType = type.toLowerCase();
-  if (lowerType.includes('fire')) return Flame;
-  if (lowerType.includes('flood')) return Waves;
-  if (lowerType.includes('hurricane') || lowerType.includes('storm') || lowerType.includes('wind')) return Wind;
-  if (lowerType.includes('earthquake')) return Mountain;
-  if (lowerType.includes('snow') || lowerType.includes('ice') || lowerType.includes('winter')) return Snowflake;
-  if (lowerType.includes('drought') || lowerType.includes('heat')) return Sun;
-  if (lowerType.includes('tornado')) return Zap;
-  return AlertTriangle;
+  if (lowerType.includes('fire')) return { type: 'lucide', component: Flame };
+  if (lowerType.includes('flood')) return { type: 'lucide', component: Waves };
+  if (lowerType.includes('hurricane') || lowerType.includes('storm') || lowerType.includes('wind')) return { type: 'lucide', component: Wind };
+  if (lowerType.includes('earthquake')) return { type: 'lucide', component: Mountain };
+  if (lowerType.includes('snow') || lowerType.includes('ice') || lowerType.includes('winter')) return { type: 'lucide', component: Snowflake };
+  if (lowerType.includes('drought') || lowerType.includes('heat')) return { type: 'lucide', component: Sun };
+  if (lowerType.includes('tornado')) return { type: 'lucide', component: Zap };
+  return { type: 'lucide', component: AlertTriangle };
 };
 
 // Get severity color based on disaster type and recency
@@ -79,8 +86,8 @@ export function ActiveDisastersDashboard({ disasters, loading }: ActiveDisasters
   }, [disasters]);
 
   const availableTypes = useMemo(() => {
-    const types = Array.from(new Set(disasters.map(d => d.incidentType).filter(Boolean))).sort();
-    return types;
+    const types = Array.from(new Set(disasters.map(d => d.incidentType).filter(Boolean))) as string[];
+    return types.sort();
   }, [disasters]);
 
   // Filter and sort disasters
@@ -296,7 +303,7 @@ export function ActiveDisastersDashboard({ disasters, loading }: ActiveDisasters
           {viewMode === 'list' ? (
             <div className="space-y-4 max-h-[600px] overflow-y-auto">
               {filteredDisasters.map((disaster) => {
-                const Icon = getDisasterIcon(disaster.incidentType);
+                const iconData = getDisasterIconComponent(disaster.incidentType);
                 const severityColor = getSeverityColor(disaster.incidentType, disaster.declarationDate);
                 
                 return (
@@ -304,8 +311,16 @@ export function ActiveDisastersDashboard({ disasters, loading }: ActiveDisasters
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-3 flex-1">
-                          <div className="p-2 rounded-full bg-gray-100">
-                            <Icon className="w-5 h-5 text-gray-700" />
+                          <div className="p-2 rounded-full bg-transparent">
+                            {iconData.type === 'custom' ? (
+                              <img 
+                                src={iconData.url} 
+                                alt={disaster.incidentType || 'Disaster'} 
+                                className="w-5 h-5 object-contain" 
+                              />
+                            ) : (
+                              <iconData.component className="w-5 h-5 text-gray-700" />
+                            )}
                           </div>
                           
                           <div className="flex-1 min-w-0">
