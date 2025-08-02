@@ -8,7 +8,7 @@ import { MapPin, Globe, Search, Leaf, Info, ExternalLink } from 'lucide-react';
 import { geocodeLocation } from '../utils/geocode';
 import InteractiveMapView from './InteractiveMapView';
 import BioregionDetails from './BioregionDetails';
-import DataSourcesOverview from './DataSourcesOverview';
+// import DataSourcesOverview from './DataSourcesOverview';
 
 // Sample bioregion data (in a real app, this would come from data/bioregions.geojson)
 const SAMPLE_BIOREGIONS = [
@@ -271,7 +271,45 @@ const BioregionExplorer: React.FC = () => {
         </Card>
       )}
 
-      <DataSourcesOverview />
+      {/* <DataSourcesOverview /> */}
+
+      {/* Enhanced Dataset Info */}
+      <Card className="mb-6">
+        <CardHeader>
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Leaf className="w-5 h-5" />
+            Enhanced Global Bioregion Dataset
+          </h3>
+          <p className="text-sm text-gray-600">
+            Expanded from 8 to 15 diverse ecoregions including Hawaii, Alaska, Caribbean, and diverse biome types
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-green-800 mb-3">🌎 New Geographic Coverage</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="space-y-1">
+                <div className="font-semibold text-green-700">🏝️ Hawaiian Ecosystems</div>
+                <div>• Hawaiian Tropical Dry Forests</div>
+                <div>• Hawaiian Tropical Rainforests</div>
+                <div>• Endemic island species</div>
+              </div>
+              <div className="space-y-1">
+                <div className="font-semibold text-green-700">❄️ Arctic & Subarctic</div>
+                <div>• Alaska Boreal Interior</div>
+                <div>• Alaskan Arctic Tundra</div>
+                <div>• Canadian Shield Forests</div>
+              </div>
+              <div className="space-y-1">
+                <div className="font-semibold text-green-700">🌴 Caribbean Tropical</div>
+                <div>• Puerto Rico Moist Forests</div>
+                <div>• El Yunque rainforest ecosystem</div>
+                <div>• Endemic Caribbean fauna</div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Implementation Guide */}
       <Card>

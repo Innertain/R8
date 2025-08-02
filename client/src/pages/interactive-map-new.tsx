@@ -12,7 +12,7 @@ import InteractiveWeatherMap from "@/components/InteractiveWeatherMap";
 import { WildfireIncidents } from "@/components/WildfireIncidents";
 import { EarthquakeIncidents } from "@/components/EarthquakeIncidents";
 import { DisasterAnalyticsDashboard } from "@/components/DisasterAnalyticsDashboard";
-import { DataSourcesOverview } from "@/components/DataSourcesOverview";
+// import { DataSourcesOverview } from "@/components/DataSourcesOverview";
 import SocialMediaEmergencyMonitor from "@/components/SocialMediaEmergencyMonitor";
 
 
@@ -202,9 +202,9 @@ export default function InteractiveMap() {
             )}
           </div>
           
-          {/* Data Sources Overview */}
+          {/* Data Sources Overview - Temporarily Disabled */}
           <div id="data-sources" className="w-full">
-            <DataSourcesOverview />
+            {/* <DataSourcesOverview /> */}
           </div>
           
           {/* Social Media Emergency Monitor - Moved to bottom */}
