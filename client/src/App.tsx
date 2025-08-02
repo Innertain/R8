@@ -15,6 +15,7 @@ import StatsDashboard from "@/pages/stats-dashboard";
 import AlertsPage from "@/pages/alerts";
 import BioregionExplorerPage from "@/pages/bioregion-explorer";
 import HawaiiRegenerationPage from "@/pages/hawaii-regeneration";
+import AppalachianRegenerationPage from "@/pages/appalachian-regeneration";
 
 
 function Navigation() {
@@ -103,6 +104,16 @@ function Navigation() {
             >
               <Mountain className="h-4 w-4" />
               Hawaiʻi Regeneration
+            </Button>
+          </Link>
+          <Link href="/appalachian">
+            <Button 
+              variant={location === "/appalachian" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Mountain className="h-4 w-4" />
+              Appalachian Regeneration
             </Button>
           </Link>
 
@@ -217,6 +228,17 @@ function Navigation() {
                 Hawaiʻi Regeneration
               </Button>
             </Link>
+            <Link href="/appalachian">
+              <Button 
+                variant={location === "/appalachian" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Mountain className="h-4 w-4" />
+                Appalachian Regeneration
+              </Button>
+            </Link>
 
             <Link href="/airtable-test">
               <Button 
@@ -247,6 +269,7 @@ function Router() {
         <Route path="/alerts" component={AlertsPage} />
         <Route path="/bioregions" component={BioregionExplorerPage} />
         <Route path="/hawaii" component={HawaiiRegenerationPage} />
+        <Route path="/appalachian" component={AppalachianRegenerationPage} />
 
         <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />
