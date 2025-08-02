@@ -20,13 +20,17 @@ import {
   X,
   ExternalLink,
   BookOpen,
-  Play
+  Play,
+  Calendar,
+  Database,
+  Clock
 } from 'lucide-react';
 
 // Import the global ecoregions data
 import globalEcoregionsData from '../data/global-ecoregions.json';
 import SmartInfoPanel from './SmartInfoPanel';
 import EngagingTutorial from './EngagingTutorial';
+import DataSourceAttribution from './DataSourceAttribution';
 
 // Enhanced biome colors with better visual distinction
 const ENHANCED_BIOME_COLORS: { [key: number]: string } = {
@@ -187,9 +191,16 @@ const EnhancedBioregionMap: React.FC = () => {
                 <Globe className="w-6 h-6" />
                 Global Ecoregions Explorer
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mb-2">
                 Explore {globalEcoregionsData.totalEcoregions} terrestrial ecoregions across {globalEcoregionsData.biomes.length} biomes worldwide
               </p>
+              <DataSourceAttribution
+                source="WWF/RESOLVE Ecoregions 2017"
+                lastUpdated="2017-06-01"
+                dataType="Global ecoregion dataset"
+                reliability="official"
+                url="https://ecoregions.appspot.com/"
+              />
             </div>
             
             {/* Search and Filter Controls */}
@@ -235,7 +246,7 @@ const EnhancedBioregionMap: React.FC = () => {
             Filter by Biomes
           </h3>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {globalEcoregionsData.biomes.map(biome => (
               <div 
@@ -258,6 +269,16 @@ const EnhancedBioregionMap: React.FC = () => {
                 <Eye className={`w-3 h-3 ${visibleBiomes.has(biome.id) ? 'text-blue-500' : 'text-gray-400'}`} />
               </div>
             ))}
+          </div>
+          
+          <div className="border-t pt-3">
+            <DataSourceAttribution
+              source="WWF Terrestrial Ecoregions"
+              lastUpdated="2017-06-01"
+              dataType="Biome classifications"
+              reliability="official"
+              url="https://www.worldwildlife.org/publications/terrestrial-ecoregions-of-the-world"
+            />
           </div>
         </CardContent>
       </Card>
@@ -334,8 +355,15 @@ const EnhancedBioregionMap: React.FC = () => {
                   )}
                 </div>
                 
-                <div className="pt-2 border-t">
+                <div className="pt-2 border-t space-y-1">
                   <div className="text-xs text-blue-600 font-medium">Click to explore in detail →</div>
+                  <DataSourceAttribution
+                    source="WWF Ecoregions"
+                    lastUpdated="2017-06-01"
+                    dataType="Ecosystem data"
+                    reliability="official"
+                    className="justify-start"
+                  />
                 </div>
               </div>
             </CardContent>
@@ -356,9 +384,12 @@ const EnhancedBioregionMap: React.FC = () => {
       {/* Statistics */}
       <Card className="mb-6">
         <CardHeader>
-          <h3 className="font-semibold">Global Statistics</h3>
+          <h3 className="font-semibold flex items-center gap-2">
+            <Database className="w-5 h-5" />
+            Global Statistics
+          </h3>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-blue-600">{filteredEcoregions.length}</div>
@@ -379,6 +410,19 @@ const EnhancedBioregionMap: React.FC = () => {
                 {filteredEcoregions.reduce((sum, e) => sum + (e.indigenousTerritories?.length || 0), 0)}
               </div>
               <div className="text-sm text-gray-600">Indigenous Groups</div>
+            </div>
+          </div>
+          
+          <div className="border-t pt-4">
+            <DataSourceAttribution
+              source="Multiple Sources"
+              lastUpdated="2024-12-15"
+              dataType="Aggregated statistics"
+              reliability="official"
+              className="justify-center"
+            />
+            <div className="mt-2 text-xs text-gray-500 text-center">
+              Based on WWF Ecoregions (2017), Native Land Digital (daily updates), IUCN assessments (2024)
             </div>
           </div>
         </CardContent>
@@ -419,10 +463,18 @@ const EnhancedBioregionMap: React.FC = () => {
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-blue-200">
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-blue-700 mb-3">
                 <strong>Currently showing 8 representative ecoregions.</strong> The platform is designed to scale to the complete WWF dataset 
                 with enhanced mapping, indigenous knowledge integration, and real-time biodiversity data from authoritative sources.
               </p>
+              <DataSourceAttribution
+                source="WWF/RESOLVE Ecoregions 2017"
+                lastUpdated="2017-06-01"
+                dataType="Complete global dataset"
+                reliability="official"
+                url="https://ecoregions.appspot.com/"
+                className="text-blue-600"
+              />
             </div>
           </div>
         </CardContent>

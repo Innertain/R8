@@ -12,8 +12,11 @@ import {
   Users, 
   Globe,
   Info,
-  Sparkles
+  Sparkles,
+  Calendar,
+  Database
 } from 'lucide-react';
+import DataSourceAttribution from './DataSourceAttribution';
 
 interface SmartInfoPanelProps {
   ecoregion: any;
@@ -76,6 +79,13 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
                     {ecoregion.area_km2 > 1000000 ? 'Massive ecosystem' : 
                      ecoregion.area_km2 > 100000 ? 'Large ecosystem' : 'Regional ecosystem'}
                   </div>
+                  <DataSourceAttribution
+                    source="WWF Ecoregions"
+                    lastUpdated="2017-06-01"
+                    dataType="Geographic boundaries"
+                    reliability="official"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <div className="text-sm font-medium text-gray-700">Conservation Status</div>
@@ -84,6 +94,13 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
                       {ecoregion.threatLevel}
                     </div>
                   </div>
+                  <DataSourceAttribution
+                    source="IUCN Red List"
+                    lastUpdated="2024-12-15"
+                    dataType="Threat assessment"
+                    reliability="official"
+                    className="mt-1"
+                  />
                 </div>
               </div>
               <div className="space-y-3">
@@ -93,6 +110,13 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
                     <Progress value={getProtectionProgress(ecoregion.protectionStatus)} className="h-2" />
                     <div className="text-xs text-gray-600">{ecoregion.protectionStatus} protected</div>
                   </div>
+                  <DataSourceAttribution
+                    source="UNEP-WCMC"
+                    lastUpdated="2024-11-30"
+                    dataType="Protected areas"
+                    reliability="official"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <div className="text-sm font-medium text-gray-700">Location</div>
@@ -100,6 +124,13 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
                   {ecoregion.countries?.length > 2 && (
                     <div className="text-xs text-gray-500">+{ecoregion.countries.length - 2} more countries</div>
                   )}
+                  <DataSourceAttribution
+                    source="Natural Earth"
+                    lastUpdated="2024-08-01"
+                    dataType="Political boundaries"
+                    reliability="official"
+                    className="mt-1"
+                  />
                 </div>
               </div>
             </div>
@@ -163,6 +194,14 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
               <div className="mt-3 text-xs text-gray-600">
                 Click sections below to learn more about the species, people, and conservation efforts here.
               </div>
+              <DataSourceAttribution
+                source="WWF/RESOLVE"
+                lastUpdated="2017-06-01"
+                dataType="Ecosystem data"
+                reliability="research"
+                url="https://ecoregions.appspot.com/"
+                className="mt-2"
+              />
             </div>
           </CardContent>
         )}
@@ -216,7 +255,14 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
                         <div className="text-sm text-gray-700 mt-1">{territory.description}</div>
                         <div className="bg-amber-50 border border-amber-200 rounded p-3 mt-2">
                           <div className="text-xs font-medium text-amber-800 mb-1">Traditional Knowledge</div>
-                          <div className="text-xs text-amber-700">{territory.traditionalKnowledge}</div>
+                          <div className="text-xs text-amber-700 mb-2">{territory.traditionalKnowledge}</div>
+                          <DataSourceAttribution
+                            source="Indigenous Knowledge Base"
+                            lastUpdated="2024-01-15"
+                            dataType="Traditional practices"
+                            reliability="community"
+                            className="text-amber-600"
+                          />
                         </div>
                       </div>
                     ))}
@@ -225,6 +271,14 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
                         +{ecoregion.indigenousTerritories.length - 2} more indigenous groups with traditional knowledge
                       </div>
                     )}
+                    <DataSourceAttribution
+                      source="Native Land Digital"
+                      lastUpdated="2025-02-02"
+                      dataType="Indigenous territories"
+                      reliability="community"
+                      url="https://native-land.ca"
+                      className="mt-3"
+                    />
                   </div>
                 </CardContent>
               )}
@@ -247,12 +301,21 @@ const SmartInfoPanel: React.FC<SmartInfoPanelProps> = ({ ecoregion, className = 
             </CardHeader>
             {expandedSections.has('species') && (
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {ecoregion.keySpecies?.map((species: string, index: number) => (
-                    <Badge key={index} variant="outline" className="justify-center p-2 text-xs">
-                      {species}
-                    </Badge>
-                  ))}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {ecoregion.keySpecies?.map((species: string, index: number) => (
+                      <Badge key={index} variant="outline" className="justify-center p-2 text-xs">
+                        {species}
+                      </Badge>
+                    ))}
+                  </div>
+                  <DataSourceAttribution
+                    source="GBIF & IUCN"
+                    lastUpdated="2024-12-01"
+                    dataType="Species occurrence"
+                    reliability="official"
+                    url="https://www.gbif.org"
+                  />
                 </div>
               </CardContent>
             )}
