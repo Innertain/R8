@@ -78,17 +78,44 @@ export function getDisasterIcon(disasterType: string): string | null {
 }
 
 export function getWeatherAlertIcon(alertType: string): string | null {
+  if (!alertType) return null;
+  
   const normalizedType = alertType.toLowerCase();
   
-  // Weather alert specific mappings
-  if (normalizedType.includes('tornado')) return TornadoIcon;
-  if (normalizedType.includes('hurricane') || normalizedType.includes('tropical')) return HurricaneIcon;
-  if (normalizedType.includes('flood') || normalizedType.includes('flash flood')) return FloodIcon;
-  if (normalizedType.includes('winter') || normalizedType.includes('ice') || normalizedType.includes('blizzard') || normalizedType.includes('snow')) return IceStormIcon;
-  if (normalizedType.includes('wind') || normalizedType.includes('gale')) return WindIcon;
-  if (normalizedType.includes('storm') || normalizedType.includes('thunderstorm') || normalizedType.includes('severe')) return StormIcon;
-  if (normalizedType.includes('fire') || normalizedType.includes('red flag')) return FireIcon;
+  // Console log for debugging
+  console.log('🔍 Weather Alert Icon Debug:', { alertType, normalizedType });
   
+  // Weather alert specific mappings - order matters for specificity
+  if (normalizedType.includes('tornado')) {
+    console.log('✅ Matched tornado icon');
+    return TornadoIcon;
+  }
+  if (normalizedType.includes('hurricane') || normalizedType.includes('tropical')) {
+    console.log('✅ Matched hurricane icon');
+    return HurricaneIcon;
+  }
+  if (normalizedType.includes('flood') || normalizedType.includes('flash flood')) {
+    console.log('✅ Matched flood icon');
+    return FloodIcon;
+  }
+  if (normalizedType.includes('winter') || normalizedType.includes('ice') || normalizedType.includes('blizzard') || normalizedType.includes('snow')) {
+    console.log('✅ Matched ice/winter storm icon');
+    return IceStormIcon;
+  }
+  if (normalizedType.includes('wind') || normalizedType.includes('gale')) {
+    console.log('✅ Matched wind icon');
+    return WindIcon;
+  }
+  if (normalizedType.includes('storm') || normalizedType.includes('thunderstorm') || normalizedType.includes('severe')) {
+    console.log('✅ Matched storm icon');
+    return StormIcon;
+  }
+  if (normalizedType.includes('fire') || normalizedType.includes('red flag')) {
+    console.log('✅ Matched fire icon');
+    return FireIcon;
+  }
+  
+  console.log('❌ No icon match found');
   return null;
 }
 

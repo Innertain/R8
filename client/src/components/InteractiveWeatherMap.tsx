@@ -126,11 +126,11 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
   }, [stateFilter]);
 
   const { data: response, refetch, isLoading, error } = useQuery({
-    queryKey: ['/api/weather-alerts'],
+    queryKey: ['/api/weather-alerts-rss'],
     refetchInterval: 300000, // 5 minutes
   });
 
-  const alerts = response?.alerts || [];
+  const alerts = (response as any)?.alerts || [];
 
   // Group alerts by state
   const statesWithAlerts = alerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
@@ -334,7 +334,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                       .filter(([stateCode]) => selectedState === 'all' || stateCode === selectedState)
                       .map(([stateCode, stateAlerts]) => {
                       const state = US_STATES[stateCode as keyof typeof US_STATES];
-                      const maxSeverity = stateAlerts.reduce((max, alert) => {
+                      const maxSeverity = (stateAlerts as WeatherAlert[]).reduce((max: string, alert: WeatherAlert) => {
                         const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
                         const alertLevel = severityOrder[alert.severity.toLowerCase() as keyof typeof severityOrder] || 0;
                         const maxLevel = severityOrder[max.toLowerCase() as keyof typeof severityOrder] || 0;
@@ -358,7 +358,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                             <div className="font-bold text-lg">{stateCode}</div>
                             <div className="text-xs opacity-90">{state?.name}</div>
                             <div className="text-xs font-semibold mt-1">
-                              {stateAlerts.length} alert{stateAlerts.length !== 1 ? 's' : ''}
+                              {(stateAlerts as WeatherAlert[]).length} alert{(stateAlerts as WeatherAlert[]).length !== 1 ? 's' : ''}
                             </div>
                           </div>
                         </div>
