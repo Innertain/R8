@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -61,36 +61,39 @@ function Navigation() {
               Volunteer Portal
             </Button>
           </Link>
-          <Link href="/map">
-            <Button 
-              variant={location === "/map" ? "default" : "outline"} 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <MapPin className="h-4 w-4" />
-              Disaster Watch Center
-            </Button>
-          </Link>
-          <Link href="/stats">
-            <Button 
-              variant={location === "/stats" ? "default" : "outline"} 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <BarChart3 className="h-4 w-4" />
-              Impact Stats
-            </Button>
-          </Link>
-          <Link href="/alerts">
-            <Button 
-              variant={location === "/alerts" ? "default" : "outline"} 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Bell className="h-4 w-4" />
-              Custom Alerts
-            </Button>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant={['/map', '/stats', '/alerts'].includes(location) ? "default" : "outline"} 
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Shield className="h-4 w-4" />
+                Disaster Response
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/map" className="flex items-center gap-2 w-full">
+                  <MapPin className="h-4 w-4" />
+                  Disaster Watch Center
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/stats" className="flex items-center gap-2 w-full">
+                  <BarChart3 className="h-4 w-4" />
+                  Impact Stats
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/alerts" className="flex items-center gap-2 w-full">
+                  <Bell className="h-4 w-4" />
+                  Custom Alerts
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
@@ -170,34 +173,38 @@ function Navigation() {
                 Volunteer Portal
               </Button>
             </Link>
+
+            {/* Disaster Response Section */}
+            <div className="text-xs font-medium text-gray-500 px-2 py-1 uppercase tracking-wide">
+              Disaster Response
+            </div>
             <Link href="/map">
               <Button 
                 variant={location === "/map" ? "default" : "outline"} 
                 size="sm"
-                className="w-full flex items-center gap-2 justify-start"
+                className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <MapPin className="h-4 w-4" />
-                Response Map
+                Disaster Watch Center
               </Button>
             </Link>
             <Link href="/stats">
               <Button 
                 variant={location === "/stats" ? "default" : "outline"} 
                 size="sm"
-                className="w-full flex items-center gap-2 justify-start"
+                className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <BarChart3 className="h-4 w-4" />
                 Impact Stats
               </Button>
             </Link>
-
             <Link href="/alerts">
               <Button 
                 variant={location === "/alerts" ? "default" : "outline"} 
                 size="sm"
-                className="w-full flex items-center gap-2 justify-start"
+                className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Bell className="h-4 w-4" />
