@@ -16,11 +16,17 @@ import {
   Eye,
   Palette,
   Search,
-  Filter
+  Filter,
+  X,
+  ExternalLink,
+  BookOpen,
+  Play
 } from 'lucide-react';
 
 // Import the global ecoregions data
 import globalEcoregionsData from '../data/global-ecoregions.json';
+import SmartInfoPanel from './SmartInfoPanel';
+import EngagingTutorial from './EngagingTutorial';
 
 // Enhanced biome colors with better visual distinction
 const ENHANCED_BIOME_COLORS: { [key: number]: string } = {
@@ -56,183 +62,70 @@ interface EcoregionDetailsProps {
 const EcoregionDetails: React.FC<EcoregionDetailsProps> = ({ ecoregion, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4">
-      <div className="bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold">{ecoregion.name}</h2>
-            <div className="flex gap-2 mt-2">
-              <Badge variant="outline">{ecoregion.realm}</Badge>
-              <Badge style={{ backgroundColor: ecoregion.biomeColor, color: 'white' }}>
-                {ecoregion.biome}
-              </Badge>
+      <div className="bg-white rounded-xl max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl">
+        {/* Header with improved design */}
+        <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white p-6">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold mb-2">{ecoregion.name}</h2>
+              <div className="flex gap-3 mb-3">
+                <Badge className="bg-white bg-opacity-20 text-white border-white border-opacity-30">
+                  {ecoregion.realm}
+                </Badge>
+                <Badge className="bg-white bg-opacity-20 text-white border-white border-opacity-30">
+                  {ecoregion.biome}
+                </Badge>
+              </div>
+              <p className="text-blue-100 text-sm">
+                {ecoregion.area_km2?.toLocaleString()} km² • {ecoregion.countries?.length} countries
+              </p>
             </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={onClose}
+              className="text-white hover:bg-white hover:bg-opacity-20"
+            >
+              <X className="w-5 h-5" />
+            </Button>
           </div>
-          <Button variant="outline" onClick={onClose}>
-            ✕
-          </Button>
         </div>
         
-        <div className="p-6">
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">
-                <Globe className="w-4 h-4 mr-1" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="indigenous">
-                <Users className="w-4 h-4 mr-1" />
-                Indigenous
-              </TabsTrigger>
-              <TabsTrigger value="ecology">
-                <TreePine className="w-4 h-4 mr-1" />
-                Ecology
-              </TabsTrigger>
-              <TabsTrigger value="conservation">
-                <Shield className="w-4 h-4 mr-1" />
-                Conservation
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <h3 className="text-lg font-semibold">Geographic Information</h3>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div><strong>Area:</strong> {ecoregion.area_km2?.toLocaleString()} km²</div>
-                    <div><strong>Countries:</strong> {ecoregion.countries?.join(', ')}</div>
-                    <div><strong>Biogeographic Realm:</strong> {ecoregion.realm}</div>
-                    <div><strong>Biome:</strong> {ecoregion.biome}</div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <h3 className="text-lg font-semibold">Conservation Status</h3>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-red-500" />
-                      <strong>Threat Level:</strong> {ecoregion.threatLevel}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-green-500" />
-                      <strong>Protection:</strong> {ecoregion.protectionStatus}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="indigenous" className="space-y-4">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-5 h-5 text-amber-600" />
-                  <h3 className="font-semibold text-amber-800">Indigenous Territories & Traditional Knowledge</h3>
+        {/* Smart Content Area */}
+        <div className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 160px)' }}>
+          <div className="p-6">
+            <SmartInfoPanel ecoregion={ecoregion} />
+            
+            {/* External Resources */}
+            <Card className="mt-6">
+              <CardHeader>
+                <h3 className="font-semibold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Learn More
+                </h3>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Button variant="outline" size="sm" className="justify-start">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    WWF Ecoregion Profile
+                  </Button>
+                  <Button variant="outline" size="sm" className="justify-start">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Conservation Status
+                  </Button>
+                  <Button variant="outline" size="sm" className="justify-start">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Species Database
+                  </Button>
+                  <Button variant="outline" size="sm" className="justify-start">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Indigenous Rights Info
+                  </Button>
                 </div>
-                <p className="text-sm text-amber-700">
-                  This information represents documented traditional knowledge and indigenous territories. 
-                  Please respect cultural sensitivities and intellectual property rights.
-                </p>
-              </div>
-              
-              {ecoregion.indigenousTerritories?.map((territory: any, index: number) => (
-                <Card key={index} className="border-l-4 border-l-amber-500">
-                  <CardHeader>
-                    <h4 className="text-lg font-semibold text-amber-800">{territory.name}</h4>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-gray-700">{territory.description}</p>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <h5 className="font-semibold text-green-800 mb-2">Traditional Ecological Knowledge</h5>
-                      <p className="text-sm text-green-700">{territory.traditionalKnowledge}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              {!ecoregion.indigenousTerritories?.length && (
-                <div className="text-center py-8 text-gray-500">
-                  <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Indigenous territory information not available for this ecoregion.</p>
-                  <p className="text-sm mt-2">We're working to expand our indigenous knowledge database.</p>
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="ecology" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <TreePine className="w-5 h-5" />
-                      Key Species
-                    </h3>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {ecoregion.keySpecies?.map((species: string, index: number) => (
-                        <Badge key={index} variant="outline" className="mr-2 mb-2">
-                          {species}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-red-500" />
-                      Threat Factors
-                    </h3>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {ecoregion.threatFactors?.map((threat: string, index: number) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          <span className="text-sm">{threat}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="conservation" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-green-500" />
-                    Conservation Efforts
-                  </h3>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {ecoregion.conservationEfforts?.map((effort: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm">{effort}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-800 mb-2">How You Can Help</h4>
-                <div className="text-sm text-blue-700 space-y-1">
-                  <div>• Support organizations working in this ecoregion</div>
-                  <div>• Choose sustainable products from this region</div>
-                  <div>• Advocate for stronger protection policies</div>
-                  <div>• Learn about and respect indigenous rights</div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
@@ -248,8 +141,20 @@ const EnhancedBioregionMap: React.FC = () => {
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRealm, setSelectedRealm] = useState<string>('all');
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return !localStorage.getItem('bioregion-tutorial-completed');
+  });
   
   const ecoregionGrid = createBioregionGrid();
+  
+  const handleTutorialComplete = () => {
+    localStorage.setItem('bioregion-tutorial-completed', 'true');
+    setShowTutorial(false);
+  };
+  
+  const handleTutorialDismiss = () => {
+    setShowTutorial(false);
+  };
   
   const handleBiomeToggle = (biomeId: number) => {
     const newVisibleBiomes = new Set(visibleBiomes);
@@ -308,6 +213,15 @@ const EnhancedBioregionMap: React.FC = () => {
                   <option key={realm.name} value={realm.name}>{realm.name}</option>
                 ))}
               </select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTutorial(true)}
+                className="flex items-center gap-1"
+              >
+                <Play className="w-4 h-4" />
+                Tutorial
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -348,47 +262,81 @@ const EnhancedBioregionMap: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Ecoregions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      {/* Ecoregions Grid - Enhanced for Better UX */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {filteredEcoregions.map(ecoregion => (
           <Card 
             key={ecoregion.id} 
-            className="cursor-pointer hover:shadow-lg transition-all duration-200 border-l-4"
+            className="cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-l-4 group"
             style={{ borderLeftColor: ecoregion.biomeColor }}
             onClick={() => setSelectedEcoregion(ecoregion)}
           >
-            <CardHeader>
+            <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-1">{ecoregion.name}</h3>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    <Badge variant="outline">{ecoregion.realm}</Badge>
-                    <Badge style={{ backgroundColor: ecoregion.biomeColor, color: 'white' }}>
+                  <h3 className="font-bold text-xl mb-2 group-hover:text-blue-600 transition-colors">
+                    {ecoregion.name}
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <Badge variant="outline" className="text-xs">{ecoregion.realm}</Badge>
+                    <Badge 
+                      style={{ backgroundColor: ecoregion.biomeColor, color: 'white' }}
+                      className="text-xs"
+                    >
                       {ecoregion.biome}
                     </Badge>
                   </div>
                 </div>
-                <MapPin className="w-5 h-5 text-gray-400" />
+                <div className="bg-blue-50 p-2 rounded-full group-hover:bg-blue-100 transition-colors">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <div><strong>Area:</strong> {ecoregion.area_km2?.toLocaleString()} km²</div>
-                <div><strong>Countries:</strong> {ecoregion.countries?.slice(0, 3).join(', ')}{ecoregion.countries?.length > 3 ? '...' : ''}</div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                  <span className="text-red-600">{ecoregion.threatLevel}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-green-500" />
-                  <span className="text-green-600">{ecoregion.protectionStatus}</span>
-                </div>
-                {ecoregion.indigenousTerritories?.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-amber-500" />
-                    <span className="text-amber-600">{ecoregion.indigenousTerritories.length} Indigenous Groups</span>
+            <CardContent className="pt-0">
+              <div className="space-y-3 text-sm">
+                {/* Quick impact statement */}
+                <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-3">
+                  <div className="text-xs font-medium text-blue-800 mb-1">Why This Matters</div>
+                  <div className="text-xs text-blue-700">
+                    {ecoregion.name === 'Amazon Basin' && 'Earth\'s largest rainforest & biodiversity hotspot'}
+                    {ecoregion.name === 'Arctic Tundra' && 'Critical climate regulator & carbon storage'}
+                    {ecoregion.name === 'Great Barrier Reef Marine Park' && 'World\'s largest coral reef system'}
+                    {ecoregion.name === 'California Central Valley grasslands' && 'America\'s agricultural heartland'}
+                    {ecoregion.name === 'Congo Basin' && 'Africa\'s lungs & gorilla habitat'}
+                    {ecoregion.name === 'Sahara Desert' && 'World\'s largest hot desert ecosystem'}
+                    {ecoregion.name === 'Himalayas' && 'World\'s highest mountain biodiversity'}
+                    {ecoregion.name === 'Madagascar Forests' && 'Unique island evolution laboratory'}
+                    {!['Amazon Basin', 'Arctic Tundra', 'Great Barrier Reef Marine Park', 'California Central Valley grasslands', 'Congo Basin', 'Sahara Desert', 'Himalayas', 'Madagascar Forests'].includes(ecoregion.name) && 'Important global ecosystem'}
                   </div>
-                )}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <div className="font-medium text-gray-700">Size</div>
+                    <div>{ecoregion.area_km2?.toLocaleString()} km²</div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-700">Countries</div>
+                    <div>{ecoregion.countries?.length} countries</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3 text-red-500" />
+                    <span className="text-xs text-red-600">{ecoregion.threatLevel.split('/')[0]}</span>
+                  </div>
+                  {ecoregion.indigenousTerritories?.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Users className="w-3 h-3 text-amber-500" />
+                      <span className="text-xs text-amber-600">{ecoregion.indigenousTerritories.length} groups</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="pt-2 border-t">
+                  <div className="text-xs text-blue-600 font-medium">Click to explore in detail →</div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -484,6 +432,13 @@ const EnhancedBioregionMap: React.FC = () => {
         <EcoregionDetails
           ecoregion={selectedEcoregion}
           onClose={() => setSelectedEcoregion(null)}
+        />
+      )}
+      
+      {showTutorial && (
+        <EngagingTutorial
+          onComplete={handleTutorialComplete}
+          onDismiss={handleTutorialDismiss}
         />
       )}
     </div>
