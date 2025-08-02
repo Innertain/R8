@@ -220,3 +220,110 @@ export const insertNotificationSettingsSchema = createInsertSchema(userNotificat
 
 export type InsertAlertRuleType = z.infer<typeof insertAlertRuleSchema>;
 export type InsertNotificationSettingsType = z.infer<typeof insertNotificationSettingsSchema>;
+
+// Species cache for bioregion explorer
+export const bioregionSpeciesCache = pgTable("bioregion_species_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  bioregionId: varchar("bioregion_id").notNull().unique(), // e.g., 'na_pacific_northwest'
+  
+  // Species summary data
+  totalSpeciesCount: integer("total_species_count").default(0),
+  endemicSpeciesCount: integer("endemic_species_count").default(0),
+  threatenedSpeciesCount: integer("threatened_species_count").default(0),
+  
+  // Flagship/representative species (arrays of species names)
+  flagshipSpecies: text("flagship_species").array(),
+  endemicSpecies: text("endemic_species").array(),
+  threatenedSpecies: text("threatened_species").array(),
+  
+  // Top taxa counts
+  topTaxa: jsonb("top_taxa"), // {"Aves": 245, "Mammalia": 89, "Plantae": 1200}
+  
+  // Conservation projects and citizen science opportunities
+  conservationProjects: jsonb("conservation_projects"), // [{name, url, description}]
+  citizenScienceProjects: jsonb("citizen_science_projects"),
+  
+  // Cache metadata
+  dataSource: varchar("data_source").default("inaturalist"),
+  lastSyncedAt: timestamp("last_synced_at").notNull(),
+  syncStatus: varchar("sync_status").default("success"), // 'success', 'failed', 'pending'
+  errorMessage: text("error_message"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Individual species records for detailed information
+export const speciesRecords = pgTable("species_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  bioregionIds: text("bioregion_ids").array(), // Can belong to multiple bioregions
+  
+  // Species identification
+  scientificName: varchar("scientific_name").notNull(),
+  commonName: varchar("common_name"),
+  taxonomicRank: varchar("taxonomic_rank"), // 'species', 'subspecies', etc.
+  
+  // Taxonomy
+  kingdom: varchar("kingdom"),
+  phylum: varchar("phylum"),
+  class: varchar("class"),
+  order: varchar("order"),
+  family: varchar("family"),
+  genus: varchar("genus"),
+  
+  // Conservation status
+  conservationStatus: varchar("conservation_status"), // 'EN', 'VU', 'LC', etc.
+  isEndemic: boolean("is_endemic").default(false),
+  isThreatened: boolean("is_threatened").default(false),
+  
+  // Occurrence data
+  observationCount: integer("observation_count").default(0),
+  lastObservedAt: timestamp("last_observed_at"),
+  
+  // External links
+  inaturalistUrl: varchar("inaturalist_url"),
+  gbifId: varchar("gbif_id"),
+  
+  // Photos (URLs)
+  photoUrls: text("photo_urls").array(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// API usage tracking to prevent rate limiting
+export const apiUsageLog = pgTable("api_usage_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  service: varchar("service").notNull(), // 'inaturalist', 'gbif', etc.
+  endpoint: varchar("endpoint").notNull(),
+  requestCount: integer("request_count").default(1),
+  responseStatus: integer("response_status"),
+  rateLimitRemaining: integer("rate_limit_remaining"),
+  rateLimitReset: timestamp("rate_limit_reset"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type BioregionSpeciesCache = typeof bioregionSpeciesCache.$inferSelect;
+export type InsertBioregionSpeciesCache = typeof bioregionSpeciesCache.$inferInsert;
+
+export type SpeciesRecord = typeof speciesRecords.$inferSelect;
+export type InsertSpeciesRecord = typeof speciesRecords.$inferInsert;
+
+export type ApiUsageLog = typeof apiUsageLog.$inferSelect;
+export type InsertApiUsageLog = typeof apiUsageLog.$inferInsert;
+
+// Zod schemas for validation
+export const insertBioregionSpeciesCacheSchema = createInsertSchema(bioregionSpeciesCache).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSpeciesRecordSchema = createInsertSchema(speciesRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertBioregionSpeciesCacheType = z.infer<typeof insertBioregionSpeciesCacheSchema>;
+export type InsertSpeciesRecordType = z.infer<typeof insertSpeciesRecordSchema>;

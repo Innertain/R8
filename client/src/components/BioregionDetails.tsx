@@ -2,6 +2,8 @@ import React from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, ExternalLink, Users, TreePine, AlertTriangle, Thermometer } from 'lucide-react';
+import SpeciesInfo from './SpeciesInfo';
+import { useSpeciesData } from '@/hooks/useSpeciesData';
 
 interface BioregionDetailsProps {
   bioregion: any;
@@ -9,6 +11,8 @@ interface BioregionDetailsProps {
 }
 
 const BioregionDetails: React.FC<BioregionDetailsProps> = ({ bioregion, isLoading }) => {
+  const { data: speciesData, isLoading: speciesLoading, error: speciesError } = useSpeciesData(bioregion?.id);
+
   if (isLoading) {
     return (
       <Card>
@@ -38,131 +42,181 @@ const BioregionDetails: React.FC<BioregionDetailsProps> = ({ bioregion, isLoadin
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <MapPin className="w-5 h-5" />
-          Your Bioregion: {bioregion.name}
-        </h3>
-        <div className={`inline-block px-3 py-1 rounded-full border text-sm font-medium ${getConservationStatusColor(bioregion.conservationStatus)}`}>
-          {bioregion.conservationStatus}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <p className="text-gray-700 leading-relaxed">{bioregion.description}</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Characteristics */}
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <TreePine className="w-4 h-4" />
-                Ecological Characteristics
-              </h4>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <strong>Biome:</strong> 
-                  <span className="text-gray-600">{bioregion.biome}</span>
-                </div>
-                <div className="flex justify-between">
-                  <strong>Area:</strong> 
-                  <span className="text-gray-600">{bioregion.area_km2?.toLocaleString()} km²</span>
-                </div>
-                <div className="flex justify-between">
-                  <strong>Countries:</strong> 
-                  <span className="text-gray-600">{bioregion.countries?.join(', ')}</span>
-                </div>
-                {bioregion.keySpecies && (
-                  <div>
-                    <strong>Key Species:</strong>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {bioregion.keySpecies.slice(0, 4).map((species: string, index: number) => (
-                        <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
-                          {species}
-                        </span>
-                      ))}
-                      {bioregion.keySpecies.length > 4 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                          +{bioregion.keySpecies.length - 4} more
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Your Bioregion: {bioregion.name}
+          </h3>
+          <div className={`inline-block px-3 py-1 rounded-full border text-sm font-medium ${getConservationStatusColor(bioregion.conservationStatus)}`}>
+            {bioregion.conservationStatus}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <p className="text-gray-700 leading-relaxed">{bioregion.description}</p>
             
-            {/* Climate & Demographics */}
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Thermometer className="w-4 h-4" />
-                Climate & Population
-              </h4>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <strong>Climate:</strong>
-                  <p className="text-gray-600 mt-1">{bioregion.climate}</p>
-                </div>
-                {bioregion.population && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Characteristics */}
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <TreePine className="w-4 h-4" />
+                  Ecological Characteristics
+                </h4>
+                <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <strong>Population:</strong> 
-                    <span className="text-gray-600 flex items-center gap-1">
-                      <Users className="w-3 h-3" />
-                      {bioregion.population.toLocaleString()}
-                    </span>
+                    <strong>Biome:</strong> 
+                    <span className="text-gray-600">{bioregion.biome}</span>
                   </div>
-                )}
+                  <div className="flex justify-between">
+                    <strong>Area:</strong> 
+                    <span className="text-gray-600">{bioregion.area_km2?.toLocaleString()} km²</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <strong>Countries:</strong> 
+                    <span className="text-gray-600">{bioregion.countries?.join(', ')}</span>
+                  </div>
+                  {bioregion.keySpecies && (
+                    <div>
+                      <strong>Key Species:</strong>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {bioregion.keySpecies.slice(0, 4).map((species: string, index: number) => (
+                          <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+                            {species}
+                          </span>
+                        ))}
+                        {bioregion.keySpecies.length > 4 && (
+                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                            +{bioregion.keySpecies.length - 4} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Climate & Demographics */}
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <Thermometer className="w-4 h-4" />
+                  Climate & Population
+                </h4>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <strong>Climate Type:</strong>
+                    <span className="text-gray-600">{bioregion.climate || 'Varies'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <strong>Population:</strong>
+                    <span className="text-gray-600">{bioregion.population ? bioregion.population.toLocaleString() : 'Not specified'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <strong>Major Cities:</strong>
+                    <span className="text-gray-600">{bioregion.majorCities?.join(', ') || 'Various'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Threats */}
+            {bioregion.threats && bioregion.threats.length > 0 && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  Conservation Threats
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {bioregion.threats.map((threat: string, index: number) => (
+                    <span key={index} className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
+                      {threat}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Traditional Knowledge */}
+            {bioregion.traditionalKnowledge && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Traditional Ecological Knowledge
+                </h4>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800 leading-relaxed">
+                    {bioregion.traditionalKnowledge}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Action Links */}
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-3">Learn More & Take Action</h4>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" className="text-xs">
+                  <ExternalLink className="w-3 h-3 mr-1" />
+                  Local Flora Guide
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs">
+                  <ExternalLink className="w-3 h-3 mr-1" />
+                  Native Species Guide
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs">
+                  <ExternalLink className="w-3 h-3 mr-1" />
+                  Conservation Projects
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs">
+                  <ExternalLink className="w-3 h-3 mr-1" />
+                  Climate Data
+                </Button>
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Conservation Status Details */}
-          {bioregion.conservationStatus && (
-            <div className={`p-4 rounded-lg border ${getConservationStatusColor(bioregion.conservationStatus)}`}>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Conservation Status: {bioregion.conservationStatus}
-              </h4>
-              <p className="text-sm">
-                {bioregion.conservationStatus === 'Relatively Stable' && 
-                  'This bioregion maintains good ecological integrity with stable ecosystems and biodiversity.'}
-                {bioregion.conservationStatus === 'Vulnerable' && 
-                  'This bioregion faces moderate threats and requires ongoing conservation efforts.'}
-                {bioregion.conservationStatus === 'Threatened' && 
-                  'This bioregion is under significant pressure from human activities and environmental changes.'}
-                {bioregion.conservationStatus === 'Critically Endangered' && 
-                  'This bioregion has lost significant habitat and biodiversity, requiring urgent conservation action.'}
-                {bioregion.conservationStatus === 'Moderately Threatened' && 
-                  'This bioregion shows signs of stress but retains much of its natural character.'}
-              </p>
-            </div>
+      {/* Species Information */}
+      {bioregion.id && (
+        <>
+          {speciesLoading && (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading species data...</p>
+                </div>
+              </CardContent>
+            </Card>
           )}
-
-          {/* Action Links */}
-          <div className="pt-4 border-t">
-            <h4 className="font-semibold text-gray-800 mb-3">Learn More & Take Action</h4>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className="text-xs">
-                <ExternalLink className="w-3 h-3 mr-1" />
-                One Earth Navigator
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs">
-                <ExternalLink className="w-3 h-3 mr-1" />
-                Native Species Guide
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs">
-                <ExternalLink className="w-3 h-3 mr-1" />
-                Conservation Projects
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs">
-                <ExternalLink className="w-3 h-3 mr-1" />
-                Climate Data
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          
+          {speciesError && (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <AlertTriangle className="w-8 h-8 text-yellow-600 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-2">Unable to load species data</p>
+                  <p className="text-sm text-gray-500">Species information will be available when cached data is refreshed</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {speciesData && (
+            <SpeciesInfo
+              bioregionId={speciesData.bioregionId}
+              bioregionName={speciesData.bioregionName}
+              species={speciesData.species}
+              conservationProjects={speciesData.conservationProjects}
+              lastUpdated={speciesData.lastUpdated}
+              isLoading={speciesLoading}
+            />
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

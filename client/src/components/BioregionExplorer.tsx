@@ -11,6 +11,7 @@ import BioregionDetails from './BioregionDetails';
 import EnhancedBioregionMap from './EnhancedBioregionMap';
 import DatasetRecommendations from './DatasetRecommendations';
 import UserExperienceEnhancements from './UserExperienceEnhancements';
+import SpeciesCacheStatus from './SpeciesCacheStatus';
 
 // Sample bioregion data (in a real app, this would come from data/bioregions.geojson)
 const SAMPLE_BIOREGIONS = [
@@ -441,6 +442,7 @@ const BioregionExplorer: React.FC = () => {
         </CardContent>
       </Card>
 
+      <SpeciesCacheStatus />
       <DatasetRecommendations />
       <UserExperienceEnhancements />
     </div>

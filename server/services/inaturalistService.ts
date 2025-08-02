@@ -1,0 +1,274 @@
+import axios from 'axios';
+import { db } from '../db';
+import { apiUsageLog, bioregionSpeciesCache, speciesRecords } from '@shared/schema';
+import { eq, desc, gte } from 'drizzle-orm';
+
+const INATURALIST_BASE_URL = 'https://api.inaturalist.org/v1';
+const RATE_LIMIT_BUFFER = 100; // Keep 100 requests in reserve
+const CACHE_DURATION_HOURS = 24; // Cache species data for 24 hours
+
+interface INaturalistTaxon {
+  id: number;
+  name: string;
+  preferred_common_name?: string;
+  rank: string;
+  iconic_taxon_name?: string;
+  conservation_status?: {
+    status_name: string;
+    iucn: number;
+  };
+  ancestors?: Array<{
+    name: string;
+    rank: string;
+  }>;
+  default_photo?: {
+    url: string;
+    medium_url: string;
+  };
+}
+
+interface INaturalistSearchResponse {
+  total_results: number;
+  page: number;
+  per_page: number;
+  results: INaturalistTaxon[];
+}
+
+class INaturalistService {
+  private async logApiUsage(endpoint: string, status: number, remaining?: number) {
+    try {
+      await db.insert(apiUsageLog).values({
+        service: 'inaturalist',
+        endpoint,
+        responseStatus: status,
+        rateLimitRemaining: remaining,
+        rateLimitReset: remaining ? new Date(Date.now() + 3600000) : undefined, // 1 hour from now
+      });
+    } catch (error) {
+      console.error('Failed to log API usage:', error);
+    }
+  }
+
+  private async checkRateLimit(): Promise<boolean> {
+    try {
+      // Get recent API usage in the last hour
+      const oneHourAgo = new Date(Date.now() - 3600000);
+      const recentUsage = await db
+        .select()
+        .from(apiUsageLog)
+        .where(
+          eq(apiUsageLog.service, 'inaturalist')
+        )
+        .orderBy(desc(apiUsageLog.createdAt))
+        .limit(1);
+
+      if (recentUsage.length > 0) {
+        const lastRequest = recentUsage[0];
+        if (lastRequest.rateLimitRemaining && lastRequest.rateLimitRemaining < RATE_LIMIT_BUFFER) {
+          console.log(`Rate limit approaching. Remaining: ${lastRequest.rateLimitRemaining}`);
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error checking rate limit:', error);
+      return true; // Allow request on error
+    }
+  }
+
+  private async makeApiRequest<T>(endpoint: string, params: Record<string, any> = {}): Promise<T | null> {
+    if (!(await this.checkRateLimit())) {
+      console.log('Rate limit reached, skipping API request');
+      return null;
+    }
+
+    try {
+      const response = await axios.get(`${INATURALIST_BASE_URL}${endpoint}`, {
+        params,
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'R8-Disaster-Relief-Platform/1.0 (educational-research)',
+        },
+      });
+
+      // Log successful request
+      const remaining = response.headers['x-ratelimit-remaining'];
+      await this.logApiUsage(endpoint, response.status, remaining ? parseInt(remaining) : undefined);
+
+      return response.data;
+    } catch (error: any) {
+      console.error(`iNaturalist API error for ${endpoint}:`, error.message);
+      await this.logApiUsage(endpoint, error.response?.status || 500);
+      return null;
+    }
+  }
+
+  async getSpeciesForBioregion(bioregionId: string, bounds: {north: number, south: number, east: number, west: number}): Promise<{
+    totalSpecies: number;
+    flagshipSpecies: string[];
+    endemicSpecies: string[];
+    threatenedSpecies: string[];
+    topTaxa: Record<string, number>;
+  }> {
+    // Check if we have fresh cached data
+    const cached = await db
+      .select()
+      .from(bioregionSpeciesCache)
+      .where(eq(bioregionSpeciesCache.bioregionId, bioregionId))
+      .limit(1);
+
+    const cacheExpiry = new Date(Date.now() - CACHE_DURATION_HOURS * 3600000);
+    
+    if (cached.length > 0 && cached[0].lastSyncedAt > cacheExpiry) {
+      console.log(`Using cached species data for ${bioregionId}`);
+      return {
+        totalSpecies: cached[0].totalSpeciesCount || 0,
+        flagshipSpecies: cached[0].flagshipSpecies || [],
+        endemicSpecies: cached[0].endemicSpecies || [],
+        threatenedSpecies: cached[0].threatenedSpecies || [],
+        topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
+      };
+    }
+
+    console.log(`Fetching fresh species data for ${bioregionId}`);
+
+    // Fetch species data from iNaturalist
+    const speciesData = await this.fetchSpeciesData(bounds);
+    
+    if (!speciesData) {
+      console.log(`Failed to fetch species data for ${bioregionId}, using cached data if available`);
+      if (cached.length > 0) {
+        return {
+          totalSpecies: cached[0].totalSpeciesCount || 0,
+          flagshipSpecies: cached[0].flagshipSpecies || [],
+          endemicSpecies: cached[0].endemicSpecies || [],
+          threatenedSpecies: cached[0].threatenedSpecies || [],
+          topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
+        };
+      }
+      return {
+        totalSpecies: 0,
+        flagshipSpecies: [],
+        endemicSpecies: [],
+        threatenedSpecies: [],
+        topTaxa: {},
+      };
+    }
+
+    // Cache the new data
+    await this.cacheSpeciesData(bioregionId, speciesData);
+
+    return speciesData;
+  }
+
+  private async fetchSpeciesData(bounds: {north: number, south: number, east: number, west: number}) {
+    // Get species observations in the bioregion bounds
+    const observationsResponse = await this.makeApiRequest<any>('/observations/species_counts', {
+      nelat: bounds.north,
+      nelng: bounds.east,
+      swlat: bounds.south,
+      swlng: bounds.west,
+      per_page: 200, // Limit to prevent API overuse
+      order: 'desc',
+      order_by: 'count',
+    });
+
+    if (!observationsResponse) return null;
+
+    const flagshipSpecies: string[] = [];
+    const endemicSpecies: string[] = [];
+    const threatenedSpecies: string[] = [];
+    const topTaxa: Record<string, number> = {};
+
+    // Process top species (first 50 to avoid too many API calls)
+    const topSpecies = observationsResponse.results.slice(0, 50);
+    
+    for (const species of topSpecies) {
+      if (species.taxon) {
+        const taxon = species.taxon;
+        
+        // Add to flagship species if it has many observations
+        if (species.count > 100) {
+          const name = taxon.preferred_common_name || taxon.name;
+          flagshipSpecies.push(name);
+        }
+
+        // Check conservation status
+        if (taxon.conservation_status && taxon.conservation_status.iucn >= 4) { // Vulnerable or higher
+          const name = taxon.preferred_common_name || taxon.name;
+          threatenedSpecies.push(name);
+        }
+
+        // Count taxa
+        const iconicTaxon = taxon.iconic_taxon_name || 'Other';
+        topTaxa[iconicTaxon] = (topTaxa[iconicTaxon] || 0) + species.count;
+      }
+    }
+
+    return {
+      totalSpecies: observationsResponse.total_results || 0,
+      flagshipSpecies: flagshipSpecies.slice(0, 10), // Limit to top 10
+      endemicSpecies, // Would need additional API calls to determine endemism
+      threatenedSpecies: threatenedSpecies.slice(0, 10),
+      topTaxa,
+    };
+  }
+
+  private async cacheSpeciesData(bioregionId: string, data: any) {
+    try {
+      const now = new Date();
+      
+      // Upsert cached data
+      await db
+        .insert(bioregionSpeciesCache)
+        .values({
+          bioregionId,
+          totalSpeciesCount: data.totalSpecies,
+          flagshipSpecies: data.flagshipSpecies,
+          endemicSpecies: data.endemicSpecies,
+          threatenedSpecies: data.threatenedSpecies,
+          topTaxa: data.topTaxa,
+          lastSyncedAt: now,
+          syncStatus: 'success',
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: bioregionSpeciesCache.bioregionId,
+          set: {
+            totalSpeciesCount: data.totalSpecies,
+            flagshipSpecies: data.flagshipSpecies,
+            endemicSpecies: data.endemicSpecies,
+            threatenedSpecies: data.threatenedSpecies,
+            topTaxa: data.topTaxa,
+            lastSyncedAt: now,
+            syncStatus: 'success',
+            updatedAt: now,
+          },
+        });
+
+      console.log(`Cached species data for ${bioregionId}: ${data.totalSpecies} species`);
+    } catch (error) {
+      console.error(`Failed to cache species data for ${bioregionId}:`, error);
+    }
+  }
+
+  async getConservationProjects(bioregionName: string): Promise<Array<{name: string, url: string, description: string}>> {
+    // Search for projects related to this bioregion
+    const projectsResponse = await this.makeApiRequest<any>('/projects', {
+      q: bioregionName,
+      type: 'collection,bioblitz',
+      per_page: 5,
+    });
+
+    if (!projectsResponse) return [];
+
+    return projectsResponse.results.map((project: any) => ({
+      name: project.title,
+      url: `https://www.inaturalist.org/projects/${project.slug}`,
+      description: project.description || 'Conservation project in this bioregion',
+    }));
+  }
+}
+
+export const inaturalistService = new INaturalistService();

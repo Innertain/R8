@@ -1,0 +1,62 @@
+import { useQuery } from '@tanstack/react-query';
+
+interface SpeciesData {
+  totalSpecies: number;
+  flagshipSpecies: string[];
+  endemicSpecies: string[];
+  threatenedSpecies: string[];
+  topTaxa: Record<string, number>;
+}
+
+interface ConservationProject {
+  name: string;
+  url: string;
+  description: string;
+}
+
+interface SpeciesResponse {
+  bioregionId: string;
+  bioregionName: string;
+  species: SpeciesData;
+  conservationProjects: ConservationProject[];
+  dataSource: string;
+  lastUpdated: string;
+}
+
+export function useSpeciesData(bioregionId: string | null) {
+  return useQuery({
+    queryKey: ['/api/species/bioregion', bioregionId],
+    queryFn: async (): Promise<SpeciesResponse | null> => {
+      if (!bioregionId) return null;
+      
+      const response = await fetch(`/api/species/bioregion/${bioregionId}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch species data: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    enabled: !!bioregionId,
+    staleTime: 30 * 60 * 1000, // Consider data fresh for 30 minutes
+    refetchOnWindowFocus: false,
+    retry: 2,
+  });
+}
+
+export function useSpeciesCacheStatus() {
+  return useQuery({
+    queryKey: ['/api/species/cache-status'],
+    queryFn: async () => {
+      const response = await fetch('/api/species/cache-status');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch cache status: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+  });
+}

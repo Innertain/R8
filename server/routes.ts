@@ -7,6 +7,7 @@ import { eq, desc, and, gte } from "drizzle-orm";
 import { alertEngine, type EmergencyEvent } from "./alerting/alertEngine";
 import { fetchShiftsFromAirtableServer } from "./airtable";
 import { getBioregionSpecies, getApiUsageStats } from "./inaturalist";
+import speciesRoutes from "./routes/species";
 
 // Server-side cache for stats data
 let statsCache: { data: any; timestamp: number } | null = null;
@@ -3641,6 +3642,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       res.status(500).json({ success: false, error: error.message });
     }
   });
+
+  // Register species routes
+  app.use('/api/species', speciesRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
