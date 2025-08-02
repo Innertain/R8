@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertTriangle, MapPin, Clock, ExternalLink, RefreshCw, Zap, Info as InfoIcon } from 'lucide-react';
 import { RealtimeApiDebugger } from './RealtimeApiDebugger';
+import { getWeatherAlertIcon } from '@/utils/disasterIcons';
 
 interface WeatherAlert {
   id: string;
@@ -378,6 +379,15 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
+                                    {getWeatherAlertIcon(alert.event || alert.title) ? (
+                                      <img 
+                                        src={getWeatherAlertIcon(alert.event || alert.title)!} 
+                                        alt={alert.event || 'Weather Alert'} 
+                                        className="w-5 h-5 object-contain flex-shrink-0" 
+                                      />
+                                    ) : (
+                                      <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                                    )}
                                     <h5 className="font-semibold text-gray-900 text-sm">{alert.title}</h5>
                                     <Badge className={getSeverityColor(alert.severity)}>
                                       {alert.severity}
@@ -425,10 +435,13 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                 </>
               )}
 
-              {/* Summary Statistics */}
+              {/* Summary Statistics with Custom Icons */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-6">
                 <Card>
                   <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <AlertTriangle className="w-6 h-6 text-red-600" />
+                    </div>
                     <div className="text-2xl font-bold text-red-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'extreme').length}
                     </div>
@@ -437,6 +450,9 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Zap className="w-6 h-6 text-orange-600" />
+                    </div>
                     <div className="text-2xl font-bold text-orange-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'severe').length}
                     </div>
@@ -445,6 +461,9 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                    </div>
                     <div className="text-2xl font-bold text-yellow-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'moderate').length}
                     </div>
@@ -453,6 +472,9 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <InfoIcon className="w-6 h-6 text-blue-600" />
+                    </div>
                     <div className="text-2xl font-bold text-blue-600">
                       {activeAlerts.filter((a: WeatherAlert) => a.severity.toLowerCase() === 'minor').length}
                     </div>
