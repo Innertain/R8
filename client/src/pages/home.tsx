@@ -21,56 +21,56 @@ export default function Home() {
       description: "Manage your volunteer shifts and availability",
       icon: <Calendar className="w-8 h-8" />,
       href: "/volunteer",
-      color: "bg-stormy-light/30 border-stormy-primary/30 hover:bg-stormy-light/50",
-      iconColor: "text-stormy-primary"
+      color: "bg-stormy-primary/80 border-stormy-light/40 hover:bg-stormy-primary/90 shadow-lg",
+      iconColor: "text-white"
     },
     {
       title: "Disaster Watch Center", 
       description: "Real-time emergency monitoring and response coordination",
       icon: <Shield className="w-8 h-8" />,
       href: "/map",
-      color: "bg-stormy-accent/20 border-stormy-accent/40 hover:bg-stormy-accent/30",
-      iconColor: "text-stormy-dark"
+      color: "bg-red-600/90 border-red-400/60 hover:bg-red-600 shadow-lg",
+      iconColor: "text-white"
     },
     {
       title: "Impact Statistics",
       description: "Track volunteer impact and community metrics",
       icon: <BarChart3 className="w-8 h-8" />,
       href: "/stats", 
-      color: "bg-stormy-primary/10 border-stormy-primary/25 hover:bg-stormy-primary/20",
-      iconColor: "text-stormy-primary"
+      color: "bg-blue-600/90 border-blue-400/60 hover:bg-blue-600 shadow-lg",
+      iconColor: "text-white"
     },
     {
       title: "Custom Alerts",
       description: "Set up personalized emergency and volunteer alerts",
       icon: <Bell className="w-8 h-8" />,
       href: "/alerts",
-      color: "bg-stormy-dark/5 border-stormy-dark/20 hover:bg-stormy-dark/10", 
-      iconColor: "text-stormy-dark"
+      color: "bg-amber-600/90 border-amber-400/60 hover:bg-amber-600 shadow-lg", 
+      iconColor: "text-white"
     },
     {
       title: "Bioregion Explorer",
       description: "Explore global ecosystems and conservation efforts",
       icon: <Globe className="w-8 h-8" />,
       href: "/bioregions",
-      color: "bg-stormy-light/40 border-stormy-accent/30 hover:bg-stormy-light/60",
-      iconColor: "text-stormy-primary"
+      color: "bg-green-600/90 border-green-400/60 hover:bg-green-600 shadow-lg",
+      iconColor: "text-white"
     },
     {
       title: "Hawaiʻi Regeneration",
       description: "Traditional practices and restoration projects in Hawaii",
       icon: <Mountain className="w-8 h-8" />,
       href: "/hawaii",
-      color: "bg-stormy-accent/15 border-stormy-light/50 hover:bg-stormy-accent/25",
-      iconColor: "text-stormy-dark"
+      color: "bg-teal-600/90 border-teal-400/60 hover:bg-teal-600 shadow-lg",
+      iconColor: "text-white"
     },
     {
       title: "Appalachian Regeneration", 
       description: "Mountain heritage and forest restoration initiatives",
       icon: <Mountain className="w-8 h-8" />,
       href: "/appalachian",
-      color: "bg-stormy-dark/8 border-stormy-primary/30 hover:bg-stormy-dark/15",
-      iconColor: "text-stormy-dark"
+      color: "bg-emerald-600/90 border-emerald-400/60 hover:bg-emerald-600 shadow-lg",
+      iconColor: "text-white"
     }
   ];
 
@@ -113,19 +113,19 @@ export default function Home() {
               <Card className={`${module.color} border-2 transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer h-full`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-4 mb-3">
-                    <div className={`p-3 rounded-lg bg-white ${module.iconColor}`}>
+                    <div className={`p-3 rounded-lg bg-white/20 backdrop-blur-sm ${module.iconColor}`}>
                       {module.icon}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                      <h3 className="text-xl font-semibold text-white mb-1">
                         {module.title}
                       </h3>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400" />
+                    <ArrowRight className="w-5 h-5 text-white/70" />
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-white/90 leading-relaxed">
                     {module.description}
                   </p>
                 </CardContent>
