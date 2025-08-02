@@ -156,23 +156,23 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
               return (
                 <div key={disaster.disasterNumber} className="relative group">
                   {/* Timeline Node with Custom Icon */}
-                  <div className={`absolute left-3 w-10 h-10 rounded-full ${nodeColor} border-4 border-white shadow-lg z-20 flex items-center justify-center transition-all duration-300 hover:scale-110`}>
+                  <div className={`absolute left-2 w-12 h-12 rounded-full ${nodeColor} border-3 border-white shadow-lg z-20 flex items-center justify-center transition-all duration-300 hover:scale-110`}>
                     {customIcon ? (
                       <img 
                         src={customIcon} 
                         alt={disaster.incidentType || 'Disaster'} 
-                        className="w-6 h-6 object-contain" 
+                        className="w-9 h-9 object-contain" 
                       />
                     ) : (
-                      <AlertTriangle className="w-5 h-5 text-white" />
+                      <AlertTriangle className="w-7 h-7 text-white" />
                     )}
                   </div>
                   
                   {/* Connection Line */}
-                  <div className={`absolute left-14 top-5 w-10 h-0.5 ${connectionColor} border-t-2 border-dashed z-10`}></div>
+                  <div className={`absolute left-14 top-6 w-12 h-0.5 ${connectionColor} border-t-2 border-dashed z-10`}></div>
                   
                   {/* Expandable Event Card */}
-                  <div className="ml-24">
+                  <div className="ml-28">
                     <div 
                       className={`border-2 rounded-xl p-4 ${typeBg} hover:shadow-xl transition-all duration-300 hover:scale-[1.01] hover:-translate-y-1 cursor-pointer`}
                       onClick={() => setExpandedCard(expandedCard === disaster.disasterNumber ? null : disaster.disasterNumber)}
@@ -180,15 +180,15 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                       {/* Compact Summary Header */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`p-3 rounded-lg ${nodeColor} shadow-lg border-2 border-white`}>
+                          <div className={`p-2 rounded-lg ${nodeColor} shadow-lg border-2 border-white`}>
                             {customIcon ? (
                               <img 
                                 src={customIcon} 
                                 alt={disaster.incidentType || 'Disaster'} 
-                                className="w-6 h-6 object-contain" 
+                                className="w-8 h-8 object-contain" 
                               />
                             ) : (
-                              <AlertTriangle className="w-6 h-6 text-white" />
+                              <AlertTriangle className="w-8 h-8 text-white" />
                             )}
                           </div>
                           <div>
