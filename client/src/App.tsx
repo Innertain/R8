@@ -87,9 +87,9 @@ function Navigation() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/stats" className="flex items-center gap-3 w-full p-3 hover:bg-blue-50">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100">
-                    <BarChart3 className="h-6 w-6 text-blue-600" />
+                <Link href="/stats" className="flex items-center gap-3 w-full p-3 hover:bg-red-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100">
+                    <BarChart3 className="h-6 w-6 text-red-600" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">Impact Stats</div>
@@ -98,9 +98,9 @@ function Navigation() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/alerts" className="flex items-center gap-3 w-full p-3 hover:bg-yellow-50">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-100">
-                    <Bell className="h-6 w-6 text-yellow-600" />
+                <Link href="/alerts" className="flex items-center gap-3 w-full p-3 hover:bg-red-50">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100">
+                    <Bell className="h-6 w-6 text-red-600" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">Custom Alerts</div>
