@@ -379,7 +379,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
                                   <div className="flex items-start gap-4 mb-3">
-                                    <div className="flex-shrink-0 p-3 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 shadow-md">
+                                    <div className="flex-shrink-0 p-3 rounded-full bg-transparent">
                                       {getWeatherAlertIcon(alert.event || alert.title) ? (
                                         <img 
                                           src={getWeatherAlertIcon(alert.event || alert.title)!} 

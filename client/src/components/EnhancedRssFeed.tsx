@@ -440,7 +440,7 @@ export function EnhancedRssFeed({
                     >
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2">
-                          <div className="p-2 rounded-full bg-white/70 shadow-sm border border-white/30">
+                          <div className="p-2 rounded-full bg-transparent">
                             {customIconUrl ? (
                               <img src={customIconUrl} alt={alert.alertType} className="w-5 h-5 object-contain" />
                             ) : (
@@ -663,7 +663,7 @@ export function EnhancedRssFeed({
                     >
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2 flex-1">
-                          <div className="p-2 rounded-full bg-gray-100">
+                          <div className="p-2 rounded-full bg-transparent">
                             <DisasterIcon className="w-4 h-4 text-gray-600" />
                           </div>
                           <div className="flex-1">
@@ -757,7 +757,7 @@ export function EnhancedRssFeed({
                     >
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex items-center gap-2">
-                          <div className="p-2 rounded-full bg-gray-100">
+                          <div className="p-2 rounded-full bg-transparent">
                             <DisasterIcon className="w-4 h-4 text-gray-600" />
                           </div>
                           <h3 className="font-semibold text-sm leading-tight flex-1">

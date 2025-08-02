@@ -428,7 +428,7 @@ export function NasaEonetEvents() {
                 {/* Compact Summary Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`p-5 rounded-full shadow-sm ${categoryColor.replace('border-', 'bg-').replace('text-', 'text-white bg-')}`}>
+                    <div className="p-5 rounded-full bg-transparent">
                       {getNasaEonetIcon(event.category?.title || '') ? (
                         <img 
                           src={getNasaEonetIcon(event.category?.title || '')!} 
