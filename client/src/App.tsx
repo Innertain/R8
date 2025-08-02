@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -13,6 +13,7 @@ import InteractiveMap from "@/pages/interactive-map-new";
 import AirtableTest from "@/pages/airtable-test";
 import StatsDashboard from "@/pages/stats-dashboard";
 import AlertsPage from "@/pages/alerts";
+import BioregionExplorerPage from "@/pages/bioregion-explorer";
 
 
 function Navigation() {
@@ -81,6 +82,16 @@ function Navigation() {
             >
               <Bell className="h-4 w-4" />
               Custom Alerts
+            </Button>
+          </Link>
+          <Link href="/bioregions">
+            <Button 
+              variant={location === "/bioregions" ? "default" : "outline"} 
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Leaf className="h-4 w-4" />
+              Bioregion Explorer
             </Button>
           </Link>
 
@@ -173,6 +184,18 @@ function Navigation() {
               </Button>
             </Link>
 
+            <Link href="/bioregions">
+              <Button 
+                variant={location === "/bioregions" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Leaf className="h-4 w-4" />
+                Bioregion Explorer
+              </Button>
+            </Link>
+
             <Link href="/airtable-test">
               <Button 
                 variant={location === "/airtable-test" ? "default" : "outline"} 
@@ -200,6 +223,7 @@ function Router() {
         <Route path="/map" component={InteractiveMap} />
         <Route path="/stats" component={StatsDashboard} />
         <Route path="/alerts" component={AlertsPage} />
+        <Route path="/bioregions" component={BioregionExplorerPage} />
 
         <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />

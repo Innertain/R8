@@ -50,6 +50,7 @@ The platform features a clean, professional design with a focus on readability. 
 - **Custom Disaster Icons Integration**: COMPLETED - Full integration of user's custom disaster icons across all platform components. Professional visual enhancement includes Fire, Flood, Hurricane, Ice/Winter Storm, Storm, Tornado, and Wind icons integrated into Weather Alerts, FEMA Disasters, Wildfire Incidents, NASA EONET Events, and Disaster Analytics Dashboard. Implemented with proper fallback system to Lucide icons and smart disaster type mapping for enhanced visual branding.
 - **Satellite Imagery Integration**: Successfully integrated high-resolution satellite imagery using Esri World Imagery tiles for all NASA EONET natural disaster events. Each event now displays actual satellite views of affected areas with reliable image loading and proper error handling. System uses coordinate-to-tile conversion for precise geographic targeting and zoom level 12 for optimal detail visualization.
 - **Comprehensive Data Sources Integration**: Platform now integrates 8 official government data sources: FEMA disaster declarations, NWS weather alerts, USGS earthquake monitoring, InciWeb wildfire incidents, NASA EONET natural hazards, Hurricane Center RSS feeds, Storm Prediction Center RSS, and temporarily disabled Twitter emergency monitoring. All sources feature real-time to daily updates with official government reliability standards.
+- **Interactive Bioregion Explorer**: COMPLETED - Comprehensive bioregion mapping system with ZIP code and state-based geocoding, interactive mapping capabilities (ready for React-Leaflet integration), point-in-polygon analysis framework using Turf.js, and detailed bioregion information display. Features professional UI with sample North American bioregion data, Zippopotam.us API integration for ZIP code geocoding, built-in state centroid database, and comprehensive implementation guide for full React-Leaflet and GeoJSON polygon rendering.
 
 ## External Dependencies
 ### Core Framework & Libraries
@@ -64,6 +65,8 @@ The platform features a clean, professional design with a focus on readability. 
 
 ### Data Integration
 - **Airtable API**: Primary data source for volunteer shifts, assignments, and volunteer information. Uses `AIRTABLE_TOKEN` and `VITE_BASE_ID` environment variables.
+- **Geocoding APIs**: Zippopotam.us for ZIP code to coordinates conversion, built-in state centroid database for U.S. state geocoding.
+- **Bioregion Data**: GeoJSON-based bioregion polygon data with Turf.js geospatial analysis capabilities.
 
 ### Development Tools
 - `@replit/vite-plugin-runtime-error-modal`: Enhanced error reporting
