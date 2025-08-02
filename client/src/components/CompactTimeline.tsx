@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Calendar, MapPin, ExternalLink, Globe } from "lucide-react";
+import { Clock, AlertTriangle, Calendar, MapPin, ExternalLink, Globe } from "lucide-react";
+import { getDisasterIcon } from "@/utils/disasterIcons";
 
 interface FemaDisasterItem {
   guid: string;
@@ -61,16 +62,9 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
       return bDate.getTime() - aDate.getTime();
     });
 
-  const getDisasterIcon = (type: string) => {
-    const lowerType = type.toLowerCase();
-    if (lowerType.includes('fire')) return Flame;
-    if (lowerType.includes('flood')) return Waves;
-    if (lowerType.includes('hurricane') || lowerType.includes('storm')) return Wind;
-    if (lowerType.includes('earthquake')) return Mountain;
-    if (lowerType.includes('drought')) return Sun;
-    if (lowerType.includes('snow') || lowerType.includes('ice')) return Snowflake;
-    if (lowerType.includes('severe weather')) return Zap;
-    return AlertTriangle;
+  const getCustomDisasterIcon = (type: string) => {
+    if (!type) return null;
+    return getDisasterIcon(type);
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -144,7 +138,7 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
           {/* Timeline Events */}
           <div className="space-y-4 pb-8">
             {filteredDisasters.slice(0, displayCount).map((disaster, index) => {
-              const Icon = getDisasterIcon(disaster.incidentType || 'Unknown');
+              const customIcon = getCustomDisasterIcon(disaster.incidentType || 'Unknown');
               const typeColor = disaster.declarationType === 'DR' ? 'text-red-600' : 'text-orange-600';
               const typeBg = disaster.declarationType === 'DR' 
                 ? 'bg-gradient-to-r from-red-50 to-red-100 border-red-300' 
@@ -161,16 +155,24 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
               
               return (
                 <div key={disaster.disasterNumber} className="relative group">
-                  {/* Timeline Node */}
-                  <div className={`absolute left-5 w-6 h-6 rounded-full ${nodeColor} border-4 border-white shadow-lg z-20 flex items-center justify-center transition-all duration-300 hover:scale-125`}>
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                  {/* Timeline Node with Custom Icon */}
+                  <div className={`absolute left-3 w-10 h-10 rounded-full ${nodeColor} border-4 border-white shadow-lg z-20 flex items-center justify-center transition-all duration-300 hover:scale-110`}>
+                    {customIcon ? (
+                      <img 
+                        src={customIcon} 
+                        alt={disaster.incidentType || 'Disaster'} 
+                        className="w-6 h-6 object-contain" 
+                      />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-white" />
+                    )}
                   </div>
                   
                   {/* Connection Line */}
-                  <div className={`absolute left-11 top-3 w-8 h-0.5 ${connectionColor} border-t-2 border-dashed z-10`}></div>
+                  <div className={`absolute left-14 top-5 w-10 h-0.5 ${connectionColor} border-t-2 border-dashed z-10`}></div>
                   
                   {/* Expandable Event Card */}
-                  <div className="ml-20">
+                  <div className="ml-24">
                     <div 
                       className={`border-2 rounded-xl p-4 ${typeBg} hover:shadow-xl transition-all duration-300 hover:scale-[1.01] hover:-translate-y-1 cursor-pointer`}
                       onClick={() => setExpandedCard(expandedCard === disaster.disasterNumber ? null : disaster.disasterNumber)}
@@ -178,8 +180,16 @@ export function CompactTimeline({ disasters }: CompactTimelineProps) {
                       {/* Compact Summary Header */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${nodeColor} shadow-lg`}>
-                            <Icon className="w-4 h-4 text-white" />
+                          <div className={`p-3 rounded-lg ${nodeColor} shadow-lg border-2 border-white`}>
+                            {customIcon ? (
+                              <img 
+                                src={customIcon} 
+                                alt={disaster.incidentType || 'Disaster'} 
+                                className="w-6 h-6 object-contain" 
+                              />
+                            ) : (
+                              <AlertTriangle className="w-6 h-6 text-white" />
+                            )}
                           </div>
                           <div>
                             <div className="font-bold text-gray-900 text-base leading-tight">
