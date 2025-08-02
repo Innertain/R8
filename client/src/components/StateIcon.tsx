@@ -13,6 +13,18 @@ import DCImg from '@assets/District of Columbia_1754172085116.png';
 import FloridaImg from '@assets/Florida_1754172085117.png';
 import GeorgiaImg from '@assets/Georgia_1754172085118.png';
 import HawaiiImg from '@assets/Hawaii_1754172085119.png';
+import IowaImg from '@assets/Iowa_1754172506887.png';
+import KansasImg from '@assets/Kansas_1754172506887.png';
+import KentuckyImg from '@assets/Kentucky_1754172506888.png';
+import LouisianaImg from '@assets/Lousiana_1754172506888.png';
+import MaineImg from '@assets/Maine_1754172506889.png';
+import MarylandImg from '@assets/Maryland_1754172506889.png';
+import MassachusettsImg from '@assets/Massachusetts_1754172506890.png';
+import MichiganImg from '@assets/Michigan_1754172506890.png';
+import MinnesotaImg from '@assets/Minnesota_1754172506891.png';
+import MissouriImg from '@assets/Misouri_1754172506891.png';
+import MississippiImg from '@assets/Mississippi_1754172506892.png';
+import NebraskaImg from '@assets/Nebraska_1754172506886.png';
 
 interface StateIconProps {
   state: string;
@@ -35,6 +47,18 @@ const stateImages: Record<string, string> = {
   'FL': FloridaImg,
   'GA': GeorgiaImg,
   'HI': HawaiiImg,
+  'IA': IowaImg,
+  'KS': KansasImg,
+  'KY': KentuckyImg,
+  'LA': LouisianaImg,
+  'ME': MaineImg,
+  'MD': MarylandImg,
+  'MA': MassachusettsImg,
+  'MI': MichiganImg,
+  'MN': MinnesotaImg,
+  'MO': MissouriImg,
+  'MS': MississippiImg,
+  'NE': NebraskaImg,
 };
 
 export function StateIcon({ state, size = 24, className = "", color = "currentColor" }: StateIconProps) {
