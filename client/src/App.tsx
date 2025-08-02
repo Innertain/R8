@@ -29,10 +29,10 @@ function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   return (
-    <nav className="bg-stormy-light border-b border-stormy-primary/20 px-4 py-3">
+    <nav className="bg-stormy-dark/90 backdrop-blur-sm border-b border-stormy-light/30 px-4 py-3">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-bold text-stormy-dark">R8</h1>
+          <h1 className="text-xl font-bold text-white">R8</h1>
           <img 
             src="/src/assets/r8-logo.png"
             alt="R8 Logo" 
@@ -180,7 +180,7 @@ function Navigation() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="sm:hidden border-t border-stormy-primary/20 mt-3 pt-3">
+        <div className="sm:hidden border-t border-stormy-light/30 mt-3 pt-3">
           <div className="flex flex-col gap-2">
             <Link href="/">
               <Button 
@@ -206,7 +206,7 @@ function Navigation() {
             </Link>
 
             {/* Disaster Response Section */}
-            <div className="text-xs font-medium text-stormy-dark px-2 py-1 uppercase tracking-wide">
+            <div className="text-xs font-medium text-stormy-light px-2 py-1 uppercase tracking-wide">
               Disaster Response
             </div>
             <Link href="/map">
@@ -244,7 +244,7 @@ function Navigation() {
             </Link>
 
             {/* Regeneration Section */}
-            <div className="text-xs font-medium text-stormy-dark px-2 py-1 uppercase tracking-wide">
+            <div className="text-xs font-medium text-stormy-light px-2 py-1 uppercase tracking-wide">
               Regeneration
             </div>
             <Link href="/bioregions">
@@ -290,7 +290,7 @@ function Navigation() {
 
 function Router() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stormy-light to-white">
+    <div className="min-h-screen bg-gradient-to-br from-stormy-dark via-stormy-primary/30 to-stormy-dark/80">
       <Navigation />
       <Switch>
         <Route path="/" component={Home} />

@@ -75,9 +75,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stormy-light/20 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-stormy-light to-stormy-accent/20 border-b border-stormy-primary/30">
+      <div className="bg-gradient-to-r from-stormy-dark via-stormy-primary to-stormy-accent/40 border-b border-stormy-light/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
@@ -86,10 +86,10 @@ export default function Home() {
                 alt="R8 Logo" 
                 className="w-16 h-16 mr-4"
               />
-              <h1 className="text-5xl font-bold text-stormy-dark">R8</h1>
+              <h1 className="text-5xl font-bold text-white">R8</h1>
             </div>
-            <p className="text-2xl text-gray-600 mb-4">Disaster Relief • Community Resiliency • Regeneration</p>
-            <p className="text-lg text-gray-500 max-w-3xl mx-auto">
+            <p className="text-2xl text-stormy-light mb-4">Disaster Relief • Community Resiliency • Regeneration</p>
+            <p className="text-lg text-stormy-light/80 max-w-3xl mx-auto">
               Connecting communities to respond to disasters, build resilience, and support regenerative practices 
               that strengthen local ecosystems and community well-being.
             </p>
@@ -100,8 +100,8 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Platform Modules</h2>
-          <p className="text-lg text-gray-600">
+          <h2 className="text-3xl font-bold text-white mb-4">Platform Modules</h2>
+          <p className="text-lg text-stormy-light/90">
             Choose a module to access R8's disaster relief, community resiliency, and regeneration tools
           </p>
         </div>
@@ -135,31 +135,31 @@ export default function Home() {
         </div>
 
         {/* Quick Stats */}
-        <div className="mt-16 bg-white rounded-lg border border-gray-200 p-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Platform Overview</h3>
+        <div className="mt-16 bg-stormy-dark/80 backdrop-blur-sm rounded-lg border border-stormy-light/30 p-8">
+          <h3 className="text-2xl font-bold text-white mb-6 text-center">Platform Overview</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-blue-600 mb-1">7</div>
-              <div className="text-sm text-gray-600">Active Modules</div>
+              <div className="text-sm text-stormy-light/80">Active Modules</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-green-600 mb-1">24/7</div>
-              <div className="text-sm text-gray-600">Monitoring</div>
+              <div className="text-sm text-stormy-light/80">Monitoring</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-purple-600 mb-1">∞</div>
-              <div className="text-sm text-gray-600">Data Sources</div>
+              <div className="text-sm text-stormy-light/80">Data Sources</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-amber-600 mb-1">🌍</div>
-              <div className="text-sm text-gray-600">Global Coverage</div>
+              <div className="text-sm text-stormy-light/80">Global Coverage</div>
             </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-12 mt-16">
+      <footer className="bg-stormy-dark border-t border-stormy-light/30 py-12 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">
@@ -168,9 +168,9 @@ export default function Home() {
                 alt="R8 Logo" 
                 className="w-8 h-8 mr-2"
               />
-              <span className="text-lg font-semibold text-gray-900">R8</span>
+              <span className="text-lg font-semibold text-white">R8</span>
             </div>
-            <p className="text-gray-600">
+            <p className="text-stormy-light/80">
               Disaster Relief • Community Resiliency • Regeneration
             </p>
           </div>
