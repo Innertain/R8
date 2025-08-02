@@ -334,7 +334,7 @@
   --card-foreground: hsl(20, 14.3%, 4.1%);
   --border: hsl(20, 5.9%, 90%);
   --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(217, 91%, 60%);
+  --primary: var(--stormy-primary);
   --primary-foreground: hsl(210, 40%, 98%);
   --secondary: hsl(60, 4.8%, 95.9%);
   --secondary-foreground: hsl(24, 9.8%, 10%);
@@ -363,6 +363,16 @@
   --blue-800: hsl(224, 76%, 48%);
   --rose-100: hsl(357, 100%, 95%);
   --rose-600: hsl(346, 77%, 49%);
+  
+  /* Stormy Morning Color Palette */
+  --stormy-dark: #384959;
+  --stormy-primary: #6A89A7;
+  --stormy-light: #BDDDFC;
+  --stormy-accent: #88BDF2;
+  --stormy-dark-hsl: 210, 21%, 28%;
+  --stormy-primary-hsl: 210, 22%, 53%;
+  --stormy-light-hsl: 210, 87%, 86%;
+  --stormy-accent-hsl: 210, 82%, 75%;
 }
 
 .dark {
@@ -376,7 +386,7 @@
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 3.7%, 15.9%);
   --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(217, 91%, 60%);
+  --primary: var(--stormy-primary);
   --primary-foreground: hsl(210, 40%, 98%);
   --secondary: hsl(240, 3.7%, 15.9%);
   --secondary-foreground: hsl(0, 0%, 98%);

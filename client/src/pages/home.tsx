@@ -21,63 +21,63 @@ export default function Home() {
       description: "Manage your volunteer shifts and availability",
       icon: <Calendar className="w-8 h-8" />,
       href: "/volunteer",
-      color: "bg-blue-50 border-blue-200 hover:bg-blue-100",
-      iconColor: "text-blue-600"
+      color: "bg-stormy-light/30 border-stormy-primary/30 hover:bg-stormy-light/50",
+      iconColor: "text-stormy-primary"
     },
     {
       title: "Disaster Watch Center", 
       description: "Real-time emergency monitoring and response coordination",
       icon: <Shield className="w-8 h-8" />,
       href: "/map",
-      color: "bg-red-50 border-red-200 hover:bg-red-100",
-      iconColor: "text-red-600"
+      color: "bg-stormy-accent/20 border-stormy-accent/40 hover:bg-stormy-accent/30",
+      iconColor: "text-stormy-dark"
     },
     {
       title: "Impact Statistics",
       description: "Track volunteer impact and community metrics",
       icon: <BarChart3 className="w-8 h-8" />,
       href: "/stats", 
-      color: "bg-green-50 border-green-200 hover:bg-green-100",
-      iconColor: "text-green-600"
+      color: "bg-stormy-primary/10 border-stormy-primary/25 hover:bg-stormy-primary/20",
+      iconColor: "text-stormy-primary"
     },
     {
       title: "Custom Alerts",
       description: "Set up personalized emergency and volunteer alerts",
       icon: <Bell className="w-8 h-8" />,
       href: "/alerts",
-      color: "bg-amber-50 border-amber-200 hover:bg-amber-100", 
-      iconColor: "text-amber-600"
+      color: "bg-stormy-dark/5 border-stormy-dark/20 hover:bg-stormy-dark/10", 
+      iconColor: "text-stormy-dark"
     },
     {
       title: "Bioregion Explorer",
       description: "Explore global ecosystems and conservation efforts",
       icon: <Globe className="w-8 h-8" />,
       href: "/bioregions",
-      color: "bg-emerald-50 border-emerald-200 hover:bg-emerald-100",
-      iconColor: "text-emerald-600"
+      color: "bg-stormy-light/40 border-stormy-accent/30 hover:bg-stormy-light/60",
+      iconColor: "text-stormy-primary"
     },
     {
       title: "Hawaiʻi Regeneration",
       description: "Traditional practices and restoration projects in Hawaii",
       icon: <Mountain className="w-8 h-8" />,
       href: "/hawaii",
-      color: "bg-cyan-50 border-cyan-200 hover:bg-cyan-100",
-      iconColor: "text-cyan-600"
+      color: "bg-stormy-accent/15 border-stormy-light/50 hover:bg-stormy-accent/25",
+      iconColor: "text-stormy-dark"
     },
     {
       title: "Appalachian Regeneration", 
       description: "Mountain heritage and forest restoration initiatives",
       icon: <Mountain className="w-8 h-8" />,
       href: "/appalachian",
-      color: "bg-purple-50 border-purple-200 hover:bg-purple-100",
-      iconColor: "text-purple-600"
+      color: "bg-stormy-dark/8 border-stormy-primary/30 hover:bg-stormy-dark/15",
+      iconColor: "text-stormy-dark"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-stormy-light/20 to-white">
       {/* Hero Section */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gradient-to-r from-stormy-light to-stormy-accent/20 border-b border-stormy-primary/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
@@ -86,7 +86,7 @@ export default function Home() {
                 alt="R8 Logo" 
                 className="w-16 h-16 mr-4"
               />
-              <h1 className="text-5xl font-bold text-gray-900">R8</h1>
+              <h1 className="text-5xl font-bold text-stormy-dark">R8</h1>
             </div>
             <p className="text-2xl text-gray-600 mb-4">Disaster Relief • Community Resiliency • Regeneration</p>
             <p className="text-lg text-gray-500 max-w-3xl mx-auto">

@@ -11,6 +11,13 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        // Stormy morning color palette
+        stormy: {
+          "dark": "#384959",
+          "primary": "#6A89A7", 
+          "light": "#BDDDFC",
+          "accent": "#88BDF2",
+        },
         background: "var(--background)",
         foreground: "var(--foreground)",
         card: {
