@@ -6,6 +6,7 @@ import { alertRules, alertDeliveries, userNotificationSettings, insertAlertRuleS
 import { eq, desc, and, gte } from "drizzle-orm";
 import { alertEngine, type EmergencyEvent } from "./alerting/alertEngine";
 import { fetchShiftsFromAirtableServer } from "./airtable";
+import { getBioregionSpecies, getApiUsageStats } from "./inaturalist";
 
 // Server-side cache for stats data
 let statsCache: { data: any; timestamp: number } | null = null;
@@ -3582,6 +3583,64 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     
     return 'low';
   }
+
+  // iNaturalist API routes with conservative usage patterns
+  app.get('/api/bioregion/:id/species', async (req, res) => {
+    try {
+      const bioregionId = req.params.id;
+      const bbox = req.query.bbox ? (req.query.bbox as string).split(',').map(Number) as [number, number, number, number] : undefined;
+      
+      if (!bbox) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Bounding box required (format: sw_lng,sw_lat,ne_lng,ne_lat)' 
+        });
+      }
+      
+      console.log(`🔬 Fetching species data for bioregion ${bioregionId}`);
+      const species = await getBioregionSpecies(bioregionId, bbox);
+      
+      res.json({
+        success: true,
+        bioregion_id: bioregionId,
+        species_count: species.length,
+        species: species.map(s => ({
+          id: s.taxon.id,
+          name: s.taxon.name,
+          common_name: s.taxon.preferred_common_name,
+          group: s.taxon.iconic_taxon_name,
+          observation_count: s.count,
+          photo: s.taxon.photos?.[0]?.medium_url
+        })),
+        note: species.length === 0 ? 'No species data available - may need API key or better location bounds' : undefined
+      });
+    } catch (error: any) {
+      console.error('Bioregion species API error:', error.message);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message.includes('Rate limit') ? error.message : 'Failed to fetch species data'
+      });
+    }
+  });
+
+  // API usage monitoring endpoint  
+  app.get('/api/inaturalist/usage', async (req, res) => {
+    try {
+      const stats = getApiUsageStats();
+      res.json({
+        success: true,
+        usage: stats,
+        status: stats.requests_this_session > 40 ? 'approaching_limit' : 'normal',
+        limits: {
+          max_requests_per_hour: 50,
+          current_session: stats.requests_this_session,
+          cache_duration_days: 30
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
