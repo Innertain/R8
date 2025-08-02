@@ -10,7 +10,6 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
 import InteractiveMap from "@/pages/interactive-map-new";
-import AirtableTest from "@/pages/airtable-test";
 import StatsDashboard from "@/pages/stats-dashboard";
 import AlertsPage from "@/pages/alerts";
 import BioregionExplorerPage from "@/pages/bioregion-explorer";
@@ -26,7 +25,7 @@ function Navigation() {
     <nav className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-bold">Volunteer Management</h1>
+          <h1 className="text-xl font-bold">R8 Emergency Response Platform</h1>
           <img 
             src="/src/assets/r8-logo.png"
             alt="R8 Logo" 
@@ -43,7 +42,7 @@ function Navigation() {
               className="flex items-center gap-2"
             >
               <HomeIcon className="h-4 w-4" />
-              Shifts
+              Home
             </Button>
           </Link>
           <Link href="/volunteer">
@@ -117,15 +116,6 @@ function Navigation() {
             </Button>
           </Link>
 
-          <Link href="/airtable-test">
-            <Button 
-              variant={location === "/airtable-test" ? "default" : "outline"} 
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              🔍 Airtable Test
-            </Button>
-          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -157,7 +147,7 @@ function Navigation() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <HomeIcon className="h-4 w-4" />
-                Browse Shifts
+                Home
               </Button>
             </Link>
             <Link href="/volunteer">
@@ -240,16 +230,6 @@ function Navigation() {
               </Button>
             </Link>
 
-            <Link href="/airtable-test">
-              <Button 
-                variant={location === "/airtable-test" ? "default" : "outline"} 
-                size="sm"
-                className="w-full flex items-center gap-2 justify-start"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                🔍 Airtable Test
-              </Button>
-            </Link>
           </div>
         </div>
       )}
@@ -271,7 +251,6 @@ function Router() {
         <Route path="/hawaii" component={HawaiiRegenerationPage} />
         <Route path="/appalachian" component={AppalachianRegenerationPage} />
 
-        <Route path="/airtable-test" component={AirtableTest} />
         <Route component={NotFound} />
       </Switch>
     </div>
