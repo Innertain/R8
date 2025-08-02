@@ -76,7 +76,7 @@ export default function InteractiveMap() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-stormy-dark via-stormy-primary/30 to-stormy-dark/80">
       {/* Global Filter Indicator */}
       <GlobalFilterIndicator 
         stateFilter={globalStateFilter !== 'all' ? globalStateFilter : undefined}
@@ -84,15 +84,15 @@ export default function InteractiveMap() {
       />
       
       {/* Header - Add top padding when filter is active */}
-      <header className={`bg-white shadow-sm border-b border-gray-200 ${globalStateFilter !== 'all' ? 'mt-32' : ''}`}>
+      <header className={`bg-stormy-dark/90 backdrop-blur-sm shadow-sm border-b border-stormy-light/30 ${globalStateFilter !== 'all' ? 'mt-32' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <MapPin className="h-8 w-8 text-blue-500 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">Disaster Watch Center</h1>
+              <h1 className="text-2xl font-bold text-white">Disaster Watch Center</h1>
             </div>
             <div className="flex items-center">
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              <Badge variant="outline" className="bg-stormy-light/20 text-stormy-light border-stormy-light/40">
                 Live Emergency Data
               </Badge>
             </div>
@@ -126,7 +126,7 @@ export default function InteractiveMap() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Description */}
         <div className="mb-8">
-          <p className="text-lg text-gray-600 max-w-4xl">
+          <p className="text-lg text-stormy-light/90 max-w-4xl">
             Real-time monitoring and analysis of emergency situations across the United States. 
             Track weather alerts, wildfire incidents, earthquake activity, and federal disaster declarations.
           </p>
@@ -134,8 +134,8 @@ export default function InteractiveMap() {
 
         {/* Quick Navigation */}
         <div className="mb-8">
-          <div className="flex flex-wrap gap-3 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-700 mr-4">Quick Navigation:</h3>
+          <div className="flex flex-wrap gap-3 p-4 bg-stormy-dark/80 backdrop-blur-sm rounded-lg border border-stormy-light/30 shadow-sm">
+            <h3 className="text-sm font-semibold text-white mr-4">Quick Navigation:</h3>
 
             <a href="#weather" className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
               <CloudRain className="w-4 h-4 mr-1" />
@@ -195,7 +195,7 @@ export default function InteractiveMap() {
           <div id="analytics" className="w-full">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="text-lg text-gray-600">Loading disaster data...</div>
+                <div className="text-lg text-stormy-light/90">Loading disaster data...</div>
               </div>
             ) : (
               <DisasterAnalyticsDashboard disasters={(femaData as any)?.items || []} />
