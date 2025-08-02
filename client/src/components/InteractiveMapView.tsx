@@ -5,7 +5,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Globe, ZoomIn, ZoomOut, RotateCcw, Layers } from 'lucide-react';
 import { booleanPointInPolygon, point as createPoint, centroid, bbox } from '../utils/turf-polyfill';
-import bioregionData from '../data/sample-bioregions.json';
+import bioregionData from '../data/expanded-bioregions.json';
 
 // Fix Leaflet default icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -191,7 +191,12 @@ const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
       'Deserts & Xeric Shrublands': '#CD853F',
       'Mediterranean Forests, Woodlands & Scrub': '#9ACD32',
       'Boreal Forests/Taiga': '#006400',
-      'Flooded Grasslands & Savannas': '#4682B4'
+      'Flooded Grasslands & Savannas': '#4682B4',
+      'Tropical & Subtropical Dry Broadleaf Forests': '#FF6347',
+      'Tropical & Subtropical Moist Broadleaf Forests': '#32CD32',
+      'Temperate Coniferous Forests': '#2E8B57',
+      'Tundra': '#B0C4DE',
+      'Montane Grasslands & Shrublands': '#BDB76B'
     };
     return colors[biome] || '#808080';
   };
@@ -316,32 +321,48 @@ const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
           />
           
           {/* Map Legend */}
-          <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg border z-10">
-            <h4 className="text-xs font-semibold mb-2">Biome Types</h4>
+          <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg border z-10 max-h-80 overflow-y-auto">
+            <h4 className="text-xs font-semibold mb-2">Biome Types ({(bioregionData as any).features.length} Ecoregions)</h4>
             <div className="space-y-1 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#228B22' }}></div>
                 <span>Temperate Forests</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#DAA520' }}></div>
-                <span>Grasslands</span>
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#32CD32' }}></div>
+                <span>Tropical Moist Forests</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#CD853F' }}></div>
-                <span>Deserts</span>
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FF6347' }}></div>
+                <span>Tropical Dry Forests</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#9ACD32' }}></div>
-                <span>Mediterranean</span>
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#2E8B57' }}></div>
+                <span>Coniferous Forests</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#006400' }}></div>
                 <span>Boreal Forest</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#4682B4' }}></div>
-                <span>Wetlands</span>
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#DAA520' }}></div>
+                <span>Grasslands</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#BDB76B' }}></div>
+                <span>Montane Grasslands</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#CD853F' }}></div>
+                <span>Deserts</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#B0C4DE' }}></div>
+                <span>Tundra</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: '#9ACD32' }}></div>
+                <span>Mediterranean</span>
               </div>
             </div>
           </div>

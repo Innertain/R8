@@ -8,6 +8,7 @@ import { MapPin, Globe, Search, Leaf, Info, ExternalLink } from 'lucide-react';
 import { geocodeLocation } from '../utils/geocode';
 import InteractiveMapView from './InteractiveMapView';
 import BioregionDetails from './BioregionDetails';
+import DataSourcesOverview from './DataSourcesOverview';
 
 // Sample bioregion data (in a real app, this would come from data/bioregions.geojson)
 const SAMPLE_BIOREGIONS = [
@@ -270,7 +271,9 @@ const BioregionExplorer: React.FC = () => {
         </Card>
       )}
 
-      {/* Sample Data Info */}
+      <DataSourcesOverview />
+
+      {/* Implementation Guide */}
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -322,7 +325,7 @@ const BioregionExplorer: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded"></div>
-                    <span className="font-mono">data/sample-bioregions.json</span>
+                    <span className="font-mono">data/expanded-bioregions.json</span>
                     <span className="text-green-600 font-semibold">✓ Active</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -350,7 +353,7 @@ const BioregionExplorer: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-1 h-1 bg-blue-500 rounded-full"></span>
-                    <span>8 North American bioregions mapped</span>
+                    <span>15 diverse ecoregions mapped (Hawaii, Alaska, Caribbean)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-1 h-1 bg-blue-500 rounded-full"></span>
@@ -365,8 +368,9 @@ const BioregionExplorer: React.FC = () => {
               <p className="text-xs text-blue-700">
                 Try entering a ZIP code like <span className="font-mono bg-white px-1 rounded">90210</span>, 
                 <span className="font-mono bg-white px-1 rounded">10001</span>, or 
-                <span className="font-mono bg-white px-1 rounded">60601</span> to see instant bioregion analysis.
-                Click polygons on the map for detailed ecological information.
+                <span className="font-mono bg-white px-1 rounded">60601</span>, or 
+                <span className="font-mono bg-white px-1 rounded">96797</span> (Hawaii) to see instant bioregion analysis.
+                Click polygons on the map for detailed ecological information including Hawaiian, Alaskan, and Caribbean ecoregions.
               </p>
             </div>
           </div>

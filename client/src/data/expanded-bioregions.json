@@ -1,0 +1,335 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "hawaiian_tropical_dry_forests",
+      "properties": {
+        "name": "Hawaiian Tropical Dry Forests",
+        "description": "Endangered dry forest ecosystems found on the leeward sides of Hawaiian islands, characterized by native species like wiliwili and mamane trees.",
+        "biome": "Tropical & Subtropical Dry Broadleaf Forests",
+        "area_km2": 6800,
+        "countries": ["United States"],
+        "climate": "Tropical dry climate with distinct wet and dry seasons",
+        "keySpecies": ["Wiliwili Tree", "Mamane", "Hawaiian Hoary Bat", "Hawaiian Hawk", "Nēnē (Hawaiian Goose)"],
+        "conservationStatus": "Critically Endangered",
+        "population": 1400000,
+        "realm": "Oceania"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-160.5, 18.8], [-154.5, 18.8], [-154.5, 22.5], [-160.5, 22.5], [-160.5, 18.8]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "hawaiian_tropical_rainforests",
+      "properties": {
+        "name": "Hawaiian Tropical Rainforests",
+        "description": "Lush rainforests on the windward sides of Hawaiian islands, home to endemic species like the Hawaiian tree ferns and native birds.",
+        "biome": "Tropical & Subtropical Moist Broadleaf Forests",
+        "area_km2": 2100,
+        "countries": ["United States"],
+        "climate": "Tropical rainforest climate with high precipitation year-round",
+        "keySpecies": ["Hawaiian Tree Fern", "Koa Tree", "ʻApapane", "Hawaiian Creeper", "ʻIʻiwi"],
+        "conservationStatus": "Vulnerable",
+        "population": 200000,
+        "realm": "Oceania"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-156.2, 19.2], [-154.8, 19.2], [-154.8, 20.3], [-156.2, 20.3], [-156.2, 19.2]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "alaska_boreal_interior",
+      "properties": {
+        "name": "Alaska Boreal Interior",
+        "description": "Vast boreal forest and tundra ecosystem covering interior Alaska, characterized by spruce forests, permafrost, and extreme seasonal temperature variations.",
+        "biome": "Boreal Forests/Taiga",
+        "area_km2": 485000,
+        "countries": ["United States"],
+        "climate": "Subarctic continental climate with extreme winter temperatures",
+        "keySpecies": ["White Spruce", "Black Spruce", "Caribou", "Moose", "Arctic Fox", "Snowy Owl"],
+        "conservationStatus": "Relatively Stable",
+        "population": 250000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-170.0, 60.0], [-130.0, 60.0], [-130.0, 68.0], [-170.0, 68.0], [-170.0, 60.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "alaskan_arctic_tundra",
+      "properties": {
+        "name": "Alaskan Arctic Tundra",
+        "description": "Treeless Arctic plains with permafrost, supporting caribou migrations and diverse Arctic wildlife during brief summer seasons.",
+        "biome": "Tundra",
+        "area_km2": 223000,
+        "countries": ["United States"],
+        "climate": "Arctic climate with permafrost and polar night/day cycles",
+        "keySpecies": ["Caribou", "Arctic Fox", "Polar Bear", "Snowy Owl", "Arctic Tern", "Musk Ox"],
+        "conservationStatus": "Vulnerable",
+        "population": 75000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-168.0, 68.0], [-140.0, 68.0], [-140.0, 71.5], [-168.0, 71.5], [-168.0, 68.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "puerto_rico_moist_forests",
+      "properties": {
+        "name": "Puerto Rico Moist Forests",
+        "description": "Tropical moist forests of Puerto Rico, including El Yunque rainforest, supporting high levels of endemism and biodiversity.",
+        "biome": "Tropical & Subtropical Moist Broadleaf Forests",
+        "area_km2": 2800,
+        "countries": ["United States"],
+        "climate": "Tropical climate with consistent temperatures and seasonal rainfall",
+        "keySpecies": ["Puerto Rican Parrot", "Cecropia Tree", "Tree Ferns", "Coquí Frog", "Puerto Rican Boa"],
+        "conservationStatus": "Endangered",
+        "population": 3200000,
+        "realm": "Neotropical"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-67.5, 17.8], [-65.2, 17.8], [-65.2, 18.6], [-67.5, 18.6], [-67.5, 17.8]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "texas_blackland_prairies",
+      "properties": {
+        "name": "Texas Blackland Prairies", 
+        "description": "Fertile prairie ecosystem characterized by deep, dark clay soils supporting diverse grassland communities and agricultural lands.",
+        "biome": "Temperate Grasslands, Savannas & Shrublands",
+        "area_km2": 50000,
+        "countries": ["United States"],
+        "climate": "Humid subtropical climate with hot summers and mild winters",
+        "keySpecies": ["Big Bluestem", "Little Bluestem", "Bison", "Greater Prairie-Chicken", "Scissor-tailed Flycatcher"],
+        "conservationStatus": "Critically Endangered",
+        "population": 6800000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-97.5, 28.5], [-95.5, 28.5], [-95.5, 33.5], [-97.5, 33.5], [-97.5, 28.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "southern_rocky_mountain_steppe",
+      "properties": {
+        "name": "Southern Rocky Mountain Steppe",
+        "description": "High elevation grasslands and shrublands of the southern Rocky Mountains, featuring sagebrush communities and montane meadows.",
+        "biome": "Montane Grasslands & Shrublands",
+        "area_km2": 85000,
+        "countries": ["United States"],
+        "climate": "Alpine and subalpine climate with cold winters and short growing seasons",
+        "keySpecies": ["Big Sagebrush", "Mountain Goat", "Pika", "White-tailed Ptarmigan", "Alpine Forget-me-not"],
+        "conservationStatus": "Relatively Stable",
+        "population": 2100000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-109.0, 37.0], [-104.5, 37.0], [-104.5, 41.0], [-109.0, 41.0], [-109.0, 37.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "mojave_desert",
+      "properties": {
+        "name": "Mojave Desert",
+        "description": "High desert ecosystem known for Joshua trees and unique desert communities, transitional between Great Basin and Sonoran deserts.",
+        "biome": "Deserts & Xeric Shrublands",
+        "area_km2": 124000,
+        "countries": ["United States"],
+        "climate": "Hot desert climate with extreme temperature variations and low precipitation",
+        "keySpecies": ["Joshua Tree", "Mojave Yucca", "Desert Tortoise", "Cholla Cactus", "Kit Fox"],
+        "conservationStatus": "Vulnerable",
+        "population": 1800000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-118.0, 34.0], [-114.0, 34.0], [-114.0, 37.5], [-118.0, 37.5], [-118.0, 34.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "great_basin_shrub_steppe",
+      "properties": {
+        "name": "Great Basin Shrub Steppe",
+        "description": "Cold desert ecosystem dominated by sagebrush and bunchgrasses, located in the rain shadow of the Sierra Nevada and Cascade mountains.",
+        "biome": "Deserts & Xeric Shrublands",
+        "area_km2": 409000,
+        "countries": ["United States"],
+        "climate": "Cold desert climate with hot summers and cold winters",
+        "keySpecies": ["Big Sagebrush", "Bluebunch Wheatgrass", "Pronghorn", "Sage Grouse", "Pygmy Rabbit"],
+        "conservationStatus": "Vulnerable",
+        "population": 1500000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-120.0, 35.5], [-111.0, 35.5], [-111.0, 43.0], [-120.0, 43.0], [-120.0, 35.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "northern_mixed_grasslands",
+      "properties": {
+        "name": "Northern Mixed Grasslands",
+        "description": "Diverse grassland ecosystem spanning the northern Great Plains, supporting both tallgrass and shortgrass prairie communities.",
+        "biome": "Temperate Grasslands, Savannas & Shrublands",
+        "area_km2": 182000,
+        "countries": ["United States", "Canada"],
+        "climate": "Continental climate with cold winters and warm summers",
+        "keySpecies": ["Blue Grama", "Buffalo Grass", "Bison", "Black-footed Ferret", "Burrowing Owl"],
+        "conservationStatus": "Endangered",
+        "population": 1200000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-104.0, 45.0], [-96.0, 45.0], [-96.0, 49.0], [-104.0, 49.0], [-104.0, 45.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "southeastern_mixed_forests",
+      "properties": {
+        "name": "Southeastern Mixed Forests",
+        "description": "Diverse temperate forests of the southeastern United States, featuring oak-hickory-pine communities and high biodiversity.",
+        "biome": "Temperate Broadleaf & Mixed Forests",
+        "area_km2": 394000,
+        "countries": ["United States"],
+        "climate": "Humid subtropical climate with hot summers and mild winters",
+        "keySpecies": ["Longleaf Pine", "Live Oak", "American Alligator", "Wood Duck", "Red-cockaded Woodpecker"],
+        "conservationStatus": "Vulnerable",
+        "population": 42000000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-94.0, 28.0], [-75.0, 28.0], [-75.0, 37.0], [-94.0, 37.0], [-94.0, 28.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "northern_california_coastal_forests", 
+      "properties": {
+        "name": "Northern California Coastal Forests",
+        "description": "Temperate coniferous forests along the northern California coast, featuring coast redwoods and Douglas fir in fog-influenced climates.",
+        "biome": "Temperate Coniferous Forests",
+        "area_km2": 7900,
+        "countries": ["United States"],
+        "climate": "Mediterranean climate with marine influence and summer fog",
+        "keySpecies": ["Coast Redwood", "Douglas Fir", "Tan Oak", "Spotted Owl", "Marbled Murrelet"],
+        "conservationStatus": "Vulnerable",
+        "population": 750000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-124.5, 38.5], [-121.5, 38.5], [-121.5, 42.0], [-124.5, 42.0], [-124.5, 38.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "central_forest_grasslands_transition",
+      "properties": {
+        "name": "Central Forest-Grasslands Transition",
+        "description": "Ecotone between eastern forests and western grasslands, creating diverse oak savannas and woodland-prairie mosaics.",
+        "biome": "Temperate Grasslands, Savannas & Shrublands",
+        "area_km2": 293000,
+        "countries": ["United States"],
+        "climate": "Continental climate with moderate precipitation",
+        "keySpecies": ["Bur Oak", "Big Bluestem", "Greater Prairie-Chicken", "Plains Pocket Gopher", "Dickcissel"],
+        "conservationStatus": "Critically Endangered",
+        "population": 18500000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-100.0, 36.0], [-90.0, 36.0], [-90.0, 43.0], [-100.0, 43.0], [-100.0, 36.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "chihuahuan_desert",
+      "properties": {
+        "name": "Chihuahuan Desert",
+        "description": "Large desert ecosystem spanning the southwestern United States and northern Mexico, characterized by diverse succulent communities.",
+        "biome": "Deserts & Xeric Shrublands",
+        "area_km2": 362000,
+        "countries": ["United States", "Mexico"],
+        "climate": "Hot desert climate with summer monsoons",
+        "keySpecies": ["Lechuguilla Agave", "Ocotillo", "Javelina", "Desert Bighorn Sheep", "Roadrunner"],
+        "conservationStatus": "Relatively Stable",
+        "population": 6200000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-109.0, 25.5], [-102.0, 25.5], [-102.0, 32.0], [-109.0, 32.0], [-109.0, 25.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "central_canadian_shield_forests",
+      "properties": {
+        "name": "Central Canadian Shield Forests",
+        "description": "Boreal forest ecosystem on the ancient Canadian Shield, featuring coniferous forests, countless lakes, and pristine wilderness.",
+        "biome": "Boreal Forests/Taiga",
+        "area_km2": 1200000,
+        "countries": ["Canada"],
+        "climate": "Boreal climate with long, cold winters and short, warm summers",
+        "keySpecies": ["Black Spruce", "Jack Pine", "Moose", "Gray Wolf", "Common Loon", "Lynx"],
+        "conservationStatus": "Relatively Stable",
+        "population": 450000,
+        "realm": "Nearctic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-102.0, 49.0], [-75.0, 49.0], [-75.0, 60.0], [-102.0, 60.0], [-102.0, 49.0]
+        ]]
+      }
+    }
+  ]
+}
