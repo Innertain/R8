@@ -8,6 +8,8 @@ import { alertEngine, type EmergencyEvent } from "./alerting/alertEngine";
 import { fetchShiftsFromAirtableServer } from "./airtable";
 import { getBioregionSpecies, getApiUsageStats } from "./inaturalist";
 import speciesRoutes from "./routes/species";
+import { airQualityService } from "./services/airQualityService";
+import { airQualityStations, airQualityReadings } from "@shared/schema";
 
 // Server-side cache for stats data
 let statsCache: { data: any; timestamp: number } | null = null;
@@ -3634,6 +3636,148 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
   // Register species routes
   app.use('/api/species', speciesRoutes);
+
+  // Air Quality API routes
+  app.get("/api/air-quality/current", async (req, res) => {
+    try {
+      console.log('🌬️ Fetching current air quality alerts...');
+      const alerts = await airQualityService.getCurrentAirQualityAlerts();
+      
+      res.json({
+        success: true,
+        alerts,
+        count: alerts.length,
+        lastUpdated: new Date().toISOString(),
+        sources: ['EPA AQS', 'PurpleAir', 'World Air Quality Index']
+      });
+    } catch (error) {
+      console.error('Error fetching air quality alerts:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch air quality data',
+        alerts: []
+      });
+    }
+  });
+
+  app.get("/api/air-quality/stations", async (req, res) => {
+    try {
+      const stations = await db.select().from(airQualityStations).limit(100);
+      res.json({
+        success: true,
+        stations,
+        count: stations.length
+      });
+    } catch (error) {
+      console.error('Error fetching air quality stations:', error);
+      res.status(500).json({ error: 'Failed to fetch stations' });
+    }
+  });
+
+  app.get("/api/air-quality/readings/:stationId", async (req, res) => {
+    try {
+      const { stationId } = req.params;
+      const readings = await db.select()
+        .from(airQualityReadings)
+        .where(eq(airQualityReadings.stationId, stationId))
+        .orderBy(desc(airQualityReadings.timestamp))
+        .limit(24); // Last 24 readings
+      
+      res.json({
+        success: true,
+        readings,
+        stationId,
+        count: readings.length
+      });
+    } catch (error) {
+      console.error('Error fetching air quality readings:', error);
+      res.status(500).json({ error: 'Failed to fetch readings' });
+    }
+  });
+
+  app.post("/api/air-quality/monitor", async (req, res) => {
+    try {
+      console.log('🔍 Manually triggering air quality monitoring...');
+      const alerts = await airQualityService.monitorAirQuality();
+      
+      // Process each alert through the alert engine
+      for (const alert of alerts) {
+        const emergencyEvent: EmergencyEvent = {
+          id: alert.id,
+          type: 'air_quality',
+          title: `Air Quality Alert: ${alert.stationName}`,
+          description: `AQI: ${alert.aqi} (${alert.aqiCategory.replace('_', ' ').toUpperCase()}) - Primary pollutant: ${alert.primaryPollutant.toUpperCase()}. ${alert.healthRecommendations.join(' ')}`,
+          severity: alert.aqi > 200 ? 'critical' : alert.aqi > 150 ? 'high' : 'medium',
+          location: alert.location,
+          state: alert.state,
+          coordinates: alert.coordinates,
+          timestamp: alert.timestamp,
+          sourceData: {
+            aqi: alert.aqi,
+            aqiCategory: alert.aqiCategory,
+            primaryPollutant: alert.primaryPollutant,
+            healthRecommendations: alert.healthRecommendations,
+            affectedGroups: alert.affectedGroups,
+            dataSource: alert.dataSource
+          }
+        };
+        
+        await alertEngine.processEvent(emergencyEvent);
+      }
+      
+      res.json({
+        success: true,
+        message: `Processed ${alerts.length} air quality alerts`,
+        alerts,
+        alertsTriggered: alerts.length
+      });
+    } catch (error) {
+      console.error('Error during air quality monitoring:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to monitor air quality' 
+      });
+    }
+  });
+
+  // Set up periodic air quality monitoring (every 30 minutes)
+  setInterval(async () => {
+    try {
+      console.log('🕒 Periodic air quality monitoring...');
+      const alerts = await airQualityService.monitorAirQuality();
+      
+      // Only process significant alerts (AQI > 150)
+      const significantAlerts = alerts.filter(alert => alert.aqi > 150);
+      
+      for (const alert of significantAlerts) {
+        const emergencyEvent: EmergencyEvent = {
+          id: alert.id,
+          type: 'air_quality',
+          title: `Air Quality Alert: ${alert.stationName}`,
+          description: `AQI: ${alert.aqi} (${alert.aqiCategory.replace('_', ' ').toUpperCase()}) - ${alert.healthRecommendations[0]}`,
+          severity: alert.aqi > 200 ? 'critical' : 'high',
+          location: alert.location,
+          state: alert.state,
+          coordinates: alert.coordinates,
+          timestamp: alert.timestamp,
+          sourceData: {
+            aqi: alert.aqi,
+            aqiCategory: alert.aqiCategory,
+            primaryPollutant: alert.primaryPollutant,
+            dataSource: alert.dataSource
+          }
+        };
+        
+        await alertEngine.processEvent(emergencyEvent);
+      }
+      
+      if (significantAlerts.length > 0) {
+        console.log(`✓ Processed ${significantAlerts.length} significant air quality alerts`);
+      }
+    } catch (error) {
+      console.error('Error in periodic air quality monitoring:', error);
+    }
+  }, 30 * 60 * 1000); // 30 minutes
 
   const httpServer = createServer(app);
   return httpServer;

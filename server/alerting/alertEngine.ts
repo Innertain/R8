@@ -11,7 +11,7 @@ export interface AlertCondition {
 
 export interface EmergencyEvent {
   id: string;
-  type: 'weather' | 'wildfire' | 'earthquake' | 'disaster';
+  type: 'weather' | 'wildfire' | 'earthquake' | 'disaster' | 'air_quality';
   title: string;
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';

@@ -118,7 +118,7 @@ export const alertRules = pgTable("alert_rules", {
   isActive: boolean("is_active").default(true),
   
   // Alert conditions
-  alertType: varchar("alert_type", { length: 50 }).notNull(), // 'weather', 'wildfire', 'earthquake', 'disaster'
+  alertType: varchar("alert_type", { length: 50 }).notNull(), // 'weather', 'wildfire', 'earthquake', 'disaster', 'air_quality'
   conditions: jsonb("conditions").notNull(), // Store complex conditions as JSON
   
   // Geographic filters
@@ -199,7 +199,7 @@ export type InsertUserNotificationSettings = typeof userNotificationSettings.$in
 // Zod schemas for validation
 export const insertAlertRuleSchema = createInsertSchema(alertRules, {
   name: z.string().min(1, "Alert name is required").max(255),
-  alertType: z.enum(["weather", "wildfire", "earthquake", "disaster"]),
+  alertType: z.enum(["weather", "wildfire", "earthquake", "disaster", "air_quality"]),
   notificationMethods: z.array(z.enum(["email", "sms", "webhook"])).min(1, "At least one notification method required"),
   cooldownMinutes: z.number().min(1).max(1440), // 1 minute to 24 hours
   maxAlertsPerDay: z.number().min(1).max(100),
@@ -349,3 +349,96 @@ export const insertSpeciesRecordSchema = createInsertSchema(speciesRecords).omit
 
 export type InsertBioregionSpeciesCacheType = z.infer<typeof insertBioregionSpeciesCacheSchema>;
 export type InsertSpeciesRecordType = z.infer<typeof insertSpeciesRecordSchema>;
+
+// Air Quality monitoring tables
+export const airQualityStations = pgTable("air_quality_stations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  stationId: varchar("station_id").notNull().unique(), // EPA/PurpleAir station ID
+  name: varchar("name").notNull(),
+  latitude: real("latitude").notNull(),
+  longitude: real("longitude").notNull(),
+  state: varchar("state", { length: 2 }),
+  county: varchar("county"),
+  dataSource: varchar("data_source").notNull(), // 'epa', 'purpleair', 'waqi'
+  isActive: boolean("is_active").default(true),
+  lastReportedAt: timestamp("last_reported_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const airQualityReadings = pgTable("air_quality_readings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  stationId: varchar("station_id").notNull().references(() => airQualityStations.stationId),
+  timestamp: timestamp("timestamp").notNull(),
+  
+  // Air Quality Index and pollutants
+  aqi: integer("aqi"), // Overall AQI (0-500)
+  aqiCategory: varchar("aqi_category"), // 'good', 'moderate', 'unhealthy_sensitive', 'unhealthy', 'very_unhealthy', 'hazardous'
+  primaryPollutant: varchar("primary_pollutant"), // 'pm25', 'pm10', 'ozone', 'no2', 'so2', 'co'
+  
+  // Individual pollutant concentrations (μg/m³)
+  pm25: real("pm25"), // PM2.5
+  pm10: real("pm10"), // PM10
+  ozone: real("ozone"), // O3 (ppb)
+  no2: real("no2"), // NO2 (ppb)
+  so2: real("so2"), // SO2 (ppb)
+  co: real("co"), // CO (ppm)
+  
+  // Weather conditions that affect air quality
+  temperature: real("temperature"), // °C
+  humidity: real("humidity"), // %
+  windSpeed: real("wind_speed"), // m/s
+  windDirection: real("wind_direction"), // degrees
+  
+  dataSource: varchar("data_source").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Air quality alert zones for geographic targeting
+export const airQualityAlertZones = pgTable("air_quality_alert_zones", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(), // "Downtown Los Angeles", "San Francisco Bay Area"
+  description: text("description"),
+  
+  // Geographic bounds
+  northLat: real("north_lat").notNull(),
+  southLat: real("south_lat").notNull(),
+  eastLng: real("east_lng").notNull(),
+  westLng: real("west_lng").notNull(),
+  
+  // Zone characteristics
+  populationDensity: varchar("population_density"), // 'low', 'medium', 'high'
+  vulnerablePopulation: boolean("vulnerable_population").default(false), // Schools, hospitals, elderly care
+  industrialActivity: boolean("industrial_activity").default(false),
+  
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type AirQualityStation = typeof airQualityStations.$inferSelect;
+export type InsertAirQualityStation = typeof airQualityStations.$inferInsert;
+
+export type AirQualityReading = typeof airQualityReadings.$inferSelect;
+export type InsertAirQualityReading = typeof airQualityReadings.$inferInsert;
+
+export type AirQualityAlertZone = typeof airQualityAlertZones.$inferSelect;
+export type InsertAirQualityAlertZone = typeof airQualityAlertZones.$inferInsert;
+
+// Zod schemas for validation
+export const insertAirQualityStationSchema = createInsertSchema(airQualityStations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAirQualityReadingSchema = createInsertSchema(airQualityReadings).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAirQualityAlertZoneSchema = createInsertSchema(airQualityAlertZones).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertAirQualityStationType = z.infer<typeof insertAirQualityStationSchema>;
+export type InsertAirQualityReadingType = z.infer<typeof insertAirQualityReadingSchema>;
+export type InsertAirQualityAlertZoneType = z.infer<typeof insertAirQualityAlertZoneSchema>;

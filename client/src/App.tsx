@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield, Wind } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -21,6 +21,7 @@ import AlertsPage from "@/pages/alerts";
 import BioregionExplorerPage from "@/pages/bioregion-explorer";
 import HawaiiRegenerationPage from "@/pages/hawaii-regeneration";
 import AppalachianRegenerationPage from "@/pages/appalachian-regeneration";
+import AirQualityPage from "@/pages/air-quality";
 import { StateSVGDefs } from "@/components/StateIcon";
 
 
@@ -109,6 +110,17 @@ function Navigation() {
                     <div>
                       <div className="font-medium text-gray-900">Custom Alerts</div>
                       <div className="text-sm text-gray-600">Personalized notifications</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/air-quality" className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer">
+                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <Wind className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">Air Quality Monitor</div>
+                      <div className="text-sm text-gray-600">Environmental health alerts</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -220,6 +232,12 @@ function Navigation() {
                 <Link href="/alerts" className="flex items-center gap-2 w-full p-2">
                   <Bell className="h-4 w-4" />
                   Alerts
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/air-quality" className="flex items-center gap-2 w-full p-2">
+                  <Wind className="h-4 w-4" />
+                  Air Quality
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -340,6 +358,17 @@ function Navigation() {
                 Custom Alerts
               </Button>
             </Link>
+            <Link href="/air-quality">
+              <Button 
+                variant={location === "/air-quality" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start ml-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Wind className="h-4 w-4" />
+                Air Quality Monitor
+              </Button>
+            </Link>
 
             {/* Regeneration Section */}
             <div className="text-xs font-medium text-stormy-light px-2 py-1 uppercase tracking-wide">
@@ -396,6 +425,7 @@ function Router() {
         <Route path="/map" component={InteractiveMap} />
         <Route path="/stats" component={StatsDashboard} />
         <Route path="/alerts" component={AlertsPage} />
+        <Route path="/air-quality" component={AirQualityPage} />
         <Route path="/bioregions" component={BioregionExplorerPage} />
         <Route path="/hawaii" component={HawaiiRegenerationPage} />
         <Route path="/appalachian" component={AppalachianRegenerationPage} />
