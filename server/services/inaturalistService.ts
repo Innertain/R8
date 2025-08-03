@@ -139,9 +139,9 @@ class INaturalistService {
         threatenedSpecies: cached[0].threatenedSpecies || [],
         topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
         recentSightings: recentSightings || [],
-        seasonalTrends: {},
+        seasonalTrends: (cached[0].seasonalTrends as Record<string, number>) || {},
         identificationNeeds: identificationNeeds || [],
-        speciesPhotos: {},
+        speciesPhotos: (cached[0].speciesPhotos as Record<string, string>) || {},
       };
     }
 
@@ -283,6 +283,10 @@ class INaturalistService {
           endemicSpecies: data.endemicSpecies,
           threatenedSpecies: data.threatenedSpecies,
           topTaxa: data.topTaxa,
+          recentSightings: data.recentSightings,
+          seasonalTrends: data.seasonalTrends,
+          identificationNeeds: data.identificationNeeds,
+          speciesPhotos: data.speciesPhotos,
           lastSyncedAt: now,
           syncStatus: 'success',
           updatedAt: now,
@@ -295,6 +299,10 @@ class INaturalistService {
             endemicSpecies: data.endemicSpecies,
             threatenedSpecies: data.threatenedSpecies,
             topTaxa: data.topTaxa,
+            recentSightings: data.recentSightings,
+            seasonalTrends: data.seasonalTrends,
+            identificationNeeds: data.identificationNeeds,
+            speciesPhotos: data.speciesPhotos,
             lastSyncedAt: now,
             syncStatus: 'success',
             updatedAt: now,

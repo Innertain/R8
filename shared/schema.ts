@@ -239,6 +239,12 @@ export const bioregionSpeciesCache = pgTable("bioregion_species_cache", {
   // Top taxa counts
   topTaxa: jsonb("top_taxa"), // {"Aves": 245, "Mammalia": 89, "Plantae": 1200}
   
+  // Recent activity data
+  recentSightings: jsonb("recent_sightings"), // [{species, location, date, photo, url}]
+  seasonalTrends: jsonb("seasonal_trends"), // {species: trend_data}
+  identificationNeeds: jsonb("identification_needs"), // [{species, observations, url}]
+  speciesPhotos: jsonb("species_photos"), // {species_name: photo_url}
+  
   // Conservation projects and citizen science opportunities
   conservationProjects: jsonb("conservation_projects"), // [{name, url, description}]
   citizenScienceProjects: jsonb("citizen_science_projects"),
