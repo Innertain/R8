@@ -49,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           baseId: BASE_ID
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       res.json({ success: false, error: error.message });
     }
   });
@@ -155,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('Metadata error:', errorText);
         res.json({ success: false, status: metaResponse.status, error: errorText });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('Metadata exception:', error.message);
       res.json({ success: false, error: error.message });
     }
@@ -183,7 +183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`Drivers "${tableName}" error:`, errorText);
         }
       } catch (error) {
-        console.log(`Drivers "${tableName}" exception:`, error.message);
+        console.log(`Drivers "${tableName}" exception:`, (error as Error).message);
         continue;
       }
     }
@@ -269,8 +269,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`✗ Failed for "${tableName}":`, errorText);
         res.json({ success: false, status: response.status, error: errorText });
       }
-    } catch (error) {
-      console.log(`Exception for "${tableName}":`, error.message);
+    } catch (error: any) {
+      console.log(`Exception for "${req.params.tableName}":`, error.message);
       res.json({ success: false, error: error.message });
     }
   });
@@ -282,7 +282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const volunteerData = insertVolunteerSchema.parse(req.body);
       const volunteer = await storage.createVolunteer(volunteerData);
       res.json(volunteer);
-    } catch (error) {
+    } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
   });
@@ -291,7 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const volunteers = await storage.getAllVolunteers();
       res.json(volunteers);
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
@@ -418,7 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const availabilityData = insertAvailabilitySchema.parse(requestData);
       const availability = await storage.createAvailability(availabilityData);
       res.json(availability);
-    } catch (error) {
+    } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
   });
@@ -516,7 +516,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(400).json({ error: "startDate and endDate are required" });
       }
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
@@ -525,7 +525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       await storage.deleteAvailability(req.params.id);
       res.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
@@ -743,7 +743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const assignments = await storage.getShiftAssignments(req.params.shiftId);
       res.json(assignments);
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
@@ -2431,17 +2431,6 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     return sources[feedIndex] || 'National Weather Service';
   }
 
-  function removeDuplicateAlerts(alerts: any[]): any[] {
-    const seen = new Set();
-    return alerts.filter(alert => {
-      const key = `${alert.title.toLowerCase()}-${alert.location}`;
-      if (seen.has(key)) {
-        return false;
-      }
-      seen.add(key);
-      return true;
-    });
-  }
 
   function sortAlertsBySeverity(alerts: any[]): any[] {
     const severityOrder = { 'severe': 0, 'moderate': 1, 'minor': 2 };
