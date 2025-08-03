@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
 import WildlifeFeedDemo from '@/components/WildlifeFeedDemo';
-import appalachianLandscapeImage from '@assets/Appalachian_1754183003386.png';
+import appalachianLandscapeImage from '@assets/Appalachian _1754183249913.png';
 
 // Appalachian restoration regions - traditional watershed and forest systems
 const appalachianProjects = [
