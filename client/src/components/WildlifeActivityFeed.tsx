@@ -16,7 +16,11 @@ import {
   Shield,
   AlertTriangle,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Leaf,
+  Sun,
+  Heart,
+  Users
 } from 'lucide-react';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
 
@@ -59,20 +63,344 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
   const getHabitatDescription = (species: string, region: string) => {
     if (region.includes('Hawaiian')) {
       const hawaiianHabitats: Record<string, string> = {
-        'Green Sea Turtle': 'Coastal waters, nesting beaches',
-        'Hawaiian Monk Seal': 'Sandy beaches, coral reefs',
-        'Hawaiian Goose': 'Grasslands, volcanic slopes, wetlands',
-        'ʻŌhiʻa Lehua': 'Native forests, volcanic soils',
-        'Java Sparrow': 'Urban areas, agricultural lands'
+        'Green Sea Turtle': 'Coastal waters, nesting beaches along sandy shores',
+        'Hawaiian Monk Seal': 'Sandy beaches, coral reefs, shallow coastal waters',
+        'Hawaiian Goose': 'Grasslands, volcanic slopes, wetlands, and lava flows',
+        'ʻŌhiʻa Lehua': 'Native forests from sea level to 8,000 feet elevation',
+        'Hawaiian Hoary Bat': 'Forest edges, agricultural areas, urban parks',
+        'Hawaiian Stilt': 'Shallow wetlands, fishponds, mudflats',
+        'Java Sparrow': 'Urban areas, agricultural lands, parks'
       };
-      return hawaiianHabitats[species] || 'Hawaiian native ecosystems';
+      return hawaiianHabitats[species] || 'Hawaiian native ecosystems and introduced habitats';
     } else {
       const appalachianHabitats: Record<string, string> = {
-        'Common Box Turtle': 'Deciduous forests, woodland edges',
-        'Monarch': 'Milkweed meadows, migration corridors'
+        'Common Box Turtle': 'Deciduous forests, woodland edges, meadows',
+        'Monarch': 'Milkweed meadows, migration corridors, open fields',
+        'Red Wolf': 'Coastal plains, forests, swamps, and agricultural areas',
+        'Florida Panther': 'Hardwood hammocks, pine flatwoods, cypress swamps'
       };
-      return appalachianHabitats[species] || 'Mixed forests, wetlands, grasslands';
+      return appalachianHabitats[species] || 'Mixed forests, wetlands, grasslands, and mountain ecosystems';
     }
+  };
+
+  const getIUCNStatus = (species: string) => {
+    const statusMap: Record<string, string> = {
+      'Green Sea Turtle': 'EN',
+      'Hawaiian Monk Seal': 'CR',
+      'Hawaiian Goose': 'VU',
+      'ʻŌhiʻa Lehua': 'VU',
+      'Hawaiian Hoary Bat': 'EN',
+      'Hawaiian Stilt': 'EN',
+      'Red Wolf': 'CR',
+      'Florida Panther': 'EN',
+      'Manatee': 'VU',
+      'Common Box Turtle': 'VU'
+    };
+    return statusMap[species] || 'VU';
+  };
+
+  const getIUCNStatusName = (species: string) => {
+    const status = getIUCNStatus(species);
+    const nameMap: Record<string, string> = {
+      'CR': 'Critically Endangered',
+      'EN': 'Endangered', 
+      'VU': 'Vulnerable',
+      'NT': 'Near Threatened',
+      'LC': 'Least Concern'
+    };
+    return nameMap[status] || 'Vulnerable';
+  };
+
+  const getPopulationTrend = (species: string) => {
+    const trendMap: Record<string, string> = {
+      'Green Sea Turtle': 'increasing',
+      'Hawaiian Monk Seal': 'decreasing',
+      'Hawaiian Goose': 'stable',
+      'ʻŌhiʻa Lehua': 'decreasing',
+      'Hawaiian Hoary Bat': 'decreasing',
+      'Red Wolf': 'stable',
+      'Florida Panther': 'increasing',
+      'Manatee': 'increasing'
+    };
+    return trendMap[species] || 'decreasing';
+  };
+
+  const getDetailedThreats = (species: string) => {
+    const threatMap: Record<string, string[]> = {
+      'Green Sea Turtle': [
+        'Marine debris and plastic pollution',
+        'Coastal development destroying nesting beaches',
+        'Climate change affecting sand temperatures',
+        'Fishing gear entanglement',
+        'Light pollution disrupting hatchlings'
+      ],
+      'Hawaiian Monk Seal': [
+        'Entanglement in marine debris and fishing nets',
+        'Limited habitat and breeding beaches',
+        'Human disturbance at pupping sites',
+        'Reduced prey availability',
+        'Disease outbreaks in small populations'
+      ],
+      'ʻŌhiʻa Lehua': [
+        'Rapid ʻŌhiʻa Death (ROD) fungal disease',
+        'Habitat destruction from development',
+        'Invasive plant species competition',
+        'Cattle and feral pig damage',
+        'Climate change stress'
+      ],
+      'Red Wolf': [
+        'Habitat loss and fragmentation',
+        'Hybridization with coyotes',
+        'Vehicle strikes on roads',
+        'Human persecution and illegal killing',
+        'Disease transmission from domestic dogs'
+      ],
+      'Florida Panther': [
+        'Vehicle collisions on highways',
+        'Habitat loss to development',
+        'Reduced genetic diversity',
+        'Mercury poisoning from prey',
+        'Competition with other predators'
+      ]
+    };
+    return threatMap[species] || [
+      'Habitat loss and degradation',
+      'Human disturbance and development',
+      'Climate change impacts',
+      'Invasive species competition',
+      'Pollution and contamination'
+    ];
+  };
+
+  const getSpeciesRange = (species: string, region: string) => {
+    if (region.includes('Hawaiian')) {
+      const hawaiianRanges: Record<string, string> = {
+        'Green Sea Turtle': 'All Hawaiian Islands, Pacific-wide distribution',
+        'Hawaiian Monk Seal': 'Northwestern Hawaiian Islands, main Hawaiian Islands',
+        'Hawaiian Goose': 'Big Island, Maui, Kauai - endemic to Hawaii',
+        'ʻŌhiʻa Lehua': 'All Hawaiian Islands from sea level to tree line',
+        'Hawaiian Hoary Bat': 'All main Hawaiian Islands - only native land mammal'
+      };
+      return hawaiianRanges[species] || 'Hawaiian Islands - endemic or indigenous species';
+    } else {
+      const appalachianRanges: Record<string, string> = {
+        'Red Wolf': 'Historically southeastern US, now only North Carolina',
+        'Florida Panther': 'Southern Florida, Big Cypress and Everglades',
+        'Common Box Turtle': 'Eastern United States from Maine to Georgia',
+        'Monarch': 'Eastern North America migration route through Appalachians'
+      };
+      return appalachianRanges[species] || 'Southeastern and Appalachian United States';
+    }
+  };
+
+  const getConservationActions = (species: string) => {
+    const actionMap: Record<string, string[]> = {
+      'Green Sea Turtle': [
+        'Beach protection and nest monitoring programs',
+        'Marine protected areas and no-take zones',
+        'Plastic pollution reduction initiatives',
+        'Fishing gear modification to reduce bycatch',
+        'Dark skies ordinances to protect hatchlings'
+      ],
+      'Hawaiian Monk Seal': [
+        'Population monitoring and health assessments',
+        'Beach closure protocols during pupping season',
+        'Marine debris removal from critical habitats',
+        'Vaccination programs against disease',
+        'Public education and volunteer programs'
+      ],
+      'ʻŌhiʻa Lehua': [
+        'Rapid ʻŌhiʻa Death research and monitoring',
+        'Forest quarantine and sanitation protocols',
+        'Native forest restoration projects',
+        'Ungulate fencing and removal programs',
+        'Seed banking and genetic preservation'
+      ],
+      'Red Wolf': [
+        'Captive breeding and reintroduction programs',
+        'Habitat corridor creation and protection',
+        'Coyote management to prevent hybridization',
+        'Vehicle collision reduction measures',
+        'Community outreach and education'
+      ]
+    };
+    return actionMap[species] || [
+      'Population monitoring and research',
+      'Habitat protection and restoration',
+      'Threat mitigation programs',
+      'Community engagement and education',
+      'Policy advocacy and legal protection'
+    ];
+  };
+
+  const getScientificName = (species: string) => {
+    const scientificMap: Record<string, string> = {
+      'Green Sea Turtle': 'Chelonia mydas',
+      'Hawaiian Monk Seal': 'Neomonachus schauinslandi',
+      'Hawaiian Goose': 'Branta sandvicensis',
+      'ʻŌhiʻa Lehua': 'Metrosideros polymorpha',
+      'Hawaiian Hoary Bat': 'Lasiurus cinereus semotus',
+      'Hawaiian Stilt': 'Himantopus mexicanus knudseni',
+      'Red Wolf': 'Canis rufus',
+      'Florida Panther': 'Puma concolor coryi',
+      'Common Box Turtle': 'Terrapene carolina',
+      'Monarch': 'Danaus plexippus',
+      'Java Sparrow': 'Lonchura oryzivora'
+    };
+    return scientificMap[species] || 'Scientific name available via GBIF database';
+  };
+
+  const getPhysicalCharacteristics = (species: string) => {
+    const physicalMap: Record<string, string> = {
+      'Green Sea Turtle': 'Length: 3-4 feet, Weight: 300-400 lbs, Distinctive heart-shaped shell',
+      'Hawaiian Monk Seal': 'Length: 7-8 feet, Weight: 375-450 lbs, Gray coat with lighter belly',
+      'Hawaiian Goose': 'Length: 22-26 inches, Weight: 3-5 lbs, Buff neck with black head and bill',
+      'ʻŌhiʻa Lehua': 'Height: 60-100 feet, Distinctive red bottlebrush flowers, Smooth bark',
+      'Red Wolf': 'Length: 4-5 feet, Weight: 45-80 lbs, Cinnamon-red coat with black markings',
+      'Florida Panther': 'Length: 6-7 feet, Weight: 70-160 lbs, Tawny coat with white muzzle',
+      'Common Box Turtle': 'Length: 4-6 inches, Weight: 1-2 lbs, High-domed shell with hinged plastron',
+      'Monarch': 'Wingspan: 3.5-4 inches, Orange wings with black veins and borders'
+    };
+    return physicalMap[species] || 'Physical characteristics vary by individual and population';
+  };
+
+  const getEcologicalRole = (species: string) => {
+    const roleMap: Record<string, string> = {
+      'Green Sea Turtle': 'Grazes seagrass beds, maintaining healthy marine ecosystems and nutrient cycling',
+      'Hawaiian Monk Seal': 'Top predator controlling fish populations, indicator of ocean health',
+      'Hawaiian Goose': 'Seed disperser for native plants, maintains grassland ecosystems',
+      'ʻŌhiʻa Lehua': 'Keystone species providing habitat for 142+ native species, watershed protection',
+      'Red Wolf': 'Apex predator controlling deer and small mammal populations, ecosystem balance',
+      'Florida Panther': 'Top predator maintaining prey species balance, indicator of ecosystem health',
+      'Common Box Turtle': 'Seed disperser, pest control through insect consumption',
+      'Monarch': 'Pollinator during migration, indicator species for habitat health'
+    };
+    return roleMap[species] || 'Plays important role in ecosystem balance and biodiversity';
+  };
+
+  const getClimateImpacts = (species: string) => {
+    const climateMap: Record<string, string[]> = {
+      'Green Sea Turtle': [
+        'Rising temperatures affect sand temperatures and sex ratios of hatchlings',
+        'Sea level rise threatens nesting beaches',
+        'Ocean acidification affects food sources'
+      ],
+      'Hawaiian Monk Seal': [
+        'Sea level rise reduces available beach habitat',
+        'Ocean warming affects prey fish distribution',
+        'Increased storm intensity destroys pupping sites'
+      ],
+      'ʻŌhiʻa Lehua': [
+        'Drought stress increases susceptibility to Rapid ʻŌhiʻa Death',
+        'Temperature increases affect high-elevation populations',
+        'Changing precipitation patterns alter forest dynamics'
+      ],
+      'Red Wolf': [
+        'Habitat shifts due to changing precipitation patterns',
+        'Prey species distribution changes with temperature',
+        'Increased extreme weather events affect denning sites'
+      ],
+      'Monarch': [
+        'Shifting weather patterns disrupt migration timing',
+        'Drought affects milkweed host plant availability',
+        'Extreme weather events during migration cause mortality'
+      ]
+    };
+    return climateMap[species] || [
+      'Habitat range shifts due to temperature changes',
+      'Altered precipitation affecting food sources',
+      'Increased extreme weather events'
+    ];
+  };
+
+  const getVolunteerOpportunities = (species: string, region: string) => {
+    if (region.includes('Hawaiian')) {
+      const hawaiianOppMap: Record<string, string[]> = {
+        'Green Sea Turtle': [
+          'Turtle Watch Hawaii - Beach monitoring programs',
+          'NOAA Marine Debris Program - Ocean cleanup events',
+          'Sustainable Coastlines Hawaii - Beach restoration'
+        ],
+        'Hawaiian Monk Seal': [
+          'Marine Mammal Center - Seal monitoring and education',
+          'NOAA Hawaiian Monk Seal Research Program - Data collection',
+          'Malama Na Honu - Community conservation efforts'
+        ],
+        'ʻŌhiʻa Lehua': [
+          'Hawaii Forest Industry Association - Reforestation projects',
+          'Big Island Invasive Species Committee - Forest protection',
+          'Kokua Hawaii Foundation - Native plant restoration'
+        ]
+      };
+      return hawaiianOppMap[species] || [
+        'Hawaii Conservation Alliance - Multi-species programs',
+        'Sierra Club Hawaii - Habitat restoration',
+        'The Nature Conservancy Hawaii - Volunteer field work'
+      ];
+    } else {
+      const appalachianOppMap: Record<string, string[]> = {
+        'Red Wolf': [
+          'Red Wolf Coalition - Public education and advocacy',
+          'NC Wildlife Federation - Habitat corridor creation',
+          'Point Defiance Zoo - Captive breeding support'
+        ],
+        'Florida Panther': [
+          'Florida Wildlife Corridor - Land conservation advocacy',
+          'Panther Ridge Conservation Center - Education programs',
+          'Florida Fish and Wildlife - Highway crossing monitoring'
+        ],
+        'Common Box Turtle': [
+          'Turtle Survival Alliance - Population monitoring',
+          'North American Box Turtle Conservation - Research support',
+          'Local Audubon chapters - Citizen science projects'
+        ]
+      };
+      return appalachianOppMap[species] || [
+        'Appalachian Trail Conservancy - Habitat protection',
+        'National Wildlife Federation - Species monitoring',
+        'Local conservation organizations - Field research'
+      ];
+    }
+  };
+
+  const getHowToHelp = (species: string) => {
+    const helpMap: Record<string, string[]> = {
+      'Green Sea Turtle': [
+        'Reduce plastic use and participate in beach cleanups',
+        'Turn off beachfront lights during nesting season',
+        'Report turtle sightings to marine biologists',
+        'Support sustainable seafood choices',
+        'Donate to sea turtle conservation organizations'
+      ],
+      'Hawaiian Monk Seal': [
+        'Maintain 150-foot distance from seals on beaches',
+        'Report injured or entangled seals immediately',
+        'Participate in marine debris cleanup events',
+        'Support local conservation organizations',
+        'Educate others about monk seal protection'
+      ],
+      'ʻŌhiʻa Lehua': [
+        'Clean boots and gear when hiking between forests',
+        'Report signs of Rapid ʻŌhiʻa Death to authorities',
+        'Volunteer for native forest restoration projects',
+        'Support sustainable tourism practices',
+        'Plant native Hawaiian species in your garden'
+      ],
+      'Red Wolf': [
+        'Support wildlife crossing construction projects',
+        'Report red wolf sightings to biologists',
+        'Volunteer with conservation organizations',
+        'Advocate for habitat protection policies',
+        'Educate communities about red wolf importance'
+      ]
+    };
+    return helpMap[species] || [
+      'Report sightings to local wildlife biologists',
+      'Support habitat conservation organizations',
+      'Participate in citizen science projects',
+      'Advocate for wildlife protection policies',
+      'Practice responsible wildlife viewing'
+    ];
   };
 
   // Generate expanded activity feed from real species data
@@ -298,43 +626,178 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                         </div>
                       )}
                       
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {/* Conservation Status */}
+                      {/* Scientific Classification & Physical */}
+                      <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                           <div className="flex items-center gap-2 mb-3">
-                            <Shield className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm font-semibold text-blue-800">Conservation Status</span>
+                            <Calendar className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-semibold text-blue-800">Scientific Classification</span>
                           </div>
-                          <p className="text-sm text-blue-700 mb-2">
-                            {getConservationDescription(selectedSpecies)}
-                          </p>
-                          <div className="text-xs text-blue-600">
-                            <strong>Threats:</strong> {getThreatsDescription(selectedSpecies)}
+                          <div className="space-y-2 text-sm">
+                            <div className="text-blue-700">
+                              <strong>Scientific Name:</strong> <em>{getScientificName(selectedSpecies)}</em>
+                            </div>
+                            <div className="text-blue-700">
+                              <strong>Physical Characteristics:</strong> {getPhysicalCharacteristics(selectedSpecies)}
+                            </div>
                           </div>
                         </div>
                         
-                        {/* Habitat Information */}
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Leaf className="w-4 h-4 text-purple-600" />
+                            <span className="text-sm font-semibold text-purple-800">Ecological Role</span>
+                          </div>
+                          <p className="text-sm text-purple-700">
+                            {getEcologicalRole(selectedSpecies)}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {/* IUCN Conservation Status */}
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Shield className="w-4 h-4 text-red-600" />
+                            <span className="text-sm font-semibold text-red-800">IUCN Red List Status</span>
+                          </div>
+                          <div className="mb-3">
+                            <span className="inline-block px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium border border-red-200">
+                              {getIUCNStatus(selectedSpecies)} - {getIUCNStatusName(selectedSpecies)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-red-700 mb-2">
+                            {getConservationDescription(selectedSpecies)}
+                          </p>
+                          <div className="text-xs text-red-600">
+                            <strong>Population Trend:</strong> <span className="capitalize">{getPopulationTrend(selectedSpecies)}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Primary Threats */}
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <AlertTriangle className="w-4 h-4 text-orange-600" />
+                            <span className="text-sm font-semibold text-orange-800">Primary Threats</span>
+                          </div>
+                          <div className="space-y-2">
+                            {getDetailedThreats(selectedSpecies).map((threat, idx) => (
+                              <div key={idx} className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                                <span className="text-xs text-orange-700">{threat}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Habitat & Range */}
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                           <div className="flex items-center gap-2 mb-3">
                             <MapPin className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-semibold text-green-800">Habitat</span>
+                            <span className="text-sm font-semibold text-green-800">Habitat & Range</span>
                           </div>
-                          <p className="text-sm text-green-700">
+                          <p className="text-sm text-green-700 mb-2">
                             {getHabitatDescription(selectedSpecies, bioregionName)}
                           </p>
+                          <div className="text-xs text-green-600">
+                            <strong>Range:</strong> {getSpeciesRange(selectedSpecies, bioregionName)}
+                          </div>
+                        </div>
+                        
+                        {/* Conservation Actions */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Users className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-semibold text-blue-800">Conservation Efforts</span>
+                          </div>
+                          <div className="space-y-2">
+                            {getConservationActions(selectedSpecies).map((action, idx) => (
+                              <div key={idx} className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                                <span className="text-xs text-blue-700">{action}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Climate Change Impacts */}
+                      <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <h5 className="text-sm font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                          <Sun className="w-4 h-4" />
+                          Climate Change Impacts
+                        </h5>
+                        <div className="space-y-1.5">
+                          {getClimateImpacts(selectedSpecies).map((impact, idx) => (
+                            <div key={idx} className="flex items-start gap-2">
+                              <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                              <span className="text-xs text-amber-700">{impact}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Volunteer Opportunities */}
+                      <div className="mt-4 bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                        <h5 className="text-sm font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+                          <Users className="w-4 h-4" />
+                          Volunteer Opportunities
+                        </h5>
+                        <div className="space-y-1.5">
+                          {getVolunteerOpportunities(selectedSpecies, bioregionName).map((opportunity, idx) => (
+                            <div key={idx} className="flex items-start gap-2">
+                              <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                              <span className="text-xs text-indigo-700">{opportunity}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* How You Can Help */}
+                      <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
+                        <h5 className="text-sm font-semibold text-green-800 mb-2 flex items-center gap-2">
+                          <Heart className="w-4 h-4" />
+                          How You Can Help
+                        </h5>
+                        <div className="space-y-1.5">
+                          {getHowToHelp(selectedSpecies).map((action, idx) => (
+                            <div key={idx} className="flex items-start gap-2">
+                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                              <span className="text-xs text-green-700">{action}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                       
                       {/* Action Buttons */}
                       <div className="mt-4 pt-3 border-t border-gray-200">
                         <div className="flex flex-wrap gap-2">
-                          <Button variant="outline" size="sm" className="text-xs">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs"
+                            onClick={() => window.open(`https://www.inaturalist.org/search?q=${encodeURIComponent(selectedSpecies)}`, '_blank')}
+                          >
                             <ExternalLink className="w-3 h-3 mr-1" />
                             View on iNaturalist
                           </Button>
-                          <Button variant="outline" size="sm" className="text-xs">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs"
+                            onClick={() => window.open(`https://www.iucnredlist.org/search?query=${encodeURIComponent(selectedSpecies)}`, '_blank')}
+                          >
                             <ExternalLink className="w-3 h-3 mr-1" />
-                            Learn More
+                            IUCN Red List
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs"
+                            onClick={() => window.open(`https://ebird.org/species/${selectedSpecies.toLowerCase().replace(/\s+/g, '-')}`, '_blank')}
+                          >
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            Species Guide
                           </Button>
                         </div>
                       </div>
@@ -345,18 +808,24 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                       <div className="mb-4 p-3 bg-white/80 rounded-lg border border-red-200">
                         <div className="text-sm text-red-800">
                           <strong>{bioregionName}</strong> is home to <strong>{speciesData.species.threatenedSpecies.length}</strong> threatened and endangered species, 
-                          highlighting the critical need for conservation efforts in this bioregion.
+                          with <strong>{speciesData.species.threatenedSpecies.filter(species => speciesData.species.speciesPhotos?.[species]).length}</strong> having photographic documentation.
                           {speciesData.species.threatenedSpecies.length > 50 && (
                             <span className="block mt-1 font-medium text-orange-700">
                               ⚠️ This region has exceptionally high biodiversity conservation priority.
                             </span>
                           )}
+                          <span className="block mt-1 text-xs text-red-600">
+                            📸 Showing only species with verified photos from iNaturalist community
+                          </span>
                         </div>
                       </div>
                       
-                      {/* Species gallery grid - show more species */}
+                      {/* Species gallery grid - only show species with photos */}
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {speciesData.species.threatenedSpecies.slice(0, 50).map((species: string, index: number) => {
+                        {speciesData.species.threatenedSpecies
+                          .filter((species: string) => speciesData.species.speciesPhotos?.[species]) // Only show species with photos
+                          .slice(0, 50)
+                          .map((species: string, index: number) => {
                         const hasPhoto = speciesData.species.speciesPhotos?.[species];
                         
                         return (
@@ -391,23 +860,27 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                       })}
                       </div>
                       
-                      {/* Show more button if there are additional species */}
-                      {speciesData.species.threatenedSpecies.length > 50 && (
-                        <div className="text-center pt-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-red-200 text-red-700 hover:bg-red-50"
-                            onClick={() => {
-                              alert(`This bioregion has ${speciesData.species.threatenedSpecies.length} total threatened species. Enhanced IUCN Red List integration now showing comprehensive conservation data!`);
-                            }}
-                          >
-                            <ChevronDown className="w-3 h-3 mr-1" />
-                            Show {Math.min(50, speciesData.species.threatenedSpecies.length - 50)} More Species
-                            <span className="ml-2 text-xs text-red-600">({speciesData.species.threatenedSpecies.length - 50} remaining)</span>
-                          </Button>
-                        </div>
-                      )}
+                      {/* Show more button if there are additional species with photos */}
+                      {(() => {
+                        const speciesWithPhotos = speciesData.species.threatenedSpecies.filter(species => speciesData.species.speciesPhotos?.[species]);
+                        const totalWithoutPhotos = speciesData.species.threatenedSpecies.length - speciesWithPhotos.length;
+                        return speciesWithPhotos.length > 50 && (
+                          <div className="text-center pt-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="border-red-200 text-red-700 hover:bg-red-50"
+                              onClick={() => {
+                                alert(`This bioregion has ${speciesData.species.threatenedSpecies.length} total threatened species (${speciesWithPhotos.length} with photos, ${totalWithoutPhotos} without photos). Only showing species with photographic documentation.`);
+                              }}
+                            >
+                              <ChevronDown className="w-3 h-3 mr-1" />
+                              Show {Math.min(50, speciesWithPhotos.length - 50)} More Species With Photos
+                              <span className="ml-2 text-xs text-red-600">({speciesWithPhotos.length - 50} remaining)</span>
+                            </Button>
+                          </div>
+                        );
+                      })()}
                     </>
                   )}
                   <div className="mt-4 text-center">
