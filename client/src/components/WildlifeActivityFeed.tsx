@@ -15,7 +15,6 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
-import EndangeredSpeciesGallery from './EndangeredSpeciesGallery';
 
 interface WildlifeActivityProps {
   bioregionName: string;
@@ -63,7 +62,8 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
           trend: index % 2 === 0 ? `High activity - ${Math.floor(Math.random() * 150 + 100)}% above normal` : undefined,
           rarity: 'seasonal',
           action: index % 2 === 0 ? 'Track activity' : 'View observation',
-          photo: speciesData.species.speciesPhotos?.[species]
+          photo: speciesData.species.speciesPhotos?.[species],
+          url: undefined
         });
       });
     }
@@ -79,7 +79,8 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
           observer: 'Conservation Scientists',
           rarity: 'critically_endangered',
           action: 'Report sighting',
-          photo: speciesData.species.speciesPhotos?.[species]
+          photo: speciesData.species.speciesPhotos?.[species],
+          url: undefined
         });
       });
     }
@@ -129,7 +130,8 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
         trend: i % 3 === 0 ? syntheticActivities[i % syntheticActivities.length] : undefined,
         rarity: ['common', 'seasonal', 'rare'][i % 3],
         action: 'View observation',
-        photo: speciesData.species.speciesPhotos?.[species]
+        photo: speciesData.species.speciesPhotos?.[species],
+        url: undefined
       });
     }
     
@@ -187,12 +189,6 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
             </CardContent>
           </Card>
 
-          {/* Endangered Species Gallery Component */}
-          <EndangeredSpeciesGallery 
-            bioregionName={bioregionName}
-            bioregionId={bioregionId}
-            speciesData={speciesData}
-          />
         </div>
       )}
 
