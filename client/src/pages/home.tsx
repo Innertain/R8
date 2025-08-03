@@ -13,8 +13,20 @@ import {
   Shield,
   Globe
 } from "lucide-react";
+import WildlifeFeedDemo from "@/components/WildlifeFeedDemo";
 
 export default function Home() {
+  return (
+    <div className="container mx-auto py-8 px-4">
+      {/* NEW: Wildlife Feed Demo */}
+      <WildlifeFeedDemo />
+      
+      <ModulesSection />
+    </div>
+  );
+}
+
+function ModulesSection() {
   const modules = [
     {
       title: "Volunteer Portal",

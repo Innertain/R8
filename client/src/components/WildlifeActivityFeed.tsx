@@ -22,10 +22,6 @@ interface WildlifeActivityProps {
 
 export default function WildlifeActivityFeed({ bioregionName, bioregionId }: WildlifeActivityProps) {
   const { data: speciesData, isLoading, error } = useSpeciesData(bioregionId);
-  
-  // Debug logging
-  console.log('WildlifeActivityFeed props:', { bioregionName, bioregionId });
-  console.log('Species data:', { speciesData, isLoading, error });
 
   // Generate activity feed from real species data
   const recentActivity = React.useMemo(() => {

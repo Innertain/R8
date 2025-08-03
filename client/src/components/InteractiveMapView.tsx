@@ -108,7 +108,6 @@ const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
             ...feature.properties,
             id: feature.id
           };
-          console.log('Map clicked - selected bioregion:', bioregionWithId);
           setSelectedBioregion(bioregionWithId);
           onBioregionSelect(bioregionWithId);
           highlightBioregion(feature);

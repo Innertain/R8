@@ -13,10 +13,6 @@ interface BioregionDetailsProps {
 
 const BioregionDetails: React.FC<BioregionDetailsProps> = ({ bioregion, isLoading }) => {
   const { data: speciesData, isLoading: speciesLoading, error: speciesError } = useSpeciesData(bioregion?.id);
-  
-  // Debug logging
-  console.log('BioregionDetails bioregion:', bioregion);
-  console.log('BioregionDetails bioregion.id:', bioregion?.id);
 
   if (isLoading) {
     return (
