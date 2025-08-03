@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,21 +10,67 @@ import {
   Binoculars,
   Zap,
   TrendingUp,
+  TrendingDown,
+  Minus,
   Users,
   Loader2,
   Shield,
   AlertTriangle,
-  Info
+  Info,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  CheckCircle,
+  Thermometer,
+  Clock
 } from 'lucide-react';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
+import { useQuery } from '@tanstack/react-query';
 
 interface WildlifeActivityProps {
   bioregionName: string;
   bioregionId: string;
 }
 
+interface ConservationStatusData {
+  species: string;
+  iucnStatus: string;
+  populationTrend: string;
+  threatCategories: string[];
+  conservationActions: Array<{
+    action: string;
+    organization: string;
+    status: string;
+    url?: string;
+    startDate?: string;
+  }>;
+  assessmentDate: string;
+  generationLength?: number;
+}
+
+interface ClimateRefugeeData {
+  species: string;
+  lastSeenYear: number;
+  disappearanceReason: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  evidence: string[];
+}
+
 export default function WildlifeActivityFeed({ bioregionName, bioregionId }: WildlifeActivityProps) {
   const { data: speciesData, isLoading, error } = useSpeciesData(bioregionId);
+  const [selectedSpecies, setSelectedSpecies] = useState<string | null>(null);
+  
+  // Fetch conservation data
+  const { data: conservationData } = useQuery<any>({
+    queryKey: ['/api/species/conservation-status', bioregionId],
+    enabled: !!bioregionId,
+  });
+  
+  // Fetch climate refugees data
+  const { data: climateData } = useQuery<any>({
+    queryKey: ['/api/species/climate-refugees', bioregionId],
+    enabled: !!bioregionId,
+  });
 
   // Generate activity feed from real species data
   const recentActivity = React.useMemo(() => {
@@ -163,6 +209,55 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
     }
   };
 
+  // Helper functions for conservation data
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'CR': return 'bg-red-100 text-red-800 border-red-300';
+      case 'EN': return 'bg-red-100 text-red-800 border-red-300';
+      case 'VU': return 'bg-orange-100 text-orange-800 border-orange-300';
+      case 'NT': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'LC': return 'bg-green-100 text-green-800 border-green-300';
+      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+
+  const getStatusName = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'CR': 'Critically Endangered',
+      'EN': 'Endangered',
+      'VU': 'Vulnerable',
+      'NT': 'Near Threatened',
+      'LC': 'Least Concern'
+    };
+    return statusMap[status] || status;
+  };
+
+  const getTrendIcon = (trend: string) => {
+    switch(trend) {
+      case 'increasing': return <TrendingUp className="w-4 h-4 text-green-600" />;
+      case 'decreasing': return <TrendingDown className="w-4 h-4 text-red-600" />;
+      case 'stable': return <Minus className="w-4 h-4 text-blue-600" />;
+      default: return <Info className="w-4 h-4 text-gray-600" />;
+    }
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch(severity) {
+      case 'critical': return 'bg-red-100 text-red-800 border-red-300';
+      case 'high': return 'bg-orange-100 text-orange-800 border-orange-300';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      default: return 'bg-blue-100 text-blue-800 border-blue-300';
+    }
+  };
+
+  const getSpeciesConservationData = (species: string) => {
+    return conservationData?.conservationStatuses?.find((s: ConservationStatusData) => s.species === species);
+  };
+
+  const getSpeciesClimateData = (species: string) => {
+    return climateData?.climateRefugees?.find((s: ClimateRefugeeData) => s.species === species);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -252,10 +347,138 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                             size="sm" 
                             variant="outline" 
                             className="w-full mt-2 text-xs border-red-200 text-red-700 hover:bg-red-50"
-                            onClick={() => window.open(`https://www.inaturalist.org/taxa?q=${encodeURIComponent(species)}`, '_blank')}
+                            onClick={() => setSelectedSpecies(selectedSpecies === species ? null : species)}
                           >
-                            Learn More
+                            {selectedSpecies === species ? (
+                              <>
+                                <ChevronUp className="w-3 h-3 mr-1" />
+                                Hide Details
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="w-3 h-3 mr-1" />
+                                Conservation Details
+                              </>
+                            )}
                           </Button>
+                          
+                          {/* Detailed Conservation Data */}
+                          {selectedSpecies === species && (
+                            <div className="mt-3 space-y-3 border-t pt-3">
+                              {/* IUCN Conservation Status */}
+                              {getSpeciesConservationData(species) && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Shield className="w-4 h-4 text-blue-600" />
+                                    <span className="text-sm font-semibold text-blue-800">IUCN Conservation Status</span>
+                                  </div>
+                                  {(() => {
+                                    const conservationInfo = getSpeciesConservationData(species)!;
+                                    return (
+                                      <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                          <Badge className={getStatusColor(conservationInfo.iucnStatus)}>
+                                            {conservationInfo.iucnStatus} - {getStatusName(conservationInfo.iucnStatus)}
+                                          </Badge>
+                                          <div className="flex items-center gap-1 text-sm">
+                                            {getTrendIcon(conservationInfo.populationTrend)}
+                                            <span className="capitalize">{conservationInfo.populationTrend}</span>
+                                          </div>
+                                        </div>
+                                        
+                                        {conservationInfo.conservationActions.length > 0 && (
+                                          <div>
+                                            <div className="text-xs font-medium text-blue-800 mb-1">Active Conservation Efforts:</div>
+                                            <div className="space-y-1">
+                                              {conservationInfo.conservationActions.slice(0, 2).map((action: any, idx: number) => (
+                                                <div key={idx} className="flex items-start gap-2 p-2 bg-white/80 rounded border text-xs">
+                                                  <CheckCircle className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
+                                                  <div className="flex-1">
+                                                    <div className="font-medium">{action.action}</div>
+                                                    <div className="text-gray-600">by {action.organization} • Since {action.startDate}</div>
+                                                  </div>
+                                                  {action.url && (
+                                                    <Button 
+                                                      size="sm"
+                                                      variant="ghost"
+                                                      className="h-auto p-1 text-xs"
+                                                      onClick={() => window.open(action.url, '_blank')}
+                                                    >
+                                                      <ExternalLink className="w-3 h-3" />
+                                                    </Button>
+                                                  )}
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })()} 
+                                </div>
+                              )}
+                              
+                              {/* Climate Impact Data */}
+                              {getSpeciesClimateData(species) && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Thermometer className="w-4 h-4 text-red-600" />
+                                    <span className="text-sm font-semibold text-red-800">Climate Impact</span>
+                                  </div>
+                                  {(() => {
+                                    const climateInfo = getSpeciesClimateData(species)!;
+                                    return (
+                                      <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                          <Badge className={getSeverityColor(climateInfo.severity)}>
+                                            {climateInfo.severity.toUpperCase()} RISK
+                                          </Badge>
+                                          <div className="flex items-center gap-1 text-xs text-gray-600">
+                                            <Clock className="w-3 h-3" />
+                                            <span>Last seen: {climateInfo.lastSeenYear}</span>
+                                          </div>
+                                        </div>
+                                        
+                                        <div className="text-xs text-red-700">
+                                          <div className="font-medium mb-1">{climateInfo.disappearanceReason}</div>
+                                          <div className="space-y-1">
+                                            {climateInfo.evidence.map((evidence: string, idx: number) => (
+                                              <div key={idx} className="flex items-center gap-2">
+                                                <div className="w-1 h-1 bg-red-400 rounded-full"></div>
+                                                {evidence}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })()} 
+                                </div>
+                              )}
+                              
+                              {/* External Links */}
+                              <div className="flex gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="flex-1 text-xs"
+                                  onClick={() => window.open(`https://www.inaturalist.org/taxa?q=${encodeURIComponent(species)}`, '_blank')}
+                                >
+                                  <ExternalLink className="w-3 h-3 mr-1" />
+                                  iNaturalist
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="flex-1 text-xs"
+                                  onClick={() => window.open(`https://www.iucnredlist.org/search?query=${encodeURIComponent(species)}`, '_blank')}
+                                >
+                                  <ExternalLink className="w-3 h-3 mr-1" />
+                                  IUCN Red List
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );

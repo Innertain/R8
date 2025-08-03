@@ -19,8 +19,6 @@ import {
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
 import WildlifeFeedDemo from '@/components/WildlifeFeedDemo';
-import ClimateRefugees from '@/components/ClimateRefugees';
-import ConservationStatus from '@/components/ConservationStatus';
 import appalachianLandscapeImage from '@assets/Appalachian _1754183249913.png';
 
 // Appalachian restoration regions - traditional watershed and forest systems
@@ -130,23 +128,11 @@ const AppalachianRegenerationPage: React.FC = () => {
         />
       </div>
 
-      {/* Wildlife Activity Feed */}
+      {/* Wildlife Activity Feed - Now includes integrated conservation details */}
       <WildlifeFeedDemo 
         bioregionName="Southeastern Mixed Forests"
         bioregionId="southeastern_mixed_forests"
         regionTitle="Appalachian"
-      />
-      
-      {/* Climate Refugees - Species displaced by climate change */}
-      <ClimateRefugees 
-        bioregionName="Southeastern Mixed Forests" 
-        bioregionId="southeastern_mixed_forests" 
-      />
-      
-      {/* Conservation Status Integration - Detailed IUCN data */}
-      <ConservationStatus 
-        bioregionName="Southeastern Mixed Forests" 
-        bioregionId="southeastern_mixed_forests" 
       />
 
       {/* Impact Statistics */}
