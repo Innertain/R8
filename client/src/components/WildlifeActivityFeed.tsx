@@ -356,7 +356,7 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                       
                       {/* Species gallery grid - show more species */}
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {speciesData.species.threatenedSpecies.slice(0, 12).map((species: string, index: number) => {
+                        {speciesData.species.threatenedSpecies.slice(0, 50).map((species: string, index: number) => {
                         const hasPhoto = speciesData.species.speciesPhotos?.[species];
                         
                         return (
@@ -392,7 +392,7 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                       </div>
                       
                       {/* Show more button if there are additional species */}
-                      {speciesData.species.threatenedSpecies.length > 12 && (
+                      {speciesData.species.threatenedSpecies.length > 50 && (
                         <div className="text-center pt-2">
                           <Button 
                             size="sm" 
@@ -403,8 +403,8 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                             }}
                           >
                             <ChevronDown className="w-3 h-3 mr-1" />
-                            Show {Math.min(12, speciesData.species.threatenedSpecies.length - 12)} More Species
-                            <span className="ml-2 text-xs text-red-600">({speciesData.species.threatenedSpecies.length - 12} remaining)</span>
+                            Show {Math.min(50, speciesData.species.threatenedSpecies.length - 50)} More Species
+                            <span className="ml-2 text-xs text-red-600">({speciesData.species.threatenedSpecies.length - 50} remaining)</span>
                           </Button>
                         </div>
                       )}
