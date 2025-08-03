@@ -19,6 +19,7 @@ import {
   Sun
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
+import WildlifeFeedDemo from '@/components/WildlifeFeedDemo';
 
 // Hawaiian ahupua'a data - traditional watershed management systems
 const hawaiianAhupuaa = [
@@ -112,6 +113,9 @@ const HawaiiRegenerationPage: React.FC = () => {
           className="justify-center"
         />
       </div>
+
+      {/* Wildlife Activity Feed */}
+      <WildlifeFeedDemo />
 
       {/* Impact Statistics */}
       <Card>
