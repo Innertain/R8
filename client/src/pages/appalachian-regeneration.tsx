@@ -18,6 +18,7 @@ import {
   Pickaxe
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
+import WildlifeFeedDemo from '@/components/WildlifeFeedDemo';
 
 // Appalachian restoration regions - traditional watershed and forest systems
 const appalachianProjects = [
@@ -111,6 +112,13 @@ const AppalachianRegenerationPage: React.FC = () => {
           className="justify-center"
         />
       </div>
+
+      {/* Wildlife Activity Feed */}
+      <WildlifeFeedDemo 
+        bioregionName="Southeastern Mixed Forests"
+        bioregionId="southeastern_mixed_forests"
+        regionTitle="Appalachian"
+      />
 
       {/* Impact Statistics */}
       <Card>

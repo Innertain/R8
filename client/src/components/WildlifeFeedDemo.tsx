@@ -5,7 +5,17 @@ import { Camera, MapPin, ArrowRight } from 'lucide-react';
 import { Link } from 'wouter';
 import WildlifeActivityFeed from './WildlifeActivityFeed';
 
-export default function WildlifeFeedDemo() {
+interface WildlifeFeedDemoProps {
+  bioregionName?: string;
+  bioregionId?: string;
+  regionTitle?: string;
+}
+
+export default function WildlifeFeedDemo({
+  bioregionName = "Hawaiian Tropical Dry Forests",
+  bioregionId = "hawaiian_tropical_dry_forests",
+  regionTitle = "Hawaii"
+}: WildlifeFeedDemoProps) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -33,12 +43,12 @@ export default function WildlifeFeedDemo() {
           </p>
         </div>
         
-        {/* Demo with Hawaii data */}
+        {/* Demo with region-specific data */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <h4 className="font-semibold text-green-800 mb-2">Preview: Hawaii Wildlife Activity</h4>
+          <h4 className="font-semibold text-green-800 mb-2">Preview: {regionTitle} Wildlife Activity</h4>
           <WildlifeActivityFeed 
-            bioregionName="Hawaiian Tropical Dry Forests" 
-            bioregionId="hawaiian_tropical_dry_forests" 
+            bioregionName={bioregionName} 
+            bioregionId={bioregionId} 
           />
         </div>
       </CardContent>

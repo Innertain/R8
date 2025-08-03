@@ -115,7 +115,11 @@ const HawaiiRegenerationPage: React.FC = () => {
       </div>
 
       {/* Wildlife Activity Feed */}
-      <WildlifeFeedDemo />
+      <WildlifeFeedDemo 
+        bioregionName="Hawaiian Tropical Dry Forests"
+        bioregionId="hawaiian_tropical_dry_forests"
+        regionTitle="Hawaii"
+      />
 
       {/* Impact Statistics */}
       <Card>
