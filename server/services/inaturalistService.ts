@@ -124,16 +124,21 @@ class INaturalistService {
     const cacheExpiry = new Date(Date.now() - CACHE_DURATION_HOURS * 3600000);
     
     if (cached.length > 0 && cached[0].lastSyncedAt > cacheExpiry) {
-      console.log(`Using cached species data for ${bioregionId}`);
+      console.log(`Using cached species data for ${bioregionId}, fetching fresh sightings`);
+      
+      // Always fetch fresh recent sightings and identification needs since they change daily
+      const recentSightings = await this.getRecentSightings(bounds);
+      const identificationNeeds = await this.getIdentificationNeeds(bounds);
+      
       return {
         totalSpecies: cached[0].totalSpeciesCount || 0,
         flagshipSpecies: cached[0].flagshipSpecies || [],
         endemicSpecies: cached[0].endemicSpecies || [],
         threatenedSpecies: cached[0].threatenedSpecies || [],
         topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
-        recentSightings: [],
+        recentSightings: recentSightings || [],
         seasonalTrends: {},
-        identificationNeeds: [],
+        identificationNeeds: identificationNeeds || [],
       };
     }
 
@@ -145,15 +150,19 @@ class INaturalistService {
     if (!speciesData) {
       console.log(`Failed to fetch species data for ${bioregionId}, using cached data if available`);
       if (cached.length > 0) {
+        // Try to fetch fresh sightings even if main species data failed
+        const recentSightings = await this.getRecentSightings(bounds);
+        const identificationNeeds = await this.getIdentificationNeeds(bounds);
+        
         return {
           totalSpecies: cached[0].totalSpeciesCount || 0,
           flagshipSpecies: cached[0].flagshipSpecies || [],
           endemicSpecies: cached[0].endemicSpecies || [],
           threatenedSpecies: cached[0].threatenedSpecies || [],
           topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
-          recentSightings: [],
+          recentSightings: recentSightings || [],
           seasonalTrends: {},
-          identificationNeeds: [],
+          identificationNeeds: identificationNeeds || [],
         };
       }
       return {
