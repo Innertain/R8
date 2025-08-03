@@ -50,6 +50,27 @@ const BIOREGION_BOUNDS: Record<string, {north: number, south: number, east: numb
     west: -161.0,
     name: 'Hawaiian Tropical Dry Forests'
   },
+  'hawaiian_tropical_dry_forests': {
+    north: 22.5,
+    south: 18.5,
+    east: -154.0,
+    west: -161.0,
+    name: 'Hawaiian Tropical Dry Forests'
+  },
+  'hawaiian_tropical_rainforests': {
+    north: 20.3,
+    south: 19.2,
+    east: -154.8,
+    west: -156.2,
+    name: 'Hawaiian Tropical Rainforests'
+  },
+  'southeastern_mixed_forests': {
+    north: 39.0,
+    south: 30.0,
+    east: -75.0,
+    west: -94.0,
+    name: 'Southeastern Mixed Forests'
+  },
   'na_alaskan_boreal': {
     north: 71.0,
     south: 60.0,

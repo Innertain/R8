@@ -6,6 +6,9 @@ interface SpeciesData {
   endemicSpecies: string[];
   threatenedSpecies: string[];
   topTaxa: Record<string, number>;
+  recentSightings: Array<{species: string, location: string, date: string, photo?: string, url: string}>;
+  seasonalTrends: Record<string, number>;
+  identificationNeeds: Array<{species: string, observations: number, url: string}>;
 }
 
 interface ConservationProject {

@@ -180,7 +180,7 @@ const BioregionDetails: React.FC<BioregionDetailsProps> = ({ bioregion, isLoadin
       </Card>
 
       {/* Live Wildlife Activity - This is what users actually want to see! */}
-      <WildlifeActivityFeed bioregionName={bioregion.name} />
+      <WildlifeActivityFeed bioregionName={bioregion.name} bioregionId={bioregion.id} />
     </div>
   );
 };
