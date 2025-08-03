@@ -74,7 +74,7 @@ export default function RealTimeAlerts({ maxItems = 5, stateFilter }: RealTimeAl
     };
 
     fetchAlerts();
-    const interval = setInterval(fetchAlerts, 5 * 60 * 1000); // Refresh every 5 minutes
+    const interval = setInterval(fetchAlerts, 2 * 60 * 60 * 1000); // Refresh every 2 hours - optimized
     return () => clearInterval(interval);
   }, [maxItems, stateFilter]);
 

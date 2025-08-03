@@ -128,7 +128,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
 
   const { data: response, refetch, isLoading, error } = useQuery({
     queryKey: ['/api/weather-alerts-rss'],
-    refetchInterval: 300000, // 5 minutes
+    refetchInterval: 2 * 60 * 60 * 1000, // 2 hours - optimized
   });
 
   const alerts = (response as any)?.alerts || [];

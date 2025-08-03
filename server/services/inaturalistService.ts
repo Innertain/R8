@@ -7,8 +7,8 @@ import { iucnService } from './iucnService';
 
 const INATURALIST_BASE_URL = 'https://api.inaturalist.org/v1';
 const RATE_LIMIT_BUFFER = 100; // Keep 100 requests in reserve
-const CACHE_DURATION_HOURS = 24; // Cache species data for 24 hours
-const PHOTO_CACHE_DURATION_HOURS = 72; // Cache photos for 3 days since they change less frequently
+const CACHE_DURATION_HOURS = 72; // Cache species data for 72 hours - optimized
+const PHOTO_CACHE_DURATION_HOURS = 168; // Cache photos for 7 days - optimized
 
 interface INaturalistTaxon {
   id: number;

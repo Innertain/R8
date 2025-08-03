@@ -2713,12 +2713,12 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   // Cache for FEMA disaster data
   let femaDisastersCache: any = null;
   let femaDisastersCacheTime: number = 0;
-  const FEMA_CACHE_DURATION = 5 * 60 * 1000; // 5 minute cache for testing
+  const FEMA_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hour cache - optimized
 
   // Cache for NASA EONET natural events
   let eonetEventsCache: any = null;
   let eonetEventsCacheTime: number = 0;
-  const EONET_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+  const EONET_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours - optimized
 
   // FEMA OpenData API - Real Disaster Declarations (with caching)
   app.get("/api/fema-disasters", async (req, res) => {
@@ -3740,7 +3740,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
-  // Set up periodic air quality monitoring (every 30 minutes)
+  // Set up periodic air quality monitoring (every 2 hours)
   setInterval(async () => {
     try {
       console.log('🕒 Periodic air quality monitoring...');
@@ -3777,7 +3777,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     } catch (error) {
       console.error('Error in periodic air quality monitoring:', error);
     }
-  }, 30 * 60 * 1000); // 30 minutes
+  }, 2 * 60 * 60 * 1000); // 2 hours
 
   const httpServer = createServer(app);
   return httpServer;

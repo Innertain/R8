@@ -155,8 +155,8 @@ export function NasaEonetEvents() {
   const { data, isLoading, error, refetch } = useQuery<EonetResponse>({
     queryKey: ['/api/nasa-eonet-events', selectedCategory],
     queryFn: () => fetch(buildApiUrl()).then(res => res.json()),
-    refetchInterval: 30 * 60 * 1000, // Refetch every 30 minutes
-    staleTime: 15 * 60 * 1000 // Consider data stale after 15 minutes
+    refetchInterval: 2 * 60 * 60 * 1000, // Refetch every 2 hours - optimized
+    staleTime: 2 * 60 * 60 * 1000 // Consider data stale after 2 hours - optimized
   });
 
   const filteredEvents = data?.events.filter(event => {

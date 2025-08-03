@@ -63,7 +63,7 @@ const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
     };
   }, []);
 
-  // Load bioregion polygons
+  // Load bioregion polygons (only on map initialization)
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
@@ -135,7 +135,7 @@ const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
     geoJsonLayer.addTo(map);
     bioregionLayersRef.current.push(geoJsonLayer);
 
-  }, [selectedBioregion, onBioregionSelect]);
+  }, []);
 
   // Handle location updates
   useEffect(() => {

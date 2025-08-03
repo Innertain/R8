@@ -42,8 +42,8 @@ export function useSpeciesData(bioregionId: string | null) {
       return response.json();
     },
     enabled: !!bioregionId,
-    staleTime: 24 * 60 * 60 * 1000, // Consider data fresh for 24 hours (matches backend cache)
-    gcTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
+    staleTime: 72 * 60 * 60 * 1000, // Consider data fresh for 72 hours (matches backend cache) - optimized
+    gcTime: 72 * 60 * 60 * 1000, // Keep in cache for 72 hours - optimized
     refetchOnWindowFocus: false,
     refetchOnMount: false, // Don't refetch if we have data
     refetchOnReconnect: false, // Don't refetch on network reconnect
@@ -63,7 +63,7 @@ export function useSpeciesCacheStatus() {
       
       return response.json();
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+    refetchInterval: 2 * 60 * 60 * 1000, // Refetch every 2 hours - optimized
+    staleTime: 2 * 60 * 60 * 1000, // Consider data fresh for 2 hours - optimized
   });
 }

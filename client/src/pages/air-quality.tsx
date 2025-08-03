@@ -46,8 +46,8 @@ export default function AirQualityPage() {
 
   const { data: airQualityData, isLoading, refetch } = useQuery<AirQualityResponse>({
     queryKey: ['/api/air-quality/current'],
-    staleTime: 15 * 60 * 1000, // 15 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes cache
+    staleTime: 2 * 60 * 60 * 1000, // 2 hours - optimized
+    gcTime: 4 * 60 * 60 * 1000, // 4 hours cache - optimized
   });
 
   const handleManualRefresh = async () => {

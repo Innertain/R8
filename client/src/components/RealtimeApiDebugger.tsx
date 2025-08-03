@@ -43,31 +43,31 @@ export function RealtimeApiDebugger() {
   const { data: femaData } = useQuery({
     queryKey: ['/api/fema-disasters', refreshKey],
     queryFn: () => fetch('/api/fema-disasters').then(res => res.json()),
-    refetchInterval: 30000, // Check every 30 seconds
+    refetchInterval: 2 * 60 * 1000, // 2 minutes - optimized
   });
 
   const { data: nasaData } = useQuery({
     queryKey: ['/api/nasa-eonet-events', refreshKey],
     queryFn: () => fetch('/api/nasa-eonet-events').then(res => res.json()),
-    refetchInterval: 30000,
+    refetchInterval: 2 * 60 * 1000, // 2 minutes - optimized
   });
 
   const { data: weatherData } = useQuery({
     queryKey: ['/api/weather-alerts-rss', refreshKey],
     queryFn: () => fetch('/api/weather-alerts-rss').then(res => res.json()),
-    refetchInterval: 30000,
+    refetchInterval: 2 * 60 * 1000, // 2 minutes - optimized
   });
 
   const { data: wildfireData } = useQuery({
     queryKey: ['/api/wildfire-incidents', refreshKey],
     queryFn: () => fetch('/api/wildfire-incidents').then(res => res.json()),
-    refetchInterval: 30000,
+    refetchInterval: 2 * 60 * 1000, // 2 minutes - optimized
   });
 
   const { data: earthquakeData } = useQuery({
     queryKey: ['/api/earthquake-incidents', refreshKey],
     queryFn: () => fetch('/api/earthquake-incidents').then(res => res.json()),
-    refetchInterval: 30000,
+    refetchInterval: 2 * 60 * 1000, // 2 minutes - optimized
   });
 
   // Build API status array

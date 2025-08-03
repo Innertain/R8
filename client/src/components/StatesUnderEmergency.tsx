@@ -50,7 +50,7 @@ export function StatesUnderEmergency() {
 
   const { data, isLoading, error, refetch } = useQuery<StatesUnderEmergencyResponse>({
     queryKey: ['/api/states-under-emergency'],
-    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
+    refetchInterval: 2 * 60 * 60 * 1000, // Refresh every 2 hours - optimized
   });
 
   const toggleStateExpansion = (stateCode: string) => {
