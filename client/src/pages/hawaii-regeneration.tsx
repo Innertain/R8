@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
 import WildlifeFeedDemo from '@/components/WildlifeFeedDemo';
+import ClimateRefugees from '@/components/ClimateRefugees';
+import ConservationStatus from '@/components/ConservationStatus';
 import hawaiiLandscapeImage from '@assets/Hawaii_1754183003386.png';
 
 // Hawaiian ahupua'a data - traditional watershed management systems
@@ -134,6 +136,18 @@ const HawaiiRegenerationPage: React.FC = () => {
         bioregionName="Hawaiian Tropical Dry Forests"
         bioregionId="hawaiian_tropical_dry_forests"
         regionTitle="Hawaii"
+      />
+      
+      {/* Climate Refugees - Species displaced by climate change */}
+      <ClimateRefugees 
+        bioregionName="Hawaiian Tropical Dry Forests" 
+        bioregionId="hawaiian_tropical_dry_forests" 
+      />
+      
+      {/* Conservation Status Integration - Detailed IUCN data */}
+      <ConservationStatus 
+        bioregionName="Hawaiian Tropical Dry Forests" 
+        bioregionId="hawaiian_tropical_dry_forests" 
       />
 
       {/* Impact Statistics */}

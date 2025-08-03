@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { inaturalistService } from '../services/inaturalistService';
+import { gbifService } from '../services/gbifService';
 import { db } from '../db';
 import { bioregionSpeciesCache } from '@shared/schema';
 import { eq } from 'drizzle-orm';
@@ -97,12 +98,30 @@ router.get('/bioregion/:bioregionId', async (req, res) => {
     // Also fetch conservation projects
     const conservationProjects = await inaturalistService.getConservationProjects(bounds.name);
     
+    // Enhance with GBIF climate and conservation data
+    let climateData = null;
+    if (speciesData.threatenedSpecies && speciesData.threatenedSpecies.length > 0) {
+      try {
+        climateData = await gbifService.enhanceSpeciesWithClimateData(
+          bioregionId,
+          bounds,
+          speciesData.threatenedSpecies
+        );
+      } catch (error) {
+        console.error('Error fetching GBIF climate data:', error);
+      }
+    }
+    
     res.json({
       bioregionId,
       bioregionName: bounds.name,
-      species: speciesData,
+      species: {
+        ...speciesData,
+        climateRefugees: climateData?.climateRefugees || [],
+        conservationStatuses: climateData?.conservationStatuses || []
+      },
       conservationProjects,
-      dataSource: 'iNaturalist',
+      dataSource: 'iNaturalist + GBIF',
       lastUpdated: new Date().toISOString(),
     });
   } catch (error) {
@@ -152,14 +171,97 @@ router.post('/refresh-cache/:bioregionId', async (req, res) => {
     // Fetch fresh data
     const speciesData = await inaturalistService.getSpeciesForBioregion(bioregionId, bounds);
     
+    // Also refresh GBIF climate data
+    let climateData = null;
+    if (speciesData.threatenedSpecies && speciesData.threatenedSpecies.length > 0) {
+      try {
+        climateData = await gbifService.enhanceSpeciesWithClimateData(
+          bioregionId,
+          bounds,
+          speciesData.threatenedSpecies
+        );
+      } catch (error) {
+        console.error('Error refreshing GBIF climate data:', error);
+      }
+    }
+    
     res.json({
       bioregionId,
       message: 'Cache refreshed successfully',
-      species: speciesData,
+      species: {
+        ...speciesData,
+        climateRefugees: climateData?.climateRefugees || [],
+        conservationStatuses: climateData?.conservationStatuses || []
+      },
     });
   } catch (error) {
     console.error('Error refreshing cache:', error);
     res.status(500).json({ error: 'Failed to refresh cache' });
+  }
+});
+
+// GET /api/species/climate-refugees/:bioregionId
+router.get('/climate-refugees/:bioregionId', async (req, res) => {
+  try {
+    const { bioregionId } = req.params;
+    
+    const bounds = BIOREGION_BOUNDS[bioregionId];
+    if (!bounds) {
+      return res.status(404).json({ error: 'Bioregion not found' });
+    }
+
+    console.log(`Fetching climate refugees for bioregion: ${bioregionId}`);
+    
+    // Get species list first
+    const speciesData = await inaturalistService.getSpeciesForBioregion(bioregionId, bounds);
+    const allSpecies = [
+      ...(speciesData.threatenedSpecies || []),
+      ...(speciesData.flagshipSpecies || []).slice(0, 3)
+    ];
+    
+    const climateRefugees = await gbifService.detectClimateRefugees(bioregionId, bounds, allSpecies);
+    
+    res.json({
+      bioregionId,
+      bioregionName: bounds.name,
+      climateRefugees,
+      dataSource: 'GBIF',
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Error fetching climate refugees:', error);
+    res.status(500).json({ error: 'Failed to fetch climate refugees data' });
+  }
+});
+
+// GET /api/species/conservation-status/:bioregionId
+router.get('/conservation-status/:bioregionId', async (req, res) => {
+  try {
+    const { bioregionId } = req.params;
+    
+    const bounds = BIOREGION_BOUNDS[bioregionId];
+    if (!bounds) {
+      return res.status(404).json({ error: 'Bioregion not found' });
+    }
+
+    console.log(`Fetching conservation status for bioregion: ${bioregionId}`);
+    
+    // Get species list first
+    const speciesData = await inaturalistService.getSpeciesForBioregion(bioregionId, bounds);
+    const threatenedSpecies = speciesData.threatenedSpecies || [];
+    
+    const conservationStatuses = await gbifService.getConservationStatus(threatenedSpecies);
+    
+    res.json({
+      bioregionId,
+      bioregionName: bounds.name,
+      conservationStatuses,
+      dataSource: 'GBIF + IUCN',
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Error fetching conservation status:', error);
+    res.status(500).json({ error: 'Failed to fetch conservation status data' });
   }
 });
 

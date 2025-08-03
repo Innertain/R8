@@ -249,6 +249,14 @@ export const bioregionSpeciesCache = pgTable("bioregion_species_cache", {
   conservationProjects: jsonb("conservation_projects"), // [{name, url, description}]
   citizenScienceProjects: jsonb("citizen_science_projects"),
   
+  // Climate impact data - Climate Refugees feature
+  climateImpactData: jsonb("climate_impact_data"), // {
+  //   rangeShifts: [{species, oldRange, newRange, shiftDirection, magnitude, timespan}],
+  //   climateRefugees: [{species, lastSeenYear, disappearanceReason, severity}],
+  //   elevationChanges: [{species, avgElevationChange, timespan}],
+  //   seasonalShifts: [{species, oldSeasonStart, newSeasonStart, daysDifference}]
+  // }
+  
   // Cache metadata
   dataSource: varchar("data_source").default("inaturalist"),
   lastSyncedAt: timestamp("last_synced_at").notNull(),
@@ -277,10 +285,18 @@ export const speciesRecords = pgTable("species_records", {
   family: varchar("family"),
   genus: varchar("genus"),
   
-  // Conservation status
-  conservationStatus: varchar("conservation_status"), // 'EN', 'VU', 'LC', etc.
+  // Enhanced Conservation Status Integration
+  conservationStatus: varchar("conservation_status"), // 'CR', 'EN', 'VU', 'NT', 'LC', 'DD', 'NE'
+  iucnStatus: varchar("iucn_status"), // Global IUCN Red List status
+  regionalStatus: varchar("regional_status"), // Regional conservation status (e.g., state level)
+  populationTrend: varchar("population_trend"), // 'increasing', 'stable', 'decreasing', 'unknown'
+  threatCategories: text("threat_categories").array(), // ['habitat_loss', 'climate_change', 'pollution', etc.]
+  conservationActions: jsonb("conservation_actions"), // [{action, organization, status, url, startDate}]
+  assessmentDate: timestamp("assessment_date"),
+  generationLength: real("generation_length"), // In years
   isEndemic: boolean("is_endemic").default(false),
   isThreatened: boolean("is_threatened").default(false),
+  isClimateRefugee: boolean("is_climate_refugee").default(false), // Species displaced by climate change
   
   // Occurrence data
   observationCount: integer("observation_count").default(0),
