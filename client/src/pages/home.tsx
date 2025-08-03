@@ -95,7 +95,7 @@ function ModulesSection() {
               />
               <h1 className="text-5xl font-bold text-white">R8</h1>
             </div>
-            <p className="text-2xl text-stormy-light mb-6">Disaster Relief • Community Resiliency • Regeneration</p>
+            <p className="text-4xl font-bold text-white mb-6 tracking-wide">Emergency Response • Resilient Communities • Regenerative Solutions</p>
             <div className="max-w-4xl mx-auto space-y-6">
               <p className="text-xl text-stormy-light/95 leading-relaxed font-medium">
                 Connecting communities for resilient disaster response and ecological regeneration.
@@ -294,7 +294,7 @@ function ModulesSection() {
               <span className="text-lg font-semibold text-white">R8</span>
             </div>
             <p className="text-stormy-light/80">
-              Disaster Relief • Community Resiliency • Regeneration
+              Emergency Response • Resilient Communities • Regenerative Solutions
             </p>
           </div>
         </div>
