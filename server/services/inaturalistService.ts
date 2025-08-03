@@ -8,6 +8,7 @@ import { iucnService } from './iucnService';
 const INATURALIST_BASE_URL = 'https://api.inaturalist.org/v1';
 const RATE_LIMIT_BUFFER = 100; // Keep 100 requests in reserve
 const CACHE_DURATION_HOURS = 24; // Cache species data for 24 hours
+const PHOTO_CACHE_DURATION_HOURS = 72; // Cache photos for 3 days since they change less frequently
 
 interface INaturalistTaxon {
   id: number;
@@ -127,19 +128,40 @@ class INaturalistService {
     const cacheExpiry = new Date(Date.now() - CACHE_DURATION_HOURS * 3600000);
     
     if (cached.length > 0 && cached[0].lastSyncedAt > cacheExpiry) {
-      console.log(`Using cached species data for ${bioregionId}, fetching fresh sightings`);
+      console.log(`Using cached species data for ${bioregionId}`);
       
       // Always fetch fresh recent sightings and identification needs since they change daily
       const recentSightings = await this.getRecentSightings(bounds);
       const identificationNeeds = await this.getIdentificationNeeds(bounds);
       
-      // Always fetch fresh photos for threatened species to ensure we have current images
+      // Use cached photos if they're fresh (within 72 hours), otherwise fetch new ones
+      const photoCacheExpiry = new Date(Date.now() - PHOTO_CACHE_DURATION_HOURS * 3600000);
       const threatenedSpecies = cached[0].threatenedSpecies || [];
-      let speciesPhotos = {};
+      let speciesPhotos = (cached[0].speciesPhotos as Record<string, string>) || {};
       
-      if (threatenedSpecies.length > 0) {
-        console.log(`Fetching fresh photos for ${threatenedSpecies.length} threatened species: ${threatenedSpecies.join(', ')}`);
-        speciesPhotos = await this.getSpeciesPhotos(threatenedSpecies, bounds);
+      // Only fetch fresh photos if cache is older than 72 hours OR we have very few cached photos
+      if (cached[0].lastSyncedAt <= photoCacheExpiry || Object.keys(speciesPhotos).length < Math.min(10, threatenedSpecies.length / 2)) {
+        console.log(`🔄 Fetching fresh photos for ${threatenedSpecies.length} threatened species (cache expired or insufficient photos)`);
+        const freshPhotos = await this.getSpeciesPhotos(threatenedSpecies, bounds);
+        
+        // Merge with existing cached photos to avoid losing good photos
+        speciesPhotos = { ...speciesPhotos, ...freshPhotos };
+        
+        // Update cache with fresh photos
+        try {
+          await db
+            .update(bioregionSpeciesCache)
+            .set({ 
+              speciesPhotos: speciesPhotos,
+              updatedAt: new Date()
+            })
+            .where(eq(bioregionSpeciesCache.bioregionId, bioregionId));
+          console.log(`📷 Updated photo cache for ${bioregionId} (${Object.keys(speciesPhotos).length} photos total)`);
+        } catch (error) {
+          console.error(`Failed to update photo cache:`, error);
+        }
+      } else {
+        console.log(`📸 Using cached photos for ${bioregionId} (${Object.keys(speciesPhotos).length} photos cached, fresh for ${Math.round((Date.now() - cached[0].lastSyncedAt.getTime()) / (1000 * 60 * 60))}h)`);
       }
       
       return {
@@ -270,7 +292,8 @@ class INaturalistService {
     }
     
     // Get photos for flagship and threatened species (prioritize threatened species)
-    const allSpeciesForPhotos = [...uniqueThreatenedSpecies.slice(0, 20), ...flagshipSpecies.slice(0, 10)];
+    const allSpeciesForPhotos = [...uniqueThreatenedSpecies.slice(0, 30), ...flagshipSpecies.slice(0, 10)];
+    console.log(`🔍 Fetching photos for ${allSpeciesForPhotos.length} species (${uniqueThreatenedSpecies.length} threatened, ${flagshipSpecies.length} flagship)`);
     const speciesPhotos = await this.getSpeciesPhotos(allSpeciesForPhotos, bounds);
     
     return {
