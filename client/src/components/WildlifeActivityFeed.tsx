@@ -265,14 +265,14 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Binoculars className="w-5 h-5 text-green-600" />
-            <h3 className="text-lg font-semibold">Live Wildlife Activity</h3>
+            <h3 className="text-lg font-semibold">Wildlife Activity Feed</h3>
           </div>
           <Badge variant="outline" className="text-green-600">
             {bioregionName}
           </Badge>
         </div>
         <p className="text-sm text-gray-600">
-          Real-time wildlife observations, migrations, and rare sightings in your area
+          Discover what’s happening in your local ecosystem right now
         </p>
       </CardHeader>
       <CardContent>
@@ -778,73 +778,89 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
             <p className="text-sm text-gray-500 mt-1">Check back later for updates!</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {recentActivity.map((activity, index) => (
-              <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start gap-4">
-                  {/* Activity Icon */}
-                  <div className="flex-shrink-0 mt-1">
-                    {getActivityIcon(activity.type)}
-                  </div>
-                  
-                  {/* Activity Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-gray-900 mb-1">
-                          {activity.species}
-                        </h4>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>{activity.location}</span>
-                          <Calendar className="w-4 h-4 ml-2" />
-                          <span>{activity.time}</span>
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h4 className="text-lg font-semibold text-gray-800 mb-2">Recent Wildlife Sightings</h4>
+              <p className="text-sm text-gray-600">Live observations from the iNaturalist community</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recentActivity.map((activity, index) => (
+                <div key={index} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                     onClick={() => activity.url && window.open(activity.url, '_blank')}>
+                  {/* Large Activity Photo */}
+                  {activity.photo ? (
+                    <div className="relative h-48 bg-gradient-to-br from-green-100 to-blue-100 overflow-hidden">
+                      <img 
+                        src={activity.photo} 
+                        alt={activity.species}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                      {/* Activity Type Badge */}
+                      <div className="absolute top-3 left-3">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                          {getActivityIcon(activity.type)}
                         </div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge className={getRarityColor(activity.rarity)}>
-                            {activity.rarity.replace('_', ' ').toUpperCase()}
-                          </Badge>
-                          <span className="text-sm text-gray-600">
-                            Observed by {activity.observer}
-                          </span>
-                        </div>
-                        {activity.trend && (
-                          <p className="text-sm text-gray-700 mb-2">{activity.trend}</p>
-                        )}
                       </div>
-                      
-                      {/* Activity Photo */}
-                      {activity.photo && (
-                        <div className="flex-shrink-0 ml-4">
-                          <img 
-                            src={activity.photo} 
-                            alt={activity.species}
-                            className="w-20 h-20 object-cover rounded-lg"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
-                          />
+                      {/* Rarity Badge */}
+                      <div className="absolute top-3 right-3">
+                        <Badge className={`${getRarityColor(activity.rarity)} shadow-lg`}>
+                          {activity.rarity.replace('_', ' ').toUpperCase()}
+                        </Badge>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-lg mx-auto mb-2">
+                          {getActivityIcon(activity.type)}
                         </div>
-                      )}
+                        <Badge className={getRarityColor(activity.rarity)}>
+                          {activity.rarity.replace('_', ' ').toUpperCase()}
+                        </Badge>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Content */}
+                  <div className="p-4">
+                    <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
+                      {activity.species}
+                    </h4>
+                    
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                      <MapPin className="w-4 h-4 text-green-600" />
+                      <span>{activity.location}</span>
                     </div>
                     
-                    {/* Action Button */}
-                    <div className="mt-3">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => activity.url && window.open(activity.url, '_blank')}
-                        className="text-xs"
-                      >
-                        <ExternalLink className="w-3 h-3 mr-1" />
-                        {activity.action}
-                      </Button>
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                      <Calendar className="w-3 h-3" />
+                      <span>{activity.time}</span>
+                      <span className="text-gray-400">•</span>
+                      <span>{activity.observer}</span>
+                    </div>
+                    
+                    {activity.trend && (
+                      <div className="bg-blue-50 rounded-lg p-2 mb-3">
+                        <p className="text-xs text-blue-800 font-medium">{activity.trend}</p>
+                      </div>
+                    )}
+                    
+                    {/* Hover Action */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div className="flex items-center gap-1 text-sm text-green-600 font-medium">
+                        <ExternalLink className="w-4 h-4" />
+                        <span>{activity.action}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </CardContent>
