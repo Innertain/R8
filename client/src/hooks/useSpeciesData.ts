@@ -42,8 +42,11 @@ export function useSpeciesData(bioregionId: string | null) {
       return response.json();
     },
     enabled: !!bioregionId,
-    staleTime: 30 * 60 * 1000, // Consider data fresh for 30 minutes
+    staleTime: 24 * 60 * 60 * 1000, // Consider data fresh for 24 hours (matches backend cache)
+    gcTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // Don't refetch if we have data
+    refetchOnReconnect: false, // Don't refetch on network reconnect
     retry: 2,
   });
 }
