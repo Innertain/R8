@@ -104,8 +104,13 @@ const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
 
         // Add click handler
         layer.on('click', () => {
-          setSelectedBioregion(feature.properties);
-          onBioregionSelect(feature.properties);
+          const bioregionWithId = {
+            ...feature.properties,
+            id: feature.id
+          };
+          console.log('Map clicked - selected bioregion:', bioregionWithId);
+          setSelectedBioregion(bioregionWithId);
+          onBioregionSelect(bioregionWithId);
           highlightBioregion(feature);
         });
 
@@ -165,7 +170,10 @@ const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
 
     for (const feature of (bioregionData as any).features) {
       if (booleanPointInPolygon(pointFeature, feature as any)) {
-        foundBioregion = feature.properties;
+        foundBioregion = {
+          ...feature.properties,
+          id: feature.id
+        };
         highlightBioregion(feature);
         break;
       }
