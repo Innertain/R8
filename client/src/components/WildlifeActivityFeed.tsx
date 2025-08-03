@@ -12,7 +12,10 @@ import {
   TrendingUp,
   Loader2,
   Info,
-  ExternalLink
+  ExternalLink,
+  Shield,
+  AlertTriangle,
+  ChevronUp
 } from 'lucide-react';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
 
@@ -24,6 +27,52 @@ interface WildlifeActivityProps {
 export default function WildlifeActivityFeed({ bioregionName, bioregionId }: WildlifeActivityProps) {
   const { data: speciesData, isLoading, error } = useSpeciesData(bioregionId);
   const [displayCount, setDisplayCount] = useState(6);
+  const [selectedSpecies, setSelectedSpecies] = useState<string | null>(null);
+
+  const getConservationDescription = (species: string) => {
+    const statusMap: Record<string, string> = {
+      'Green Sea Turtle': 'Endangered - Protected under ESA',
+      'Hawaiian Monk Seal': 'Critically Endangered - <1,600 remain',
+      'Hawaiian Goose': 'Vulnerable - State bird recovery success',
+      'ʻŌhiʻa Lehua': 'Threatened by Rapid ʻŌhiʻa Death disease',
+      'Common Box Turtle': 'Vulnerable - Habitat loss & road mortality',
+      'Monarch': 'Endangered - 80% population decline',
+      'Java Sparrow': 'Vulnerable - Introduced species management'
+    };
+    return statusMap[species] || 'Conservation concern - Status varies by region';
+  };
+
+  const getThreatsDescription = (species: string) => {
+    const threatsMap: Record<string, string> = {
+      'Green Sea Turtle': 'Plastic pollution, climate change, fishing nets',
+      'Hawaiian Monk Seal': 'Fishing interactions, habitat loss, disease',
+      'Hawaiian Goose': 'Habitat loss, predation, vehicle strikes',
+      'ʻŌhiʻa Lehua': 'Rapid ʻŌhiʻa Death fungal disease',
+      'Common Box Turtle': 'Road mortality, habitat fragmentation, collection',
+      'Monarch': 'Pesticides, habitat loss, climate change',
+      'Java Sparrow': 'Competition with native species'
+    };
+    return threatsMap[species] || 'Habitat loss, climate change, human activities';
+  };
+
+  const getHabitatDescription = (species: string, region: string) => {
+    if (region.includes('Hawaiian')) {
+      const hawaiianHabitats: Record<string, string> = {
+        'Green Sea Turtle': 'Coastal waters, nesting beaches',
+        'Hawaiian Monk Seal': 'Sandy beaches, coral reefs',
+        'Hawaiian Goose': 'Grasslands, volcanic slopes, wetlands',
+        'ʻŌhiʻa Lehua': 'Native forests, volcanic soils',
+        'Java Sparrow': 'Urban areas, agricultural lands'
+      };
+      return hawaiianHabitats[species] || 'Hawaiian native ecosystems';
+    } else {
+      const appalachianHabitats: Record<string, string> = {
+        'Common Box Turtle': 'Deciduous forests, woodland edges',
+        'Monarch': 'Milkweed meadows, migration corridors'
+      };
+      return appalachianHabitats[species] || 'Mixed forests, wetlands, grasslands';
+    }
+  };
 
   // Generate expanded activity feed from real species data
   const allActivities = React.useMemo(() => {
@@ -201,33 +250,119 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                       {speciesData.species.threatenedSpecies.length} species at risk
                     </Badge>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {speciesData.species.threatenedSpecies.slice(0, 6).map((species: string, index: number) => {
-                      const hasPhoto = speciesData.species.speciesPhotos?.[species];
+                  {selectedSpecies ? (
+                    // Individual species detail view
+                    <div className="bg-white border border-red-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-5 h-5 text-blue-600" />
+                          <h4 className="text-lg font-semibold text-gray-900">{selectedSpecies}</h4>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => setSelectedSpecies(null)}
+                          className="text-gray-600"
+                        >
+                          <ChevronUp className="w-4 h-4 mr-1" />
+                          Back to Gallery
+                        </Button>
+                      </div>
                       
-                      return (
-                        <div key={index} className="bg-white/90 rounded-lg border border-red-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-                          {hasPhoto && (
-                            <div className="h-32 bg-gray-100 overflow-hidden">
-                              <img 
-                                src={hasPhoto} 
-                                alt={species}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                }}
-                              />
-                            </div>
-                          )}
-                          <div className="p-3">
-                            <h5 className="text-sm font-semibold text-red-800 mb-1">{species}</h5>
-                            <p className="text-xs text-red-600">Conservation concern - Status varies by region</p>
+                      {/* Species photo if available */}
+                      {speciesData.species.speciesPhotos?.[selectedSpecies] && (
+                        <div className="mb-4">
+                          <img 
+                            src={speciesData.species.speciesPhotos[selectedSpecies]} 
+                            alt={selectedSpecies}
+                            className="w-full h-48 object-cover rounded-lg"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {/* Conservation Status */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Shield className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-semibold text-blue-800">Conservation Status</span>
+                          </div>
+                          <p className="text-sm text-blue-700 mb-2">
+                            {getConservationDescription(selectedSpecies)}
+                          </p>
+                          <div className="text-xs text-blue-600">
+                            <strong>Threats:</strong> {getThreatsDescription(selectedSpecies)}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                        
+                        {/* Habitat Information */}
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <MapPin className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-semibold text-green-800">Habitat</span>
+                          </div>
+                          <p className="text-sm text-green-700">
+                            {getHabitatDescription(selectedSpecies, bioregionName)}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="mt-4 pt-3 border-t border-gray-200">
+                        <div className="flex flex-wrap gap-2">
+                          <Button variant="outline" size="sm" className="text-xs">
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            View on iNaturalist
+                          </Button>
+                          <Button variant="outline" size="sm" className="text-xs">
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            Learn More
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Species gallery grid
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {speciesData.species.threatenedSpecies.slice(0, 6).map((species: string, index: number) => {
+                        const hasPhoto = speciesData.species.speciesPhotos?.[species];
+                        
+                        return (
+                          <div 
+                            key={index} 
+                            className="bg-white/90 rounded-lg border border-red-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer"
+                            onClick={() => setSelectedSpecies(species)}
+                          >
+                            {hasPhoto && (
+                              <div className="h-32 bg-gray-100 overflow-hidden">
+                                <img 
+                                  src={hasPhoto} 
+                                  alt={species}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            <div className="p-3">
+                              <div className="flex items-start gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                <h5 className="text-sm font-semibold text-red-800 leading-tight">{species}</h5>
+                              </div>
+                              <p className="text-xs text-red-600 mb-2">{getConservationDescription(species)}</p>
+                              <div className="text-xs text-blue-600 font-medium">Click to view details →</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className="mt-4 text-center">
                     <p className="text-xs text-red-700">
                       These species face extinction without immediate conservation action. Your observations help scientists track populations and develop protection strategies.
