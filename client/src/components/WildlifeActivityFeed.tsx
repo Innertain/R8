@@ -11,7 +11,10 @@ import {
   Zap,
   TrendingUp,
   Users,
-  Loader2
+  Loader2,
+  Shield,
+  AlertTriangle,
+  Info
 } from 'lucide-react';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
 
@@ -131,6 +134,59 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
         </p>
       </CardHeader>
       <CardContent>
+        {/* Biodiversity Overview Section */}
+        {speciesData && (
+          <div className="mb-6 space-y-4">
+            {/* Total Species Count */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <Info className="w-5 h-5 text-green-600" />
+                <h4 className="text-lg font-semibold text-green-800">Biodiversity Snapshot</h4>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-600">
+                    {speciesData.species.totalSpecies.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-green-700">Total Species Documented</div>
+                </div>
+                <div className="text-sm text-green-700">
+                  This bioregion is home to thousands of documented species, from tiny insects to large mammals, 
+                  all contributing to a complex and vital ecosystem.
+                </div>
+              </div>
+            </div>
+
+            {/* Threatened Species Section */}
+            {speciesData.species.threatenedSpecies && speciesData.species.threatenedSpecies.length > 0 && (
+              <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <Shield className="w-5 h-5 text-red-600" />
+                  <h4 className="text-lg font-semibold text-red-800">Conservation Priority Species</h4>
+                  <Badge className="bg-red-100 text-red-800 border-red-200">
+                    {speciesData.species.threatenedSpecies.length} species at risk
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {speciesData.species.threatenedSpecies.slice(0, 6).map((species, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-white/70 rounded-lg p-2">
+                      <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                      <span className="text-sm font-medium text-red-800">{species}</span>
+                    </div>
+                  ))}
+                  {speciesData.species.threatenedSpecies.length > 6 && (
+                    <div className="text-sm text-red-600 italic">
+                      +{speciesData.species.threatenedSpecies.length - 6} more threatened species...
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-red-700 mt-2">
+                  These species face conservation challenges and benefit from protection efforts and citizen science monitoring.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-6 h-6 animate-spin text-green-600 mr-2" />
