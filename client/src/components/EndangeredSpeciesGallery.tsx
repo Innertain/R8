@@ -158,8 +158,26 @@ export default function EndangeredSpeciesGallery({ bioregionName, bioregionId, s
     return climateData?.climateRefugees?.find((s: ClimateRefugeeData) => s.species === species);
   };
 
+  // Debug logging
+  console.log('EndangeredSpeciesGallery props:', { bioregionName, bioregionId, speciesData });
+  console.log('Threatened species:', speciesData?.species?.threatenedSpecies);
+
   if (!speciesData?.species?.threatenedSpecies || speciesData.species.threatenedSpecies.length === 0) {
-    return null;
+    return (
+      <Card>
+        <CardContent className="p-0">
+          <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Shield className="w-5 h-5 text-red-600" />
+              <h4 className="text-lg font-semibold text-red-800">Endangered Species Gallery</h4>
+            </div>
+            <p className="text-red-700 text-sm">
+              {!speciesData ? 'Loading species data...' : 'No threatened species data available for this bioregion.'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
