@@ -400,7 +400,7 @@ export default function EndangeredSpeciesGallery({ bioregionName, bioregionId, s
               ) : (
                 // Species gallery grid
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {speciesData.species.threatenedSpecies.slice(0, 6).map((species, index) => {
+                  {speciesData.species.threatenedSpecies.slice(0, 6).map((species: string, index: number) => {
                     const hasPhoto = speciesData.species.speciesPhotos?.[species];
                     
                     return (
@@ -463,7 +463,7 @@ export default function EndangeredSpeciesGallery({ bioregionName, bioregionId, s
           ) : (
             // Conservation Details View - Replace entire section
             <div className="space-y-4">
-              {speciesData.species.threatenedSpecies.slice(0, 6).map((species, index) => {
+              {speciesData.species.threatenedSpecies.slice(0, 6).map((species: string, index: number) => {
                 const conservationInfo = getSpeciesConservationData(species);
                 const climateInfo = getSpeciesClimateData(species);
                 const hasPhoto = speciesData.species.speciesPhotos?.[species];
