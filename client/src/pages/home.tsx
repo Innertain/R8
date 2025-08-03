@@ -96,16 +96,30 @@ function ModulesSection() {
               <h1 className="text-5xl font-bold text-white">R8</h1>
             </div>
             <p className="text-2xl text-stormy-light mb-6">Disaster Relief • Community Resiliency • Regeneration</p>
-            <div className="max-w-4xl mx-auto space-y-4">
-              <p className="text-lg text-stormy-light/90 leading-relaxed">
-                R8 is a comprehensive platform connecting communities, organizations, and individuals to create resilient networks 
-                for disaster response, community building, and ecological regeneration.
+            <div className="max-w-4xl mx-auto space-y-6">
+              <p className="text-xl text-stormy-light/95 leading-relaxed font-medium">
+                Connecting communities for resilient disaster response and ecological regeneration.
               </p>
-              <p className="text-base text-stormy-light/80 leading-relaxed">
-                We bridge immediate disaster relief with long-term community resilience, supporting bioregional restoration 
-                projects that strengthen both human communities and natural ecosystems. From real-time emergency monitoring 
-                to traditional ecological knowledge preservation, R8 empowers communities to thrive in harmony with their landscapes.
-              </p>
+              
+              <div className="grid md:grid-cols-2 gap-6 text-left">
+                <div className="space-y-3">
+                  <h4 className="text-lg font-semibold text-white">Immediate Response</h4>
+                  <ul className="text-base text-stormy-light/90 space-y-2">
+                    <li>• Real-time emergency monitoring</li>
+                    <li>• Community network coordination</li>
+                    <li>• Disaster relief resources</li>
+                  </ul>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-lg font-semibold text-white">Long-term Resilience</h4>
+                  <ul className="text-base text-stormy-light/90 space-y-2">
+                    <li>• Bioregional restoration projects</li>
+                    <li>• Traditional knowledge preservation</li>
+                    <li>• Regenerative community building</li>
+                  </ul>
+                </div>
+              </div>
               <div className="flex flex-wrap justify-center gap-6 pt-4">
                 <div className="text-center">
                   <Shield className="w-8 h-8 text-red-400 mx-auto mb-2" />
