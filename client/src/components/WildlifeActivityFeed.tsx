@@ -312,174 +312,249 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                   {speciesData.species.threatenedSpecies.slice(0, 6).map((species, index) => {
                     const hasPhoto = speciesData.species.speciesPhotos?.[species];
+                    const isSelected = selectedSpecies === species;
+                    const conservationInfo = getSpeciesConservationData(species);
+                    const climateInfo = getSpeciesClimateData(species);
+                    
                     return (
                       <div key={index} className="bg-white/90 rounded-lg border border-red-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-                        {hasPhoto && (
-                          <div className="h-32 bg-gray-100 overflow-hidden">
-                            <img 
-                              src={hasPhoto} 
-                              alt={species}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                              }}
-                            />
-                          </div>
-                        )}
-                        <div className="p-3">
-                          <div className="flex items-start gap-2 mb-2">
-                            <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                            <h5 className="text-sm font-semibold text-red-800 leading-tight">{species}</h5>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="text-xs text-red-700">
-                              <span className="font-medium">Status:</span> {getConservationDescription(species)}
-                            </div>
-                            <div className="text-xs text-red-600">
-                              <span className="font-medium">Threats:</span> {getThreatsDescription(species)}
-                            </div>
-                            <div className="text-xs text-red-600">
-                              <span className="font-medium">Habitat:</span> {getHabitatDescription(species, bioregionName)}
-                            </div>
-                          </div>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="w-full mt-2 text-xs border-red-200 text-red-700 hover:bg-red-50"
-                            onClick={() => setSelectedSpecies(selectedSpecies === species ? null : species)}
-                          >
-                            {selectedSpecies === species ? (
-                              <>
-                                <ChevronUp className="w-3 h-3 mr-1" />
-                                Hide Details
-                              </>
-                            ) : (
-                              <>
+                        {!isSelected ? (
+                          // Regular species card view
+                          <>
+                            {hasPhoto && (
+                              <div className="h-32 bg-gray-100 overflow-hidden">
+                                <img 
+                                  src={hasPhoto} 
+                                  alt={species}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            <div className="p-3">
+                              <div className="flex items-start gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                <h5 className="text-sm font-semibold text-red-800 leading-tight">{species}</h5>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="text-xs text-red-700">
+                                  <span className="font-medium">Status:</span> {getConservationDescription(species)}
+                                </div>
+                                <div className="text-xs text-red-600">
+                                  <span className="font-medium">Threats:</span> {getThreatsDescription(species)}
+                                </div>
+                                <div className="text-xs text-red-600">
+                                  <span className="font-medium">Habitat:</span> {getHabitatDescription(species, bioregionName)}
+                                </div>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="w-full mt-2 text-xs border-red-200 text-red-700 hover:bg-red-50"
+                                onClick={() => setSelectedSpecies(species)}
+                              >
                                 <ChevronDown className="w-3 h-3 mr-1" />
                                 Conservation Details
-                              </>
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
+                          // Expanded conservation details view - full card
+                          <div className="p-4 max-h-96 overflow-y-auto">
+                            {/* Header with species name and close */}
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-2">
+                                <Shield className="w-5 h-5 text-blue-600" />
+                                <h4 className="text-lg font-semibold text-gray-900">{species}</h4>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={() => setSelectedSpecies(null)}
+                                className="text-gray-600"
+                              >
+                                <ChevronUp className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            
+                            {/* Species photo if available */}
+                            {hasPhoto && (
+                              <div className="mb-4">
+                                <img 
+                                  src={hasPhoto} 
+                                  alt={species}
+                                  className="w-full h-32 object-cover rounded-lg"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
                             )}
-                          </Button>
-                          
-                          {/* Detailed Conservation Data */}
-                          {selectedSpecies === species && (
-                            <div className="mt-3 space-y-3 border-t pt-3">
-                              {/* IUCN Conservation Status */}
-                              {getSpeciesConservationData(species) && (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <Shield className="w-4 h-4 text-blue-600" />
-                                    <span className="text-sm font-semibold text-blue-800">IUCN Conservation Status</span>
+                            
+                            {/* IUCN Conservation Status */}
+                            {conservationInfo && (
+                              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Shield className="w-4 h-4 text-blue-600" />
+                                  <span className="text-sm font-semibold text-blue-800">IUCN Red List Status</span>
+                                </div>
+                                
+                                <div className="space-y-3">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <Badge className={getStatusColor(conservationInfo.iucnStatus)}>
+                                      {conservationInfo.iucnStatus} - {getStatusName(conservationInfo.iucnStatus)}
+                                    </Badge>
+                                    <div className="flex items-center gap-1 text-sm">
+                                      {getTrendIcon(conservationInfo.populationTrend)}
+                                      <span className="capitalize font-medium">{conservationInfo.populationTrend}</span>
+                                    </div>
                                   </div>
-                                  {(() => {
-                                    const conservationInfo = getSpeciesConservationData(species)!;
-                                    return (
-                                      <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                          <Badge className={getStatusColor(conservationInfo.iucnStatus)}>
-                                            {conservationInfo.iucnStatus} - {getStatusName(conservationInfo.iucnStatus)}
+                                  
+                                  <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="bg-white/80 p-2 rounded">
+                                      <div className="font-medium text-blue-800">Assessment Date</div>
+                                      <div className="text-gray-600">{new Date(conservationInfo.assessmentDate).toLocaleDateString()}</div>
+                                    </div>
+                                    {conservationInfo.generationLength && (
+                                      <div className="bg-white/80 p-2 rounded">
+                                        <div className="font-medium text-blue-800">Generation Length</div>
+                                        <div className="text-gray-600">{conservationInfo.generationLength} years</div>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Threat Categories */}
+                                  <div>
+                                    <div className="text-xs font-medium text-blue-800 mb-2">Primary Threats:</div>
+                                    <div className="flex flex-wrap gap-1">
+                                      {conservationInfo.threatCategories.map((threat: string, idx: number) => (
+                                        <Badge key={idx} variant="outline" className="text-xs">
+                                          {threat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Active Conservation Efforts */}
+                            {conservationInfo && conservationInfo.conservationActions.length > 0 && (
+                              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Users className="w-4 h-4 text-green-600" />
+                                  <span className="text-sm font-semibold text-green-800">Active Conservation Projects</span>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  {conservationInfo.conservationActions.map((action: any, idx: number) => (
+                                    <div key={idx} className="bg-white/80 rounded border p-3">
+                                      <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                          <div className="flex items-center gap-2 mb-1">
+                                            <CheckCircle className="w-3 h-3 text-green-600 flex-shrink-0" />
+                                            <div className="text-sm font-medium text-gray-900">{action.action}</div>
+                                          </div>
+                                          <div className="text-xs text-gray-600 mb-1">
+                                            Led by <span className="font-medium">{action.organization}</span> • Since {action.startDate}
+                                          </div>
+                                          <Badge variant="outline" className="text-xs">
+                                            {action.status}
                                           </Badge>
-                                          <div className="flex items-center gap-1 text-sm">
-                                            {getTrendIcon(conservationInfo.populationTrend)}
-                                            <span className="capitalize">{conservationInfo.populationTrend}</span>
-                                          </div>
                                         </div>
-                                        
-                                        {conservationInfo.conservationActions.length > 0 && (
-                                          <div>
-                                            <div className="text-xs font-medium text-blue-800 mb-1">Active Conservation Efforts:</div>
-                                            <div className="space-y-1">
-                                              {conservationInfo.conservationActions.slice(0, 2).map((action: any, idx: number) => (
-                                                <div key={idx} className="flex items-start gap-2 p-2 bg-white/80 rounded border text-xs">
-                                                  <CheckCircle className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
-                                                  <div className="flex-1">
-                                                    <div className="font-medium">{action.action}</div>
-                                                    <div className="text-gray-600">by {action.organization} • Since {action.startDate}</div>
-                                                  </div>
-                                                  {action.url && (
-                                                    <Button 
-                                                      size="sm"
-                                                      variant="ghost"
-                                                      className="h-auto p-1 text-xs"
-                                                      onClick={() => window.open(action.url, '_blank')}
-                                                    >
-                                                      <ExternalLink className="w-3 h-3" />
-                                                    </Button>
-                                                  )}
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
+                                        {action.url && (
+                                          <Button 
+                                            size="sm"
+                                            variant="ghost"
+                                            className="h-auto p-1"
+                                            onClick={() => window.open(action.url, '_blank')}
+                                          >
+                                            <ExternalLink className="w-3 h-3" />
+                                          </Button>
                                         )}
                                       </div>
-                                    );
-                                  })()} 
+                                    </div>
+                                  ))}
                                 </div>
-                              )}
-                              
-                              {/* Climate Impact Data */}
-                              {getSpeciesClimateData(species) && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <Thermometer className="w-4 h-4 text-red-600" />
-                                    <span className="text-sm font-semibold text-red-800">Climate Impact</span>
+                              </div>
+                            )}
+                            
+                            {/* Climate Impact Data */}
+                            {climateInfo && (
+                              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Thermometer className="w-4 h-4 text-red-600" />
+                                  <span className="text-sm font-semibold text-red-800">Climate Change Impact</span>
+                                </div>
+                                
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2">
+                                    <Badge className={getSeverityColor(climateInfo.severity)}>
+                                      {climateInfo.severity.toUpperCase()} CLIMATE RISK
+                                    </Badge>
+                                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                                      <Clock className="w-3 h-3" />
+                                      <span>Last documented: {climateInfo.lastSeenYear}</span>
+                                    </div>
                                   </div>
-                                  {(() => {
-                                    const climateInfo = getSpeciesClimateData(species)!;
-                                    return (
-                                      <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                          <Badge className={getSeverityColor(climateInfo.severity)}>
-                                            {climateInfo.severity.toUpperCase()} RISK
-                                          </Badge>
-                                          <div className="flex items-center gap-1 text-xs text-gray-600">
-                                            <Clock className="w-3 h-3" />
-                                            <span>Last seen: {climateInfo.lastSeenYear}</span>
-                                          </div>
+                                  
+                                  <div className="bg-white/80 p-3 rounded">
+                                    <div className="text-sm font-medium text-red-800 mb-2">{climateInfo.disappearanceReason}</div>
+                                    <div className="text-xs text-red-700 space-y-1">
+                                      <div className="font-medium">Population Evidence:</div>
+                                      {climateInfo.evidence.map((evidence: string, idx: number) => (
+                                        <div key={idx} className="flex items-start gap-2">
+                                          <div className="w-1 h-1 bg-red-400 rounded-full mt-1.5 flex-shrink-0"></div>
+                                          <span>{evidence}</span>
                                         </div>
-                                        
-                                        <div className="text-xs text-red-700">
-                                          <div className="font-medium mb-1">{climateInfo.disappearanceReason}</div>
-                                          <div className="space-y-1">
-                                            {climateInfo.evidence.map((evidence: string, idx: number) => (
-                                              <div key={idx} className="flex items-center gap-2">
-                                                <div className="w-1 h-1 bg-red-400 rounded-full"></div>
-                                                {evidence}
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    );
-                                  })()} 
+                                      ))}
+                                    </div>
+                                  </div>
                                 </div>
-                              )}
-                              
-                              {/* External Links */}
-                              <div className="flex gap-2">
+                              </div>
+                            )}
+                            
+                            {/* External Resources */}
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                              <div className="text-sm font-semibold text-gray-800 mb-2">Learn More & Take Action</div>
+                              <div className="grid grid-cols-1 gap-2">
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
-                                  className="flex-1 text-xs"
+                                  className="justify-start text-xs"
                                   onClick={() => window.open(`https://www.inaturalist.org/taxa?q=${encodeURIComponent(species)}`, '_blank')}
                                 >
-                                  <ExternalLink className="w-3 h-3 mr-1" />
-                                  iNaturalist
+                                  <ExternalLink className="w-3 h-3 mr-2" />
+                                  View on iNaturalist - Recent observations & photos
                                 </Button>
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
-                                  className="flex-1 text-xs"
+                                  className="justify-start text-xs"
                                   onClick={() => window.open(`https://www.iucnredlist.org/search?query=${encodeURIComponent(species)}`, '_blank')}
                                 >
-                                  <ExternalLink className="w-3 h-3 mr-1" />
-                                  IUCN Red List
+                                  <ExternalLink className="w-3 h-3 mr-2" />
+                                  IUCN Red List - Official conservation assessment
                                 </Button>
+                                {conservationInfo && (
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    className="justify-start text-xs"
+                                    onClick={() => window.open(`https://www.gbif.org/species/search?q=${encodeURIComponent(species)}`, '_blank')}
+                                  >
+                                    <ExternalLink className="w-3 h-3 mr-2" />
+                                    GBIF - Global occurrence data & research
+                                  </Button>
+                                )}
                               </div>
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
