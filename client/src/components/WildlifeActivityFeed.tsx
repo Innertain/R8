@@ -189,6 +189,55 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
             </CardContent>
           </Card>
 
+          {/* Endangered Species Gallery */}
+          {speciesData.species.threatenedSpecies && speciesData.species.threatenedSpecies.length > 0 && (
+            <Card>
+              <CardContent className="p-0">
+                <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Info className="w-5 h-5 text-red-600" />
+                    <h4 className="text-lg font-semibold text-red-800">Endangered Species</h4>
+                    <Badge className="bg-red-100 text-red-800 border-red-200">
+                      {speciesData.species.threatenedSpecies.length} species at risk
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {speciesData.species.threatenedSpecies.slice(0, 6).map((species: string, index: number) => {
+                      const hasPhoto = speciesData.species.speciesPhotos?.[species];
+                      
+                      return (
+                        <div key={index} className="bg-white/90 rounded-lg border border-red-200 overflow-hidden hover:shadow-lg transition-all duration-200">
+                          {hasPhoto && (
+                            <div className="h-32 bg-gray-100 overflow-hidden">
+                              <img 
+                                src={hasPhoto} 
+                                alt={species}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
+                          <div className="p-3">
+                            <h5 className="text-sm font-semibold text-red-800 mb-1">{species}</h5>
+                            <p className="text-xs text-red-600">Conservation concern - Status varies by region</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-4 text-center">
+                    <p className="text-xs text-red-700">
+                      These species face extinction without immediate conservation action. Your observations help scientists track populations and develop protection strategies.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
         </div>
       )}
 

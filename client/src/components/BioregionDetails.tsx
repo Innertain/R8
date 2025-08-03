@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { MapPin, ExternalLink, Users, TreePine, AlertTriangle, Thermometer } from 'lucide-react';
 import SpeciesInfo from './SpeciesInfo';
 import WildlifeActivityFeed from './WildlifeActivityFeed';
-import EndangeredSpeciesGallery from './EndangeredSpeciesGallery';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
 
 interface BioregionDetailsProps {
@@ -179,13 +178,6 @@ const BioregionDetails: React.FC<BioregionDetailsProps> = ({ bioregion, isLoadin
           </div>
         </CardContent>
       </Card>
-
-      {/* Endangered Species Gallery - Separate Section */}
-      <EndangeredSpeciesGallery 
-        bioregionName={bioregion.name}
-        bioregionId={bioregion.id}
-        speciesData={speciesData}
-      />
 
       {/* Live Wildlife Activity - This is what users actually want to see! */}
       <WildlifeActivityFeed bioregionName={bioregion.name} bioregionId={bioregion.id} />
