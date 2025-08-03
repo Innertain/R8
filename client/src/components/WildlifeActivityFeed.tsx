@@ -32,7 +32,28 @@ interface WildlifeActivityProps {
 export default function WildlifeActivityFeed({ bioregionName, bioregionId }: WildlifeActivityProps) {
   const { data: speciesData, isLoading, error } = useSpeciesData(bioregionId);
   const [displayCount, setDisplayCount] = useState(6);
+  const [speciesDisplayCount, setSpeciesDisplayCount] = useState(8); // Mobile-first: show 8 initially
   const [selectedSpecies, setSelectedSpecies] = useState<string | null>(null);
+
+  // Set responsive initial display count
+  React.useEffect(() => {
+    const setResponsiveDisplayCount = () => {
+      const isMobile = window.innerWidth < 768;
+      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+      
+      if (isMobile) {
+        setSpeciesDisplayCount(6); // Mobile: 6 species initially
+      } else if (isTablet) {
+        setSpeciesDisplayCount(12); // Tablet: 12 species initially  
+      } else {
+        setSpeciesDisplayCount(16); // Desktop: 16 species initially
+      }
+    };
+    
+    setResponsiveDisplayCount();
+    window.addEventListener('resize', setResponsiveDisplayCount);
+    return () => window.removeEventListener('resize', setResponsiveDisplayCount);
+  }, []);
 
   const getConservationDescription = (species: string) => {
     const statusMap: Record<string, string> = {
@@ -849,7 +870,7 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {speciesData.species.threatenedSpecies
                           .filter((species: string) => speciesData.species.speciesPhotos?.[species]) // Only show species with photos
-                          .slice(0, 50)
+                          .slice(0, speciesDisplayCount)
                           .map((species: string, index: number) => {
                         const hasPhoto = speciesData.species.speciesPhotos?.[species];
                         
@@ -890,24 +911,44 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                       })}
                       </div>
                       
-                      {/* Show more button if there are additional species with photos */}
+                      {/* Load more button for species gallery - responsive */}
                       {(() => {
                         const speciesWithPhotos = speciesData.species.threatenedSpecies.filter(species => speciesData.species.speciesPhotos?.[species]);
+                        const remainingSpecies = speciesWithPhotos.length - speciesDisplayCount;
                         const totalWithoutPhotos = speciesData.species.threatenedSpecies.length - speciesWithPhotos.length;
-                        return speciesWithPhotos.length > 50 && (
-                          <div className="text-center pt-2">
+                        
+                        return remainingSpecies > 0 && (
+                          <div className="text-center pt-4">
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="border-red-200 text-red-700 hover:bg-red-50"
+                              className="border-red-200 text-red-700 hover:bg-red-50 px-6 py-2"
                               onClick={() => {
-                                alert(`This bioregion has ${speciesData.species.threatenedSpecies.length} total threatened species (${speciesWithPhotos.length} with photos, ${totalWithoutPhotos} without photos). Only showing species with photographic documentation.`);
+                                // Load more species - responsive increments
+                                const isMobile = window.innerWidth < 768;
+                                const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+                                
+                                let increment;
+                                if (isMobile) {
+                                  increment = 6; // Mobile: +6 more
+                                } else if (isTablet) {
+                                  increment = 8; // Tablet: +8 more
+                                } else {
+                                  increment = 12; // Desktop: +12 more
+                                }
+                                
+                                setSpeciesDisplayCount(prev => Math.min(prev + increment, speciesWithPhotos.length));
                               }}
                             >
                               <ChevronDown className="w-3 h-3 mr-1" />
-                              Show {Math.min(50, speciesWithPhotos.length - 50)} More Species With Photos
-                              <span className="ml-2 text-xs text-red-600">({speciesWithPhotos.length - 50} remaining)</span>
+                              Load More Species
+                              <span className="ml-2 text-xs text-red-600">({remainingSpecies} remaining)</span>
                             </Button>
+                            {totalWithoutPhotos > 0 && (
+                              <p className="text-xs text-gray-600 mt-2">
+                                📷 {totalWithoutPhotos} additional species lack photos
+                              </p>
+                            )}
                           </div>
                         );
                       })()}
