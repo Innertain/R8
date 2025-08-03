@@ -15,7 +15,8 @@ import {
   ExternalLink,
   Shield,
   AlertTriangle,
-  ChevronUp
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import { useSpeciesData } from '@/hooks/useSpeciesData';
 
@@ -82,21 +83,23 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
     const timeVariations = ['2 hours ago', '5 hours ago', '1 day ago', '2 days ago', '3 days ago', '1 week ago'];
     const observers = ['iNaturalist Community', 'Local Naturalists', 'Wildlife Researchers', 'Conservation Scientists', 'Citizen Scientists', 'Park Rangers'];
     
-    // Add recent wildlife sightings with photos
+    // Add recent wildlife sightings ONLY if they have photos
     if (speciesData.species.recentSightings) {
-      speciesData.species.recentSightings.forEach((sighting, index) => {
-        activities.push({
-          type: 'sighting',
-          species: sighting.species,
-          location: sighting.location,
-          time: sighting.date,
-          observer: observers[index % observers.length],
-          photo: sighting.photo,
-          rarity: 'common',
-          action: 'View observation',
-          url: sighting.url
+      speciesData.species.recentSightings
+        .filter(sighting => sighting.photo && sighting.photo.trim() !== '') // Only include sightings with valid photos
+        .forEach((sighting, index) => {
+          activities.push({
+            type: 'sighting',
+            species: sighting.species,
+            location: sighting.location,
+            time: sighting.date,
+            observer: observers[index % observers.length],
+            photo: sighting.photo,
+            rarity: 'common',
+            action: 'View observation',
+            url: sighting.url
+          });
         });
-      });
     }
     
     // Add flagship species activities
@@ -184,8 +187,10 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
       });
     }
     
-    // Shuffle activities for variety
-    return activities.sort(() => Math.random() - 0.5);
+    // Final filter: only return activities that have photos, then shuffle for variety
+    return activities
+      .filter(activity => activity.photo && activity.photo.trim() !== '') // Ensure all activities have valid photos
+      .sort(() => Math.random() - 0.5);
   }, [speciesData, bioregionName]);
   
   const recentActivity = allActivities.slice(0, displayCount);
