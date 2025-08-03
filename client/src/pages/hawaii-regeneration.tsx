@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
 import WildlifeFeedDemo from '@/components/WildlifeFeedDemo';
+import hawaiiLandscapeImage from '@assets/Hawaii_1754183003386.png';
 
 // Hawaiian ahupua'a data - traditional watershed management systems
 const hawaiianAhupuaa = [
@@ -96,15 +97,29 @@ const HawaiiRegenerationPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Hawaiʻi Regeneration Network
-        </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Connecting communities to restore native ecosystems and traditional practices across the Hawaiian Islands
-        </p>
+    <div className="space-y-0">
+      {/* Hero Section with Landscape */}
+      <div className="relative h-96 overflow-hidden">
+        <img 
+          src={hawaiiLandscapeImage} 
+          alt="Hawaiian landscape with lush mountains and turquoise ocean"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-30" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center space-y-4 text-white px-6">
+            <h1 className="text-5xl font-bold drop-shadow-lg">
+              Hawaiʻi Regeneration Network
+            </h1>
+            <p className="text-xl max-w-3xl mx-auto drop-shadow-md">
+              Connecting communities to restore native ecosystems and traditional practices across the Hawaiian Islands
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <div className="text-center space-y-4">
         <DataSourceAttribution
           source="Hawaiian Conservation Organizations"
           lastUpdated="2025-02-02"
@@ -481,6 +496,7 @@ const HawaiiRegenerationPage: React.FC = () => {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 };

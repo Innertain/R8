@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
 import WildlifeFeedDemo from '@/components/WildlifeFeedDemo';
+import appalachianLandscapeImage from '@assets/Appalachian_1754183003386.png';
 
 // Appalachian restoration regions - traditional watershed and forest systems
 const appalachianProjects = [
@@ -95,15 +96,29 @@ const AppalachianRegenerationPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Appalachian Regeneration Network
-        </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Restoring the ancient mountains through traditional knowledge, forest stewardship, and community-led conservation
-        </p>
+    <div className="space-y-0">
+      {/* Hero Section with Landscape */}
+      <div className="relative h-96 overflow-hidden">
+        <img 
+          src={appalachianLandscapeImage} 
+          alt="Appalachian mountain landscape with rolling green hills and valleys"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-30" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center space-y-4 text-white px-6">
+            <h1 className="text-5xl font-bold drop-shadow-lg">
+              Appalachian Regeneration Network
+            </h1>
+            <p className="text-xl max-w-3xl mx-auto drop-shadow-md">
+              Restoring the ancient mountains through traditional knowledge, forest stewardship, and community-led conservation
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <div className="text-center space-y-4">
         <DataSourceAttribution
           source="Appalachian Regional Commission"
           lastUpdated="2025-01-28"
@@ -490,6 +505,7 @@ const AppalachianRegenerationPage: React.FC = () => {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 };
