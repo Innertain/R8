@@ -9,6 +9,7 @@ interface SpeciesData {
   recentSightings: Array<{species: string, location: string, date: string, photo?: string, url: string}>;
   seasonalTrends: Record<string, number>;
   identificationNeeds: Array<{species: string, observations: number, url: string}>;
+  speciesPhotos: Record<string, string>;
 }
 
 interface ConservationProject {

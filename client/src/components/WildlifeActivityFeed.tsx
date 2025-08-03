@@ -60,7 +60,7 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
         trend: `High activity - ${Math.floor(Math.random() * 200 + 100)}% above normal`,
         rarity: 'seasonal',
         action: 'Track activity',
-        photo: undefined
+        photo: speciesData.species.speciesPhotos?.[speciesData.species.flagshipSpecies[0]]
       });
     }
     
@@ -74,7 +74,7 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
         observer: 'Conservation Scientists',
         rarity: 'critically_endangered',
         action: 'Report sighting',
-        photo: undefined
+        photo: speciesData.species.speciesPhotos?.[speciesData.species.threatenedSpecies[0]]
       });
     }
     

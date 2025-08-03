@@ -2,6 +2,7 @@ import axios from 'axios';
 import { db } from '../db';
 import { apiUsageLog, bioregionSpeciesCache, speciesRecords } from '@shared/schema';
 import { eq, desc, gte } from 'drizzle-orm';
+import { usfwsService } from './usfwsService';
 
 const INATURALIST_BASE_URL = 'https://api.inaturalist.org/v1';
 const RATE_LIMIT_BUFFER = 100; // Keep 100 requests in reserve
@@ -113,6 +114,7 @@ class INaturalistService {
     recentSightings: Array<{species: string, location: string, date: string, photo?: string, url: string}>;
     seasonalTrends: Record<string, number>;
     identificationNeeds: Array<{species: string, observations: number, url: string}>;
+    speciesPhotos: Record<string, string>;
   }> {
     // Check if we have fresh cached data
     const cached = await db
@@ -139,13 +141,14 @@ class INaturalistService {
         recentSightings: recentSightings || [],
         seasonalTrends: {},
         identificationNeeds: identificationNeeds || [],
+        speciesPhotos: {},
       };
     }
 
     console.log(`Fetching fresh species data for ${bioregionId}`);
 
     // Fetch species data from iNaturalist
-    const speciesData = await this.fetchSpeciesData(bounds);
+    const speciesData = await this.fetchSpeciesData(bounds, bioregionId);
     
     if (!speciesData) {
       console.log(`Failed to fetch species data for ${bioregionId}, using cached data if available`);
@@ -163,6 +166,7 @@ class INaturalistService {
           recentSightings: recentSightings || [],
           seasonalTrends: {},
           identificationNeeds: identificationNeeds || [],
+          speciesPhotos: {},
         };
       }
       return {
@@ -174,6 +178,7 @@ class INaturalistService {
         recentSightings: [],
         seasonalTrends: {},
         identificationNeeds: [],
+        speciesPhotos: {},
       };
     }
 
@@ -183,7 +188,7 @@ class INaturalistService {
     return speciesData;
   }
 
-  private async fetchSpeciesData(bounds: {north: number, south: number, east: number, west: number}) {
+  private async fetchSpeciesData(bounds: {north: number, south: number, east: number, west: number}, bioregionId?: string) {
     // Get species observations in the bioregion bounds
     const observationsResponse = await this.makeApiRequest<any>('/observations/species_counts', {
       nelat: bounds.north,
@@ -233,15 +238,34 @@ class INaturalistService {
     // Get observations needing identification
     const identificationNeeds = await this.getIdentificationNeeds(bounds);
     
+    // Get additional threatened species from USFWS for more comprehensive coverage
+    let uniqueThreatenedSpecies = threatenedSpecies.slice(0, 10);
+    if (bioregionId) {
+      const additionalThreatenedSpecies = await usfwsService.getRegionalThreatenedSpecies(bioregionId);
+      const combinedThreatenedSpecies = [
+        ...threatenedSpecies,
+        ...additionalThreatenedSpecies.slice(0, 8) // Add up to 8 more species
+      ];
+      
+      // Remove duplicates and limit to 15 total
+      const uniqueSet = new Set(combinedThreatenedSpecies);
+      uniqueThreatenedSpecies = Array.from(uniqueSet).slice(0, 15);
+    }
+    
+    // Get photos for flagship and threatened species
+    const allSpeciesForPhotos = [...flagshipSpecies.slice(0, 3), ...uniqueThreatenedSpecies.slice(0, 3)];
+    const speciesPhotos = await this.getSpeciesPhotos(allSpeciesForPhotos, bounds);
+    
     return {
       totalSpecies: observationsResponse.total_results || 0,
       flagshipSpecies: flagshipSpecies.slice(0, 10),
       endemicSpecies,
-      threatenedSpecies: threatenedSpecies.slice(0, 10),
+      threatenedSpecies: uniqueThreatenedSpecies,
       topTaxa,
       recentSightings: recentSightings || [],
       seasonalTrends: {},
       identificationNeeds: identificationNeeds || [],
+      speciesPhotos: speciesPhotos || {},
     };
   }
 
@@ -309,6 +333,36 @@ class INaturalistService {
       photo: obs.photos?.[0]?.url?.replace('square', 'medium'),
       url: `https://www.inaturalist.org/observations/${obs.id}`,
     }));
+  }
+
+  // New method to get photos for specific species names
+  async getSpeciesPhotos(speciesNames: string[], bounds: {north: number, south: number, east: number, west: number}): Promise<Record<string, string>> {
+    const photos: Record<string, string> = {};
+    
+    for (const speciesName of speciesNames.slice(0, 5)) { // Limit to 5 to avoid too many API calls
+      try {
+        const response = await this.makeApiRequest<any>('/observations', {
+          nelat: bounds.north,
+          nelng: bounds.east, 
+          swlat: bounds.south,
+          swlng: bounds.west,
+          taxon_name: speciesName,
+          per_page: 1,
+          order: 'desc',
+          order_by: 'created_at',
+          photos: true,
+          quality_grade: 'research',
+        });
+        
+        if (response?.results?.[0]?.photos?.[0]) {
+          photos[speciesName] = response.results[0].photos[0].url.replace('square', 'medium');
+        }
+      } catch (error) {
+        console.log(`Failed to get photo for ${speciesName}:`, error);
+      }
+    }
+    
+    return photos;
   }
 
   async getIdentificationNeeds(bounds: {north: number, south: number, east: number, west: number}) {
