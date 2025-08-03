@@ -239,8 +239,8 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                 {recentActivity.map((activity, index) => (
                   <div key={index} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
                        onClick={() => activity.url && window.open(activity.url, '_blank')}>
-                    {/* Large Activity Photo */}
-                    {activity.photo ? (
+                    {/* Large Activity Photo - only show if photo exists */}
+                    {activity.photo && (
                       <div className="relative h-48 bg-gradient-to-br from-green-100 to-blue-100 overflow-hidden">
                         <img 
                           src={activity.photo} 
@@ -264,21 +264,22 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                           </Badge>
                         </div>
                       </div>
-                    ) : (
-                      <div className="h-48 bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-lg mx-auto mb-2">
+                    )}
+                    
+                    {/* Content */}
+                    <div className="p-4">
+                      {/* Show badges and icon for cards without photos */}
+                      {!activity.photo && (
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="bg-gray-50 rounded-full p-2">
                             {getActivityIcon(activity.type)}
                           </div>
                           <Badge className={getRarityColor(activity.rarity)}>
                             {activity.rarity.replace('_', ' ').toUpperCase()}
                           </Badge>
                         </div>
-                      </div>
-                    )}
-                    
-                    {/* Content */}
-                    <div className="p-4">
+                      )}
+                      
                       <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
                         {activity.species}
                       </h4>
