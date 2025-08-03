@@ -132,16 +132,25 @@ class INaturalistService {
       const recentSightings = await this.getRecentSightings(bounds);
       const identificationNeeds = await this.getIdentificationNeeds(bounds);
       
+      // Always fetch fresh photos for threatened species to ensure we have current images
+      const threatenedSpecies = cached[0].threatenedSpecies || [];
+      let speciesPhotos = {};
+      
+      if (threatenedSpecies.length > 0) {
+        console.log(`Fetching fresh photos for ${threatenedSpecies.length} threatened species: ${threatenedSpecies.join(', ')}`);
+        speciesPhotos = await this.getSpeciesPhotos(threatenedSpecies, bounds);
+      }
+      
       return {
         totalSpecies: cached[0].totalSpeciesCount || 0,
         flagshipSpecies: cached[0].flagshipSpecies || [],
         endemicSpecies: cached[0].endemicSpecies || [],
-        threatenedSpecies: cached[0].threatenedSpecies || [],
+        threatenedSpecies: threatenedSpecies,
         topTaxa: (cached[0].topTaxa as Record<string, number>) || {},
         recentSightings: recentSightings || [],
         seasonalTrends: (cached[0].seasonalTrends as Record<string, number>) || {},
         identificationNeeds: identificationNeeds || [],
-        speciesPhotos: (cached[0].speciesPhotos as Record<string, string>) || {},
+        speciesPhotos: speciesPhotos,
       };
     }
 
