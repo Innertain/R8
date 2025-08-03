@@ -95,11 +95,32 @@ function ModulesSection() {
               />
               <h1 className="text-5xl font-bold text-white">R8</h1>
             </div>
-            <p className="text-2xl text-stormy-light mb-4">Disaster Relief • Community Resiliency • Regeneration</p>
-            <p className="text-lg text-stormy-light/80 max-w-3xl mx-auto">
-              Connecting communities to respond to disasters, build resilience, and support regenerative practices 
-              that strengthen local ecosystems and community well-being.
-            </p>
+            <p className="text-2xl text-stormy-light mb-6">Disaster Relief • Community Resiliency • Regeneration</p>
+            <div className="max-w-4xl mx-auto space-y-4">
+              <p className="text-lg text-stormy-light/90 leading-relaxed">
+                R8 is a comprehensive platform connecting communities, organizations, and individuals to create resilient networks 
+                for disaster response, community building, and ecological regeneration.
+              </p>
+              <p className="text-base text-stormy-light/80 leading-relaxed">
+                We bridge immediate disaster relief with long-term community resilience, supporting bioregional restoration 
+                projects that strengthen both human communities and natural ecosystems. From real-time emergency monitoring 
+                to traditional ecological knowledge preservation, R8 empowers communities to thrive in harmony with their landscapes.
+              </p>
+              <div className="flex flex-wrap justify-center gap-6 pt-4">
+                <div className="text-center">
+                  <Shield className="w-8 h-8 text-red-400 mx-auto mb-2" />
+                  <div className="text-sm text-stormy-light/90 font-medium">Emergency Response</div>
+                </div>
+                <div className="text-center">
+                  <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                  <div className="text-sm text-stormy-light/90 font-medium">Community Networks</div>
+                </div>
+                <div className="text-center">
+                  <Leaf className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                  <div className="text-sm text-stormy-light/90 font-medium">Ecological Restoration</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -139,6 +160,71 @@ function ModulesSection() {
               </Card>
             </Link>
           ))}
+        </div>
+
+        {/* Bioregeneration Section */}
+        <div className="mt-16 bg-gradient-to-r from-green-600/20 via-emerald-600/20 to-teal-600/20 backdrop-blur-sm rounded-xl border border-green-400/30 p-8">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center mb-4">
+              <Leaf className="w-10 h-10 text-green-400 mr-3" />
+              <h3 className="text-3xl font-bold text-white">Bioregeneration</h3>
+            </div>
+            <p className="text-lg text-stormy-light/90 max-w-3xl mx-auto leading-relaxed">
+              Moving beyond sustainability to active regeneration of living systems, communities, and bioregional economies.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-green-400/20">
+              <Globe className="w-8 h-8 text-green-400 mb-3" />
+              <h4 className="text-lg font-semibold text-white mb-2">Bioregional Ecosystems</h4>
+              <p className="text-sm text-stormy-light/80">
+                Explore and protect the unique ecological regions that support diverse species, 
+                traditional knowledge systems, and regenerative practices.
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-emerald-400/20">
+              <Mountain className="w-8 h-8 text-emerald-400 mb-3" />
+              <h4 className="text-lg font-semibold text-white mb-2">Traditional Knowledge</h4>
+              <p className="text-sm text-stormy-light/80">
+                Honor and integrate indigenous wisdom, traditional ecological practices, 
+                and time-tested approaches to living in harmony with the land.
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-teal-400/20">
+              <Users className="w-8 h-8 text-teal-400 mb-3" />
+              <h4 className="text-lg font-semibold text-white mb-2">Community Resilience</h4>
+              <p className="text-sm text-stormy-light/80">
+                Build local capacity for regenerative economies, mutual aid networks, 
+                and community-led solutions that thrive in times of crisis and abundance.
+              </p>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-base text-stormy-light/90 mb-4">
+              Discover how communities are healing land, waters, and social systems through regenerative practices.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/hawaii">
+                <Button className="bg-teal-600 hover:bg-teal-700 text-white">
+                  Hawaiʻi Regeneration <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/appalachian">
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  Appalachian Restoration <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/bioregions">
+                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                  Explore All Bioregions <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Quick Stats */}
