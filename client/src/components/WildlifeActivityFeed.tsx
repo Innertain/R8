@@ -856,7 +856,7 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                         return (
                           <div 
                             key={index} 
-                            className="bg-white/90 rounded-lg border border-red-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer"
+                            className="bg-white/90 rounded-lg border border-red-200 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer group"
                             onClick={() => setSelectedSpecies(species)}
                           >
                             {hasPhoto && (
@@ -864,7 +864,7 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                                 <img 
                                   src={hasPhoto} 
                                   alt={species}
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 ease-in-out"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = 'none';
