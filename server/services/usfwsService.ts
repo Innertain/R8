@@ -54,16 +54,19 @@ class USFWSService {
       console.log(`Failed to get USFWS data:`, error);
     }
 
-    // Return a sample of species for the region (simplified approach)
+    // Return comprehensive list of threatened species
     const allSpecies = Array.from(threatenedSpecies);
-    return allSpecies.slice(0, 10); // Return first 10 species
+    return allSpecies.slice(0, 100); // Increased to 100 species for comprehensive coverage
   }
 
   async getRegionalThreatenedSpecies(bioregionId: string): Promise<string[]> {
     // Map bioregions to states for USFWS API queries
     const bioregionToStates: Record<string, string[]> = {
       'hawaiian_tropical_dry_forests': ['HI'],
+      'hawaiian_tropical_high_shrublands': ['HI'],
+      'hawaiian_mixed_mesophytic_forests': ['HI'],
       'southeastern_mixed_forests': ['NC', 'SC', 'GA', 'FL', 'AL', 'TN', 'KY', 'VA', 'WV', 'MS', 'AR', 'LA'],
+      'appalachian_mixed_mesophytic_forests': ['PA', 'OH', 'WV', 'VA', 'KY', 'TN', 'NC', 'SC', 'GA', 'AL', 'MD', 'NY'],
       'na_appalachian': ['PA', 'OH', 'WV', 'VA', 'KY', 'TN', 'NC', 'SC', 'GA', 'AL', 'MD', 'NY'],
       'na_california_chaparral': ['CA'],
       'na_sonoran_desert': ['AZ', 'CA', 'NV'],

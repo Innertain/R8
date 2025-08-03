@@ -3,6 +3,7 @@ import { db } from '../db';
 import { apiUsageLog, bioregionSpeciesCache, speciesRecords } from '@shared/schema';
 import { eq, desc, gte } from 'drizzle-orm';
 import { usfwsService } from './usfwsService';
+import { iucnService } from './iucnService';
 
 const INATURALIST_BASE_URL = 'https://api.inaturalist.org/v1';
 const RATE_LIMIT_BUFFER = 100; // Keep 100 requests in reserve
@@ -204,7 +205,7 @@ class INaturalistService {
       nelng: bounds.east,
       swlat: bounds.south,
       swlng: bounds.west,
-      per_page: 200, // Limit to prevent API overuse
+      per_page: 500, // Increased limit for comprehensive species data
       order: 'desc',
       order_by: 'count',
     });
@@ -216,8 +217,8 @@ class INaturalistService {
     const threatenedSpecies: string[] = [];
     const topTaxa: Record<string, number> = {};
 
-    // Process top species (first 50 to avoid too many API calls)
-    const topSpecies = observationsResponse.results.slice(0, 50);
+    // Process top species (increased to 200 for comprehensive coverage)
+    const topSpecies = observationsResponse.results.slice(0, 200);
     
     for (const species of topSpecies) {
       if (species.taxon) {
@@ -247,22 +248,29 @@ class INaturalistService {
     // Get observations needing identification
     const identificationNeeds = await this.getIdentificationNeeds(bounds);
     
-    // Get additional threatened species from USFWS for more comprehensive coverage
-    let uniqueThreatenedSpecies = threatenedSpecies.slice(0, 10);
+    // Get additional threatened species from multiple authoritative sources
+    let uniqueThreatenedSpecies = threatenedSpecies.slice(0, 50); // From iNaturalist observations
     if (bioregionId) {
-      const additionalThreatenedSpecies = await usfwsService.getRegionalThreatenedSpecies(bioregionId);
+      const [usfwsSpecies, iucnFallbackSpecies] = await Promise.all([
+        usfwsService.getRegionalThreatenedSpecies(bioregionId),
+        Promise.resolve(iucnService.getFallbackThreatenedSpecies(bioregionId))
+      ]);
+      
       const combinedThreatenedSpecies = [
         ...threatenedSpecies,
-        ...additionalThreatenedSpecies.slice(0, 8) // Add up to 8 more species
+        ...usfwsSpecies.slice(0, 50),
+        ...iucnFallbackSpecies.slice(0, 50)
       ];
       
-      // Remove duplicates and limit to 15 total
+      // Remove duplicates and allow up to 150 total threatened species
       const uniqueSet = new Set(combinedThreatenedSpecies);
-      uniqueThreatenedSpecies = Array.from(uniqueSet).slice(0, 15);
+      uniqueThreatenedSpecies = Array.from(uniqueSet).slice(0, 150);
+      
+      console.log(`🦎 Found ${uniqueThreatenedSpecies.length} threatened species for ${bioregionId}`);
     }
     
-    // Get photos for flagship and threatened species
-    const allSpeciesForPhotos = [...flagshipSpecies.slice(0, 3), ...uniqueThreatenedSpecies.slice(0, 3)];
+    // Get photos for flagship and threatened species (prioritize threatened species)
+    const allSpeciesForPhotos = [...uniqueThreatenedSpecies.slice(0, 20), ...flagshipSpecies.slice(0, 10)];
     const speciesPhotos = await this.getSpeciesPhotos(allSpeciesForPhotos, bounds);
     
     return {
@@ -356,7 +364,7 @@ class INaturalistService {
   async getSpeciesPhotos(speciesNames: string[], bounds: {north: number, south: number, east: number, west: number}): Promise<Record<string, string>> {
     const photos: Record<string, string> = {};
     
-    for (const speciesName of speciesNames.slice(0, 5)) { // Limit to 5 to avoid too many API calls
+    for (const speciesName of speciesNames.slice(0, 30)) { // Increased to 30 for comprehensive photo coverage
       try {
         const response = await this.makeApiRequest<any>('/observations', {
           nelat: bounds.north,
