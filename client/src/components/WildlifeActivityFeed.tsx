@@ -111,6 +111,30 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
     return nameMap[status] || 'Vulnerable';
   };
 
+  const getIUCNStatusColor = (species: string) => {
+    const status = getIUCNStatus(species);
+    const colorMap: Record<string, string> = {
+      'CR': 'bg-red-100 text-red-800 border-red-300', // Critically Endangered - Red
+      'EN': 'bg-orange-100 text-orange-800 border-orange-300', // Endangered - Orange
+      'VU': 'bg-amber-100 text-amber-800 border-amber-300', // Vulnerable - Amber
+      'NT': 'bg-blue-100 text-blue-800 border-blue-300', // Near Threatened - Blue
+      'LC': 'bg-green-100 text-green-800 border-green-300' // Least Concern - Green
+    };
+    return colorMap[status] || 'bg-amber-100 text-amber-800 border-amber-300';
+  };
+
+  const getIUCNStatusIcon = (species: string) => {
+    const status = getIUCNStatus(species);
+    const iconMap: Record<string, JSX.Element> = {
+      'CR': <AlertTriangle className="w-3 h-3 text-red-600" />, // Critically Endangered
+      'EN': <Shield className="w-3 h-3 text-orange-600" />, // Endangered
+      'VU': <Info className="w-3 h-3 text-amber-600" />, // Vulnerable
+      'NT': <Eye className="w-3 h-3 text-blue-600" />, // Near Threatened
+      'LC': <Heart className="w-3 h-3 text-green-600" /> // Least Concern
+    };
+    return iconMap[status] || <Info className="w-3 h-3 text-amber-600" />;
+  };
+
   const getPopulationTrend = (species: string) => {
     const trendMap: Record<string, string> = {
       'Green Sea Turtle': 'increasing',
@@ -661,10 +685,11 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                             <Shield className="w-4 h-4 text-red-600" />
                             <span className="text-sm font-semibold text-red-800">IUCN Red List Status</span>
                           </div>
-                          <div className="mb-3">
-                            <span className="inline-block px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium border border-red-200">
-                              {getIUCNStatus(selectedSpecies)} - {getIUCNStatusName(selectedSpecies)}
-                            </span>
+                          <div className="mb-3 flex items-center gap-2">
+                            <Badge className={`${getIUCNStatusColor(selectedSpecies)} flex items-center gap-1.5 px-3 py-1.5`}>
+                              {getIUCNStatusIcon(selectedSpecies)}
+                              <span className="font-medium">{getIUCNStatus(selectedSpecies)} - {getIUCNStatusName(selectedSpecies)}</span>
+                            </Badge>
                           </div>
                           <p className="text-sm text-red-700 mb-2">
                             {getConservationDescription(selectedSpecies)}
@@ -848,11 +873,16 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                               </div>
                             )}
                             <div className="p-3">
-                              <div className="flex items-start gap-2 mb-2">
-                                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                                <h5 className="text-sm font-semibold text-red-800 leading-tight">{species}</h5>
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-start gap-2 flex-1">
+                                  {getIUCNStatusIcon(species)}
+                                  <h5 className="text-sm font-semibold text-gray-800 leading-tight">{species}</h5>
+                                </div>
+                                <Badge className={`${getIUCNStatusColor(species)} text-xs px-1.5 py-0.5 flex items-center gap-1`}>
+                                  {getIUCNStatus(species)}
+                                </Badge>
                               </div>
-                              <p className="text-xs text-red-600 mb-2">{getConservationDescription(species)}</p>
+                              <p className="text-xs text-gray-600 mb-2">{getConservationDescription(species)}</p>
                               <div className="text-xs text-blue-600 font-medium">Click to view details →</div>
                             </div>
                           </div>
@@ -957,11 +987,18 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                             {getActivityIcon(activity.type)}
                           </div>
                         </div>
-                        {/* Rarity Badge */}
+                        {/* Conservation Status Badge for threatened species */}
                         <div className="absolute top-3 right-3">
-                          <Badge className={`${getRarityColor(activity.rarity)} shadow-lg`}>
-                            {activity.rarity.replace('_', ' ').toUpperCase()}
-                          </Badge>
+                          {activity.rarity === 'critically_endangered' ? (
+                            <Badge className={`${getIUCNStatusColor(activity.species)} shadow-lg flex items-center gap-1`}>
+                              {getIUCNStatusIcon(activity.species)}
+                              <span className="text-xs">{getIUCNStatus(activity.species)}</span>
+                            </Badge>
+                          ) : (
+                            <Badge className={`${getRarityColor(activity.rarity)} shadow-lg`}>
+                              {activity.rarity.replace('_', ' ').toUpperCase()}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     )}
@@ -974,9 +1011,16 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                           <div className="bg-gray-50 rounded-full p-2">
                             {getActivityIcon(activity.type)}
                           </div>
-                          <Badge className={getRarityColor(activity.rarity)}>
-                            {activity.rarity.replace('_', ' ').toUpperCase()}
-                          </Badge>
+                          {activity.rarity === 'critically_endangered' ? (
+                            <Badge className={`${getIUCNStatusColor(activity.species)} flex items-center gap-1`}>
+                              {getIUCNStatusIcon(activity.species)}
+                              <span className="text-xs">{getIUCNStatus(activity.species)}</span>
+                            </Badge>
+                          ) : (
+                            <Badge className={getRarityColor(activity.rarity)}>
+                              {activity.rarity.replace('_', ' ').toUpperCase()}
+                            </Badge>
+                          )}
                         </div>
                       )}
                       
