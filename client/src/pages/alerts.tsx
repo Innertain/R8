@@ -124,6 +124,22 @@ export default function AlertsPage() {
         </div>
       </header>
 
+      {/* Coming Soon Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-center space-x-3">
+            <Bell className="w-6 h-6 animate-pulse" />
+            <div className="text-center">
+              <h2 className="text-xl font-bold">🚧 Coming Soon - Full Alert System</h2>
+              <p className="text-blue-100 text-sm">
+                Custom notifications, email/SMS delivery, and advanced filtering currently in development. Interface shown for demonstration.
+              </p>
+            </div>
+            <Bell className="w-6 h-6 animate-pulse" />
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isComingSoon ? (
