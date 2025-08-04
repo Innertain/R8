@@ -17,6 +17,7 @@ import {
   Heart,
   Clock
 } from "lucide-react";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
 
 
 // Color schemes for charts
@@ -439,7 +440,9 @@ export default function StatsDashboard() {
             <MapPin className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{totals.sites.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              <AnimatedCounter end={totals.sites} duration={2000} />
+            </div>
             <p className="text-xs text-gray-600">Active locations</p>
           </CardContent>
         </Card>
@@ -450,7 +453,9 @@ export default function StatsDashboard() {
             <Package className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{totals.completedDeliveries.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-600">
+              <AnimatedCounter end={totals.completedDeliveries} duration={2200} />
+            </div>
             <p className="text-xs text-gray-600">Successfully delivered</p>
           </CardContent>
         </Card>
@@ -461,7 +466,9 @@ export default function StatsDashboard() {
             <Package className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{totals.totalFoodBoxes.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-amber-600">
+              <AnimatedCounter end={totals.totalFoodBoxes} duration={2400} />
+            </div>
             <p className="text-xs text-gray-600">Total distributed</p>
           </CardContent>
         </Card>
@@ -472,7 +479,9 @@ export default function StatsDashboard() {
             <Users className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{totals.volunteers.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-purple-600">
+              <AnimatedCounter end={totals.volunteers} duration={1800} />
+            </div>
             <p className="text-xs text-gray-600">Active volunteers</p>
           </CardContent>
         </Card>
@@ -483,7 +492,9 @@ export default function StatsDashboard() {
             <Truck className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{totals.drivers.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-orange-600">
+              <AnimatedCounter end={totals.drivers} duration={2100} />
+            </div>
             <p className="text-xs text-gray-600">Available drivers</p>
           </CardContent>
         </Card>
@@ -494,7 +505,9 @@ export default function StatsDashboard() {
             <Users className="h-4 w-4 text-teal-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-teal-600">{(totals.estimatedFamiliesHelped || 0).toLocaleString()}</div>
+            <div className="text-2xl font-bold text-teal-600">
+              <AnimatedCounter end={totals.estimatedFamiliesHelped || 0} duration={2600} />
+            </div>
             <p className="text-xs text-gray-600">Site estimates*</p>
           </CardContent>
         </Card>
@@ -508,7 +521,9 @@ export default function StatsDashboard() {
             <MapPin className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold text-emerald-600">{totals.activeSitesLast60Days.toLocaleString()}</div>
+            <div className="text-xl font-bold text-emerald-600">
+              <AnimatedCounter end={totals.activeSitesLast60Days} duration={1500} />
+            </div>
             <p className="text-xs text-gray-600">Updated inventory recently</p>
           </CardContent>
         </Card>
@@ -519,7 +534,9 @@ export default function StatsDashboard() {
             <Package className="h-4 w-4 text-indigo-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold text-indigo-600">{totals.sitesWithDeliveries.toLocaleString()}</div>
+            <div className="text-xl font-bold text-indigo-600">
+              <AnimatedCounter end={totals.sitesWithDeliveries} duration={1700} />
+            </div>
             <p className="text-xs text-gray-600">Received aid deliveries</p>
           </CardContent>
         </Card>
@@ -530,7 +547,9 @@ export default function StatsDashboard() {
             <Users className="h-4 w-4 text-rose-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold text-rose-600">{totals.sitesWithRecentActivity.toLocaleString()}</div>
+            <div className="text-xl font-bold text-rose-600">
+              <AnimatedCounter end={totals.sitesWithRecentActivity} duration={1600} />
+            </div>
             <p className="text-xs text-gray-600">Active requests or needs</p>
           </CardContent>
         </Card>
@@ -541,7 +560,9 @@ export default function StatsDashboard() {
             <Heart className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold text-purple-600">{totals.partners.toLocaleString()}</div>
+            <div className="text-xl font-bold text-purple-600">
+              <AnimatedCounter end={totals.partners} duration={1400} />
+            </div>
             <p className="text-xs text-gray-600">Partner organizations</p>
           </CardContent>
         </Card>
