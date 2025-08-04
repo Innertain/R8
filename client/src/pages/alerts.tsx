@@ -19,7 +19,7 @@ export default function AlertsPage() {
   const queryClient = useQueryClient();
 
   // Coming Soon - disable functionality
-  const isComingSoon = true;
+  const isComingSoon = false;
 
   // Fetch alert rules
   const { data: rulesData, isLoading: rulesLoading } = useQuery({
