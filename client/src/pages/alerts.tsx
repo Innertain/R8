@@ -18,6 +18,9 @@ export default function AlertsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Coming Soon - disable functionality
+  const isComingSoon = true;
+
   // Fetch alert rules
   const { data: rulesData, isLoading: rulesLoading } = useQuery({
     queryKey: ['/api/alerts/rules'],
@@ -123,12 +126,54 @@ export default function AlertsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <p className="text-lg text-gray-600 max-w-4xl">
-            Create custom alert rules to receive notifications when emergency events meet your specified criteria.
-            Set up email, SMS, or webhook notifications for weather alerts, wildfire incidents, earthquakes, and disaster declarations.
-          </p>
-        </div>
+        {isComingSoon ? (
+          <div className="text-center py-16">
+            <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto">
+              <Bell className="w-16 h-16 text-blue-500 mx-auto mb-6" />
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Custom Alerts Coming Soon!</h2>
+              <p className="text-lg text-gray-600 mb-6">
+                We're working hard to bring you personalized emergency alert notifications. 
+                This feature will allow you to create custom rules for weather, wildfire, earthquake, 
+                and disaster alerts with email, SMS, and webhook delivery options.
+              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-left">
+                <h3 className="font-semibold text-blue-900 mb-3">Planned Features:</h3>
+                <ul className="space-y-2 text-blue-800">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                    Geographic filtering by state or region
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                    Severity threshold controls
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                    Multi-channel delivery (Email, SMS, Webhooks)
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                    Cooldown periods and daily limits
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                    Alert history and analytics
+                  </li>
+                </ul>
+              </div>
+              <p className="text-sm text-gray-500 mt-6">
+                Stay tuned for updates! In the meantime, you can view live emergency data on other pages.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8">
+              <p className="text-lg text-gray-600 max-w-4xl">
+                Create custom alert rules to receive notifications when emergency events meet your specified criteria.
+                Set up email, SMS, or webhook notifications for weather alerts, wildfire incidents, earthquakes, and disaster declarations.
+              </p>
+            </div>
 
         <Tabs defaultValue="rules" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -309,6 +354,8 @@ export default function AlertsPage() {
             />
           </DialogContent>
         </Dialog>
+          </>
+        )}
       </main>
     </div>
   );
