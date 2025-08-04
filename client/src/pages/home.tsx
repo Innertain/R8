@@ -28,7 +28,7 @@ import {
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
 import appalachianLandscape from "@assets/Appalachian _1754183249913.png";
-import WildlifeFeedDemo from "@/components/WildlifeFeedDemo";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
@@ -136,14 +136,7 @@ function FeaturesShowcase() {
           </p>
         </div>
 
-        {/* Live Wildlife Activity Demo */}
-        <div className="mb-16">
-          <WildlifeFeedDemo 
-            bioregionName="Hawaiian Tropical Dry Forests"
-            bioregionId="hawaiian_tropical_dry_forests"
-            regionTitle="Hawaii"
-          />
-        </div>
+        
 
         {/* Key Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
