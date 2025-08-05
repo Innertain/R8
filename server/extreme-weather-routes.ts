@@ -134,9 +134,9 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
         end_date: '2024-09-29T06:00:00Z',
         state: 'Florida',
         areas: 'Big Bend Florida, Georgia, North Carolina, South Carolina, Tennessee, Virginia',
-        injuries_direct: 600,
-        deaths_direct: 228,
-        damage_property: 47500000000,
+        injuries_direct: 579, 
+        deaths_direct: 249,
+        damage_property: 78700000000,
         damage_crops: 2100000000,
         source: 'National Hurricane Center',
         coordinates: [-84.2807, 30.4518],
@@ -172,9 +172,9 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
         end_date: '2024-10-11T18:00:00Z',
         state: 'Florida',
         areas: 'Pinellas, Hillsborough, Manatee, Sarasota Counties',
-        injuries_direct: 245,
-        deaths_direct: 28,
-        damage_property: 8500000000,
+        injuries_direct: 126,
+        deaths_direct: 23,
+        damage_property: 34600000000,
         damage_crops: 580000000,
         source: 'National Hurricane Center',
         coordinates: [-82.6404, 27.7676],
@@ -527,7 +527,7 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
     console.log(`📊 Loaded ${allHistoricalEvents.length} comprehensive historical storm events from NOAA Storm Database`);
     console.log(`📊 Fetched ${allHistoricalEvents.length} historical storm events from NOAA Storm Database`);
     
-    return processEvents(allHistoricalEvents);
+    return processExtremeWeatherData(allHistoricalEvents);
     
   } catch (error: any) {
     console.log(`⚠️ Storm events loading failed: ${error.message}`);

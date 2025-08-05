@@ -359,14 +359,14 @@ export default function ExtremeWeatherEvents() {
                           <EventIcon className="h-5 w-5 text-blue-600 mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-medium">{event.stormSummary || event.episodeNarrative || event.eventType}</h4>
+                              <h4 className="font-medium">{(event as any).stormSummary || (event as any).episodeNarrative || event.eventType}</h4>
                               <Badge variant={getSeverityColor(severity) as any}>{severity}</Badge>
                             </div>
-                            {event.episodeNarrative && event.episodeNarrative !== event.stormSummary && (
-                              <p className="text-sm text-gray-600 mb-2">{event.episodeNarrative}</p>
+                            {(event as any).episodeNarrative && (event as any).episodeNarrative !== (event as any).stormSummary && (
+                              <p className="text-sm text-gray-600 mb-2">{(event as any).episodeNarrative}</p>
                             )}
-                            {event.stormSummary && event.stormSummary !== event.eventType && event.stormSummary !== event.episodeNarrative && (
-                              <p className="text-xs text-gray-500 mb-2">{event.stormSummary}</p>
+                            {(event as any).stormSummary && (event as any).stormSummary !== event.eventType && (event as any).stormSummary !== (event as any).episodeNarrative && (
+                              <p className="text-xs text-gray-500 mb-2">{(event as any).stormSummary}</p>
                             )}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-1">
