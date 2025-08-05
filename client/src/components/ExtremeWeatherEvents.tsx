@@ -132,19 +132,20 @@ export default function ExtremeWeatherEvents() {
   
   const { events, statistics, trends, totalEvents, timeRange } = data;
 
-  // Filter events first, then sort by date (newest first)
-  const filteredEvents = events
-    .filter(event => {
-      const matchesEventType = selectedEventType === 'all' || selectedEventType === '' || event.eventType === selectedEventType;
-      const matchesState = selectedState === 'all' || selectedState === '' || event.state === selectedState;
-      
-      return matchesEventType && matchesState;
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.beginDate).getTime();
-      const dateB = new Date(b.beginDate).getTime();
-      return dateB - dateA; // Newest first
-    });
+  // Filter events while preserving chronological order (events already sorted by backend)
+  const filteredEvents = events.filter(event => {
+    const matchesEventType = selectedEventType === 'all' || selectedEventType === '' || event.eventType === selectedEventType;
+    const matchesState = selectedState === 'all' || selectedState === '' || event.state === selectedState;
+    
+    return matchesEventType && matchesState;
+  });
+  
+  // Ensure consistent chronological sorting (newest first) in case backend order changes
+  const sortedFilteredEvents = [...filteredEvents].sort((a, b) => {
+    const dateA = new Date(a.beginDate).getTime();
+    const dateB = new Date(b.beginDate).getTime();
+    return dateB - dateA; // Newest first: 2025 → 2024 → 2023 → etc.
+  });
 
   // Get unique values for filter options
   const uniqueEventTypes = [...new Set(events.map(e => e.eventType))].sort();
@@ -171,8 +172,8 @@ export default function ExtremeWeatherEvents() {
     .sort((a, b) => (b[1].deaths + b[1].injuries) - (a[1].deaths + a[1].injuries))
     .slice(0, 10);
 
-  // Handle empty data case
-  if (!events || events.length === 0) {
+  // Handle empty filtered results
+  if (!sortedFilteredEvents || sortedFilteredEvents.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -418,7 +419,7 @@ export default function ExtremeWeatherEvents() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {filteredEvents.map((event, index) => {
+                {sortedFilteredEvents.map((event, index) => {
                   const EventIcon = eventTypeIcons[event.eventType] || AlertTriangle;
                   
                   return (

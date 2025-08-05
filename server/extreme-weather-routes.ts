@@ -792,17 +792,25 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
 
     const allHistoricalEvents = [...historicalStormEvents, ...additional2024Events];
     
-    // Remove duplicates based on ID
+    // Remove duplicates based on ID but preserve all unique events
     const uniqueEvents = allHistoricalEvents.filter((event, index, self) => 
       index === self.findIndex(e => e.id === event.id)
     );
     
+    // Sort by date (newest first) to ensure 2025 events appear at top
+    const sortedEvents = uniqueEvents.sort((a, b) => {
+      const dateA = new Date(a.begin_date).getTime();
+      const dateB = new Date(b.begin_date).getTime();
+      return dateB - dateA; // Newest first
+    });
+    
     console.log(`📊 Loaded ${allHistoricalEvents.length} comprehensive historical storm events from NOAA Storm Database`);
     console.log(`📊 Filtered to ${uniqueEvents.length} unique events (removed ${allHistoricalEvents.length - uniqueEvents.length} duplicates)`);
-    console.log(`📊 Fetched ${uniqueEvents.length} historical storm events from NOAA Storm Database`);
+    console.log(`📊 Sorted ${sortedEvents.length} events chronologically (newest first)`);
+    console.log(`📊 Fetched ${sortedEvents.length} historical storm events from NOAA Storm Database`);
     
-    // Push unique events to the events array passed by reference
-    events.push(...uniqueEvents);
+    // Push sorted events to the events array passed by reference
+    events.push(...sortedEvents);
     
   } catch (error: any) {
     console.log(`⚠️ Storm events loading failed: ${error.message}`);
