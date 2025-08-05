@@ -345,7 +345,19 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                   } else if (eventType.includes('ice') && (resultType.includes('ice') || resultType.includes('winter storm'))) {
                     isRelevantMatch = true;
                   } else if (eventType.includes('hurricane') && resultType.includes('hurricane')) {
-                    isRelevantMatch = true;
+                    // For hurricanes, also check if the specific hurricane name matches
+                    if (eventType.includes('milton') && resultType.includes('milton')) {
+                      isRelevantMatch = true;
+                    } else if (eventType.includes('helene') && resultType.includes('helene')) {
+                      isRelevantMatch = true;
+                    } else if (eventType.includes('ian') && resultType.includes('ian')) {
+                      isRelevantMatch = true;
+                    } else if (eventType.includes('ida') && resultType.includes('ida')) {
+                      isRelevantMatch = true;
+                    } else if (resultType.includes('hurricane') && resultType.includes(state.toLowerCase())) {
+                      // Generic hurricane match for the same state/year
+                      isRelevantMatch = true;
+                    }
                   } else if (eventType.includes('tornado') && resultType.includes('tornado')) {
                     isRelevantMatch = true;
                   } else if (eventType.includes('storm') && resultType.includes('storm')) {
@@ -453,7 +465,19 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                         } else if (eventType.includes('ice') && (resultType.includes('ice') || resultType.includes('winter storm'))) {
                           isRelevantMatch = true;
                         } else if (eventType.includes('hurricane') && resultType.includes('hurricane')) {
-                          isRelevantMatch = true;
+                          // For hurricanes, also check if the specific hurricane name matches
+                          if (eventType.includes('milton') && resultType.includes('milton')) {
+                            isRelevantMatch = true;
+                          } else if (eventType.includes('helene') && resultType.includes('helene')) {
+                            isRelevantMatch = true;
+                          } else if (eventType.includes('ian') && resultType.includes('ian')) {
+                            isRelevantMatch = true;
+                          } else if (eventType.includes('ida') && resultType.includes('ida')) {
+                            isRelevantMatch = true;
+                          } else if (resultType.includes('hurricane')) {
+                            // Generic hurricane match
+                            isRelevantMatch = true;
+                          }
                         } else if (eventType.includes('tornado') && resultType.includes('tornado')) {
                           isRelevantMatch = true;
                         } else if (eventType.includes('storm') && resultType.includes('storm')) {
@@ -524,7 +548,12 @@ export default function ExtremeWeatherEvents() {
     } else if (eventType.includes('fire')) {
       return `${year} ${state} wildfire`;
     } else if (eventType.includes('hurricane')) {
-      return `${year} ${state} hurricane`;
+      // For hurricanes, try to extract the hurricane name from stormSummary or episodeNarrative
+      if (eventName && eventName.toLowerCase().includes('hurricane')) {
+        // Try to extract hurricane name (e.g., "Hurricane Milton" -> "Hurricane Milton 2024")
+        return `${eventName} ${year}`;
+      }
+      return `Hurricane ${year} ${state}`;
     } else if (eventType.includes('tornado')) {
       return `${year} ${state} tornado outbreak`;
     }
@@ -1238,7 +1267,7 @@ export default function ExtremeWeatherEvents() {
                   className: "h-5 w-5 text-blue-600" 
                 })
               }
-              {selectedEvent?.eventType} - {selectedEvent?.state}
+{(selectedEvent as any)?.stormSummary || (selectedEvent as any)?.episodeNarrative || selectedEvent?.eventType} - {selectedEvent?.state}
               <BookOpen className="h-4 w-4 text-blue-600 ml-2" />
             </DialogTitle>
           </DialogHeader>
