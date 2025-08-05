@@ -134,18 +134,45 @@ function HeroSection() {
                     <span className="text-2xl font-black">R</span>escue
                   </span>
                   <span className="scroll-word-red mx-8">
-                    <span className="text-2xl font-black">R</span>ecycling
+                    <span className="text-2xl font-black">R</span>eclamation
                   </span>
                   <span className="scroll-word-emerald mx-8">
-                    <span className="text-2xl font-black">R</span>eforestation
+                    <span className="text-2xl font-black">R</span>ejuvenation
                   </span>
                   <span className="scroll-word-teal mx-8">
-                    <span className="text-2xl font-black">R</span>esurgence
+                    <span className="text-2xl font-black">R</span>eplenishment
                   </span>
                   <span className="scroll-word-amber mx-8">
-                    <span className="text-2xl font-black">R</span>evolution
+                    <span className="text-2xl font-black">R</span>elief
                   </span>
                   <span className="scroll-word-cyan mx-8 text-3xl">
+                    ∞
+                  </span>
+                  <span className="scroll-word-indigo mx-8">
+                    <span className="text-2xl font-black">R</span>esponse
+                  </span>
+                  <span className="scroll-word-rose mx-8">
+                    <span className="text-2xl font-black">R</span>emediation
+                  </span>
+                  <span className="scroll-word-orange mx-8">
+                    <span className="text-2xl font-black">R</span>edundancy
+                  </span>
+                  <span className="scroll-word-lime mx-8">
+                    <span className="text-2xl font-black">R</span>eframing
+                  </span>
+                  <span className="scroll-word-pink mx-8">
+                    <span className="text-2xl font-black">R</span>obustness
+                  </span>
+                  <span className="scroll-word-violet mx-8">
+                    <span className="text-2xl font-black">R</span>each
+                  </span>
+                  <span className="scroll-word-sky mx-8">
+                    <span className="text-2xl font-black">R</span>eforestation
+                  </span>
+                  <span className="scroll-word-red mx-8">
+                    <span className="text-2xl font-black">R</span>esurgence
+                  </span>
+                  <span className="scroll-word-emerald mx-8 text-3xl">
                     ∞
                   </span>
                   {/* Seamless duplicate for continuous scroll */}
@@ -189,18 +216,45 @@ function HeroSection() {
                     <span className="text-2xl font-black">R</span>escue
                   </span>
                   <span className="scroll-word-red mx-8">
-                    <span className="text-2xl font-black">R</span>ecycling
+                    <span className="text-2xl font-black">R</span>eclamation
                   </span>
                   <span className="scroll-word-emerald mx-8">
-                    <span className="text-2xl font-black">R</span>eforestation
+                    <span className="text-2xl font-black">R</span>ejuvenation
                   </span>
                   <span className="scroll-word-teal mx-8">
-                    <span className="text-2xl font-black">R</span>esurgence
+                    <span className="text-2xl font-black">R</span>eplenishment
                   </span>
                   <span className="scroll-word-amber mx-8">
-                    <span className="text-2xl font-black">R</span>evolution
+                    <span className="text-2xl font-black">R</span>elief
                   </span>
                   <span className="scroll-word-cyan mx-8 text-3xl">
+                    ∞
+                  </span>
+                  <span className="scroll-word-indigo mx-8">
+                    <span className="text-2xl font-black">R</span>esponse
+                  </span>
+                  <span className="scroll-word-rose mx-8">
+                    <span className="text-2xl font-black">R</span>emediation
+                  </span>
+                  <span className="scroll-word-orange mx-8">
+                    <span className="text-2xl font-black">R</span>edundancy
+                  </span>
+                  <span className="scroll-word-lime mx-8">
+                    <span className="text-2xl font-black">R</span>eframing
+                  </span>
+                  <span className="scroll-word-pink mx-8">
+                    <span className="text-2xl font-black">R</span>obustness
+                  </span>
+                  <span className="scroll-word-violet mx-8">
+                    <span className="text-2xl font-black">R</span>each
+                  </span>
+                  <span className="scroll-word-sky mx-8">
+                    <span className="text-2xl font-black">R</span>eforestation
+                  </span>
+                  <span className="scroll-word-red mx-8">
+                    <span className="text-2xl font-black">R</span>esurgence
+                  </span>
+                  <span className="scroll-word-emerald mx-8 text-3xl">
                     ∞
                   </span>
                 </div>
