@@ -319,27 +319,53 @@ function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
 
   rawEvents.forEach((event, index) => {
     try {
-      processed.push({
-        id: `storm_${index}_${Date.now()}`,
-        eventType: event.eventType || event.EVENT_TYPE || 'Unknown',
-        state: event.state || event.STATE || 'Unknown',
-        county: event.county || event.CZ_NAME || 'Unknown',
-        beginDate: event.beginDate || event.BEGIN_DATE || new Date().toISOString(),
-        endDate: event.endDate || event.END_DATE || new Date().toISOString(),
-        deaths: parseInt(event.deathsDirect || event.DEATHS_DIRECT || '0'),
-        injuries: parseInt(event.injuriesDirect || event.INJURIES_DIRECT || '0'),
-        damageProperty: parseFloat(event.damageProperty || event.DAMAGE_PROPERTY || '0'),
-        damageCrops: parseFloat(event.damageCrops || event.DAMAGE_CROPS || '0'),
-        magnitude: parseFloat(event.magnitude || event.MAGNITUDE || '0'),
-        tornadoScale: event.torScale || event.TOR_F_SCALE || null,
-        floodCause: event.floodCause || event.FLOOD_CAUSE || null,
-        stormSummary: event.eventNarrative || event.EVENT_NARRATIVE || null,
-        episodeNarrative: event.episodeNarrative || event.EPISODE_NARRATIVE || null,
-        coordinates: {
-          latitude: parseFloat(event.beginLat || event.BEGIN_LAT || '0'),
-          longitude: parseFloat(event.beginLon || event.BEGIN_LON || '0')
-        }
-      });
+      // Handle real NOAA data structure
+      if (event.real_data) {
+        processed.push({
+          id: event.id || `real_${index}_${Date.now()}`,
+          eventType: event.event_type || event.title || 'Weather Event',
+          state: event.state || 'Unknown',
+          county: event.areas || event.county || 'Unknown',
+          beginDate: event.begin_date || new Date().toISOString(),
+          endDate: event.end_date || new Date().toISOString(),
+          deaths: parseInt(event.deaths_direct || '0'),
+          injuries: parseInt(event.injuries_direct || '0'),
+          damageProperty: parseFloat(event.damage_property || '0'),
+          damageCrops: parseFloat(event.damage_crops || '0'),
+          magnitude: parseFloat(event.magnitude || '0'),
+          tornadoScale: event.tornado_scale || null,
+          floodCause: event.flood_cause || null,
+          stormSummary: event.description || event.title || null,
+          episodeNarrative: event.description || null,
+          coordinates: {
+            latitude: parseFloat(event.coordinates?.[1] || '0'),
+            longitude: parseFloat(event.coordinates?.[0] || '0')
+          }
+        });
+      } else {
+        // Handle CSV/legacy data format
+        processed.push({
+          id: `storm_${index}_${Date.now()}`,
+          eventType: event.eventType || event.EVENT_TYPE || 'Unknown',
+          state: event.state || event.STATE || 'Unknown',
+          county: event.county || event.CZ_NAME || 'Unknown',
+          beginDate: event.beginDate || event.BEGIN_DATE || new Date().toISOString(),
+          endDate: event.endDate || event.END_DATE || new Date().toISOString(),
+          deaths: parseInt(event.deathsDirect || event.DEATHS_DIRECT || '0'),
+          injuries: parseInt(event.injuriesDirect || event.INJURIES_DIRECT || '0'),
+          damageProperty: parseFloat(event.damageProperty || event.DAMAGE_PROPERTY || '0'),
+          damageCrops: parseFloat(event.damageCrops || event.DAMAGE_CROPS || '0'),
+          magnitude: parseFloat(event.magnitude || event.MAGNITUDE || '0'),
+          tornadoScale: event.torScale || event.TOR_F_SCALE || null,
+          floodCause: event.floodCause || event.FLOOD_CAUSE || null,
+          stormSummary: event.eventNarrative || event.EVENT_NARRATIVE || null,
+          episodeNarrative: event.episodeNarrative || event.EPISODE_NARRATIVE || null,
+          coordinates: {
+            latitude: parseFloat(event.beginLat || event.BEGIN_LAT || '0'),
+            longitude: parseFloat(event.beginLon || event.BEGIN_LON || '0')
+          }
+        });
+      }
     } catch (error: any) {
       console.warn(`⚠️ Error processing event ${index}:`, error.message);
     }

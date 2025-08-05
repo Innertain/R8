@@ -126,6 +126,8 @@ export default function ExtremeWeatherEvents() {
   
   const { events, statistics, trends, totalEvents, timeRange } = data;
 
+  console.log('ExtremeWeatherEvents data:', { success: data?.success, totalEvents, eventsLength: events?.length });
+
   // Handle empty data case
   if (!events || events.length === 0) {
     return (
@@ -139,6 +141,7 @@ export default function ExtremeWeatherEvents() {
         <CardContent>
           <p className="text-gray-600">No extreme weather events data is currently available.</p>
           <p className="text-sm text-gray-500 mt-2">Time range: {timeRange || 'Unknown'}</p>
+          <p className="text-sm text-gray-500 mt-1">Total events received: {totalEvents || 0}</p>
         </CardContent>
       </Card>
     );
