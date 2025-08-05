@@ -30,7 +30,7 @@ const stateNames: Record<string, string> = {
   'OCEAN': 'Ocean', 'INTL': 'International'
 };
 
-export function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilterIndicatorProps) {
+function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilterIndicatorProps) {
   if (!stateFilter || stateFilter === 'all') {
     return null;
   }
@@ -79,3 +79,5 @@ export function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilt
     </div>
   );
 }
+
+export default GlobalFilterIndicator;
