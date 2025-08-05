@@ -134,10 +134,15 @@ export default function ExtremeWeatherEvents() {
 
   console.log('ExtremeWeatherEvents data:', { success: data?.success, totalEvents, eventsLength: events?.length });
 
+  // Sort events by date (newest first) and then filter
+  const sortedEvents = [...events].sort((a, b) => new Date(b.beginDate).getTime() - new Date(a.beginDate).getTime());
+  
   // Filter events based on selected criteria
-  const filteredEvents = events.filter(event => {
+  const filteredEvents = sortedEvents.filter(event => {
     const matchesEventType = selectedEventType === 'all' || event.eventType === selectedEventType;
     const matchesState = selectedState === 'all' || event.state === selectedState;
+    
+
     
     return matchesEventType && matchesState;
   });
@@ -406,7 +411,7 @@ export default function ExtremeWeatherEvents() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {filteredEvents.sort((a, b) => new Date(b.beginDate).getTime() - new Date(a.beginDate).getTime()).map((event) => {
+                {filteredEvents.map((event) => {
                   const EventIcon = eventTypeIcons[event.eventType] || AlertTriangle;
                   
                   return (
