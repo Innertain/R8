@@ -85,8 +85,6 @@ const severityColors = ['#22c55e', '#eab308', '#f97316', '#ef4444', '#dc2626'];
 export default function ExtremeWeatherEvents() {
   const [selectedEventType, setSelectedEventType] = useState<string>('all');
   const [selectedState, setSelectedState] = useState<string>('all');
-  const [selectedSeverity, setSelectedSeverity] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { data, isLoading, error } = useQuery<ExtremeWeatherData>({
     queryKey: ['/api/extreme-weather-events'],
@@ -136,33 +134,17 @@ export default function ExtremeWeatherEvents() {
 
   console.log('ExtremeWeatherEvents data:', { success: data?.success, totalEvents, eventsLength: events?.length });
 
-  // Define getSeverityLevel function
-  const getSeverityLevel = (event: any) => {
-    const totalCasualties = event.deaths + event.injuries;
-    if (totalCasualties >= 100) return 'Critical';
-    if (totalCasualties >= 20) return 'High';
-    if (totalCasualties >= 5) return 'Moderate';
-    return 'Low';
-  };
-
   // Filter events based on selected criteria
   const filteredEvents = events.filter(event => {
-    const matchesEventType = selectedEventType === 'all' || selectedEventType === 'Event Type' || event.eventType === selectedEventType;
-    const matchesState = selectedState === 'all' || selectedState === 'All States' || event.state === selectedState;
-    const matchesSeverity = selectedSeverity === 'all' || selectedSeverity === 'All Severities' || getSeverityLevel(event) === selectedSeverity;
-    const matchesSearch = searchTerm === '' || 
-      event.eventType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.county.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.stormSummary?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesEventType = selectedEventType === 'all' || event.eventType === selectedEventType;
+    const matchesState = selectedState === 'all' || event.state === selectedState;
     
-    return matchesEventType && matchesState && matchesSeverity && matchesSearch;
+    return matchesEventType && matchesState;
   });
 
   // Get unique values for filter options
   const uniqueEventTypes = [...new Set(events.map(e => e.eventType))].sort();
   const uniqueStates = [...new Set(events.map(e => e.state))].sort();
-  const uniqueSeverities = ['Low', 'Moderate', 'High', 'Critical'];
 
   // Calculate most affected states
   const stateImpacts = events.reduce((acc, event) => {
@@ -396,10 +378,10 @@ export default function ExtremeWeatherEvents() {
               </CardDescription>
               
               {/* Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <Select value={selectedEventType} onValueChange={setSelectedEventType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Event Type" />
+                    <SelectValue placeholder="All Event Types" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Event Types</SelectItem>
@@ -420,31 +402,12 @@ export default function ExtremeWeatherEvents() {
                     ))}
                   </SelectContent>
                 </Select>
-
-                <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Severities" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Severities</SelectItem>
-                    {uniqueSeverities.map(severity => (
-                      <SelectItem key={severity} value={severity}>{severity}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Input
-                  placeholder="Search events..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {filteredEvents.sort((a, b) => new Date(b.beginDate).getTime() - new Date(a.beginDate).getTime()).map((event) => {
                   const EventIcon = eventTypeIcons[event.eventType] || AlertTriangle;
-                  const severity = getSeverityLevel(event);
                   
                   return (
                     <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -454,7 +417,6 @@ export default function ExtremeWeatherEvents() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <h4 className="font-medium">{(event as any).stormSummary || (event as any).episodeNarrative || event.eventType}</h4>
-                              <Badge variant={getSeverityColor(severity) as any}>{severity}</Badge>
                             </div>
                             {(event as any).episodeNarrative && (event as any).episodeNarrative !== (event as any).stormSummary && (
                               <p className="text-sm text-gray-600 mb-2">{(event as any).episodeNarrative}</p>
