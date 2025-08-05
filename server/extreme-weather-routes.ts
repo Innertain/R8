@@ -649,25 +649,7 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
         episode_narrative: 'Arctic air mass collided with Pacific moisture creating perfect conditions for freezing rain. Ice accumulations of 1-2 inches snapped power lines and trees throughout metro Portland area.',
         real_data: true
       },
-      {
-        id: 'noaa-2024-010-tx-hill-country',
-        event_type: 'Flash Flood',
-        title: 'Texas Hill Country Flooding - July 2024',
-        description: 'Destructive and deadly flooding took place in the Hill Country region of Texas. Water levels along the Guadalupe River rose rapidly due to intense rainfall over the watershed. Kerr County experienced the worst impacts with 117 fatalities, making this one of the deadliest flooding events in Texas history.',
-        begin_date: '2024-07-15T18:00:00Z',
-        end_date: '2024-07-17T12:00:00Z',
-        state: 'Texas',
-        areas: 'Kerr, Kendall, Gillespie, Blanco Counties',
-        injuries_direct: 75,
-        deaths_direct: 135,
-        damage_property: 2800000000,
-        damage_crops: 180000000,
-        source: 'Texas Department of Public Safety, Kerr County Emergency Management',
-        coordinates: [-99.3078, 30.0471],
-        flood_cause: 'Heavy Rain',
-        episode_narrative: 'Guadalupe River reached historic levels due to rapid rainfall over Hill Country watershed. Kerr County recorded 117 of the 135 total fatalities. Flash flooding caught many residents unprepared as water levels rose extremely rapidly.',
-        real_data: true
-      },
+
       {
         id: 'noaa-2025-001',
         event_type: 'Wildfire',
