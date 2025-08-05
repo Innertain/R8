@@ -118,12 +118,31 @@ export default function ExtremeWeatherEvents() {
         </CardHeader>
         <CardContent>
           <p className="text-gray-600">Unable to load extreme weather events data. Please try again later.</p>
+          <p className="text-sm text-gray-500 mt-2">Error details: {error?.message || 'Unknown error'}</p>
         </CardContent>
       </Card>
     );
   }
-
+  
   const { events, statistics, trends, totalEvents, timeRange } = data;
+
+  // Handle empty data case
+  if (!events || events.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-yellow-600">
+            <AlertTriangle className="h-5 w-5" />
+            No Weather Events Data
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">No extreme weather events data is currently available.</p>
+          <p className="text-sm text-gray-500 mt-2">Time range: {timeRange || 'Unknown'}</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Process data for charts
   const eventTypeChart = Object.entries(statistics.eventTypes).map(([type, count]) => ({
