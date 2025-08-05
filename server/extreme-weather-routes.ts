@@ -1189,8 +1189,16 @@ function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
     index === self.findIndex(e => e.id === event.id)
   );
   
-  console.log(`📈 Processed ${uniqueProcessed.length} extreme weather events (removed ${processed.length - uniqueProcessed.length} final duplicates)`);
-  return uniqueProcessed;
+  // Sort events by date - most recent first (2025 to 2021)
+  const sortedProcessed = uniqueProcessed.sort((a, b) => {
+    const dateA = new Date(a.beginDate);
+    const dateB = new Date(b.beginDate);
+    return dateB.getTime() - dateA.getTime(); // Descending order (newest first)
+  });
+  
+  console.log(`📈 Processed ${sortedProcessed.length} extreme weather events (removed ${processed.length - uniqueProcessed.length} final duplicates)`);
+  console.log(`📅 Events sorted chronologically: ${sortedProcessed[0]?.beginDate.substring(0, 4)} to ${sortedProcessed[sortedProcessed.length - 1]?.beginDate.substring(0, 4)}`);
+  return sortedProcessed;
 }
 
 // Generate statistics for extreme weather events
