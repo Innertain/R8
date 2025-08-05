@@ -561,7 +561,7 @@ export default function ExtremeWeatherEvents() {
                               <img 
                                 src={stateIconMapping[state]} 
                                 alt={`${state} icon`}
-                                className="h-3 w-3 object-contain"
+                                className="h-5 w-5 object-contain"
                               />
                             )}
                             <span>{state}</span>
@@ -594,15 +594,15 @@ export default function ExtremeWeatherEvents() {
                               <p className="text-xs text-gray-500 mb-2">{(event as any).stormSummary}</p>
                             )}
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm text-gray-600">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-3">
                                 {stateIconMapping[event.state] ? (
                                   <img 
                                     src={stateIconMapping[event.state]} 
                                     alt={`${event.state} icon`}
-                                    className="h-4 w-4 object-contain"
+                                    className="h-6 w-6 object-contain"
                                   />
                                 ) : (
-                                  <MapPin className="h-4 w-4" />
+                                  <MapPin className="h-6 w-6" />
                                 )}
                                 <span>{event.county}, {event.state}</span>
                               </div>
