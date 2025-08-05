@@ -368,7 +368,7 @@ export default function ExtremeWeatherEvents() {
                             {(event as any).stormSummary && (event as any).stormSummary !== event.eventType && (event as any).stormSummary !== (event as any).episodeNarrative && (
                               <p className="text-xs text-gray-500 mb-2">{(event as any).stormSummary}</p>
                             )}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm text-gray-600">
                               <div className="flex items-center gap-1">
                                 <MapPin className="h-4 w-4" />
                                 <span>{event.county}, {event.state}</span>
@@ -378,8 +378,12 @@ export default function ExtremeWeatherEvents() {
                                 <span>{format(new Date(event.beginDate), 'MMM d, yyyy')}</span>
                               </div>
                               <div className="flex items-center gap-1">
-                                <Users className="h-4 w-4" />
-                                <span>{event.deaths + event.injuries} casualties</span>
+                                <Users className="h-4 w-4 text-red-500" />
+                                <span>{event.deaths} deaths</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Users className="h-4 w-4 text-orange-500" />
+                                <span>{event.injuries} injuries</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <DollarSign className="h-4 w-4" />
