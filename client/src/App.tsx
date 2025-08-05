@@ -457,15 +457,19 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <StateSVGDefs />
-        {globalStateFilter && (
-          <GlobalFilterIndicator 
-            stateFilter={globalStateFilter}
-            onClearFilter={clearGlobalFilter}
-          />
-        )}
-        <Router />
-        <Toaster />
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-stormy-dark via-stormy-medium to-stormy-dark">
+          <StateSVGDefs />
+          <Navigation />
+          {globalStateFilter && (
+            <GlobalFilterIndicator 
+              stateFilter={globalStateFilter}
+              onClearFilter={clearGlobalFilter}
+            />
+          )}
+          <Router />
+          <Footer />
+          <Toaster />
+        </div>
       </TooltipProvider>
     </QueryClientProvider>  
   );
