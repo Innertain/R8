@@ -44,12 +44,12 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
   // Get data range info
   const dataRange = useMemo(() => {
     if (disasters.length === 0) return { start: null, end: null, years: 0 };
-    
+
     const dates = disasters.map(d => new Date(d.declarationDate)).sort((a, b) => a.getTime() - b.getTime());
     const start = dates[0];
     const end = dates[dates.length - 1];
     const years = Math.ceil((end.getTime() - start.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-    
+
     return { start, end, years };
   }, [disasters]);
 
@@ -58,7 +58,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
     return disasters.filter(disaster => {
       const now = new Date();
       const declarationDate = new Date(disaster.declarationDate);
-      
+
       // Time filter
       if (timeFilter === 'recent') {
         // Last 12 months
@@ -71,13 +71,13 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
       } else if (timeFilter === 'since2022') {
         if (declarationDate.getFullYear() < 2022) return false;
       }
-      
+
       // State filter
       if (stateFilter !== 'all' && disaster.state !== stateFilter) return false;
-      
+
       // Type filter
       if (typeFilter !== 'all' && disaster.incidentType !== typeFilter) return false;
-      
+
       return true;
     });
   }, [disasters, timeFilter, stateFilter, typeFilter]);
@@ -167,10 +167,10 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
       filters: { timeFilter, stateFilter, typeFilter },
       generatedAt: new Date().toISOString()
     };
-    
+
     const dataStr = JSON.stringify(analyticsData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', `disaster-analytics-${new Date().toISOString().split('T')[0]}.json`);
@@ -213,7 +213,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               </div>
             </div>
           </div>
-          
+
           {/* Filters */}
           <div className="flex gap-3 mt-4">
             <Select value={timeFilter} onValueChange={setTimeFilter}>
@@ -454,17 +454,14 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <TrendingUp className="w-5 h-5 text-blue-600" />
-                  Disaster Declarations Trend (2022-2025)
+                  Disaster Declarations Trend (2020-2025)
                 </CardTitle>
                 <p className="text-sm text-gray-600">
-                  Consistent high activity • Enhanced data accuracy
+                  Analysis of disaster frequency from 2020 to 2025
                 </p>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-2 mt-2">
                   <p className="text-xs text-green-700">
-                    <strong>Data Coverage:</strong> 2022-2025 (~389 declarations from enhanced FEMA API queries)
-                  </p>
-                  <p className="text-xs text-blue-700 mt-1">
-                    <strong>2023 Verification:</strong> 114 declarations (close to official 83+ major disasters + emergencies)
+                    <strong>Data Coverage:</strong> 2020-2025 (data aggregated from declarations)
                   </p>
                 </div>
               </CardHeader>
@@ -472,18 +469,26 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={Object.entries(
-                        filteredDisasters.reduce((acc, disaster) => {
+                      data={(() => {
+                        const yearData: Record<string, number> = {
+                          '2020': 0,
+                          '2021': 0,
+                          '2022': 0,
+                          '2023': 0,
+                          '2024': 0,
+                          '2025': 0,
+                        };
+                        filteredDisasters.forEach(disaster => {
                           const year = new Date(disaster.declarationDate).getFullYear().toString();
-                          acc[year] = (acc[year] || 0) + 1;
-                          return acc;
-                        }, {} as Record<string, number>)
-                      )
-                        .sort(([a], [b]) => a.localeCompare(b))
-                        .map(([year, count]) => ({
-                          year,
-                          declarations: count
-                        }))}
+                          if (yearData[year] !== undefined) { // Only count years in our range
+                            yearData[year] = yearData[year] + 1;
+                          }
+                        });
+
+                        return Object.entries(yearData)
+                          .map(([year, count]) => ({ year, count }))
+                          .sort((a, b) => parseInt(a.year) - parseInt(b.year));
+                      })()}
                       margin={{
                         top: 20,
                         right: 30,
@@ -509,11 +514,13 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                             const year = parseInt(label);
                             const count = payload[0].value;
                             let context = '';
-                            if (year === 2022) context = '82 declarations - Baseline activity';
+                            if (year === 2020) context = 'Initial data year';
+                            else if (year === 2021) context = 'Continued activity';
+                            else if (year === 2022) context = '82 declarations - Baseline activity';
                             else if (year === 2023) context = '114 declarations - High activity year';
                             else if (year === 2024) context = '111 declarations - Consistent high activity';
                             else if (year === 2025) context = '82 declarations - Ongoing activity (through July)';
-                            
+
                             return (
                               <div className="bg-white p-3 border rounded-lg shadow-lg max-w-xs">
                                 <p className="font-bold text-gray-900 text-lg">{label}</p>
@@ -538,35 +545,48 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                
+
                 {/* Year-by-year breakdown */}
                 <div className="mt-4 grid grid-cols-5 gap-2 text-center">
-                  {Object.entries(
-                    filteredDisasters.reduce((acc, disaster) => {
+                  {(() => {
+                    const yearData: Record<string, number> = {
+                      '2020': 0,
+                      '2021': 0,
+                      '2022': 0,
+                      '2023': 0,
+                      '2024': 0,
+                      '2025': 0,
+                    };
+                    filteredDisasters.forEach(disaster => {
                       const year = new Date(disaster.declarationDate).getFullYear().toString();
-                      acc[year] = (acc[year] || 0) + 1;
-                      return acc;
-                    }, {} as Record<string, number>)
-                  )
-                    .sort(([a], [b]) => a.localeCompare(b))
-                    .map(([year, count]) => (
-                      <div key={year} className={`p-2 rounded-lg text-xs ${
-                        year === '2023' || year === '2024' ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'
-                      }`}>
-                        <div className="font-bold text-gray-800">{year}</div>
-                        <div className={`text-lg font-bold ${
-                          year === '2023' || year === '2024' ? 'text-blue-600' : 'text-gray-600'
+                      if (yearData[year] !== undefined) { // Only count years in our range
+                        yearData[year] = yearData[year] + 1;
+                      }
+                    });
+
+                    return Object.entries(yearData)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([year, count]) => (
+                        <div key={year} className={`p-2 rounded-lg text-xs ${
+                          year === '2023' || year === '2024' ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'
                         }`}>
-                          {count}
+                          <div className="font-bold text-gray-800">{year}</div>
+                          <div className={`text-lg font-bold ${
+                            year === '2023' || year === '2024' ? 'text-blue-600' : 'text-gray-600'
+                          }`}>
+                            {count}
+                          </div>
+                          <div className="text-gray-500 text-xs">
+                            {year === '2020' ? 'Start' :
+                             year === '2021' ? 'Activity' :
+                             year === '2022' ? 'Baseline' :
+                             year === '2023' ? 'Peak' :
+                             year === '2024' ? 'High' :
+                             year === '2025' ? 'Current' : ''}
+                          </div>
                         </div>
-                        <div className="text-gray-500 text-xs">
-                          {year === '2022' ? 'Baseline' :
-                           year === '2023' ? 'Peak' :
-                           year === '2024' ? 'High' :
-                           year === '2025' ? 'Current' : ''}
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                  })()}
                 </div>
               </CardContent>
             </Card>
@@ -590,7 +610,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                     const color = type === 'DR' ? 'red' : type === 'EM' ? 'orange' : 'yellow';
                     const bgColor = type === 'DR' ? 'bg-red-50' : type === 'EM' ? 'bg-orange-50' : 'bg-yellow-50';
                     const borderColor = type === 'DR' ? 'border-red-200' : type === 'EM' ? 'border-orange-200' : 'border-yellow-200';
-                    
+
                     return (
                       <div key={type} className={`p-4 rounded-lg border ${bgColor} ${borderColor} hover:shadow-sm transition-shadow`}>
                         <div className="flex items-center justify-between mb-2">
@@ -637,7 +657,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 <Badge variant="outline" className="text-xs bg-green-50 text-green-700">Enhanced Data Coverage</Badge>
               </CardTitle>
               <p className="text-sm text-gray-600">
-                Regional disaster patterns from enhanced FEMA data (2022-2025)
+                Regional disaster patterns from enhanced FEMA data (2020-2025)
               </p>
             </CardHeader>
             <CardContent>
@@ -645,7 +665,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <div className="mb-8">
                 <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-red-500" />
-                  Most Impacted States (2022-2025)
+                  Most Impacted States (2020-2025)
                 </h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {analytics.topStates.slice(0, 4).map(([state, count], index) => {
@@ -658,7 +678,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                     }, {} as Record<string, number>);
                     const topType = Object.entries(typeCount).sort(([,a], [,b]) => b - a)[0];
                     const Icon = getDisasterIconComponent(topType?.[0] || '');
-                    
+
                     return (
                       <div key={state} className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105">
                         <div className="text-center">
@@ -700,10 +720,10 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                         acc[d.state] = (acc[d.state] || 0) + 1;
                         return acc;
                       }, {} as Record<string, number>);
-                    
+
                     const topState = Object.entries(statesWithType).sort(([,a], [,b]) => b - a)[0];
                     const Icon = getDisasterIcon(type);
-                    
+
                     return (
                       <div key={type} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-3">
@@ -734,7 +754,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               {/* Data Source Note */}
               <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-xs text-blue-700">
-                  <strong>Data Source:</strong> Enhanced FEMA API queries covering 2022-2025 period with {filteredDisasters.length} total declarations. This represents recent disaster activity patterns and may not reflect complete historical trends.
+                  <strong>Data Source:</strong> Enhanced FEMA API queries covering 2020-2025 period with {filteredDisasters.length} total declarations. This represents recent disaster activity patterns and may not reflect complete historical trends.
                 </p>
               </div>
             </CardContent>
@@ -806,7 +826,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                           .filter(d => d.state === state && d.declarationType === 'DR').length;
                         const emergencies = filteredDisasters
                           .filter(d => d.state === state && d.declarationType === 'EM').length;
-                        
+
                         return (
                           <div key={state} className="p-3 border rounded-lg">
                             <div className="flex items-center justify-between mb-2">
@@ -987,7 +1007,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       {/* Real-time API Debugger */}
       <RealtimeApiDebugger />
     </div>
