@@ -131,6 +131,12 @@ export default function ExtremeWeatherEvents() {
   }
   
   const { events, statistics, trends, totalEvents, timeRange } = data;
+  const dataDescription = (data as any).dataDescription;
+  const dataSources = (data as any).dataSources;
+  const updateFrequency = (data as any).updateFrequency;
+  const dataQuality = (data as any).dataQuality;
+  const lastDataUpdate = (data as any).lastDataUpdate;
+  const nextUpdateScheduled = (data as any).nextUpdateScheduled;
 
   // Filter events while preserving chronological order (events already sorted by backend)
   const filteredEvents = events.filter(event => {
