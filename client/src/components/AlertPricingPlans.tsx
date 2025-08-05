@@ -39,6 +39,40 @@ export function AlertPricingPlans() {
       popular: false
     },
     {
+      name: "Non-Profit",
+      description: "Special pricing for qualifying non-profits and NGOs",
+      icon: <Church className="w-6 h-6 text-green-600" />,
+      userLimit: "Up to 100 users",
+      price: billingCycle === 'monthly' ? 35 : 350,
+      period: billingCycle === 'monthly' ? '/month' : '/year',
+      savings: billingCycle === 'yearly' ? 'Save $70/year' : null,
+      pricePerUser: billingCycle === 'monthly' ? '$0.35' : '$0.29',
+      specialNote: "501(c)(3) verification required",
+      features: [
+        "100 recipients included",
+        "Unlimited custom messages",
+        "Email, SMS & voice calls",
+        "Advanced message scheduling",
+        "Custom message templates",
+        "Volunteer management tools",
+        "Message analytics & tracking",
+        "Priority support",
+        "Donation campaign integration",
+        "Event coordination tools"
+      ],
+      emergencyFeatures: [
+        "FREE Emergency Weather Alerts",
+        "FREE Disaster Notifications",
+        "FREE Community Safety Updates",
+        "Emergency response coordination",
+        "Crisis communication templates"
+      ],
+      useCases: ["Non-profit organizations", "NGOs", "Community groups", "Charitable foundations"],
+      cta: "Apply for Non-Profit Plan",
+      popular: false,
+      discount: "40% off regular pricing"
+    },
+    {
       name: "Medium Organization",
       description: "Ideal for schools, churches, and growing businesses",
       icon: <Users className="w-6 h-6 text-green-600" />,
@@ -151,7 +185,7 @@ export function AlertPricingPlans() {
         </p>
 
         {/* Use Case Icons */}
-        <div className="flex justify-center items-center gap-8 mb-6 text-sm text-gray-600">
+        <div className="flex justify-center items-center gap-6 mb-6 text-sm text-gray-600">
           <div className="flex flex-col items-center gap-2">
             <School className="w-8 h-8 text-blue-500" />
             <span>Schools</span>
@@ -166,6 +200,10 @@ export function AlertPricingPlans() {
           </div>
           <div className="flex flex-col items-center gap-2">
             <Users className="w-8 h-8 text-orange-500" />
+            <span>Non-Profits</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Building className="w-8 h-8 text-red-500" />
             <span>Organizations</span>
           </div>
         </div>
@@ -232,6 +270,12 @@ export function AlertPricingPlans() {
                     <div className="text-sm text-gray-500 mt-1">{plan.pricePerUser} per user</div>
                     {plan.savings && (
                       <p className="text-sm text-green-600 mt-1">{plan.savings}</p>
+                    )}
+                    {plan.discount && (
+                      <p className="text-sm text-green-600 font-medium mt-1">{plan.discount}</p>
+                    )}
+                    {plan.specialNote && (
+                      <p className="text-xs text-gray-500 mt-2">{plan.specialNote}</p>
                     )}
                   </div>
                 ) : (
@@ -369,6 +413,13 @@ export function AlertPricingPlans() {
             <p className="text-sm text-gray-600">
               Yes! All plans include a 14-day free trial with full access to custom messaging 
               and emergency alerts. No credit card required to start.
+            </p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-900 mb-2">How do I qualify for non-profit pricing?</h4>
+            <p className="text-sm text-gray-600">
+              Valid 501(c)(3) status or equivalent NGO documentation required. 
+              Apply with your tax-exempt certificate to receive 40% off regular pricing.
             </p>
           </div>
         </div>
