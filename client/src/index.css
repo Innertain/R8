@@ -149,77 +149,150 @@
   animation-play-state: paused;
 }
 
-/* Modern Gradient Text Effects for R8 */
-.gradient-text-response {
-  background: linear-gradient(135deg, 
+/* Reactive Full-Word Gradient Effects */
+.gradient-word-response {
+  background: linear-gradient(90deg, 
     #ff6b6b 0%, 
-    #ee5a52 25%, 
-    #ff8a80 50%, 
-    #ff5722 75%, 
-    #e53e3e 100%);
+    #ff8a80 15%, 
+    #ee5a52 30%, 
+    #ff5722 45%, 
+    #e53e3e 60%, 
+    rgba(255, 255, 255, 0.9) 75%, 
+    rgba(255, 255, 255, 0.7) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  animation: gradientShift 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.4));
+  background-size: 300% 100%;
+  animation: reactiveGradientFlow 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 25px rgba(255, 107, 107, 0.5));
+  font-weight: 900;
+  text-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
 }
 
-.gradient-text-resilience {
-  background: linear-gradient(135deg, 
+.gradient-word-resilience {
+  background: linear-gradient(90deg, 
     #4fc3f7 0%, 
-    #29b6f6 25%, 
-    #03a9f4 50%, 
-    #0288d1 75%, 
-    #0277bd 100%);
+    #29b6f6 15%, 
+    #03a9f4 30%, 
+    #0288d1 45%, 
+    #0277bd 60%, 
+    rgba(255, 255, 255, 0.9) 75%, 
+    rgba(255, 255, 255, 0.7) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  animation: gradientShift 3s ease-in-out infinite;
-  animation-delay: 1s;
-  filter: drop-shadow(0 0 20px rgba(79, 195, 247, 0.4));
+  background-size: 300% 100%;
+  animation: reactiveGradientFlow 4s ease-in-out infinite;
+  animation-delay: 1.3s;
+  filter: drop-shadow(0 0 25px rgba(79, 195, 247, 0.5));
+  font-weight: 900;
+  text-shadow: 0 0 30px rgba(79, 195, 247, 0.3);
 }
 
-.gradient-text-regeneration {
-  background: linear-gradient(135deg, 
+.gradient-word-regeneration {
+  background: linear-gradient(90deg, 
     #66bb6a 0%, 
-    #4caf50 25%, 
-    #43a047 50%, 
-    #388e3c 75%, 
-    #2e7d32 100%);
+    #4caf50 15%, 
+    #43a047 30%, 
+    #388e3c 45%, 
+    #2e7d32 60%, 
+    rgba(255, 255, 255, 0.9) 75%, 
+    rgba(255, 255, 255, 0.7) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  animation: gradientShift 3s ease-in-out infinite;
-  animation-delay: 2s;
-  filter: drop-shadow(0 0 20px rgba(102, 187, 106, 0.4));
+  background-size: 300% 100%;
+  animation: reactiveGradientFlow 4s ease-in-out infinite;
+  animation-delay: 2.6s;
+  filter: drop-shadow(0 0 25px rgba(102, 187, 106, 0.5));
+  font-weight: 900;
+  text-shadow: 0 0 30px rgba(102, 187, 106, 0.3);
 }
 
-@keyframes gradientShift {
+@keyframes reactiveGradientFlow {
   0%, 100% {
     background-position: 0% 50%;
+    transform: scale(1);
+  }
+  25% {
+    background-position: 50% 50%;
+    transform: scale(1.02);
   }
   50% {
     background-position: 100% 50%;
+    transform: scale(1.05);
+  }
+  75% {
+    background-position: 50% 50%;
+    transform: scale(1.02);
   }
 }
 
-/* Hover effects for gradient text */
-.gradient-text-response:hover {
-  animation-duration: 0.8s;
-  filter: drop-shadow(0 0 30px rgba(255, 107, 107, 0.6)) drop-shadow(0 0 60px rgba(255, 107, 107, 0.3));
+/* Enhanced hover effects for gradient words */
+.gradient-word-response:hover {
+  animation-duration: 1.5s;
+  filter: drop-shadow(0 0 40px rgba(255, 107, 107, 0.8)) drop-shadow(0 0 80px rgba(255, 107, 107, 0.4));
+  transform: scale(1.1) rotate(1deg);
 }
 
-.gradient-text-resilience:hover {
-  animation-duration: 0.8s;
-  filter: drop-shadow(0 0 30px rgba(79, 195, 247, 0.6)) drop-shadow(0 0 60px rgba(79, 195, 247, 0.3));
+.gradient-word-resilience:hover {
+  animation-duration: 1.5s;
+  filter: drop-shadow(0 0 40px rgba(79, 195, 247, 0.8)) drop-shadow(0 0 80px rgba(79, 195, 247, 0.4));
+  transform: scale(1.1) rotate(-1deg);
 }
 
-.gradient-text-regeneration:hover {
-  animation-duration: 0.8s;
-  filter: drop-shadow(0 0 30px rgba(102, 187, 106, 0.6)) drop-shadow(0 0 60px rgba(102, 187, 106, 0.3));
+.gradient-word-regeneration:hover {
+  animation-duration: 1.5s;
+  filter: drop-shadow(0 0 40px rgba(102, 187, 106, 0.8)) drop-shadow(0 0 80px rgba(102, 187, 106, 0.4));
+  transform: scale(1.1) rotate(1deg);
+}
+
+/* Seamless Continuous Scrolling Animation */
+@keyframes scroll-seamless {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-seamless {
+  animation: scroll-seamless 30s linear infinite;
+  will-change: transform;
+}
+
+/* Scrolling R-word color effects */
+.scroll-word-purple { color: #c084fc; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-amber { color: #fbbf24; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-teal { color: #14b8a6; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-emerald { color: #10b981; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-indigo { color: #6366f1; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-rose { color: #f43f5e; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-cyan { color: #06b6d4; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-orange { color: #f97316; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-lime { color: #84cc16; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-pink { color: #ec4899; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-violet { color: #8b5cf6; font-weight: 600; transition: all 0.3s ease; }
+.scroll-word-sky { color: #0ea5e9; font-weight: 600; transition: all 0.3s ease; }
+
+/* Hover effects for scrolling words */
+.scroll-word-purple:hover { transform: scale(1.1); text-shadow: 0 0 20px #c084fc; }
+.scroll-word-amber:hover { transform: scale(1.1); text-shadow: 0 0 20px #fbbf24; }
+.scroll-word-teal:hover { transform: scale(1.1); text-shadow: 0 0 20px #14b8a6; }
+.scroll-word-emerald:hover { transform: scale(1.1); text-shadow: 0 0 20px #10b981; }
+.scroll-word-indigo:hover { transform: scale(1.1); text-shadow: 0 0 20px #6366f1; }
+.scroll-word-rose:hover { transform: scale(1.1); text-shadow: 0 0 20px #f43f5e; }
+.scroll-word-cyan:hover { transform: scale(1.1); text-shadow: 0 0 20px #06b6d4; }
+.scroll-word-orange:hover { transform: scale(1.1); text-shadow: 0 0 20px #f97316; }
+.scroll-word-lime:hover { transform: scale(1.1); text-shadow: 0 0 20px #84cc16; }
+.scroll-word-pink:hover { transform: scale(1.1); text-shadow: 0 0 20px #ec4899; }
+.scroll-word-violet:hover { transform: scale(1.1); text-shadow: 0 0 20px #8b5cf6; }
+.scroll-word-sky:hover { transform: scale(1.1); text-shadow: 0 0 20px #0ea5e9; }
+
+/* Pause scrolling on hover */
+.animate-scroll-seamless:hover {
+  animation-play-state: paused;
 }
 
 /* Icon glow effect on hover */

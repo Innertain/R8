@@ -73,57 +73,99 @@ function HeroSection() {
           </div>
 
           <div className="space-y-8">
-            {/* Main 3 R's with Modern Gradient Effects */}
+            {/* Main 3 R's with Reactive Gradient Effects */}
             <div className="text-center">
               <h2 className="text-6xl font-bold text-white leading-tight mb-6">
                 <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:rotate-2">
-                  <span className="text-7xl font-black gradient-text-response drop-shadow-2xl">R</span><span className="text-white/90 font-semibold">esponse</span>
+                  <span className="gradient-word-response drop-shadow-2xl">Response</span>
                 </span>
-                <span className="mx-6 text-white/30 text-4xl">→</span>
+                <span className="mx-6 text-white/30 text-4xl animate-pulse">→</span>
                 <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:-rotate-1">
-                  <span className="text-7xl font-black gradient-text-resilience drop-shadow-2xl">R</span><span className="text-white/90 font-semibold">esilience</span>
+                  <span className="gradient-word-resilience drop-shadow-2xl">Resilience</span>
                 </span>
-                <span className="mx-6 text-white/30 text-4xl">→</span>
+                <span className="mx-6 text-white/30 text-4xl animate-pulse" style={{animationDelay: '1s'}}>→</span>
                 <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:rotate-1">
-                  <span className="text-7xl font-black gradient-text-regeneration drop-shadow-2xl">R</span><span className="text-white/90 font-semibold">egeneration</span>
+                  <span className="gradient-word-regeneration drop-shadow-2xl">Regeneration</span>
                 </span>
               </h2>
             </div>
 
-            {/* Scrolling Supporting R's */}
+            {/* Continuous Scrolling R Words */}
             <div className="relative overflow-hidden bg-black/20 backdrop-blur-sm rounded-lg border border-white/10 h-16">
               <div className="absolute inset-0 flex items-center">
-                <div className="animate-scroll-left whitespace-nowrap flex items-center space-x-8 text-lg">
-                  <span className="text-purple-300 font-semibold">
+                <div className="animate-scroll-seamless whitespace-nowrap flex items-center text-lg">
+                  <span className="scroll-word-purple mx-8">
                     <span className="text-2xl font-black">R</span>esponsibility
                   </span>
-                  <span className="text-amber-300 font-semibold">
+                  <span className="scroll-word-amber mx-8">
                     <span className="text-2xl font-black">R</span>esources
                   </span>
-                  <span className="text-teal-300 font-semibold">
+                  <span className="scroll-word-teal mx-8">
                     <span className="text-2xl font-black">R</span>ecovery
                   </span>
-                  <span className="text-emerald-300 font-semibold">
+                  <span className="scroll-word-emerald mx-8">
                     <span className="text-2xl font-black">R</span>estoration
                   </span>
-                  <span className="text-indigo-300 font-semibold">
+                  <span className="scroll-word-indigo mx-8">
                     <span className="text-2xl font-black">R</span>enewal
                   </span>
-                  {/* Duplicate for seamless loop */}
-                  <span className="text-purple-300 font-semibold">
+                  <span className="scroll-word-rose mx-8">
+                    <span className="text-2xl font-black">R</span>esilience
+                  </span>
+                  <span className="scroll-word-cyan mx-8">
+                    <span className="text-2xl font-black">R</span>egeneration
+                  </span>
+                  <span className="scroll-word-orange mx-8">
+                    <span className="text-2xl font-black">R</span>eadiness
+                  </span>
+                  <span className="scroll-word-lime mx-8">
+                    <span className="text-2xl font-black">R</span>ehabilitation
+                  </span>
+                  <span className="scroll-word-pink mx-8">
+                    <span className="text-2xl font-black">R</span>evitalization
+                  </span>
+                  <span className="scroll-word-violet mx-8">
+                    <span className="text-2xl font-black">R</span>eforestation
+                  </span>
+                  <span className="scroll-word-sky mx-8">
+                    <span className="text-2xl font-black">R</span>ecycling
+                  </span>
+                  {/* Seamless duplicate for continuous scroll */}
+                  <span className="scroll-word-purple mx-8">
                     <span className="text-2xl font-black">R</span>esponsibility
                   </span>
-                  <span className="text-amber-300 font-semibold">
+                  <span className="scroll-word-amber mx-8">
                     <span className="text-2xl font-black">R</span>esources
                   </span>
-                  <span className="text-teal-300 font-semibold">
+                  <span className="scroll-word-teal mx-8">
                     <span className="text-2xl font-black">R</span>ecovery
                   </span>
-                  <span className="text-emerald-300 font-semibold">
+                  <span className="scroll-word-emerald mx-8">
                     <span className="text-2xl font-black">R</span>estoration
                   </span>
-                  <span className="text-indigo-300 font-semibold">
+                  <span className="scroll-word-indigo mx-8">
                     <span className="text-2xl font-black">R</span>enewal
+                  </span>
+                  <span className="scroll-word-rose mx-8">
+                    <span className="text-2xl font-black">R</span>esilience
+                  </span>
+                  <span className="scroll-word-cyan mx-8">
+                    <span className="text-2xl font-black">R</span>egeneration
+                  </span>
+                  <span className="scroll-word-orange mx-8">
+                    <span className="text-2xl font-black">R</span>eadiness
+                  </span>
+                  <span className="scroll-word-lime mx-8">
+                    <span className="text-2xl font-black">R</span>ehabilitation
+                  </span>
+                  <span className="scroll-word-pink mx-8">
+                    <span className="text-2xl font-black">R</span>evitalization
+                  </span>
+                  <span className="scroll-word-violet mx-8">
+                    <span className="text-2xl font-black">R</span>eforestation
+                  </span>
+                  <span className="scroll-word-sky mx-8">
+                    <span className="text-2xl font-black">R</span>ecycling
                   </span>
                 </div>
               </div>
