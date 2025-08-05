@@ -118,6 +118,9 @@ function HeroSection() {
                   <span className="scroll-word-orange mx-8">
                     <span className="text-2xl font-black">R</span>eadiness
                   </span>
+                  <span className="scroll-word-purple mx-8 text-3xl">
+                    ∞
+                  </span>
                   <span className="scroll-word-lime mx-8">
                     <span className="text-2xl font-black">R</span>ehabilitation
                   </span>
@@ -136,7 +139,13 @@ function HeroSection() {
                   <span className="scroll-word-emerald mx-8">
                     <span className="text-2xl font-black">R</span>eforestation
                   </span>
-                  <span className="scroll-word-purple mx-8 text-3xl">
+                  <span className="scroll-word-teal mx-8">
+                    <span className="text-2xl font-black">R</span>esurgence
+                  </span>
+                  <span className="scroll-word-amber mx-8">
+                    <span className="text-2xl font-black">R</span>evolution
+                  </span>
+                  <span className="scroll-word-cyan mx-8 text-3xl">
                     ∞
                   </span>
                   {/* Seamless duplicate for continuous scroll */}
@@ -164,6 +173,9 @@ function HeroSection() {
                   <span className="scroll-word-orange mx-8">
                     <span className="text-2xl font-black">R</span>eadiness
                   </span>
+                  <span className="scroll-word-purple mx-8 text-3xl">
+                    ∞
+                  </span>
                   <span className="scroll-word-lime mx-8">
                     <span className="text-2xl font-black">R</span>ehabilitation
                   </span>
@@ -181,6 +193,12 @@ function HeroSection() {
                   </span>
                   <span className="scroll-word-emerald mx-8">
                     <span className="text-2xl font-black">R</span>eforestation
+                  </span>
+                  <span className="scroll-word-teal mx-8">
+                    <span className="text-2xl font-black">R</span>esurgence
+                  </span>
+                  <span className="scroll-word-amber mx-8">
+                    <span className="text-2xl font-black">R</span>evolution
                   </span>
                   <span className="scroll-word-cyan mx-8 text-3xl">
                     ∞
