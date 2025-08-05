@@ -69,7 +69,7 @@ function HeroSection() {
               alt="R8 Logo" 
               className="w-20 h-20 mr-4"
             />
-            <h1 className="text-6xl font-bold text-white tracking-wide">R8</h1>
+            <h1 className="text-6xl font-bold tracking-wide gradient-text-r8">R8</h1>
           </div>
 
           <div className="space-y-8">
