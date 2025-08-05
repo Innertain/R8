@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, MessageSquare, Users, Building, PhoneCall, Zap, School, Church, Store, AlertTriangle } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 export function AlertPricingPlans() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -361,66 +367,229 @@ export function AlertPricingPlans() {
       </div>
 
       {/* Use Case Examples Section */}
-      <div className="mt-12 max-w-6xl mx-auto p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
-        <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">Use Case Examples</h3>
-        <div className="space-y-8">
+      <div className="mt-12 max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Real-World Message Examples</h3>
+          <p className="text-gray-600">See how organizations use our platform during emergencies and daily operations</p>
+        </div>
+
+        <div className="space-y-4">
           {/* Use Case 1: Welfare Check */}
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <AlertTriangle className="w-6 h-6 text-red-500" />
-              <h4 className="text-xl font-semibold text-red-700">Use Case 1: Welfare Check</h4>
-            </div>
-            <p className="text-gray-700 mb-2"><strong>Scenario:</strong> A tornado has struck your area.</p>
-            <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
-              <h5 className="font-semibold text-gray-800 mb-2">SMS Template:</h5>
-              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
-                ⚡ WELFARE CHECK
-                There was a major tornado in your area. Please let us know if you’re okay.
-                1 – YES, I’m okay
-                2 – NO, I need help
-                Text STOP to opt out.
-              </pre>
-            </div>
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
-              <h5 className="font-semibold text-gray-800 mb-2">Follow-up (if they reply “2”):</h5>
-              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
-                We’re here to help. Please reply with your location or call our hotline at 123-456-7890.
-              </pre>
-            </div>
-          </div>
+          <Collapsible>
+            <CollapsibleTrigger className="w-full">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-red-100 rounded-lg">
+                        <AlertTriangle className="w-5 h-5 text-red-600" />
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-lg font-semibold text-red-700">Tornado Welfare Check</h4>
+                        <p className="text-sm text-gray-600">Emergency response & community safety</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  </div>
+                </CardHeader>
+              </Card>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="mt-2 border-l-4 border-l-red-500">
+                <CardContent className="pt-6">
+                  <p className="text-gray-700 mb-4"><strong>Scenario:</strong> A tornado has struck your area.</p>
+                  <div className="space-y-4">
+                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                      <h5 className="font-semibold text-red-800 mb-2">Initial SMS Template:</h5>
+                      <pre className="text-sm bg-white p-3 rounded border whitespace-pre-wrap font-mono text-red-700">
+⚡ WELFARE CHECK
+There was a major tornado in your area. Please let us know if you're okay.
+1 – YES, I'm okay
+2 – NO, I need help
+Text STOP to opt out.
+                      </pre>
+                    </div>
+                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                      <h5 className="font-semibold text-red-800 mb-2">Follow-up (if they reply "2"):</h5>
+                      <pre className="text-sm bg-white p-3 rounded border whitespace-pre-wrap font-mono text-red-700">
+We're here to help. Please reply with your location or call our hotline at 123-456-7890.
+                      </pre>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
 
           {/* Use Case 2: Business Closure Notice */}
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <AlertTriangle className="w-6 h-6 text-yellow-500" />
-              <h4 className="text-xl font-semibold text-yellow-700">Use Case 2: Business Closure Notice</h4>
-            </div>
-            <p className="text-gray-700 mb-2"><strong>Scenario:</strong> A hurricane is imminent.</p>
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
-              <h5 className="font-semibold text-gray-800 mb-2">SMS Template:</h5>
-              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
-                🌪️ BUSINESS CLOSURE
-                Due to the hurricane forecast (view alert), our business will be closed for the next 2 days. Please stay safe and follow local guidance.
-                Text STOP to opt out.
-              </pre>
-            </div>
-          </div>
+          <Collapsible>
+            <CollapsibleTrigger className="w-full">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-yellow-100 rounded-lg">
+                        <Building className="w-5 h-5 text-yellow-600" />
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-lg font-semibold text-yellow-700">Hurricane Business Closure</h4>
+                        <p className="text-sm text-gray-600">Preemptive closure notifications</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  </div>
+                </CardHeader>
+              </Card>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="mt-2 border-l-4 border-l-yellow-500">
+                <CardContent className="pt-6">
+                  <p className="text-gray-700 mb-4"><strong>Scenario:</strong> A hurricane is imminent.</p>
+                  <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h5 className="font-semibold text-yellow-800 mb-2">SMS Template:</h5>
+                    <pre className="text-sm bg-white p-3 rounded border whitespace-pre-wrap font-mono text-yellow-700">
+🌪️ BUSINESS CLOSURE
+Due to the hurricane forecast (view alert), our business will be closed for the next 2 days. Please stay safe and follow local guidance.
+Text STOP to opt out.
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
 
           {/* Use Case 3: Free Meal Alert */}
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <AlertTriangle className="w-6 h-6 text-blue-500" />
-              <h4 className="text-xl font-semibold text-blue-700">Use Case 3: Free Meal Alert</h4>
+          <Collapsible>
+            <CollapsibleTrigger className="w-full">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Users className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-lg font-semibold text-blue-700">Community Meal Distribution</h4>
+                        <p className="text-sm text-gray-600">Relief & community support services</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  </div>
+                </CardHeader>
+              </Card>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="mt-2 border-l-4 border-l-blue-500">
+                <CardContent className="pt-6">
+                  <p className="text-gray-700 mb-4"><strong>Scenario:</strong> You're distributing hot meals to the community.</p>
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h5 className="font-semibold text-blue-800 mb-2">SMS Template:</h5>
+                    <pre className="text-sm bg-white p-3 rounded border whitespace-pre-wrap font-mono text-blue-700">
+🍲 FREE HOT MEALS
+We're serving FREE hot meals at 123 Main St. from 11 AM–3 PM while supplies last.
+Reply with any questions.
+Text STOP to opt out.
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Use Case 4: Ice Storm Attendance Check */}
+          <Collapsible>
+            <CollapsibleTrigger className="w-full">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-cyan-100 rounded-lg">
+                        <Zap className="w-5 h-5 text-cyan-600" />
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-lg font-semibold text-cyan-700">Ice Storm Attendance Check</h4>
+                        <p className="text-sm text-gray-600">Employee safety & workplace communication</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  </div>
+                </CardHeader>
+              </Card>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="mt-2 border-l-4 border-l-cyan-500">
+                <CardContent className="pt-6">
+                  <p className="text-gray-700 mb-4"><strong>Scenario:</strong> Severe ice storm impacting your commute.</p>
+                  <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-200">
+                    <h5 className="font-semibold text-cyan-800 mb-2">SMS Template:</h5>
+                    <pre className="text-sm bg-white p-3 rounded border whitespace-pre-wrap font-mono text-cyan-700">
+❄️ ICE STORM CHECK
+We understand there was a severe ice storm in your area. If you're unable to come to work for safety reasons, please let us know:
+1 – NO, I can't make it
+2 – YES, I'm coming in
+We hope you're safe—stay warm!
+Text STOP to opt out.
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Use Case 5: Air Quality Alert */}
+          <Collapsible>
+            <CollapsibleTrigger className="w-full">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-100 rounded-lg">
+                        <School className="w-5 h-5 text-gray-600" />
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-lg font-semibold text-gray-700">Air Quality Class Cancellation</h4>
+                        <p className="text-sm text-gray-600">Educational institution safety protocols</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  </div>
+                </CardHeader>
+              </Card>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="mt-2 border-l-4 border-l-gray-500">
+                <CardContent className="pt-6">
+                  <p className="text-gray-700 mb-4"><strong>Scenario:</strong> Air quality warning in effect.</p>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h5 className="font-semibold text-gray-800 mb-2">SMS Template:</h5>
+                    <pre className="text-sm bg-white p-3 rounded border whitespace-pre-wrap font-mono text-gray-700">
+🌫️ AIR QUALITY WARNING
+Due to the current air quality alert, we are cancelling all outdoor classes until the warning is lifted. We'll notify you once it's safe to resume.
+Text STOP to opt out.
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
+        {/* Usage Tips */}
+        <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6">
+          <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5" />
+            Message Template Best Practices
+          </h4>
+          <div className="grid md:grid-cols-2 gap-4 text-sm text-green-700">
+            <div>
+              <div className="font-medium mb-1">• Keep messages concise and clear</div>
+              <div className="font-medium mb-1">• Use emojis to quickly convey message type</div>
+              <div className="font-medium mb-1">• Include specific action items when needed</div>
             </div>
-            <p className="text-gray-700 mb-2"><strong>Scenario:</strong> You’re distributing hot meals to the community.</p>
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
-              <h5 className="font-semibold text-gray-800 mb-2">SMS Template:</h5>
-              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
-                🍲 FREE HOT MEALS
-                We’re serving FREE hot meals at 123 Main St. from 11 AM–3 PM while supplies last.
-                Reply with any questions.
-                Text STOP to opt out.
-              </pre>
+            <div>
+              <div className="font-medium mb-1">• Always include opt-out instructions</div>
+              <div className="font-medium mb-1">• Provide alternative contact methods</div>
+              <div className="font-medium mb-1">• Test templates before emergency situations</div>
             </div>
           </div>
         </div>
@@ -439,7 +608,7 @@ export function AlertPricingPlans() {
             <h4 className="font-semibold text-gray-900 mb-2">Custom Group Messaging</h4>
             <p className="text-sm text-gray-600">
               Send instant messages to your entire group via SMS, email, and voice calls.
-              Perfect for announcements, alerts, and important updates.
+              Perfect for announcements, reminders, and important updates.
             </p>
           </div>
           <div className="text-center">
