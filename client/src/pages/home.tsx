@@ -76,7 +76,7 @@ function HeroSection() {
             <h2 className="text-5xl font-bold text-white leading-tight">
               Emergency Response • Resilient Communities
               <br />
-              <span className="text-green-300">Regenerative Solutions</span>
+              <span className="text-green-300">Resilience and Regenerative Solutions</span>
             </h2>
             
             <p className="text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed">
