@@ -178,7 +178,7 @@ export function AlertPricingPlans() {
         "Custom crisis management tools",
         "Emergency response integration"
       ],
-      useCases: ["Fortune 500 companies", "Federal agencies", "State governments", "Major universities"],
+      useCases: ["Fortune 500 companies", "Local governments", "Major universities", "Large organizations"],
       cta: "Contact Sales",
       popular: false
     }
