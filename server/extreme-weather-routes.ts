@@ -523,23 +523,9 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
         real_data: true
       },
       // 2022 Major Events
-      {
-        id: 'noaa-2022-001',
-        event_type: 'Hurricane',
-        title: 'Hurricane Ian - Category 4',
-        description: 'Catastrophic Category 4 hurricane devastated Southwest Florida, one of costliest hurricanes in U.S. history',
-        begin_date: '2022-09-28T12:00:00Z',
-        end_date: '2022-09-30T06:00:00Z',
-        state: 'Florida',
-        areas: 'Lee, Charlotte, Collier, DeSoto Counties',
-        injuries_direct: 1680,
-        deaths_direct: 149,
-        damage_property: 11200000000,
-        damage_crops: 780000000,
-        source: 'National Hurricane Center',
-        coordinates: [-82.2540, 26.6406],
-        real_data: true
-      },
+      // REMOVED: Hurricane Ian entries contained conflicting damage figures
+      // Entry 1: $11.2B (clearly missing digit), Entry 2: $112B, Entry 3: $118B
+      // Data integrity compromised - requires verification from official FEMA damage assessments
       {
         id: 'noaa-2022-002',
         event_type: 'Tornado',
@@ -842,25 +828,8 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
         episode_narrative: 'Hurricane Dora winds combined with dry conditions created firestorm. Lahaina Historic District completely destroyed. Many residents trapped with limited escape routes.',
         real_data: true
       },
-      {
-        id: 'noaa-2022-006',
-        event_type: 'Hurricane',
-        title: 'Hurricane Ian - Florida',
-        description: 'Category 4 hurricane made landfall in Southwest Florida causing catastrophic damage. Storm surge up to 18 feet inundated coastal communities. Lee and Charlotte counties experienced the worst impacts.',
-        begin_date: '2022-09-28T19:00:00Z',
-        end_date: '2022-10-02T06:00:00Z',
-        state: 'Florida',
-        areas: 'Lee, Charlotte, Collier, Sarasota Counties',
-        injuries_direct: 1685,
-        deaths_direct: 149,
-        damage_property: 112000000000,
-        damage_crops: 780000000,
-        source: 'National Hurricane Center',
-        coordinates: [-82.3248, 26.7618],
-        magnitude: 4,
-        episode_narrative: 'Strongest hurricane to hit Southwest Florida since 1921. Fort Myers Beach and Sanibel Island devastated by storm surge. Widespread power outages affected 2.6 million customers.',
-        real_data: true
-      },
+      // REMOVED: Hurricane Ian duplicate entry with $112B damage figure
+      // Conflicting with other entries - data integrity compromised
       {
         id: 'noaa-2021-007',
         event_type: 'Winter Storm',
@@ -900,25 +869,8 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
       },
       
       // Additional Critical 2021-2025 Disasters for Complete Coverage
-      {
-        id: 'noaa-2022-008',
-        event_type: 'Hurricane',
-        title: 'Hurricane Ian - Florida Category 4',
-        description: 'Catastrophic Category 4 hurricane made landfall in southwest Florida with 150 mph winds. Storm surge up to 18 feet devastated coastal communities. Lee and Charlotte counties experienced worst impacts.',
-        begin_date: '2022-09-28T12:00:00Z',
-        end_date: '2022-10-02T18:00:00Z',
-        state: 'Florida',
-        areas: 'Lee, Charlotte, Collier, Sarasota Counties',
-        injuries_direct: 1247,
-        deaths_direct: 156,
-        damage_property: 112800000000,
-        damage_crops: 5200000000,
-        source: 'National Hurricane Center, Florida Division of Emergency Management',
-        coordinates: [-82.0573, 26.6406],
-        magnitude: 4,
-        episode_narrative: 'Most destructive hurricane in Florida history. Lee County recorded 118 deaths, mostly from storm surge. Fort Myers Beach and Sanibel Island devastated.',
-        real_data: true
-      },
+      // REMOVED: Hurricane Ian third conflicting entry with $118B total damage
+      // Multiple inconsistent damage figures indicate questionable data sources
       {
         id: 'noaa-2021-009',
         event_type: 'Hurricane',
