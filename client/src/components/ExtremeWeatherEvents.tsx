@@ -359,9 +359,12 @@ export default function ExtremeWeatherEvents() {
                           <EventIcon className="h-5 w-5 text-blue-600 mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-medium">{event.eventType}</h4>
+                              <h4 className="font-medium">{event.stormSummary || event.episodeNarrative || event.eventType}</h4>
                               <Badge variant={getSeverityColor(severity) as any}>{severity}</Badge>
                             </div>
+                            {event.stormSummary && event.stormSummary !== event.eventType && (
+                              <p className="text-sm text-gray-600 mb-2">{event.stormSummary}</p>
+                            )}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-1">
                                 <MapPin className="h-4 w-4" />

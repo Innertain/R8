@@ -467,7 +467,7 @@ function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
       if (event.real_data) {
         processed.push({
           id: event.id || `real_${index}_${Date.now()}`,
-          eventType: event.event_type || event.title || 'Weather Event',
+          eventType: event.event_type || 'Weather Event',
           state: event.state || 'Unknown',
           county: event.areas || event.county || 'Unknown',
           beginDate: event.begin_date || new Date().toISOString(),
@@ -479,7 +479,7 @@ function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
           magnitude: parseFloat(event.magnitude || '0'),
           tornadoScale: event.tornado_scale || null,
           floodCause: event.flood_cause || null,
-          stormSummary: event.description || event.title || null,
+          stormSummary: event.title || event.description || null,
           episodeNarrative: event.description || null,
           coordinates: {
             latitude: parseFloat(event.coordinates?.[1] || '0'),
