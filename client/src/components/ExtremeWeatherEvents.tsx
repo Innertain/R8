@@ -132,14 +132,6 @@ export default function ExtremeWeatherEvents() {
   
   const { events, statistics, trends, totalEvents, timeRange } = data;
 
-  console.log('ExtremeWeatherEvents data:', { 
-    success: data?.success, 
-    totalEvents, 
-    eventsLength: events?.length,
-    selectedEventType,
-    selectedState
-  });
-
   // Sort events by date (newest first) and then filter
   const sortedEvents = [...events].sort((a, b) => new Date(b.beginDate).getTime() - new Date(a.beginDate).getTime());
   
@@ -149,12 +141,6 @@ export default function ExtremeWeatherEvents() {
     const matchesState = selectedState === 'all' || selectedState === '' || event.state === selectedState;
     
     return matchesEventType && matchesState;
-  });
-
-  console.log('Filtered results:', {
-    totalAfterSort: sortedEvents.length,
-    totalAfterFilter: filteredEvents.length,
-    firstFewFiltered: filteredEvents.slice(0, 3).map(e => ({ id: e.id, eventType: e.eventType, state: e.state, date: e.beginDate }))
   });
 
   // Get unique values for filter options
@@ -389,7 +375,9 @@ export default function ExtremeWeatherEvents() {
             <CardHeader>
               <CardTitle>Weather Events</CardTitle>
               <CardDescription>
-                Comprehensive list of {filteredEvents.length} events from {timeRange}
+                Showing {filteredEvents.length} of {totalEvents} events from {timeRange}
+                {selectedEventType !== 'all' && ` • Filtered by: ${selectedEventType}`}
+                {selectedState !== 'all' && ` • State: ${selectedState}`}
               </CardDescription>
               
               {/* Filters */}
@@ -427,11 +415,11 @@ export default function ExtremeWeatherEvents() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {filteredEvents.map((event) => {
+                {filteredEvents.map((event, index) => {
                   const EventIcon = eventTypeIcons[event.eventType] || AlertTriangle;
                   
                   return (
-                    <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div key={`${event.id}-${index}`} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           <EventIcon className="h-5 w-5 text-blue-600 mt-1" />
