@@ -1635,34 +1635,124 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           }
         }
         
-        // Extract fire size if available
-        const sizeMatch = item.description.match(/(\d+(?:,\d+)*)\s*acres/i);
-        const acres = sizeMatch ? parseInt(sizeMatch[1].replace(/,/g, '')) : null;
+        // Clean and parse the description for better readability
+        const cleanDescription = (rawDesc: string): string => {
+          // Remove HTML tags and excessive whitespace
+          let cleaned = rawDesc.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+          
+          // Remove common technical prefixes and suffixes
+          cleaned = cleaned.replace(/^(Incident Summary:|Summary:|Description:|Update:)/i, '');
+          cleaned = cleaned.replace(/\s*(For more information.*|Visit.*|Contact.*|Additional details.*)$/i, '');
+          
+          // Split into sentences and take the most relevant ones
+          const sentences = cleaned.split(/[.!?]+/).filter(s => s.trim().length > 20);
+          
+          // Prioritize sentences with key information
+          const prioritySentences = sentences.filter(s => 
+            /acres|percent|contained|controlled|firefighters|evacuation|threat|damage/i.test(s)
+          );
+          
+          // Return the best summary (max 2-3 sentences)
+          const selectedSentences = prioritySentences.length > 0 
+            ? prioritySentences.slice(0, 2) 
+            : sentences.slice(0, 2);
+            
+          return selectedSentences.join('. ').trim() + (selectedSentences.length > 0 ? '.' : '');
+        };
+
+        // Extract fire size with better parsing
+        const sizeMatches = item.description.match(/(\d+(?:,\d+)*)\s*acres/gi) || [];
+        let acres = null;
+        if (sizeMatches.length > 0) {
+          // Get the largest acreage mentioned (often the most current)
+          const acreageValues = sizeMatches.map(match => {
+            const numMatch = match.match(/(\d+(?:,\d+)*)/);
+            return numMatch ? parseInt(numMatch[1].replace(/,/g, '')) : 0;
+          });
+          acres = Math.max(...acreageValues);
+        }
         
-        // Extract status from description
+        // Extract containment percentage
+        const containmentMatch = item.description.match(/(\d+)\s*%?\s*contain/i);
+        const containmentPercent = containmentMatch ? parseInt(containmentMatch[1]) : null;
+        
+        // Extract status with more sophisticated parsing
         let status = 'Active';
         const desc = item.description.toLowerCase();
-        if (desc.includes('contained')) status = 'Contained';
-        else if (desc.includes('controlled')) status = 'Controlled';
-        else if (desc.includes('suppressed')) status = 'Suppressed';
-        else if (desc.includes('out')) status = 'Out';
+        if (containmentPercent === 100 || desc.includes('fully contained') || desc.includes('100% contained')) {
+          status = 'Contained';
+        } else if (desc.includes('controlled') || desc.includes('suppressed')) {
+          status = 'Controlled';
+        } else if (desc.includes('out') && !desc.includes('without')) {
+          status = 'Out';
+        } else if (containmentPercent && containmentPercent > 75) {
+          status = 'Nearly Contained';
+        } else if (desc.includes('contained') || containmentPercent) {
+          status = 'Partially Contained';
+        }
         
-        // Extract incident type
+        // Extract incident type with better detection
         let incidentType = 'Wildfire';
-        if (desc.includes('prescribed')) incidentType = 'Prescribed Fire';
-        else if (desc.includes('structure')) incidentType = 'Structure Fire';
-        else if (desc.includes('grass')) incidentType = 'Grass Fire';
+        if (desc.includes('prescribed') || desc.includes('planned burn')) {
+          incidentType = 'Prescribed Fire';
+        } else if (desc.includes('structure') || desc.includes('building')) {
+          incidentType = 'Structure Fire';
+        } else if (desc.includes('grass') || desc.includes('prairie')) {
+          incidentType = 'Grass Fire';
+        } else if (desc.includes('brush') || desc.includes('vegetation')) {
+          incidentType = 'Brush Fire';
+        }
+        
+        // Extract personnel count
+        const personnelMatch = item.description.match(/(\d+)\s*(?:firefighters?|personnel|crew)/i);
+        const personnelCount = personnelMatch ? parseInt(personnelMatch[1]) : null;
+        
+        // Extract threat information
+        const threatKeywords = ['evacuation', 'threatened', 'at risk', 'danger', 'smoke'];
+        const hasThreat = threatKeywords.some(keyword => desc.includes(keyword));
+        
+        // Create human-readable summary
+        const createSummary = (): string => {
+          let summary = '';
+          
+          if (acres) {
+            summary += `${acres.toLocaleString()} acre ${incidentType.toLowerCase()}`;
+          } else {
+            summary += incidentType;
+          }
+          
+          if (containmentPercent) {
+            summary += ` is ${containmentPercent}% contained`;
+          } else {
+            summary += ` is currently ${status.toLowerCase()}`;
+          }
+          
+          if (personnelCount) {
+            summary += `. ${personnelCount} firefighters are responding`;
+          }
+          
+          if (hasThreat) {
+            summary += '. Area residents may be affected';
+          }
+          
+          return summary + '.';
+        };
         
         return {
           id: item.guid || `incident-${index}`,
           title: item.title.trim(),
-          description: item.description.trim(),
+          description: cleanDescription(item.description),
+          rawDescription: item.description.trim(), // Keep original for reference
+          humanSummary: createSummary(),
           link: item.link,
           pubDate: item.pubDate,
           state,
           acres,
+          containmentPercent,
+          personnelCount,
           status,
           incidentType,
+          hasThreat,
           source: 'InciWeb',
           severity: acres && acres > 1000 ? 'severe' : acres && acres > 100 ? 'moderate' : 'minor'
         };

@@ -12,12 +12,17 @@ interface WildfireIncident {
   id: string;
   title: string;
   description: string;
+  rawDescription?: string;
+  humanSummary?: string;
   link: string;
   pubDate: string;
   state: string;
   acres: number | null;
+  containmentPercent?: number | null;
+  personnelCount?: number | null;
   status: string;
   incidentType: string;
+  hasThreat?: boolean;
   source: string;
   severity: string;
 }
@@ -402,23 +407,58 @@ export function WildfireIncidents({ stateFilter, onStateFilterChange, onClearFil
                                   <Badge className={getStatusColor(incident.status)}>
                                     {incident.status}
                                   </Badge>
+                                  {incident.hasThreat && (
+                                    <Badge variant="destructive" className="text-xs">
+                                      ⚠️ Threat
+                                    </Badge>
+                                  )}
                                 </div>
+                                
+                                {/* Human-readable summary first */}
+                                {incident.humanSummary && (
+                                  <div className="bg-orange-50 border-l-4 border-orange-400 p-3 mb-2 rounded">
+                                    <p className="text-sm font-medium text-orange-800">
+                                      {incident.humanSummary}
+                                    </p>
+                                  </div>
+                                )}
+                                
+                                {/* Clean description */}
                                 <p className="text-sm text-gray-600 leading-relaxed mb-2">
                                   {incident.description}
                                 </p>
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-2">
                                   {incident.acres && (
                                     <span className="flex items-center gap-1">
                                       <MapPin className="w-3 h-3" />
                                       {incident.acres.toLocaleString()} acres
                                     </span>
                                   )}
+                                  {incident.containmentPercent !== null && incident.containmentPercent !== undefined && (
+                                    <span className="flex items-center gap-1 text-blue-600">
+                                      📊 {incident.containmentPercent}% contained
+                                    </span>
+                                  )}
+                                  {incident.personnelCount && (
+                                    <span className="flex items-center gap-1 text-green-600">
+                                      👥 {incident.personnelCount} firefighters
+                                    </span>
+                                  )}
                                   <span className="flex items-center gap-1">
                                     <Calendar className="w-3 h-3" />
                                     {new Date(incident.pubDate).toLocaleDateString()}
                                   </span>
-                                  <span className="text-orange-600">
+                                </div>
+                                
+                                <div className="flex items-center gap-2 text-xs mb-2">
+                                  <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded">
                                     {incident.incidentType}
+                                  </span>
+                                  <span className={`px-2 py-1 rounded text-white text-xs ${
+                                    incident.severity === 'severe' ? 'bg-red-500' :
+                                    incident.severity === 'moderate' ? 'bg-orange-500' : 'bg-yellow-500'
+                                  }`}>
+                                    {incident.severity} threat
                                   </span>
                                 </div>
                                 
