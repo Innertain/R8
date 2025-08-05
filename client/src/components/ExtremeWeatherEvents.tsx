@@ -132,16 +132,19 @@ export default function ExtremeWeatherEvents() {
   
   const { events, statistics, trends, totalEvents, timeRange } = data;
 
-  // Sort events by date (newest first) and then filter
-  const sortedEvents = [...events].sort((a, b) => new Date(b.beginDate).getTime() - new Date(a.beginDate).getTime());
-  
-  // Filter events based on selected criteria
-  const filteredEvents = sortedEvents.filter(event => {
-    const matchesEventType = selectedEventType === 'all' || selectedEventType === '' || event.eventType === selectedEventType;
-    const matchesState = selectedState === 'all' || selectedState === '' || event.state === selectedState;
-    
-    return matchesEventType && matchesState;
-  });
+  // Filter events first, then sort by date (newest first)
+  const filteredEvents = events
+    .filter(event => {
+      const matchesEventType = selectedEventType === 'all' || selectedEventType === '' || event.eventType === selectedEventType;
+      const matchesState = selectedState === 'all' || selectedState === '' || event.state === selectedState;
+      
+      return matchesEventType && matchesState;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.beginDate).getTime();
+      const dateB = new Date(b.beginDate).getTime();
+      return dateB - dateA; // Newest first
+    });
 
   // Get unique values for filter options
   const uniqueEventTypes = [...new Set(events.map(e => e.eventType))].sort();
