@@ -132,19 +132,29 @@ export default function ExtremeWeatherEvents() {
   
   const { events, statistics, trends, totalEvents, timeRange } = data;
 
-  console.log('ExtremeWeatherEvents data:', { success: data?.success, totalEvents, eventsLength: events?.length });
+  console.log('ExtremeWeatherEvents data:', { 
+    success: data?.success, 
+    totalEvents, 
+    eventsLength: events?.length,
+    selectedEventType,
+    selectedState
+  });
 
   // Sort events by date (newest first) and then filter
   const sortedEvents = [...events].sort((a, b) => new Date(b.beginDate).getTime() - new Date(a.beginDate).getTime());
   
   // Filter events based on selected criteria
   const filteredEvents = sortedEvents.filter(event => {
-    const matchesEventType = selectedEventType === 'all' || event.eventType === selectedEventType;
-    const matchesState = selectedState === 'all' || event.state === selectedState;
-    
-
+    const matchesEventType = selectedEventType === 'all' || selectedEventType === '' || event.eventType === selectedEventType;
+    const matchesState = selectedState === 'all' || selectedState === '' || event.state === selectedState;
     
     return matchesEventType && matchesState;
+  });
+
+  console.log('Filtered results:', {
+    totalAfterSort: sortedEvents.length,
+    totalAfterFilter: filteredEvents.length,
+    firstFewFiltered: filteredEvents.slice(0, 3).map(e => ({ id: e.id, eventType: e.eventType, state: e.state, date: e.beginDate }))
   });
 
   // Get unique values for filter options
@@ -384,29 +394,35 @@ export default function ExtremeWeatherEvents() {
               
               {/* Filters */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <Select value={selectedEventType} onValueChange={setSelectedEventType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Event Types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Event Types</SelectItem>
-                    {uniqueEventTypes.map(type => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Event Type</label>
+                  <Select value={selectedEventType} onValueChange={setSelectedEventType}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Event Types</SelectItem>
+                      {uniqueEventTypes.map(type => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <Select value={selectedState} onValueChange={setSelectedState}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All States" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All States</SelectItem>
-                    {uniqueStates.map(state => (
-                      <SelectItem key={state} value={state}>{state}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">State</label>
+                  <Select value={selectedState} onValueChange={setSelectedState}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All States</SelectItem>
+                      {uniqueStates.map(state => (
+                        <SelectItem key={state} value={state}>{state}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
