@@ -56,10 +56,10 @@ function HeroSection() {
           style={{ backgroundImage: `url(${appalachianLandscape})` }}
         />
       </div>
-      
+
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-dark/90" />
-      
+
       {/* Hero Content */}
       <div className="relative z-10 flex items-center justify-center h-full px-6">
         <div className="text-center max-w-6xl mx-auto">
@@ -71,16 +71,16 @@ function HeroSection() {
             />
             <h1 className="text-6xl font-bold text-white tracking-wide">R8</h1>
           </div>
-          
+
           <div className="space-y-6">
             <h2 className="text-5xl font-bold text-white leading-tight">
               <span className="text-red-400">R</span>esponse • <span className="text-blue-400">R</span>esilience • <span className="text-green-400">R</span>egeneration
             </h2>
-            
+
             <p className="text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed">
               Three R's for community transformation: Emergency <span className="text-red-400 font-semibold">Response</span>, Community <span className="text-blue-400 font-semibold">Resilience</span>, and Ecological <span className="text-green-400 font-semibold">Regeneration</span>.
             </p>
-            
+
             <div className="flex flex-wrap justify-center gap-4 pt-8">
               <Link href="/map">
                 <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white text-lg px-8 py-4">
@@ -104,7 +104,7 @@ function HeroSection() {
           </div>
         </div>
       </div>
-      
+
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/70 animate-bounce">
         <div className="text-center">
@@ -134,7 +134,7 @@ function FeaturesShowcase() {
           </p>
         </div>
 
-        
+
 
         {/* Key Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -400,7 +400,7 @@ function StatsSection() {
             Real numbers from communities using R8 for resilience and regeneration
           </p>
         </div>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
           <div className="text-center p-4 bg-stormy-primary/20 rounded-lg border border-stormy-light/20">
             <div className="text-3xl font-bold text-blue-500 mb-2">7</div>
