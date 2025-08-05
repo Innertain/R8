@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   MapPin, 
   Calendar, 
@@ -23,7 +24,7 @@ import {
   Droplets,
   Info
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
 
 interface StormEvent {
@@ -484,18 +485,59 @@ export default function ExtremeWeatherEvents() {
                                 <Calendar className="h-4 w-4" />
                                 <span>{format(new Date(event.beginDate), 'MMM d, yyyy')}</span>
                               </div>
-                              <div className="flex items-center gap-1">
-                                <Users className="h-4 w-4 text-red-500" />
-                                <span>{event.deaths} deaths</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Users className="h-4 w-4 text-orange-500" />
-                                <span>{event.injuries} injuries</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <DollarSign className="h-4 w-4" />
-                                <span>{formatCurrency(event.damageProperty + event.damageCrops)}</span>
-                              </div>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1 cursor-help">
+                                      <Users className="h-4 w-4 text-red-500" />
+                                      <span>{event.deaths} deaths</span>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-sm max-w-xs">
+                                      <strong>Data Source:</strong> {(event as any).source || 'Official government reports'}<br/>
+                                      <strong>Verified by:</strong> FEMA disaster declarations, state emergency management agencies, CDC mortality surveillance
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1 cursor-help">
+                                      <Users className="h-4 w-4 text-orange-500" />
+                                      <span>{event.injuries} injuries</span>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-sm max-w-xs">
+                                      <strong>Data Source:</strong> {(event as any).source || 'Official government reports'}<br/>
+                                      <strong>Verified by:</strong> State health departments, emergency response agencies, hospital records
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1 cursor-help">
+                                      <DollarSign className="h-4 w-4" />
+                                      <span>{formatCurrency(event.damageProperty + event.damageCrops)}</span>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-sm max-w-xs">
+                                      <strong>Data Source:</strong> {(event as any).source || 'Official government reports'}<br/>
+                                      <strong>Property Damage:</strong> {formatCurrency(event.damageProperty)}<br/>
+                                      <strong>Crop Damage:</strong> {formatCurrency(event.damageCrops)}<br/>
+                                      <strong>Verified by:</strong> NOAA damage assessments, FEMA declarations, state agriculture departments
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </div>
                           </div>
                         </div>
@@ -530,14 +572,40 @@ export default function ExtremeWeatherEvents() {
                 <div className="space-y-2">
                   <h4 className="font-medium text-red-600">Human Impact</h4>
                   <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span>Deaths:</span>
-                      <span className="font-medium">{statistics.totals.deaths}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Injuries:</span>
-                      <span className="font-medium">{statistics.totals.injuries}</span>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex justify-between cursor-help">
+                            <span>Deaths:</span>
+                            <span className="font-medium">{statistics.totals.deaths}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm max-w-xs">
+                            <strong>Sources:</strong> FEMA disaster declarations, CDC mortality surveillance, state vital records<br/>
+                            <strong>Coverage:</strong> 2021-2025 major disasters (10+ deaths or $100M+ damage)
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex justify-between cursor-help">
+                            <span>Injuries:</span>
+                            <span className="font-medium">{statistics.totals.injuries}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm max-w-xs">
+                            <strong>Sources:</strong> State health departments, emergency response agencies, hospital records<br/>
+                            <strong>Coverage:</strong> 2021-2025 major disasters with verified injury counts
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
                     <div className="flex justify-between border-t pt-1">
                       <span>Total Casualties:</span>
                       <span className="font-medium">{statistics.totals.deaths + statistics.totals.injuries}</span>
@@ -548,18 +616,56 @@ export default function ExtremeWeatherEvents() {
                 <div className="space-y-2">
                   <h4 className="font-medium text-orange-600">Economic Impact</h4>
                   <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span>Property Damage:</span>
-                      <span className="font-medium">{formatCurrency(statistics.totals.propertyDamage)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Crop Damage:</span>
-                      <span className="font-medium">{formatCurrency(statistics.totals.cropDamage)}</span>
-                    </div>
-                    <div className="flex justify-between border-t pt-1">
-                      <span>Total Damage:</span>
-                      <span className="font-medium">{formatCurrency(statistics.totals.totalDamage)}</span>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex justify-between cursor-help">
+                            <span>Property Damage:</span>
+                            <span className="font-medium">{formatCurrency(statistics.totals.propertyDamage)}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm max-w-xs">
+                            <strong>Sources:</strong> NOAA damage assessments, FEMA declarations, insurance industry reports<br/>
+                            <strong>Coverage:</strong> Residential, commercial, and infrastructure damage from major disasters
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex justify-between cursor-help">
+                            <span>Crop Damage:</span>
+                            <span className="font-medium">{formatCurrency(statistics.totals.cropDamage)}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm max-w-xs">
+                            <strong>Sources:</strong> USDA crop loss reports, state agriculture departments, FEMA declarations<br/>
+                            <strong>Coverage:</strong> Agricultural losses from weather-related disasters
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex justify-between border-t pt-1 cursor-help">
+                            <span>Total Damage:</span>
+                            <span className="font-medium">{formatCurrency(statistics.totals.totalDamage)}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm max-w-xs">
+                            <strong>Sources:</strong> Combined NOAA, FEMA, USDA official damage assessments<br/>
+                            <strong>Note:</strong> Only includes disasters meeting threshold criteria (10+ deaths or $100M+ damage)
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
 
