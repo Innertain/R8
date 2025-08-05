@@ -22,7 +22,8 @@ import {
   Flame,
   Wind,
   Droplets,
-  Info
+  Info,
+  CheckCircle
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
@@ -227,35 +228,22 @@ export default function ExtremeWeatherEvents() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-600">
             <AlertTriangle className="h-5 w-5" />
-            Data Integrity Protection Active
+            Error Loading Authentic Data
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <h4 className="font-semibold text-red-800 mb-3">Inaccurate Data Detected and Blocked</h4>
-            <p className="text-red-700 mb-3">
-              Multiple data accuracy issues have been identified in the disaster database:
-            </p>
-            <ul className="list-disc list-inside text-red-700 space-y-1 mb-3">
-              <li><strong>Hurricane Helene (NC):</strong> Database shows $26.4B damage, research shows $53B+</li>
-              <li><strong>Hurricane Ian:</strong> Three conflicting entries with damage ranging $11.2B to $118B</li>
-              <li><strong>Source verification:</strong> Claims of "official sources" cannot be verified</li>
-            </ul>
-            <p className="text-red-700 font-medium">
-              To maintain data integrity, all questionable entries have been blocked until authentic government sources can be verified.
-            </p>
-          </div>
-          
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">Authentic Data Sources Needed</h4>
-            <p className="text-blue-700 mb-3">The platform requires connections to official government APIs:</p>
+        <CardContent>
+          <p className="text-gray-600 mb-3">Unable to connect to official government APIs for authentic disaster data.</p>
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+            <p className="font-medium text-blue-800 mb-2">Attempting to connect to:</p>
             <ul className="list-disc list-inside text-blue-700 space-y-1">
-              <li>FEMA Disaster Declarations Database (OpenData API)</li>
-              <li>NOAA Storm Events Database (NCEI API)</li>
+              <li>FEMA Disaster Declarations Database</li>
+              <li>NOAA Storm Events Database</li>
               <li>USGS Earthquake Hazards Program</li>
-              <li>InciWeb Wildfire Information System</li>
             </ul>
           </div>
+          <p className="text-sm text-gray-500 mt-3">
+            Error details: {error?.message || 'Unknown error accessing official APIs'}
+          </p>
         </CardContent>
       </Card>
     );
