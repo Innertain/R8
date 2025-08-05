@@ -528,6 +528,15 @@ export default function ExtremeWeatherEvents() {
                 {selectedEventType !== 'all' && ` • Filtered by: ${selectedEventType}`}
                 {selectedState !== 'all' && ` • State: ${selectedState}`}
               </CardDescription>
+              <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center gap-2 text-yellow-800">
+                  <Info className="h-4 w-4" />
+                  <span className="text-sm font-medium">Under Construction</span>
+                </div>
+                <p className="text-xs text-yellow-700 mt-1">
+                  This section is currently under development and data may not be fully accurate. We are working to ensure complete data integrity from official government sources.
+                </p>
+              </div>
               
               {/* Filters */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -561,7 +570,7 @@ export default function ExtremeWeatherEvents() {
                               <img 
                                 src={stateIconMapping[state]} 
                                 alt={`${state} icon`}
-                                className="h-3 w-3 object-contain"
+                                className="h-4 w-4 object-contain"
                               />
                             )}
                             <span>{state}</span>
@@ -599,7 +608,7 @@ export default function ExtremeWeatherEvents() {
                                   <img 
                                     src={stateIconMapping[event.state]} 
                                     alt={`${event.state} icon`}
-                                    className="h-4 w-4 object-contain"
+                                    className="h-6 w-6 object-contain"
                                   />
                                 ) : (
                                   <MapPin className="h-4 w-4" />
