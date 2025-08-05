@@ -280,14 +280,16 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
       if (!query || !enabled) return null;
       
       try {
-        // Multiple search strategies for better coverage
+        // More targeted search strategies for disasters
+        const queryParts = query.split(' ');
         const searchStrategies = [
           query, // Original query
-          `${query.split(' ')[0]} fire California`, // For wildfires
-          `${query.split(' ')[0]} ${query.split(' ')[1]} wildfire`, // Alternative wildfire search
-          `${query.split(' ')[2]} ${query.split(' ')[0].toLowerCase()}`, // State + event type
-          `California wildfires ${new Date().getFullYear()}`, // Recent California fires
-          `${query.split(' ')[0]} disaster`
+          `${queryParts[0]} fire`, // Just the fire name
+          `${queryParts[0]} ${queryParts[1]} fire`, // Fire name + location
+          `${queryParts.slice(0, 2).join(' ')} wildfire`, // First two words + wildfire
+          `${queryParts[0]} Fire`, // Capitalized fire name
+          `2025 California wildfires`, // Recent California fires context
+          `${queryParts[0]} disaster ${queryParts[queryParts.length - 1]}` // Name + year
         ];
 
         for (const searchQuery of searchStrategies) {
@@ -379,21 +381,23 @@ export default function ExtremeWeatherEvents() {
   const [selectedEventType, setSelectedEventType] = useState<string>('all');
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedEvent, setSelectedEvent] = useState<StormEvent | null>(null);
+  const [enableWikipedia, setEnableWikipedia] = useState<boolean>(true);
 
   const { data, isLoading, error } = useQuery<ExtremeWeatherData>({
     queryKey: ['/api/extreme-weather-events'],
     refetchInterval: 2 * 60 * 60 * 1000, // 2 hours
   });
 
-  // Wikipedia search for selected event with enhanced query building
+  // Wikipedia search for selected event with better query building
   const wikipediaQuery = selectedEvent ? (() => {
     const eventName = (selectedEvent as any).stormSummary || (selectedEvent as any).episodeNarrative || selectedEvent.eventType;
     const year = format(new Date(selectedEvent.beginDate), 'yyyy');
     
-    // Extract specific fire name or location for better search
-    if (selectedEvent.eventType.toLowerCase().includes('fire') || selectedEvent.eventType.toLowerCase().includes('wildfire')) {
-      const locationParts = selectedEvent.county.split(',')[0].trim();
-      return `${eventName} ${locationParts} ${selectedEvent.state} ${year}`;
+    // Extract specific disaster name from description
+    if (eventName && eventName !== selectedEvent.eventType) {
+      // Try to extract the specific fire/disaster name
+      const specificName = eventName.split(' ').slice(0, 2).join(' '); // Take first two words
+      return `${specificName} ${year}`;
     }
     
     return `${selectedEvent.eventType} ${selectedEvent.state} ${year}`;
@@ -401,7 +405,7 @@ export default function ExtremeWeatherEvents() {
   
   const { data: wikipediaData, isLoading: wikipediaLoading } = useWikipediaSearch(
     wikipediaQuery, 
-    !!selectedEvent
+    !!selectedEvent && enableWikipedia
   );
 
   if (isLoading) {
@@ -1156,10 +1160,27 @@ export default function ExtremeWeatherEvents() {
                     <CardTitle className="text-lg flex items-center gap-2">
                       Wikipedia Information
                       <ExternalLink className="h-4 w-4" />
+                      <label className="ml-auto flex items-center gap-2 text-sm font-normal cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={enableWikipedia}
+                          onChange={(e) => setEnableWikipedia(e.target.checked)}
+                          className="rounded"
+                        />
+                        Enable
+                      </label>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {wikipediaLoading ? (
+                    {!enableWikipedia ? (
+                      <div className="text-center py-6">
+                        <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 mb-2">Wikipedia integration disabled</p>
+                        <p className="text-xs text-gray-400">
+                          Enable the checkbox above to view Wikipedia information
+                        </p>
+                      </div>
+                    ) : wikipediaLoading ? (
                       <div className="space-y-2">
                         <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                         <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
@@ -1168,167 +1189,115 @@ export default function ExtremeWeatherEvents() {
                     ) : wikipediaData ? (
                       <div className="space-y-3">
                         {wikipediaData.thumbnail && (
-                          <img 
-                            src={wikipediaData.thumbnail.source} 
-                            alt={wikipediaData.title}
-                            className="w-full h-32 object-cover rounded-lg"
-                          />
+                          <div className="relative">
+                            <img 
+                              src={wikipediaData.thumbnail.source} 
+                              alt={wikipediaData.title}
+                              className="w-full h-48 object-cover rounded-lg"
+                            />
+                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                              Source: Wikipedia
+                            </div>
+                          </div>
                         )}
-                        <h4 className="font-medium">{wikipediaData.title}</h4>
-                        <p className="text-sm text-gray-600 line-clamp-3">{wikipediaData.extract}</p>
                         
-                        {/* Wikipedia Infobox Data */}
+                        <div>
+                          <h4 className="font-medium text-lg mb-2">{wikipediaData.title}</h4>
+                          <p className="text-sm text-gray-700 leading-relaxed">{wikipediaData.extract}</p>
+                        </div>
+                        
+                        {/* Direct Wikipedia Statistics Display */}
                         {wikipediaData.infobox && Object.keys(wikipediaData.infobox).length > 0 && (
-                          <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                            <h5 className="font-medium text-orange-900 mb-2 flex items-center gap-1">
-                              <Database className="h-4 w-4" />
-                              Wikipedia Statistics
-                            </h5>
-                            <div className="grid grid-cols-1 gap-2 text-xs">
+                          <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded">
+                            <h5 className="font-medium text-orange-900 mb-3 text-base">Statistics from Wikipedia</h5>
+                            <div className="grid grid-cols-2 gap-3">
                               {wikipediaData.infobox.status && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Status:</span>
-                                  <span className="font-medium">{wikipediaData.infobox.status}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Status</div>
+                                  <div className="font-medium">{wikipediaData.infobox.status}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.burnedArea && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Burned Area:</span>
-                                  <span className="font-medium">{wikipediaData.infobox.burnedArea}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Burned Area</div>
+                                  <div className="font-medium">{wikipediaData.infobox.burnedArea}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.deaths && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Deaths:</span>
-                                  <span className="font-medium text-red-600">{wikipediaData.infobox.deaths}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Deaths</div>
+                                  <div className="font-medium text-red-600">{wikipediaData.infobox.deaths}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.injuries && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Injuries:</span>
-                                  <span className="font-medium text-orange-600">{wikipediaData.infobox.injuries}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Injuries</div>
+                                  <div className="font-medium text-orange-600">{wikipediaData.infobox.injuries}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.missing && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Missing:</span>
-                                  <span className="font-medium text-yellow-600">{wikipediaData.infobox.missing}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Missing</div>
+                                  <div className="font-medium text-yellow-600">{wikipediaData.infobox.missing}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.evacuated && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Evacuated:</span>
-                                  <span className="font-medium">{wikipediaData.infobox.evacuated}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Evacuated</div>
+                                  <div className="font-medium">{wikipediaData.infobox.evacuated}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.structuresDestroyed && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Structures:</span>
-                                  <span className="font-medium">{wikipediaData.infobox.structuresDestroyed}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Structures Destroyed</div>
+                                  <div className="font-medium">{wikipediaData.infobox.structuresDestroyed}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.damage && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Damage:</span>
-                                  <span className="font-medium text-green-600">{wikipediaData.infobox.damage}</span>
+                                <div className="bg-white p-2 rounded shadow-sm">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Damage</div>
+                                  <div className="font-medium text-green-600">{wikipediaData.infobox.damage}</div>
                                 </div>
                               )}
                               {wikipediaData.infobox.cause && (
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Cause:</span>
-                                  <span className="font-medium">{wikipediaData.infobox.cause}</span>
+                                <div className="bg-white p-2 rounded shadow-sm col-span-2">
+                                  <div className="text-xs text-gray-500 uppercase tracking-wide">Cause</div>
+                                  <div className="font-medium">{wikipediaData.infobox.cause}</div>
                                 </div>
                               )}
                             </div>
                           </div>
                         )}
 
-                        <a 
-                          href={wikipediaData.pageUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm"
-                        >
-                          Read more on Wikipedia <ExternalLink className="h-3 w-3" />
-                        </a>
-                        
-                        {/* Data Verification Section */}
-                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <h5 className="font-medium text-blue-900 mb-2">Data Verification Analysis</h5>
-                          <p className="text-xs text-blue-800 mb-2">
-                            Cross-reference Wikipedia information with our database values to verify accuracy of casualty figures and damage estimates.
-                          </p>
-                          
-                          {selectedEvent && (
-                            <div className="text-xs text-blue-700 space-y-1">
-                              <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div className="p-2 border border-blue-300 rounded">
-                                  <p><strong>Our Database (Official):</strong></p>
-                                  <p>Deaths: {selectedEvent.deaths}</p>
-                                  <p>Injuries: {selectedEvent.injuries}</p>
-                                  <p>Damage: {formatCurrency(selectedEvent.damageProperty + selectedEvent.damageCrops)}</p>
-                                </div>
-                                <div className="p-2 border border-orange-300 rounded">
-                                  <p><strong>Wikipedia (Crowd-sourced):</strong></p>
-                                  {wikipediaData?.infobox?.deaths ? (
-                                    <p>Deaths: {wikipediaData.infobox.deaths}</p>
-                                  ) : (
-                                    <p className="text-gray-500">Deaths: Not specified</p>
-                                  )}
-                                  {wikipediaData?.infobox?.injuries ? (
-                                    <p>Injuries: {wikipediaData.infobox.injuries}</p>
-                                  ) : (
-                                    <p className="text-gray-500">Injuries: Not specified</p>
-                                  )}
-                                  {wikipediaData?.infobox?.damage ? (
-                                    <p>Damage: {wikipediaData.infobox.damage}</p>
-                                  ) : (
-                                    <p className="text-gray-500">Damage: Not specified</p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              {/* Comparison Analysis */}
-                              {wikipediaData?.infobox && (
-                                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                                  <p className="font-medium text-yellow-800">Quick Comparison:</p>
-                                  {wikipediaData.infobox.deaths && (
-                                    <p className={`${selectedEvent.deaths.toString() === wikipediaData.infobox.deaths.replace(/[^0-9]/g, '') ? 'text-green-700' : 'text-red-700'}`}>
-                                      Deaths: {selectedEvent.deaths === parseInt(wikipediaData.infobox.deaths.replace(/[^0-9]/g, '') || '0') ? '✓ Match' : '⚠ Discrepancy'}
-                                    </p>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          
-                          <div className="mt-2 text-xs text-blue-700 pt-2 border-t border-blue-200">
-                            <p><strong>Our Sources:</strong> FEMA, NOAA, CDC, State Emergency Management</p>
-                            <p><strong>Wikipedia Sources:</strong> News outlets, government reports, academic studies</p>
-                          </div>
+                        <div className="text-center">
+                          <a 
+                            href={wikipediaData.pageUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            View Full Wikipedia Article
+                          </a>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-4">
-                        <BookOpen className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">No Wikipedia information found for this event</p>
-                        <p className="text-xs text-gray-400 mt-1">Try searching manually with these terms:</p>
-                        <div className="mt-2 space-y-1">
-                          {selectedEvent && (
-                            <>
-                              <p className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
-                                "{(selectedEvent as any).stormSummary || selectedEvent.eventType}"
-                              </p>
-                              <br />
-                              <p className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
-                                "{selectedEvent.eventType} {selectedEvent.state} {format(new Date(selectedEvent.beginDate), 'yyyy')}"
-                              </p>
-                            </>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-400 mt-2">
-                          Recent events may not yet have Wikipedia coverage
+                      <div className="text-center py-6">
+                        <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 mb-2">Wikipedia information not available</p>
+                        <p className="text-xs text-gray-400 mb-3">
+                          Recent events like this may not have detailed Wikipedia coverage yet
                         </p>
+                        {selectedEvent && (
+                          <a 
+                            href={`https://en.wikipedia.org/wiki/Special:Search/${encodeURIComponent((selectedEvent as any).stormSummary || selectedEvent.eventType)}`}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm"
+                          >
+                            Search Wikipedia manually <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
                       </div>
                     )}
                   </CardContent>
