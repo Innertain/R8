@@ -331,6 +331,45 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                 
                 // Only proceed if it's disaster-related and not irrelevant
                 if (hasDisasterContent && !hasIrrelevantContent) {
+                  // Additional validation: ensure the Wikipedia result matches the actual event
+                  const eventType = query.toLowerCase();
+                  const resultType = (extract + ' ' + title).toLowerCase();
+                  
+                  // Check if the Wikipedia result type matches the actual event type
+                  let isRelevantMatch = false;
+                  
+                  if (eventType.includes('flood') && (resultType.includes('flood') || resultType.includes('flooding'))) {
+                    isRelevantMatch = true;
+                  } else if (eventType.includes('fire') && (resultType.includes('fire') || resultType.includes('wildfire'))) {
+                    isRelevantMatch = true;
+                  } else if (eventType.includes('ice') && (resultType.includes('ice') || resultType.includes('winter storm'))) {
+                    isRelevantMatch = true;
+                  } else if (eventType.includes('hurricane') && resultType.includes('hurricane')) {
+                    isRelevantMatch = true;
+                  } else if (eventType.includes('tornado') && resultType.includes('tornado')) {
+                    isRelevantMatch = true;
+                  } else if (eventType.includes('storm') && resultType.includes('storm')) {
+                    isRelevantMatch = true;
+                  }
+                  
+                  // Also check if the location/state matches (more flexible)
+                  const eventLocation = query.toLowerCase();
+                  const resultLocation = (extract + ' ' + title).toLowerCase();
+                  let hasLocationMatch = false;
+                  
+                  if (eventLocation.includes('texas') && resultLocation.includes('texas')) {
+                    hasLocationMatch = true;
+                  } else if (eventLocation.includes('california') && resultLocation.includes('california')) {
+                    hasLocationMatch = true;
+                  } else if (eventLocation.includes('oregon') && resultLocation.includes('oregon')) {
+                    hasLocationMatch = true;
+                  } else if (eventLocation.includes('florida') && resultLocation.includes('florida')) {
+                    hasLocationMatch = true;
+                  }
+                  // Add more states as needed, or make this more generic
+                  
+                  // Only proceed if both event type and some location context match
+                  if (isRelevantMatch) {
                   // Get additional detailed information
                   const detailResponse = await fetch(
                     `https://en.wikipedia.org/w/api.php?action=query&format=json&titles=${encodeURIComponent(data.title)}&prop=extracts|images|pageimages&exintro=&explaintext=&piprop=thumbnail|name&pithumbsize=400&origin=*`
@@ -355,6 +394,7 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                     images: additionalData.images || [],
                     infobox: await extractInfoboxData(data.title)
                   };
+                  }
                 }
               }
             }
@@ -401,6 +441,26 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                       );
                       
                       if (hasDisasterContent && !hasIrrelevantContent) {
+                        // Same validation for search results - ensure type match
+                        const eventType = query.toLowerCase();
+                        const resultType = (extract + ' ' + title).toLowerCase();
+                        
+                        let isRelevantMatch = false;
+                        if (eventType.includes('flood') && (resultType.includes('flood') || resultType.includes('flooding'))) {
+                          isRelevantMatch = true;
+                        } else if (eventType.includes('fire') && (resultType.includes('fire') || resultType.includes('wildfire'))) {
+                          isRelevantMatch = true;
+                        } else if (eventType.includes('ice') && (resultType.includes('ice') || resultType.includes('winter storm'))) {
+                          isRelevantMatch = true;
+                        } else if (eventType.includes('hurricane') && resultType.includes('hurricane')) {
+                          isRelevantMatch = true;
+                        } else if (eventType.includes('tornado') && resultType.includes('tornado')) {
+                          isRelevantMatch = true;
+                        } else if (eventType.includes('storm') && resultType.includes('storm')) {
+                          isRelevantMatch = true;
+                        }
+                        
+                        if (isRelevantMatch) {
                         return {
                           title: pageData.title,
                           extract: pageData.extract,
@@ -410,6 +470,7 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                           images: [],
                           infobox: await extractInfoboxData(pageData.title)
                         };
+                        }
                       }
                     }
                   }
