@@ -1,5 +1,5 @@
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   MapPin, 
   Calendar, 
@@ -22,7 +23,9 @@ import {
   Flame,
   Wind,
   Droplets,
-  Info
+  Info,
+  ExternalLink,
+  BookOpen
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
@@ -190,14 +193,96 @@ const stateIconMapping: Record<string, string> = {
 
 const severityColors = ['#22c55e', '#eab308', '#f97316', '#ef4444', '#dc2626'];
 
+// Wikipedia data interface
+interface WikipediaData {
+  title: string;
+  extract: string;
+  thumbnail?: {
+    source: string;
+  };
+  pageUrl: string;
+  damage?: string;
+  casualties?: string;
+  verified: boolean;
+}
+
+// Custom hook for Wikipedia search
+function useWikipediaSearch(query: string, enabled: boolean = false) {
+  return useQuery<WikipediaData | null>({
+    queryKey: ['wikipedia', query],
+    queryFn: async () => {
+      if (!query || !enabled) return null;
+      
+      try {
+        // Search for the disaster on Wikipedia
+        const searchResponse = await fetch(
+          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`
+        );
+        
+        if (!searchResponse.ok) {
+          // Try alternative search terms
+          const altQuery = `${query.split(' ')[0]} disaster ${new Date().getFullYear()}`;
+          const altResponse = await fetch(
+            `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(altQuery)}&limit=1&namespace=0&format=json&origin=*`
+          );
+          
+          if (altResponse.ok) {
+            const altData = await altResponse.json();
+            if (altData[1]?.length > 0) {
+              const pageTitle = altData[1][0];
+              const summaryResponse = await fetch(
+                `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`
+              );
+              const summaryData = await summaryResponse.json();
+              
+              return {
+                title: summaryData.title,
+                extract: summaryData.extract,
+                thumbnail: summaryData.thumbnail,
+                pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
+                verified: true
+              };
+            }
+          }
+          return null;
+        }
+        
+        const data = await searchResponse.json();
+        return {
+          title: data.title,
+          extract: data.extract,
+          thumbnail: data.thumbnail,
+          pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
+          verified: true
+        };
+      } catch (error) {
+        console.error('Wikipedia API error:', error);
+        return null;
+      }
+    },
+    enabled: enabled && !!query,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+  });
+}
+
 export default function ExtremeWeatherEvents() {
   const [selectedEventType, setSelectedEventType] = useState<string>('all');
   const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedEvent, setSelectedEvent] = useState<StormEvent | null>(null);
 
   const { data, isLoading, error } = useQuery<ExtremeWeatherData>({
     queryKey: ['/api/extreme-weather-events'],
     refetchInterval: 2 * 60 * 60 * 1000, // 2 hours
   });
+
+  // Wikipedia search for selected event
+  const wikipediaQuery = selectedEvent ? 
+    `${selectedEvent.eventType} ${selectedEvent.state} ${format(new Date(selectedEvent.beginDate), 'yyyy')}` : '';
+  
+  const { data: wikipediaData, isLoading: wikipediaLoading } = useWikipediaSearch(
+    wikipediaQuery, 
+    !!selectedEvent
+  );
 
   if (isLoading) {
     return (
@@ -588,13 +673,14 @@ export default function ExtremeWeatherEvents() {
                   const EventIcon = eventTypeIcons[event.eventType] || AlertTriangle;
                   
                   return (
-                    <div key={`${event.id}-${index}`} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div key={`${event.id}-${index}`} className="border rounded-lg p-4 hover:bg-gray-50 transition-all cursor-pointer hover:border-blue-300" onClick={() => setSelectedEvent(event)}>
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           <EventIcon className="h-5 w-5 text-blue-600 mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <h4 className="font-medium">{(event as any).stormSummary || (event as any).episodeNarrative || event.eventType}</h4>
+                              <BookOpen className="h-4 w-4 text-blue-600 ml-auto" />
                             </div>
                             {(event as any).episodeNarrative && (event as any).episodeNarrative !== (event as any).stormSummary && (
                               <p className="text-sm text-gray-600 mb-2">{(event as any).episodeNarrative}</p>
@@ -888,6 +974,140 @@ export default function ExtremeWeatherEvents() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Wikipedia Detail Modal */}
+      <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedEvent && eventTypeIcons[selectedEvent.eventType] && 
+                React.createElement(eventTypeIcons[selectedEvent.eventType], { 
+                  className: "h-5 w-5 text-blue-600" 
+                })
+              }
+              {selectedEvent?.eventType} - {selectedEvent?.state}
+              <BookOpen className="h-4 w-4 text-blue-600 ml-2" />
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedEvent && (
+            <div className="space-y-4">
+              {/* Event Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Event Details</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      {stateIconMapping[selectedEvent.state] ? (
+                        <img 
+                          src={stateIconMapping[selectedEvent.state]} 
+                          alt={`${selectedEvent.state} icon`}
+                          className="h-5 w-5 object-contain"
+                        />
+                      ) : (
+                        <MapPin className="h-4 w-4" />
+                      )}
+                      <span><strong>Location:</strong> {selectedEvent.county}, {selectedEvent.state}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      <span><strong>Date:</strong> {format(new Date(selectedEvent.beginDate), 'MMMM d, yyyy')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-red-500" />
+                      <span><strong>Casualties:</strong> {selectedEvent.deaths} deaths, {selectedEvent.injuries} injuries</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      <span><strong>Damage:</strong> {formatCurrency(selectedEvent.damageProperty + selectedEvent.damageCrops)}</span>
+                    </div>
+                    <div className="text-sm">
+                      <p><strong>Property Damage:</strong> {formatCurrency(selectedEvent.damageProperty)}</p>
+                      <p><strong>Crop Damage:</strong> {formatCurrency(selectedEvent.damageCrops)}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Wikipedia Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      Wikipedia Information
+                      <ExternalLink className="h-4 w-4" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {wikipediaLoading ? (
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                      </div>
+                    ) : wikipediaData ? (
+                      <div className="space-y-3">
+                        {wikipediaData.thumbnail && (
+                          <img 
+                            src={wikipediaData.thumbnail.source} 
+                            alt={wikipediaData.title}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                        )}
+                        <h4 className="font-medium">{wikipediaData.title}</h4>
+                        <p className="text-sm text-gray-600 line-clamp-4">{wikipediaData.extract}</p>
+                        <a 
+                          href={wikipediaData.pageUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm"
+                        >
+                          Read more on Wikipedia <ExternalLink className="h-3 w-3" />
+                        </a>
+                        
+                        {/* Data Verification Section */}
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <h5 className="font-medium text-blue-900 mb-2">Data Verification</h5>
+                          <p className="text-xs text-blue-800">
+                            Cross-reference Wikipedia information with our database values to verify accuracy of casualty figures and damage estimates.
+                          </p>
+                          <div className="mt-2 text-xs text-blue-700">
+                            <p><strong>Our Data Sources:</strong> FEMA, NOAA, CDC, State Emergency Management</p>
+                            <p><strong>Wikipedia Sources:</strong> Various news outlets, government reports, academic studies</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4">
+                        <BookOpen className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No Wikipedia information found for this event</p>
+                        <p className="text-xs text-gray-400 mt-1">Try searching manually for more details</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Event Description */}
+              {((selectedEvent as any).episodeNarrative || (selectedEvent as any).stormSummary) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Event Description</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {(selectedEvent as any).episodeNarrative && (
+                      <p className="text-sm text-gray-700 mb-2">{(selectedEvent as any).episodeNarrative}</p>
+                    )}
+                    {(selectedEvent as any).stormSummary && (selectedEvent as any).stormSummary !== (selectedEvent as any).episodeNarrative && (
+                      <p className="text-sm text-gray-600">{(selectedEvent as any).stormSummary}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
