@@ -81,3 +81,4 @@ function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilterIndic
 }
 
 export default GlobalFilterIndicator;
+export { GlobalFilterIndicator };

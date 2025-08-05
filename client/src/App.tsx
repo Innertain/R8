@@ -26,7 +26,7 @@ import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
 import { Footer } from "@/components/Footer";
-import GlobalFilterIndicator from "@/components/GlobalFilterIndicator"; // Assuming this component exists
+import { GlobalFilterIndicator } from "@/components/GlobalFilterIndicator";
 
 
 function Navigation() {
