@@ -73,19 +73,19 @@ function HeroSection() {
           </div>
 
           <div className="space-y-8">
-            {/* Main 3 R's with Bold Effects */}
+            {/* Main 3 R's with Modern Gradient Effects */}
             <div className="text-center">
               <h2 className="text-6xl font-bold text-white leading-tight mb-6">
-                <span className="inline-block transform hover:scale-110 transition-transform duration-300">
-                  <span className="text-7xl font-black text-red-500 drop-shadow-lg animate-pulse">R</span><span className="text-red-100">esponse</span>
+                <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:rotate-2">
+                  <span className="text-7xl font-black gradient-text-response drop-shadow-2xl">R</span><span className="text-white/90 font-semibold">esponse</span>
                 </span>
-                <span className="mx-4 text-white/50">•</span>
-                <span className="inline-block transform hover:scale-110 transition-transform duration-300">
-                  <span className="text-7xl font-black text-blue-500 drop-shadow-lg animate-pulse" style={{animationDelay: '0.5s'}}>R</span><span className="text-blue-100">esilience</span>
+                <span className="mx-6 text-white/30 text-4xl">→</span>
+                <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:-rotate-1">
+                  <span className="text-7xl font-black gradient-text-resilience drop-shadow-2xl">R</span><span className="text-white/90 font-semibold">esilience</span>
                 </span>
-                <span className="mx-4 text-white/50">•</span>
-                <span className="inline-block transform hover:scale-110 transition-transform duration-300">
-                  <span className="text-7xl font-black text-green-500 drop-shadow-lg animate-pulse" style={{animationDelay: '1s'}}>R</span><span className="text-green-100">egeneration</span>
+                <span className="mx-6 text-white/30 text-4xl">→</span>
+                <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:rotate-1">
+                  <span className="text-7xl font-black gradient-text-regeneration drop-shadow-2xl">R</span><span className="text-white/90 font-semibold">egeneration</span>
                 </span>
               </h2>
             </div>
