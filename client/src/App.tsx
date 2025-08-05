@@ -460,7 +460,7 @@ function App() {
         <StateSVGDefs />
         {globalStateFilter && (
           <GlobalFilterIndicator 
-            selectedState={globalStateFilter}
+            stateFilter={globalStateFilter}
             onClearFilter={clearGlobalFilter}
           />
         )}
