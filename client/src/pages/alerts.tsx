@@ -187,8 +187,8 @@ export default function AlertsPage() {
           <>
             <div className="mb-8">
               <p className="text-lg text-gray-600 max-w-4xl">
-                Create custom alert rules to receive notifications when emergency events meet your specified criteria.
-                Set up email, SMS, or webhook notifications for weather alerts, wildfire incidents, earthquakes, and disaster declarations.
+                Send instant custom messages to your entire group via SMS, email, and voice calls. Perfect for schools, churches, businesses, and organizations. 
+                Plus, receive automatic emergency alerts for weather, disasters, and safety events at no additional cost.
               </p>
             </div>
 
