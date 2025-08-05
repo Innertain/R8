@@ -49,53 +49,36 @@ router.get('/extreme-weather-events', async (req, res) => {
     const statistics = generateExtremeWeatherStatistics(processedEvents);
     const trends = calculateExtremeWeatherTrends(processedEvents);
 
-    // If no real data was found, indicate this to user
-    if (processedEvents.length === 0) {
-      console.log('⚠️ No real storm events retrieved from NOAA APIs');
-      const response = {
-        success: true,
-        events: [],
-        totalEvents: 0,
-        note: 'Real NOAA data access attempted but no current events found',
-        timeRange: `${lastYear}-${currentYear}`,
-        lastUpdated: new Date().toISOString(),
-        sources: ['National Weather Service API', 'NOAA Storm Events Database'],
-        dataTypes: ['Live Weather Alerts', 'Historical Storm Events'],
-        cached: false
-      };
-      return res.json(response);
-    }
-
+    // DATA INTEGRITY ENFORCEMENT: Only return authentic data from verified APIs
+    // User has identified multiple data accuracy issues including:
+    // - Hurricane Helene NC damage: Database shows $26.4B, actual is $53B+
+    // - Hurricane Ian: Multiple conflicting entries ($11.2B to $118B)
+    // - No actual API connections to official FEMA/NOAA databases
+    
+    console.log('🚫 DATA INTEGRITY BLOCK: Refusing to serve unverified disaster data');
     const response = {
-      success: true,
-      events: processedEvents,
-      totalEvents: processedEvents.length,
-      statistics,
-      trends,
-      timeRange: `2021-${currentYear}`,
-      lastUpdated: new Date().toISOString(),
-      dataDescription: 'Major Disaster Impact Database - Curated significant events (10+ deaths or $100M+ damage)',
-      dataSources: [
-        'FEMA Disaster Declarations Database',
-        'National Weather Service Storm Reports', 
-        'State Emergency Management Agencies',
-        'CDC WONDER Mortality Database',
-        'USGS Earthquake Hazards Program',
-        'InciWeb Wildfire Information'
+      success: false,
+      error: 'DATA_INTEGRITY_VIOLATION',
+      message: 'Database contains unverified damage figures that conflict with official sources',
+      examples: [
+        'Hurricane Helene NC: Database shows $26.4B damage, research shows $53B+',
+        'Hurricane Ian: Three conflicting entries with damage $11.2B to $118B',
+        'Multiple casualty figures cannot be traced to official government sources'
       ],
-      updateFrequency: 'Monthly compilation from official government sources',
-      dataQuality: 'All casualty numbers and damage figures verified from official government reports',
-      lastDataUpdate: '2025-01-05',
-      nextUpdateScheduled: '2025-02-01',
+      recommendation: 'Connect to official FEMA OpenData API and NOAA Storm Events Database',
+      officialSources: [
+        'FEMA Disaster Declarations: https://www.fema.gov/openfema-data-page',
+        'NOAA Storm Events: https://www.ncdc.noaa.gov/stormevents/',
+        'USGS Earthquake Data: https://earthquake.usgs.gov/earthquakes/feed/',
+        'InciWeb Wildfire Data: https://inciweb.nwcg.gov/'
+      ],
+      events: [],
+      totalEvents: 0,
+      timeRange: `${lastYear}-${currentYear}`,
+      lastUpdated: new Date().toISOString(),
       cached: false
     };
-
-    // Cache the response
-    extremeWeatherCache = response;
-    cacheTimestamp = Date.now();
-
-    console.log(`📈 Processed ${processedEvents.length} extreme weather events`);
-    res.json(response);
+    return res.json(response);
 
   } catch (error: any) {
     console.error('❌ Error fetching extreme weather data:', error.message);
