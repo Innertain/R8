@@ -32,13 +32,22 @@ interface NoaaReport {
   temperatureAnomaly?: {
     value: number;
     unit: string;
+    confidence?: string;
   } | null;
   precipitationData?: {
     value: number;
     unit: string;
+    confidence?: string;
   } | null;
-  percentageData?: number | null;
+  percentageData?: {
+    value: number;
+    context: string;
+    confidence: string;
+  } | number | null;
   reportType: string;
+  severityLevel?: string;
+  geographicScope?: string;
+  feedSource?: string;
 }
 
 interface NoaaClimateData {
@@ -1011,7 +1020,9 @@ export default function NoaaClimateReports() {
                             )}
                             {report.percentageData && (
                               <span className="text-yellow-600">
-                                {report.percentageData}%
+                                {typeof report.percentageData === 'object' 
+                                  ? `${report.percentageData.value}% ${report.percentageData.context}`
+                                  : `${report.percentageData}%`}
                               </span>
                             )}
                           </div>
