@@ -136,15 +136,25 @@ export default function ExtremeWeatherEvents() {
 
   console.log('ExtremeWeatherEvents data:', { success: data?.success, totalEvents, eventsLength: events?.length });
 
+  // Define getSeverityLevel function
+  const getSeverityLevel = (event: any) => {
+    const totalCasualties = event.deaths + event.injuries;
+    if (totalCasualties >= 100) return 'Critical';
+    if (totalCasualties >= 20) return 'High';
+    if (totalCasualties >= 5) return 'Moderate';
+    return 'Low';
+  };
+
   // Filter events based on selected criteria
   const filteredEvents = events.filter(event => {
-    const matchesEventType = selectedEventType === 'all' || event.eventType === selectedEventType;
-    const matchesState = selectedState === 'all' || event.state === selectedState;
-    const matchesSeverity = selectedSeverity === 'all' || getSeverityLevel(event) === selectedSeverity;
+    const matchesEventType = selectedEventType === 'all' || selectedEventType === 'Event Type' || event.eventType === selectedEventType;
+    const matchesState = selectedState === 'all' || selectedState === 'All States' || event.state === selectedState;
+    const matchesSeverity = selectedSeverity === 'all' || selectedSeverity === 'All Severities' || getSeverityLevel(event) === selectedSeverity;
     const matchesSearch = searchTerm === '' || 
       event.eventType.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.county.toLowerCase().includes(searchTerm.toLowerCase());
+      event.county.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.stormSummary?.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesEventType && matchesState && matchesSeverity && matchesSearch;
   });
@@ -221,15 +231,7 @@ export default function ExtremeWeatherEvents() {
     return `$${value.toFixed(0)}`;
   };
 
-  const getSeverityLevel = (event: StormEvent) => {
-    const casualties = event.deaths + event.injuries;
-    const damage = event.damageProperty + event.damageCrops;
-    
-    if (casualties >= 10 || damage >= 100000000) return 'Critical';
-    if (casualties >= 5 || damage >= 50000000) return 'High';
-    if (casualties >= 1 || damage >= 10000000) return 'Moderate';
-    return 'Low';
-  };
+
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -388,10 +390,6 @@ export default function ExtremeWeatherEvents() {
         <TabsContent value="events" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Extreme Weather Events</CardTitle>
-              <CardDescription>
-                Comprehensive list of {filteredEvents.length} events from {timeRange}
-              </CardDescription>
               <CardTitle>Weather Events</CardTitle>
               <CardDescription>
                 Comprehensive list of {filteredEvents.length} events from {timeRange}
@@ -413,7 +411,7 @@ export default function ExtremeWeatherEvents() {
 
                 <Select value={selectedState} onValueChange={setSelectedState}>
                   <SelectTrigger>
-                    <SelectValue placeholder="State" />
+                    <SelectValue placeholder="All States" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All States</SelectItem>
@@ -425,7 +423,7 @@ export default function ExtremeWeatherEvents() {
 
                 <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Severity" />
+                    <SelectValue placeholder="All Severities" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Severities</SelectItem>
