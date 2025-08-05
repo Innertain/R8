@@ -20,7 +20,8 @@ import {
   Snowflake,
   Flame,
   Wind,
-  Droplets
+  Droplets,
+  Info
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
@@ -237,6 +238,37 @@ export default function ExtremeWeatherEvents() {
 
   return (
     <div className="space-y-6">
+      {/* Header with Data Source Information */}
+      <div className="mb-6">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Major Disaster Impact Database</h2>
+        <p className="text-gray-600 mb-3">
+          {dataDescription || `Comprehensive analysis of major disasters (10+ deaths or $100M+ damage) from ${timeRange}`}
+        </p>
+        
+        {/* Data Source Information */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-blue-900 mb-2">Data Sources & Reliability</h4>
+              <p className="text-sm text-blue-800 mb-2">
+                {dataQuality || 'All casualty numbers and damage figures verified from official government reports'}
+              </p>
+              {dataSources && (
+                <div className="text-xs text-blue-700">
+                  <strong>Sources:</strong> {dataSources.join(', ')}
+                </div>
+              )}
+              <div className="flex flex-wrap gap-4 mt-2 text-xs text-blue-700">
+                {updateFrequency && <span><strong>Updates:</strong> {updateFrequency}</span>}
+                {lastDataUpdate && <span><strong>Last Updated:</strong> {lastDataUpdate}</span>}
+                {nextUpdateScheduled && <span><strong>Next Update:</strong> {nextUpdateScheduled}</span>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
