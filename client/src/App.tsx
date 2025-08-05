@@ -26,6 +26,7 @@ import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
 import { Footer } from "@/components/Footer";
+import GlobalFilterIndicator from "@/components/GlobalFilterIndicator"; // Assuming this component exists
 
 
 function Navigation() {
@@ -420,39 +421,53 @@ function Navigation() {
 
 function Router() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stormy-dark via-stormy-primary/30 to-stormy-dark/80 flex flex-col">
-      <Navigation />
-      <div className="flex-1">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/volunteer" component={VolunteerPortal} />
-          <Route path="/map" component={InteractiveMap} />
-          <Route path="/stats" component={StatsDashboard} />
-          <Route path="/alerts" component={AlertsPage} />
-          <Route path="/air-quality" component={AirQualityPage} />
-          <Route path="/bioregions" component={BioregionExplorerPage} />
-          <Route path="/hawaii" component={HawaiiRegenerationPage} />
-          <Route path="/appalachian" component={AppalachianRegenerationPage} />
-          <Route path="/privacy-policy" component={PrivacyPolicyPage} />
-          <Route path="/terms-of-service" component={TermsOfServicePage} />
+    <div className="flex-1">
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/volunteer" component={VolunteerPortal} />
+        <Route path="/map" component={InteractiveMap} />
+        <Route path="/stats" component={StatsDashboard} />
+        <Route path="/alerts" component={AlertsPage} />
+        <Route path="/air-quality" component={AirQualityPage} />
+        <Route path="/bioregions" component={BioregionExplorerPage} />
+        <Route path="/hawaii" component={HawaiiRegenerationPage} />
+        <Route path="/appalachian" component={AppalachianRegenerationPage} />
+        <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+        <Route path="/terms-of-service" component={TermsOfServicePage} />
 
-          <Route component={NotFound} />
-        </Switch>
-      </div>
-      <Footer />
+        <Route component={NotFound} />
+      </Switch>
     </div>
   );
 }
 
 function App() {
+  const [globalStateFilter, setGlobalStateFilter] = useState<string | null>(null);
+
+  const clearGlobalFilter = () => {
+    setGlobalStateFilter(null);
+    // Clear any URL parameters or other filter state
+    if (window.location.search.includes('state=')) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('state');
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
         <StateSVGDefs />
+        {globalStateFilter && (
+          <GlobalFilterIndicator 
+            selectedState={globalStateFilter}
+            onClearFilter={clearGlobalFilter}
+          />
+        )}
         <Router />
+        <Toaster />
       </TooltipProvider>
-    </QueryClientProvider>
+    </QueryClientProvider>  
   );
 }
 

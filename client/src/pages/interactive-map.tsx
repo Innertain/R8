@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InteractiveUSMap from "@/components/InteractiveUSMap";
 import FemaRssFeed from "@/components/FemaRssFeed";
+import InteractiveLeafletMap from "@/components/InteractiveLeafletMap"; // Ensure this import is correct
 
 // Real disaster and activity data with geographical coordinates
 const mockDisasters = [
@@ -29,23 +30,44 @@ export default function InteractiveMap() {
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [selectedCounty, setSelectedCounty] = useState<string | null>(null);
   const [showCounties, setShowCounties] = useState(false);
+  const [mapView, setMapView] = useState<MapViewType>("states"); // Default to states
+  const [showDisasters, setShowDisasters] = useState(true); // Default to showing disasters
+  const [showActivities, setShowActivities] = useState(true); // Default to showing activities
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null); // State for selected region
+  const [showGlobalFilter, setShowGlobalFilter] = useState(false); // State for global filter visibility
 
   const handleStateClick = (stateCode: string, stateName: string) => {
     setSelectedState(stateCode);
     setShowCounties(true);
     setSelectedCounty(null);
     console.log(`Selected state: ${stateName} (${stateCode})`);
+    setShowGlobalFilter(true); // Show global filter indicator when a state is selected
   };
 
   const handleCountyClick = (countyName: string, stateCode: string) => {
     setSelectedCounty(countyName);
     console.log(`Selected county: ${countyName} in ${stateCode}`);
+    setShowGlobalFilter(true); // Show global filter indicator when a county is selected
   };
 
   const handleBackToStates = () => {
     setSelectedState(null);
     setShowCounties(false);
     setSelectedCounty(null);
+    setShowGlobalFilter(false); // Hide global filter indicator when going back to states
+  };
+
+  const clearGlobalFilter = () => {
+    setSelectedState(null);
+    setShowGlobalFilter(false);
+    // Clear any URL state or other persisted filter state
+    if (window.location.search.includes('state=')) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('state');
+      window.history.replaceState({}, '', url.toString());
+    }
+    // Force refresh of all filtered components
+    window.dispatchEvent(new CustomEvent('globalFilterCleared'));
   };
 
   const getSeverityColor = (severity: string) => {
@@ -67,7 +89,7 @@ export default function InteractiveMap() {
               <MapPin className="h-8 w-8 text-blue-500 mr-3" />
               <h1 className="text-xl font-semibold text-gray-900">Community Response Map</h1>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <Select value={mapView} onValueChange={(value: MapViewType) => setMapView(value)}>
                 <SelectTrigger className="w-48">
@@ -81,7 +103,7 @@ export default function InteractiveMap() {
                   <SelectItem value="fema">FEMA Regions</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <div className="flex items-center space-x-2">
                 <Button
                   variant={showDisasters ? "default" : "outline"}
@@ -104,6 +126,19 @@ export default function InteractiveMap() {
               </div>
             </div>
           </div>
+          {showGlobalFilter && selectedState && (
+            <div className="flex justify-center py-2">
+              <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-md shadow-md flex items-center justify-between w-full max-w-lg">
+                <span>
+                  <Filter className="w-5 h-5 inline-block mr-2" />
+                  Currently filtered by: {selectedState} {selectedCounty && ` > ${selectedCounty}`}
+                </span>
+                <Button variant="ghost" size="sm" onClick={clearGlobalFilter}>
+                  Show All Data <ArrowLeft className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -125,17 +160,28 @@ export default function InteractiveMap() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-full p-0">
-                <InteractiveLeafletMap 
+                <InteractiveLeafletMap
                   mapView={mapView}
                   onRegionClick={(regionId, regionName) => setSelectedRegion(regionName)}
                   showDisasters={showDisasters}
                   showActivities={showActivities}
+                  selectedState={selectedState} // Pass selectedState to the map component
+                  selectedCounty={selectedCounty} // Pass selectedCounty to the map component
+                  onStateClick={handleStateClick} // Pass the handler
+                  onCountyClick={handleCountyClick} // Pass the handler
                 />
                 {selectedRegion && (
                   <div className="absolute top-2 left-2 z-10">
                     <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
                       Selected: {selectedRegion}
                     </Badge>
+                  </div>
+                )}
+                {selectedState && !showCounties && (
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <Button variant="outline" size="sm" onClick={handleBackToStates}>
+                      Back to States <ArrowLeft className="w-4 h-4 ml-1" />
+                    </Button>
                   </div>
                 )}
               </CardContent>
@@ -170,7 +216,7 @@ export default function InteractiveMap() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm">Activity Types</h4>
                   <div className="space-y-1">
@@ -188,7 +234,7 @@ export default function InteractiveMap() {
                     </div>
                   </div>
                 </div>
-                
+
                 {mapView === "bioregions" && (
                   <div className="space-y-2">
                     <h4 className="font-medium text-sm">Bioregions</h4>
@@ -245,7 +291,7 @@ export default function InteractiveMap() {
                     <TabsTrigger value="disasters">Disasters</TabsTrigger>
                     <TabsTrigger value="activities">Activities</TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="disasters" className="space-y-3 mt-4">
                     {mockDisasters.map((disaster) => (
                       <div key={disaster.id} className="p-3 border rounded-lg space-y-1">
@@ -261,7 +307,7 @@ export default function InteractiveMap() {
                       </div>
                     ))}
                   </TabsContent>
-                  
+
                   <TabsContent value="activities" className="space-y-3 mt-4">
                     {mockCommunityActivities.map((activity) => (
                       <div key={activity.id} className="p-3 border rounded-lg space-y-1">
@@ -302,7 +348,7 @@ export default function InteractiveMap() {
             </Card>
           </div>
         </div>
-        
+
         {/* Emergency Alerts Section */}
         <div className="mt-8 max-w-4xl">
           <FemaRssFeed maxItems={4} />

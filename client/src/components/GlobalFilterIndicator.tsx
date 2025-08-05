@@ -59,6 +59,7 @@ export function GlobalFilterIndicator({ stateFilter, onClearFilter }: GlobalFilt
           <Button
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               onClearFilter();
             }}
             variant="outline"
