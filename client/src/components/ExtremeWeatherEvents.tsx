@@ -368,18 +368,36 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                   } else if (eventType.includes('ice') && (resultType.includes('ice') || resultType.includes('winter storm'))) {
                     isRelevantMatch = true;
                   } else if (eventType.includes('hurricane') && resultType.includes('hurricane')) {
-                    // For hurricanes, also check if the specific hurricane name matches
-                    if (eventType.includes('milton') && resultType.includes('milton')) {
-                      isRelevantMatch = true;
-                    } else if (eventType.includes('helene') && resultType.includes('helene')) {
-                      isRelevantMatch = true;
-                    } else if (eventType.includes('ian') && resultType.includes('ian')) {
-                      isRelevantMatch = true;
-                    } else if (eventType.includes('ida') && resultType.includes('ida')) {
-                      isRelevantMatch = true;
-                    } else if (resultType.includes('hurricane') && resultType.includes(state.toLowerCase())) {
-                      // Generic hurricane match for the same state/year
-                      isRelevantMatch = true;
+                    // For hurricanes, require EXACT name matching to prevent cross-matching
+                    // Extract hurricane name from the query
+                    let hurricaneName = '';
+                    if (eventType.includes('milton')) hurricaneName = 'milton';
+                    else if (eventType.includes('helene')) hurricaneName = 'helene';
+                    else if (eventType.includes('ian')) hurricaneName = 'ian';
+                    else if (eventType.includes('ida')) hurricaneName = 'ida';
+                    else if (eventType.includes('michael')) hurricaneName = 'michael';
+                    else if (eventType.includes('florence')) hurricaneName = 'florence';
+                    else if (eventType.includes('dorian')) hurricaneName = 'dorian';
+                    
+                    // Only match if the exact hurricane name is found AND it's not a different hurricane
+                    if (hurricaneName && resultType.includes(hurricaneName)) {
+                      // Additional checks to prevent cross-matching
+                      if (hurricaneName === 'helene' && resultType.includes('irene')) {
+                        isRelevantMatch = false; // Prevent Helene from matching Irene
+                      } else {
+                        // Also check year to prevent matching hurricanes from different years
+                        const queryYear = query.match(/20\d{2}/);
+                        if (queryYear) {
+                          const year = queryYear[0];
+                          if (resultType.includes(year) || !resultType.match(/20\d{2}/)) {
+                            isRelevantMatch = true;
+                          } else {
+                            isRelevantMatch = false; // Different year
+                          }
+                        } else {
+                          isRelevantMatch = true;
+                        }
+                      }
                     }
                   } else if (eventType.includes('tornado') && resultType.includes('tornado')) {
                     isRelevantMatch = true;
@@ -488,18 +506,35 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                         } else if (eventType.includes('ice') && (resultType.includes('ice') || resultType.includes('winter storm'))) {
                           isRelevantMatch = true;
                         } else if (eventType.includes('hurricane') && resultType.includes('hurricane')) {
-                          // For hurricanes, also check if the specific hurricane name matches
-                          if (eventType.includes('milton') && resultType.includes('milton')) {
-                            isRelevantMatch = true;
-                          } else if (eventType.includes('helene') && resultType.includes('helene')) {
-                            isRelevantMatch = true;
-                          } else if (eventType.includes('ian') && resultType.includes('ian')) {
-                            isRelevantMatch = true;
-                          } else if (eventType.includes('ida') && resultType.includes('ida')) {
-                            isRelevantMatch = true;
-                          } else if (resultType.includes('hurricane')) {
-                            // Generic hurricane match
-                            isRelevantMatch = true;
+                          // For hurricanes, require EXACT name matching to prevent cross-matching
+                          let hurricaneName = '';
+                          if (eventType.includes('milton')) hurricaneName = 'milton';
+                          else if (eventType.includes('helene')) hurricaneName = 'helene';
+                          else if (eventType.includes('ian')) hurricaneName = 'ian';
+                          else if (eventType.includes('ida')) hurricaneName = 'ida';
+                          else if (eventType.includes('michael')) hurricaneName = 'michael';
+                          else if (eventType.includes('florence')) hurricaneName = 'florence';
+                          else if (eventType.includes('dorian')) hurricaneName = 'dorian';
+                          
+                          // Only match if the exact hurricane name is found
+                          if (hurricaneName && resultType.includes(hurricaneName)) {
+                            // Additional checks to prevent cross-matching
+                            if (hurricaneName === 'helene' && resultType.includes('irene')) {
+                              isRelevantMatch = false; // Prevent Helene from matching Irene
+                            } else {
+                              // Also check year to prevent matching hurricanes from different years
+                              const queryYear = query.match(/20\d{2}/);
+                              if (queryYear) {
+                                const year = queryYear[0];
+                                if (resultType.includes(year) || !resultType.match(/20\d{2}/)) {
+                                  isRelevantMatch = true;
+                                } else {
+                                  isRelevantMatch = false; // Different year
+                                }
+                              } else {
+                                isRelevantMatch = true;
+                              }
+                            }
                           }
                         } else if (eventType.includes('tornado') && resultType.includes('tornado')) {
                           isRelevantMatch = true;
