@@ -25,7 +25,8 @@ import {
   Droplets,
   Info,
   ExternalLink,
-  BookOpen
+  BookOpen,
+  Database
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
@@ -193,6 +194,56 @@ const stateIconMapping: Record<string, string> = {
 
 const severityColors = ['#22c55e', '#eab308', '#f97316', '#ef4444', '#dc2626'];
 
+// Function to extract infobox data from Wikipedia
+async function extractInfoboxData(title: string): Promise<any> {
+  try {
+    const response = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&format=json&titles=${encodeURIComponent(title)}&prop=revisions&rvprop=content&rvsection=0&origin=*`
+    );
+    
+    if (!response.ok) return {};
+    
+    const data = await response.json();
+    const pages = data.query?.pages;
+    if (!pages) return {};
+    
+    const pageData = Object.values(pages)[0] as any;
+    const content = pageData.revisions?.[0]?.['*'];
+    if (!content) return {};
+    
+    // Extract infobox data using regex patterns
+    const infobox: any = {};
+    
+    // Common infobox patterns for disasters
+    const patterns = {
+      date: /\|[\s]*date[\s]*=[\s]*([^|\n]+)/i,
+      location: /\|[\s]*location[\s]*=[\s]*([^|\n]+)/i,
+      coordinates: /\|[\s]*coordinates[\s]*=[\s]*([^|\n]+)/i,
+      deaths: /\|[\s]*deaths[\s]*=[\s]*([^|\n]+)/i,
+      injuries: /\|[\s]*(?:injuries|injured)[\s]*=[\s]*([^|\n]+)/i,
+      missing: /\|[\s]*missing[\s]*=[\s]*([^|\n]+)/i,
+      evacuated: /\|[\s]*evacuated[\s]*=[\s]*([^|\n]+)/i,
+      damage: /\|[\s]*damage[\s]*=[\s]*([^|\n]+)/i,
+      burnedArea: /\|[\s]*(?:burned|area)[\s]*=[\s]*([^|\n]+)/i,
+      structuresDestroyed: /\|[\s]*(?:structures|buildings)[\s]*=[\s]*([^|\n]+)/i,
+      cause: /\|[\s]*cause[\s]*=[\s]*([^|\n]+)/i,
+      status: /\|[\s]*status[\s]*=[\s]*([^|\n]+)/i
+    };
+    
+    for (const [key, pattern] of Object.entries(patterns)) {
+      const match = content.match(pattern);
+      if (match) {
+        infobox[key] = match[1].trim().replace(/\[\[([^\]]+)\]\]/g, '$1').replace(/\{\{[^}]+\}\}/g, '');
+      }
+    }
+    
+    return infobox;
+  } catch (error) {
+    console.error('Error extracting infobox data:', error);
+    return {};
+  }
+}
+
 // Wikipedia data interface
 interface WikipediaData {
   title: string;
@@ -204,6 +255,21 @@ interface WikipediaData {
   damage?: string;
   casualties?: string;
   verified: boolean;
+  images?: string[];
+  infobox?: {
+    date?: string;
+    location?: string;
+    coordinates?: string;
+    status?: string;
+    burnedArea?: string;
+    deaths?: string;
+    injuries?: string;
+    missing?: string;
+    evacuated?: string;
+    structuresDestroyed?: string;
+    damage?: string;
+    cause?: string;
+  };
 }
 
 // Custom hook for Wikipedia search
@@ -234,12 +300,29 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
             if (summaryResponse.ok) {
               const data = await summaryResponse.json();
               if (data.extract && data.extract.length > 50) { // Ensure substantial content
+                // Get additional detailed information
+                const detailResponse = await fetch(
+                  `https://en.wikipedia.org/w/api.php?action=query&format=json&titles=${encodeURIComponent(data.title)}&prop=extracts|images|pageimages&exintro=&explaintext=&piprop=thumbnail|name&pithumbsize=400&origin=*`
+                );
+                
+                let additionalData: any = {};
+                if (detailResponse.ok) {
+                  const details = await detailResponse.json();
+                  const pages = details.query?.pages;
+                  if (pages) {
+                    const pageData = Object.values(pages)[0] as any;
+                    additionalData.images = pageData.images?.map((img: any) => img.title).slice(0, 5) || [];
+                  }
+                }
+
                 return {
                   title: data.title,
                   extract: data.extract,
                   thumbnail: data.thumbnail,
                   pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
-                  verified: true
+                  verified: true,
+                  images: additionalData.images || [],
+                  infobox: await extractInfoboxData(data.title)
                 };
               }
             }
@@ -266,7 +349,9 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                         extract: pageData.extract,
                         thumbnail: pageData.thumbnail,
                         pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
-                        verified: true
+                        verified: true,
+                        images: [],
+                        infobox: await extractInfoboxData(pageData.title)
                       };
                     }
                   }
@@ -1090,7 +1175,74 @@ export default function ExtremeWeatherEvents() {
                           />
                         )}
                         <h4 className="font-medium">{wikipediaData.title}</h4>
-                        <p className="text-sm text-gray-600 line-clamp-4">{wikipediaData.extract}</p>
+                        <p className="text-sm text-gray-600 line-clamp-3">{wikipediaData.extract}</p>
+                        
+                        {/* Wikipedia Infobox Data */}
+                        {wikipediaData.infobox && Object.keys(wikipediaData.infobox).length > 0 && (
+                          <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                            <h5 className="font-medium text-orange-900 mb-2 flex items-center gap-1">
+                              <Database className="h-4 w-4" />
+                              Wikipedia Statistics
+                            </h5>
+                            <div className="grid grid-cols-1 gap-2 text-xs">
+                              {wikipediaData.infobox.status && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Status:</span>
+                                  <span className="font-medium">{wikipediaData.infobox.status}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.burnedArea && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Burned Area:</span>
+                                  <span className="font-medium">{wikipediaData.infobox.burnedArea}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.deaths && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Deaths:</span>
+                                  <span className="font-medium text-red-600">{wikipediaData.infobox.deaths}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.injuries && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Injuries:</span>
+                                  <span className="font-medium text-orange-600">{wikipediaData.infobox.injuries}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.missing && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Missing:</span>
+                                  <span className="font-medium text-yellow-600">{wikipediaData.infobox.missing}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.evacuated && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Evacuated:</span>
+                                  <span className="font-medium">{wikipediaData.infobox.evacuated}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.structuresDestroyed && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Structures:</span>
+                                  <span className="font-medium">{wikipediaData.infobox.structuresDestroyed}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.damage && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Damage:</span>
+                                  <span className="font-medium text-green-600">{wikipediaData.infobox.damage}</span>
+                                </div>
+                              )}
+                              {wikipediaData.infobox.cause && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Cause:</span>
+                                  <span className="font-medium">{wikipediaData.infobox.cause}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         <a 
                           href={wikipediaData.pageUrl} 
                           target="_blank" 
@@ -1110,19 +1262,43 @@ export default function ExtremeWeatherEvents() {
                           {selectedEvent && (
                             <div className="text-xs text-blue-700 space-y-1">
                               <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                  <p><strong>Our Database:</strong></p>
+                                <div className="p-2 border border-blue-300 rounded">
+                                  <p><strong>Our Database (Official):</strong></p>
                                   <p>Deaths: {selectedEvent.deaths}</p>
                                   <p>Injuries: {selectedEvent.injuries}</p>
                                   <p>Damage: {formatCurrency(selectedEvent.damageProperty + selectedEvent.damageCrops)}</p>
                                 </div>
-                                <div>
-                                  <p><strong>Wikipedia:</strong></p>
-                                  <p className="text-gray-500">Compare with article data</p>
-                                  <p className="text-gray-500">Verify damage estimates</p>
-                                  <p className="text-gray-500">Cross-check casualties</p>
+                                <div className="p-2 border border-orange-300 rounded">
+                                  <p><strong>Wikipedia (Crowd-sourced):</strong></p>
+                                  {wikipediaData?.infobox?.deaths ? (
+                                    <p>Deaths: {wikipediaData.infobox.deaths}</p>
+                                  ) : (
+                                    <p className="text-gray-500">Deaths: Not specified</p>
+                                  )}
+                                  {wikipediaData?.infobox?.injuries ? (
+                                    <p>Injuries: {wikipediaData.infobox.injuries}</p>
+                                  ) : (
+                                    <p className="text-gray-500">Injuries: Not specified</p>
+                                  )}
+                                  {wikipediaData?.infobox?.damage ? (
+                                    <p>Damage: {wikipediaData.infobox.damage}</p>
+                                  ) : (
+                                    <p className="text-gray-500">Damage: Not specified</p>
+                                  )}
                                 </div>
                               </div>
+                              
+                              {/* Comparison Analysis */}
+                              {wikipediaData?.infobox && (
+                                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                                  <p className="font-medium text-yellow-800">Quick Comparison:</p>
+                                  {wikipediaData.infobox.deaths && (
+                                    <p className={`${selectedEvent.deaths.toString() === wikipediaData.infobox.deaths.replace(/[^0-9]/g, '') ? 'text-green-700' : 'text-red-700'}`}>
+                                      Deaths: {selectedEvent.deaths === parseInt(wikipediaData.infobox.deaths.replace(/[^0-9]/g, '') || '0') ? '✓ Match' : '⚠ Discrepancy'}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           )}
                           
