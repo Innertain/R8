@@ -74,13 +74,11 @@ function HeroSection() {
           
           <div className="space-y-6">
             <h2 className="text-5xl font-bold text-white leading-tight">
-              Emergency Response • Resilient Communities
-              <br />
-              <span className="text-green-300">Resilience and Regenerative Solutions</span>
+              <span className="text-red-400">R</span>esponse • <span className="text-blue-400">R</span>esilience • <span className="text-green-400">R</span>egeneration
             </h2>
             
             <p className="text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-              The comprehensive platform connecting communities for disaster relief, ecological restoration, and regenerative development across bioregions worldwide.
+              Three R's for community transformation: Emergency <span className="text-red-400 font-semibold">Response</span>, Community <span className="text-blue-400 font-semibold">Resilience</span>, and Ecological <span className="text-green-400 font-semibold">Regeneration</span>.
             </p>
             
             <div className="flex flex-wrap justify-center gap-4 pt-8">
@@ -456,7 +454,7 @@ function Footer() {
             <span className="text-2xl font-bold text-white">R8</span>
           </div>
           <p className="text-white/80 text-lg mb-6">
-            Emergency Response • Resilient Communities • Regenerative Solutions
+            <span className="text-red-400 font-semibold">Response</span> • <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-green-400 font-semibold">Regeneration</span>
           </p>
           <div className="flex justify-center gap-8 text-sm text-white/60">
             <Link href="/volunteer" className="hover:text-white transition-colors">Get Involved</Link>
