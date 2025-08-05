@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { 
   MapPin, 
   Calendar, 
@@ -80,6 +83,11 @@ const eventTypeIcons: Record<string, any> = {
 const severityColors = ['#22c55e', '#eab308', '#f97316', '#ef4444', '#dc2626'];
 
 export default function ExtremeWeatherEvents() {
+  const [selectedEventType, setSelectedEventType] = useState<string>('all');
+  const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedSeverity, setSelectedSeverity] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
   const { data, isLoading, error } = useQuery<ExtremeWeatherData>({
     queryKey: ['/api/extreme-weather-events'],
     refetchInterval: 2 * 60 * 60 * 1000, // 2 hours
@@ -127,6 +135,45 @@ export default function ExtremeWeatherEvents() {
   const { events, statistics, trends, totalEvents, timeRange } = data;
 
   console.log('ExtremeWeatherEvents data:', { success: data?.success, totalEvents, eventsLength: events?.length });
+
+  // Filter events based on selected criteria
+  const filteredEvents = events.filter(event => {
+    const matchesEventType = selectedEventType === 'all' || event.eventType === selectedEventType;
+    const matchesState = selectedState === 'all' || event.state === selectedState;
+    const matchesSeverity = selectedSeverity === 'all' || getSeverityLevel(event) === selectedSeverity;
+    const matchesSearch = searchTerm === '' || 
+      event.eventType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.county.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesEventType && matchesState && matchesSeverity && matchesSearch;
+  });
+
+  // Get unique values for filter options
+  const uniqueEventTypes = [...new Set(events.map(e => e.eventType))].sort();
+  const uniqueStates = [...new Set(events.map(e => e.state))].sort();
+  const uniqueSeverities = ['Low', 'Moderate', 'High', 'Critical'];
+
+  // Calculate most affected states
+  const stateImpacts = events.reduce((acc, event) => {
+    if (!acc[event.state]) {
+      acc[event.state] = { 
+        events: 0, 
+        deaths: 0, 
+        injuries: 0, 
+        damage: 0 
+      };
+    }
+    acc[event.state].events += 1;
+    acc[event.state].deaths += event.deaths;
+    acc[event.state].injuries += event.injuries;
+    acc[event.state].damage += event.damageProperty + event.damageCrops;
+    return acc;
+  }, {} as Record<string, { events: number; deaths: number; injuries: number; damage: number }>);
+
+  const topAffectedStates = Object.entries(stateImpacts)
+    .sort((a, b) => (b[1].deaths + b[1].injuries) - (a[1].deaths + a[1].injuries))
+    .slice(0, 10);
 
   // Handle empty data case
   if (!events || events.length === 0) {
@@ -343,12 +390,61 @@ export default function ExtremeWeatherEvents() {
             <CardHeader>
               <CardTitle>Recent Extreme Weather Events</CardTitle>
               <CardDescription>
-                Comprehensive list of {totalEvents} events from {timeRange}
+                Comprehensive list of {filteredEvents.length} events from {timeRange}
               </CardDescription>
+              <CardTitle>Weather Events</CardTitle>
+              <CardDescription>
+                Comprehensive list of {filteredEvents.length} events from {timeRange}
+              </CardDescription>
+              
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                <Select value={selectedEventType} onValueChange={setSelectedEventType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Event Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Event Types</SelectItem>
+                    {uniqueEventTypes.map(type => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedState} onValueChange={setSelectedState}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="State" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All States</SelectItem>
+                    {uniqueStates.map(state => (
+                      <SelectItem key={state} value={state}>{state}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Severity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Severities</SelectItem>
+                    {uniqueSeverities.map(severity => (
+                      <SelectItem key={severity} value={severity}>{severity}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Input
+                  placeholder="Search events..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {events.slice(0, 20).map((event) => {
+                {filteredEvents.slice(0, 20).map((event) => {
                   const EventIcon = eventTypeIcons[event.eventType] || AlertTriangle;
                   const severity = getSeverityLevel(event);
                   
@@ -397,9 +493,14 @@ export default function ExtremeWeatherEvents() {
                   );
                 })}
               </div>
-              {events.length > 20 && (
+              {filteredEvents.length > 20 && (
                 <div className="text-center mt-4 text-sm text-gray-500">
-                  Showing 20 of {totalEvents} events
+                  Showing 20 of {filteredEvents.length} filtered events
+                </div>
+              )}
+              {filteredEvents.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No events match your current filters
                 </div>
               )}
             </CardContent>
@@ -474,6 +575,40 @@ export default function ExtremeWeatherEvents() {
         </TabsContent>
 
         <TabsContent value="trends" className="space-y-6">
+          {/* Most Affected States */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Most Affected States</CardTitle>
+              <CardDescription>States ranked by total casualties (deaths + injuries)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {topAffectedStates.map(([state, data], index) => {
+                  const totalCasualties = data.deaths + data.injuries;
+                  const maxCasualties = Math.max(...topAffectedStates.map(([, d]) => d.deaths + d.injuries));
+                  const percentage = Math.round((totalCasualties / maxCasualties) * 100);
+                  
+                  return (
+                    <div key={state} className="flex items-center gap-3">
+                      <div className="w-6 text-sm text-gray-500">#{index + 1}</div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-medium">{state}</span>
+                          <div className="text-sm text-gray-600 flex gap-4">
+                            <span className="text-red-600">{data.deaths} deaths</span>
+                            <span className="text-orange-600">{data.injuries} injuries</span>
+                            <span className="text-blue-600">{data.events} events</span>
+                            <span className="text-green-600">{formatCurrency(data.damage)}</span>
+                          </div>
+                        </div>
+                        <Progress value={percentage} className="h-2" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <CardTitle>Event Type Rankings</CardTitle>
