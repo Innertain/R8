@@ -214,47 +214,72 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
       if (!query || !enabled) return null;
       
       try {
-        // Search for the disaster on Wikipedia
-        const searchResponse = await fetch(
-          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`
-        );
-        
-        if (!searchResponse.ok) {
-          // Try alternative search terms
-          const altQuery = `${query.split(' ')[0]} disaster ${new Date().getFullYear()}`;
-          const altResponse = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(altQuery)}&limit=1&namespace=0&format=json&origin=*`
-          );
-          
-          if (altResponse.ok) {
-            const altData = await altResponse.json();
-            if (altData[1]?.length > 0) {
-              const pageTitle = altData[1][0];
-              const summaryResponse = await fetch(
-                `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`
-              );
-              const summaryData = await summaryResponse.json();
-              
-              return {
-                title: summaryData.title,
-                extract: summaryData.extract,
-                thumbnail: summaryData.thumbnail,
-                pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
-                verified: true
-              };
+        // Multiple search strategies for better coverage
+        const searchStrategies = [
+          query, // Original query
+          `${query.split(' ')[0]} fire California`, // For wildfires
+          `${query.split(' ')[0]} ${query.split(' ')[1]} wildfire`, // Alternative wildfire search
+          `${query.split(' ')[2]} ${query.split(' ')[0].toLowerCase()}`, // State + event type
+          `California wildfires ${new Date().getFullYear()}`, // Recent California fires
+          `${query.split(' ')[0]} disaster`
+        ];
+
+        for (const searchQuery of searchStrategies) {
+          try {
+            // Try direct page summary first
+            const summaryResponse = await fetch(
+              `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchQuery)}`
+            );
+            
+            if (summaryResponse.ok) {
+              const data = await summaryResponse.json();
+              if (data.extract && data.extract.length > 50) { // Ensure substantial content
+                return {
+                  title: data.title,
+                  extract: data.extract,
+                  thumbnail: data.thumbnail,
+                  pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
+                  verified: true
+                };
+              }
             }
+
+            // Try search API if direct lookup fails
+            const searchResponse = await fetch(
+              `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(searchQuery)}&limit=3&namespace=0&format=json&origin=*`
+            );
+            
+            if (searchResponse.ok) {
+              const searchData = await searchResponse.json();
+              if (searchData[1]?.length > 0) {
+                // Try the first few search results
+                for (const pageTitle of searchData[1].slice(0, 2)) {
+                  const pageResponse = await fetch(
+                    `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`
+                  );
+                  
+                  if (pageResponse.ok) {
+                    const pageData = await pageResponse.json();
+                    if (pageData.extract && pageData.extract.length > 50) {
+                      return {
+                        title: pageData.title,
+                        extract: pageData.extract,
+                        thumbnail: pageData.thumbnail,
+                        pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
+                        verified: true
+                      };
+                    }
+                  }
+                }
+              }
+            }
+          } catch (strategyError) {
+            console.log(`Search strategy "${searchQuery}" failed:`, strategyError);
+            continue; // Try next strategy
           }
-          return null;
         }
         
-        const data = await searchResponse.json();
-        return {
-          title: data.title,
-          extract: data.extract,
-          thumbnail: data.thumbnail,
-          pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
-          verified: true
-        };
+        return null; // No results found with any strategy
       } catch (error) {
         console.error('Wikipedia API error:', error);
         return null;
@@ -275,9 +300,19 @@ export default function ExtremeWeatherEvents() {
     refetchInterval: 2 * 60 * 60 * 1000, // 2 hours
   });
 
-  // Wikipedia search for selected event
-  const wikipediaQuery = selectedEvent ? 
-    `${selectedEvent.eventType} ${selectedEvent.state} ${format(new Date(selectedEvent.beginDate), 'yyyy')}` : '';
+  // Wikipedia search for selected event with enhanced query building
+  const wikipediaQuery = selectedEvent ? (() => {
+    const eventName = (selectedEvent as any).stormSummary || (selectedEvent as any).episodeNarrative || selectedEvent.eventType;
+    const year = format(new Date(selectedEvent.beginDate), 'yyyy');
+    
+    // Extract specific fire name or location for better search
+    if (selectedEvent.eventType.toLowerCase().includes('fire') || selectedEvent.eventType.toLowerCase().includes('wildfire')) {
+      const locationParts = selectedEvent.county.split(',')[0].trim();
+      return `${eventName} ${locationParts} ${selectedEvent.state} ${year}`;
+    }
+    
+    return `${selectedEvent.eventType} ${selectedEvent.state} ${year}`;
+  })() : '';
   
   const { data: wikipediaData, isLoading: wikipediaLoading } = useWikipediaSearch(
     wikipediaQuery, 
@@ -1067,13 +1102,33 @@ export default function ExtremeWeatherEvents() {
                         
                         {/* Data Verification Section */}
                         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <h5 className="font-medium text-blue-900 mb-2">Data Verification</h5>
-                          <p className="text-xs text-blue-800">
+                          <h5 className="font-medium text-blue-900 mb-2">Data Verification Analysis</h5>
+                          <p className="text-xs text-blue-800 mb-2">
                             Cross-reference Wikipedia information with our database values to verify accuracy of casualty figures and damage estimates.
                           </p>
-                          <div className="mt-2 text-xs text-blue-700">
-                            <p><strong>Our Data Sources:</strong> FEMA, NOAA, CDC, State Emergency Management</p>
-                            <p><strong>Wikipedia Sources:</strong> Various news outlets, government reports, academic studies</p>
+                          
+                          {selectedEvent && (
+                            <div className="text-xs text-blue-700 space-y-1">
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                  <p><strong>Our Database:</strong></p>
+                                  <p>Deaths: {selectedEvent.deaths}</p>
+                                  <p>Injuries: {selectedEvent.injuries}</p>
+                                  <p>Damage: {formatCurrency(selectedEvent.damageProperty + selectedEvent.damageCrops)}</p>
+                                </div>
+                                <div>
+                                  <p><strong>Wikipedia:</strong></p>
+                                  <p className="text-gray-500">Compare with article data</p>
+                                  <p className="text-gray-500">Verify damage estimates</p>
+                                  <p className="text-gray-500">Cross-check casualties</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="mt-2 text-xs text-blue-700 pt-2 border-t border-blue-200">
+                            <p><strong>Our Sources:</strong> FEMA, NOAA, CDC, State Emergency Management</p>
+                            <p><strong>Wikipedia Sources:</strong> News outlets, government reports, academic studies</p>
                           </div>
                         </div>
                       </div>
@@ -1081,7 +1136,23 @@ export default function ExtremeWeatherEvents() {
                       <div className="text-center py-4">
                         <BookOpen className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-500">No Wikipedia information found for this event</p>
-                        <p className="text-xs text-gray-400 mt-1">Try searching manually for more details</p>
+                        <p className="text-xs text-gray-400 mt-1">Try searching manually with these terms:</p>
+                        <div className="mt-2 space-y-1">
+                          {selectedEvent && (
+                            <>
+                              <p className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
+                                "{(selectedEvent as any).stormSummary || selectedEvent.eventType}"
+                              </p>
+                              <br />
+                              <p className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
+                                "{selectedEvent.eventType} {selectedEvent.state} {format(new Date(selectedEvent.beginDate), 'yyyy')}"
+                              </p>
+                            </>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2">
+                          Recent events may not yet have Wikipedia coverage
+                        </p>
                       </div>
                     )}
                   </CardContent>
