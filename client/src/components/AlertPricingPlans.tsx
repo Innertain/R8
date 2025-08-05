@@ -695,37 +695,122 @@ Text STOP to opt out.
         </div>
       </div>
 
-      {/* Terms and Disclaimers */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-6xl mx-auto">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">Important Terms & Disclaimers</h3>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
-          <div>
-            <h4 className="font-medium mb-2">Emergency Messaging</h4>
-            <p className="mb-3">
-              Emergency disaster alerts in your area are provided free within reasonable usage limits.
-              These include weather warnings, natural disasters, and public safety notifications.
-            </p>
+      {/* Privacy Policy and Terms of Service */}
+      <div className="mt-12 max-w-6xl mx-auto p-6 bg-gray-50 rounded-lg border border-gray-200">
+        <h3 className="text-2xl font-bold text-center mb-6 text-gray-900">Privacy Policy & Terms of Service</h3>
 
-            <h4 className="font-medium mb-2">Carrier Charges</h4>
-            <p className="mb-3">
-              Standard cellphone and carrier message/data charges may apply.
-              Contact your mobile carrier for specific rates and terms.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-medium mb-2">User Consent & Opt-Out</h4>
-            <p className="mb-3">
-              All users must provide explicit permission to receive messages.
-              Users may opt out at any time by replying STOP or through account settings.
-            </p>
+        {/* Privacy Policy Section */}
+        <section className="mb-8">
+          <h4 className="text-xl font-semibold mb-4 text-gray-800">Privacy Policy</h4>
+          <p className="text-sm text-gray-600 mb-4">
+            This Privacy Policy describes how your information is collected, used, and shared when you use our disaster response and community resilience platform. Your privacy and data security are paramount to us.
+          </p>
 
-            <h4 className="font-medium mb-2">Terms of Service</h4>
-            <p>
-              By using our service, you agree to our Terms of Service and Privacy Policy.
-              User consent is required for all messaging services.
-            </p>
+          <div className="space-y-4">
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">1. Information We Collect</h5>
+              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li><strong>Account Information:</strong> When you create an account, we collect your name, email address, and organization details.</li>
+                <li><strong>Contact Lists:</strong> Information you upload or provide for your group's contacts (names, phone numbers, emails). This data is used solely for sending messages as directed by you.</li>
+                <li><strong>Usage Data:</strong> Information on how you interact with our platform, such as features used, message sending activity, and system performance data.</li>
+                <li><strong>Emergency Data:</strong> Information related to emergency alerts you send or receive, including timestamps and message content, for service improvement and audit purposes.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">2. How We Use Your Information</h5>
+              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>To provide, maintain, and improve our services.</li>
+                <li>To send messages and alerts to your designated groups.</li>
+                <li>To manage your account and provide customer support.</li>
+                <li>To enhance platform security and prevent fraudulent activity.</li>
+                <li>To analyze usage patterns and improve user experience.</li>
+                <li>To comply with legal obligations and enforce our policies.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">3. Data Security and Transparency</h5>
+              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>We implement robust security measures to protect your data from unauthorized access, alteration, disclosure, or destruction.</li>
+                <li>Your contact list data is encrypted and used only for the purpose of sending messages you initiate. We do not sell or share your contact lists with third parties.</li>
+                <li>We are committed to transparency regarding how your data is handled.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">4. Sharing Your Information</h5>
+              <p className="text-sm text-gray-600 mb-1">We do not sell your personal information. We may share your information in the following limited circumstances:</p>
+              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>With service providers who assist us in operating our platform, under strict confidentiality agreements.</li>
+                <li>To comply with legal requirements, court orders, or government requests.</li>
+                <li>If involved in a merger, acquisition, or sale of assets, your information may be transferred.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">5. Your Choices and Rights</h5>
+              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>You can access and update your account information at any time.</li>
+                <li>You have the right to request deletion of your data.</li>
+                <li>You can opt-out of non-essential communications.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">6. Children's Privacy</h5>
+              <p className="text-sm text-gray-600">Our service is not directed at children under 13. We do not knowingly collect personal information from children.</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">7. Changes to This Privacy Policy</h5>
+              <p className="text-sm text-gray-600">We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* Terms of Service Section */}
+        <section>
+          <h4 className="text-xl font-semibold mb-4 text-gray-800">Terms of Service</h4>
+          <p className="text-sm text-gray-600 mb-4">
+            These Terms of Service govern your access to and use of our platform. By accessing or using the service, you agree to be bound by these terms.
+          </p>
+
+          <div className="space-y-4">
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">1. Use of the Platform</h5>
+              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>You agree to use the platform only for lawful purposes and in accordance with these Terms.</li>
+                <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+                <li>You must obtain consent from individuals before adding them to your contact lists.</li>
+                <li>You agree not to use the platform to send spam, unsolicited messages, or any illegal content.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">2. Intellectual Property</h5>
+              <p className="text-sm text-gray-600">All content and technology underlying the service are our proprietary property.</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">3. Disclaimers and Limitation of Liability</h5>
+              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>The service is provided "as is" without any warranties.</li>
+                <li>We do not guarantee uninterrupted or error-free service.</li>
+                <li>We are not liable for any damages arising from your use of the service, including direct, indirect, incidental, or consequential damages.</li>
+                <li>Emergency alert delivery is dependent on third-party networks and carriers; we are not responsible for failures in these systems.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">4. Indemnification</h5>
+              <p className="text-sm text-gray-600">You agree to indemnify and hold us harmless from any claims arising from your breach of these Terms.</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">5. Governing Law</h5>
+              <p className="text-sm text-gray-600">These Terms shall be governed by the laws of [Your Jurisdiction].</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">6. Changes to Terms</h5>
+              <p className="text-sm text-gray-600">We reserve the right to modify these Terms at any time.</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">7. Contact Us</h5>
+              <p className="text-sm text-gray-600">If you have any questions about these policies, please contact us at [Your Contact Email/Link].</p>
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* CTA Section */}

@@ -28,7 +28,7 @@ import { StateSVGDefs } from "@/components/StateIcon";
 function Navigation() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   return (
     <nav className="bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
       <div className="container mx-auto flex items-center justify-between">
@@ -40,7 +40,7 @@ function Navigation() {
           />
           <h1 className="text-2xl font-bold text-white">R8</h1>
         </div>
-        
+
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-3">
           <Link href="/">
@@ -53,7 +53,7 @@ function Navigation() {
               Home
             </button>
           </Link>
-          
+
           <Link href="/volunteer">
             <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               location === "/volunteer" 
@@ -64,7 +64,7 @@ function Navigation() {
               Volunteer Portal
             </button>
           </Link>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -127,7 +127,7 @@ function Navigation() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -180,7 +180,7 @@ function Navigation() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        
+
         {/* Fallback for smaller screens - simplified buttons */}
         <div className="hidden md:flex lg:hidden gap-2">
           <Link href="/">
@@ -429,6 +429,8 @@ function Router() {
         <Route path="/bioregions" component={BioregionExplorerPage} />
         <Route path="/hawaii" component={HawaiiRegenerationPage} />
         <Route path="/appalachian" component={AppalachianRegenerationPage} />
+        <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+        <Route path="/terms-of-service" component={TermsOfServicePage} />
 
         <Route component={NotFound} />
       </Switch>
