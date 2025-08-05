@@ -25,6 +25,7 @@ import AirQualityPage from "@/pages/air-quality";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
+import { Footer } from "@/components/Footer";
 
 
 function Navigation() {
@@ -419,23 +420,26 @@ function Navigation() {
 
 function Router() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stormy-dark via-stormy-primary/30 to-stormy-dark/80">
+    <div className="min-h-screen bg-gradient-to-br from-stormy-dark via-stormy-primary/30 to-stormy-dark/80 flex flex-col">
       <Navigation />
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/volunteer" component={VolunteerPortal} />
-        <Route path="/map" component={InteractiveMap} />
-        <Route path="/stats" component={StatsDashboard} />
-        <Route path="/alerts" component={AlertsPage} />
-        <Route path="/air-quality" component={AirQualityPage} />
-        <Route path="/bioregions" component={BioregionExplorerPage} />
-        <Route path="/hawaii" component={HawaiiRegenerationPage} />
-        <Route path="/appalachian" component={AppalachianRegenerationPage} />
-        <Route path="/privacy-policy" component={PrivacyPolicyPage} />
-        <Route path="/terms-of-service" component={TermsOfServicePage} />
+      <div className="flex-1">
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/volunteer" component={VolunteerPortal} />
+          <Route path="/map" component={InteractiveMap} />
+          <Route path="/stats" component={StatsDashboard} />
+          <Route path="/alerts" component={AlertsPage} />
+          <Route path="/air-quality" component={AirQualityPage} />
+          <Route path="/bioregions" component={BioregionExplorerPage} />
+          <Route path="/hawaii" component={HawaiiRegenerationPage} />
+          <Route path="/appalachian" component={AppalachianRegenerationPage} />
+          <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+          <Route path="/terms-of-service" component={TermsOfServicePage} />
 
-        <Route component={NotFound} />
-      </Switch>
+          <Route component={NotFound} />
+        </Switch>
+      </div>
+      <Footer />
     </div>
   );
 }
