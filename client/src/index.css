@@ -278,6 +278,7 @@
 .scroll-word-pink { color: #f9a8d4; font-weight: 500; transition: all 0.3s ease; opacity: 0.8; }
 .scroll-word-violet { color: #c4b5fd; font-weight: 500; transition: all 0.3s ease; opacity: 0.8; }
 .scroll-word-sky { color: #7dd3fc; font-weight: 500; transition: all 0.3s ease; opacity: 0.8; }
+.scroll-word-red { color: #f87171; font-weight: 500; transition: all 0.3s ease; opacity: 0.8; }
 
 /* Subtle hover effects for scrolling words */
 .scroll-word-purple:hover { transform: scale(1.05); opacity: 1; text-shadow: 0 0 8px rgba(167, 139, 250, 0.3); }
@@ -292,11 +293,9 @@
 .scroll-word-pink:hover { transform: scale(1.05); opacity: 1; text-shadow: 0 0 8px rgba(249, 168, 212, 0.3); }
 .scroll-word-violet:hover { transform: scale(1.05); opacity: 1; text-shadow: 0 0 8px rgba(196, 181, 253, 0.3); }
 .scroll-word-sky:hover { transform: scale(1.05); opacity: 1; text-shadow: 0 0 8px rgba(125, 211, 252, 0.3); }
+.scroll-word-red:hover { transform: scale(1.05); opacity: 1; text-shadow: 0 0 8px rgba(248, 113, 113, 0.3); }
 
-/* Pause scrolling on hover */
-.animate-scroll-seamless:hover {
-  animation-play-state: paused;
-}
+
 
 /* Icon glow effect on hover */
 .card-hover-effect:hover .activity-icon {

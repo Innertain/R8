@@ -125,9 +125,12 @@ function HeroSection() {
                     <span className="text-2xl font-black">R</span>evitalization
                   </span>
                   <span className="scroll-word-violet mx-8">
-                    <span className="text-2xl font-black">R</span>eforestation
+                    <span className="text-2xl font-black">R</span>evolution
                   </span>
                   <span className="scroll-word-sky mx-8">
+                    <span className="text-2xl font-black">R</span>escue
+                  </span>
+                  <span className="scroll-word-red mx-8">
                     <span className="text-2xl font-black">R</span>ecycling
                   </span>
                   {/* Seamless duplicate for continuous scroll */}
@@ -162,9 +165,12 @@ function HeroSection() {
                     <span className="text-2xl font-black">R</span>evitalization
                   </span>
                   <span className="scroll-word-violet mx-8">
-                    <span className="text-2xl font-black">R</span>eforestation
+                    <span className="text-2xl font-black">R</span>evolution
                   </span>
                   <span className="scroll-word-sky mx-8">
+                    <span className="text-2xl font-black">R</span>escue
+                  </span>
+                  <span className="scroll-word-red mx-8">
                     <span className="text-2xl font-black">R</span>ecycling
                   </span>
                 </div>
