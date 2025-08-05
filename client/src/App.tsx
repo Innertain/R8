@@ -22,6 +22,8 @@ import BioregionExplorerPage from "@/pages/bioregion-explorer";
 import HawaiiRegenerationPage from "@/pages/hawaii-regeneration";
 import AppalachianRegenerationPage from "@/pages/appalachian-regeneration";
 import AirQualityPage from "@/pages/air-quality";
+import PrivacyPolicyPage from "@/pages/privacy-policy";
+import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
 
 
