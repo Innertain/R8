@@ -77,11 +77,11 @@ function HeroSection() {
             <div className="text-center">
               <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
                 <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:rotate-1">
-                  <span className="gradient-word-response drop-shadow-xl">Response</span>
+                  <span className="gradient-word-resilience drop-shadow-xl">Resilience</span>
                 </span>
                 <span className="mx-3 text-white/40 text-2xl">→</span>
                 <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:-rotate-1">
-                  <span className="gradient-word-resilience drop-shadow-xl">Resilience</span>
+                  <span className="gradient-word-response drop-shadow-xl">Response</span>
                 </span>
                 <span className="mx-3 text-white/40 text-2xl">→</span>
                 <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:rotate-1">
@@ -638,7 +638,7 @@ function Footer() {
             <span className="text-2xl font-bold text-white">R8</span>
           </div>
           <p className="text-white/80 text-lg mb-4">
-            <span className="text-red-400 font-semibold">Response</span> • <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-green-400 font-semibold">Regeneration</span>
+            <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
           </p>
           <p className="text-white/60 text-sm mb-6">
             Powered by: <span className="text-purple-300">Responsibility</span> • <span className="text-amber-300">Resources</span> • <span className="text-teal-300">Recovery</span> • <span className="text-emerald-300">Restoration</span> • <span className="text-indigo-300">Renewal</span>
