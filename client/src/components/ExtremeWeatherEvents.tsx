@@ -22,8 +22,7 @@ import {
   Flame,
   Wind,
   Droplets,
-  Info,
-  CheckCircle
+  Info
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
@@ -228,22 +227,12 @@ export default function ExtremeWeatherEvents() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-600">
             <AlertTriangle className="h-5 w-5" />
-            Error Loading Authentic Data
+            Error Loading Weather Data
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600 mb-3">Unable to connect to official government APIs for authentic disaster data.</p>
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm">
-            <p className="font-medium text-blue-800 mb-2">Attempting to connect to:</p>
-            <ul className="list-disc list-inside text-blue-700 space-y-1">
-              <li>FEMA Disaster Declarations Database</li>
-              <li>NOAA Storm Events Database</li>
-              <li>USGS Earthquake Hazards Program</li>
-            </ul>
-          </div>
-          <p className="text-sm text-gray-500 mt-3">
-            Error details: {error?.message || 'Unknown error accessing official APIs'}
-          </p>
+          <p className="text-gray-600">Unable to load extreme weather events data. Please try again later.</p>
+          <p className="text-sm text-gray-500 mt-2">Error details: {error?.message || 'Unknown error'}</p>
         </CardContent>
       </Card>
     );
@@ -572,7 +561,7 @@ export default function ExtremeWeatherEvents() {
                               <img 
                                 src={stateIconMapping[state]} 
                                 alt={`${state} icon`}
-                                className="h-5 w-5 object-contain"
+                                className="h-3 w-3 object-contain"
                               />
                             )}
                             <span>{state}</span>
@@ -605,15 +594,15 @@ export default function ExtremeWeatherEvents() {
                               <p className="text-xs text-gray-500 mb-2">{(event as any).stormSummary}</p>
                             )}
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm text-gray-600">
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
                                 {stateIconMapping[event.state] ? (
                                   <img 
                                     src={stateIconMapping[event.state]} 
                                     alt={`${event.state} icon`}
-                                    className="h-6 w-6 object-contain"
+                                    className="h-4 w-4 object-contain"
                                   />
                                 ) : (
-                                  <MapPin className="h-6 w-6" />
+                                  <MapPin className="h-4 w-4" />
                                 )}
                                 <span>{event.county}, {event.state}</span>
                               </div>
