@@ -9,6 +9,7 @@ import { AlertTriangle, Plus, Settings, Bell, Clock, MapPin, Trash2, Edit, TestT
 import { AlertRuleForm } from "@/components/AlertRuleForm";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { AlertHistory } from "@/components/AlertHistory";
+import { AlertPricingPlans } from "@/components/AlertPricingPlans";
 import { useToast } from "@/hooks/use-toast";
 import type { AlertRule } from "@shared/schema";
 
@@ -191,12 +192,18 @@ export default function AlertsPage() {
               </p>
             </div>
 
-        <Tabs defaultValue="rules" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="pricing" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="pricing">Pricing Plans</TabsTrigger>
             <TabsTrigger value="rules">Alert Rules</TabsTrigger>
             <TabsTrigger value="history">Alert History</TabsTrigger>
             <TabsTrigger value="settings">Notification Settings</TabsTrigger>
           </TabsList>
+
+          {/* Pricing Plans Tab */}
+          <TabsContent value="pricing">
+            <AlertPricingPlans />
+          </TabsContent>
 
           {/* Alert Rules Tab */}
           <TabsContent value="rules" className="space-y-6">
