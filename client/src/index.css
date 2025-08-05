@@ -231,23 +231,59 @@
   }
 }
 
-/* Refined hover effects for gradient words */
+/* Enhanced hover effects with color fade for gradient words */
+.gradient-word-response {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .gradient-word-response:hover {
-  filter: drop-shadow(0 4px 16px rgba(255, 107, 107, 0.3));
+  background: linear-gradient(90deg, 
+    #ef4444 0%, 
+    #f87171 25%, 
+    #fca5a5 60%, 
+    rgba(239, 68, 68, 0.8) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 16px rgba(239, 68, 68, 0.4));
   transform: scale(1.02);
-  transition: all 0.3s ease;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.gradient-word-resilience {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gradient-word-resilience:hover {
-  filter: drop-shadow(0 4px 16px rgba(79, 195, 247, 0.3));
+  background: linear-gradient(90deg, 
+    #3b82f6 0%, 
+    #60a5fa 25%, 
+    #93c5fd 60%, 
+    rgba(59, 130, 246, 0.8) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 16px rgba(59, 130, 246, 0.4));
   transform: scale(1.02);
-  transition: all 0.3s ease;
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.gradient-word-regeneration {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gradient-word-regeneration:hover {
-  filter: drop-shadow(0 4px 16px rgba(102, 187, 106, 0.3));
+  background: linear-gradient(90deg, 
+    #22c55e 0%, 
+    #4ade80 25%, 
+    #86efac 60%, 
+    rgba(34, 197, 94, 0.8) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 16px rgba(34, 197, 94, 0.4));
   transform: scale(1.02);
-  transition: all 0.3s ease;
+  text-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 }
 
 /* Seamless Continuous Scrolling Animation */
