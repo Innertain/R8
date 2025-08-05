@@ -325,14 +325,22 @@ export function AlertPricingPlans() {
                     <MessageSquare className="w-4 h-4" />
                     Custom Messaging Features:
                   </h4>
-                  <ul className="space-y-2">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full text-left text-sm text-gray-700 font-medium mb-2">
+                      <span>{plan.features.length} Features</span>
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <ul className="space-y-2">
+                        {plan.features.map((feature, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm">
+                            <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-700">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
@@ -340,14 +348,22 @@ export function AlertPricingPlans() {
                     <Zap className="w-4 h-4" />
                     FREE Emergency Alerts:
                   </h4>
-                  <ul className="space-y-1">
-                    {plan.emergencyFeatures.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-green-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full text-left text-sm text-green-700 font-medium mb-2">
+                      <span>{plan.emergencyFeatures.length} Alerts</span>
+                      <ChevronDown className="w-4 h-4 text-green-400" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <ul className="space-y-1">
+                        {plan.emergencyFeatures.map((feature, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm">
+                            <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-green-700">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
