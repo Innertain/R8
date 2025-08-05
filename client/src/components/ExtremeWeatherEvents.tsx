@@ -27,6 +27,58 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
 
+// Import state icons
+import alaskaIcon from '@assets/Alaska_1754172085109.png';
+import arizonaIcon from '@assets/Arizona_1754172085110.png';
+import arkansasIcon from '@assets/Arkansas_1754172085111.png';
+import californiaIcon from '@assets/California_1754172085112.png';
+import coloradoIcon from '@assets/Colorado_1754172085113.png';
+import connecticutIcon from '@assets/Connecticut Map Silhouette_1754172085114.png';
+import delawareIcon from '@assets/Delaware_1754172085115.png';
+import dcIcon from '@assets/District of Columbia_1754172085116.png';
+import floridaIcon from '@assets/Florida_1754172085117.png';
+import georgiaIcon from '@assets/Georgia_1754172085118.png';
+import hawaiiIcon from '@assets/Hawaii_1754172085119.png';
+import idahoIcon from '@assets/Idaho_1754172085120.png';
+import illinoisIcon from '@assets/Illinois_1754172085121.png';
+import indianaIcon from '@assets/Indiana_1754172085108.png';
+import iowaIcon from '@assets/Iowa_1754172090688.png';
+import kansasIcon from '@assets/Kansas_1754172090689.png';
+import kentuckyIcon from '@assets/Kentucky_1754172090690.png';
+import louisianaIcon from '@assets/Lousiana_1754172090691.png';
+import maineIcon from '@assets/Maine_1754172090691.png';
+import marylandIcon from '@assets/Maryland_1754172090693.png';
+import massachusettsIcon from '@assets/Massachusetts_1754172090694.png';
+import michiganIcon from '@assets/Michigan_1754172090695.png';
+import minnesotaIcon from '@assets/Minnesota_1754172090696.png';
+import mississippiIcon from '@assets/Mississippi_1754172090697.png';
+import missouriIcon from '@assets/Missouri_1754172090698.png';
+import montanaIcon from '@assets/Montana_1754172090698.png';
+import nebraskaIcon from '@assets/Nebraska_1754172090686.png';
+import nevadaIcon from '@assets/Nevada_1754172552866.png';
+import newHampshireIcon from '@assets/New Hampshire_1754172552868.png';
+import newJerseyIcon from '@assets/New Jersey_1754172552869.png';
+import newMexicoIcon from '@assets/New Mexico_1754172552870.png';
+import newYorkIcon from '@assets/New York State_1754172552871.png';
+import northCarolinaIcon from '@assets/North Carolina_1754172552872.png';
+import northDakotaIcon from '@assets/North Dakota_1754172552872.png';
+import ohioIcon from '@assets/Ohio_1754172552873.png';
+import oklahomaIcon from '@assets/Oklahoma_1754172552874.png';
+import oregonIcon from '@assets/Oregon_1754172552875.png';
+import pennsylvaniaIcon from '@assets/Pennsylvania_1754172552875.png';
+import rhodeIslandIcon from '@assets/Rhode Island_1754172552876.png';
+import southCarolinaIcon from '@assets/South Carolina_1754172552865.png';
+import southDakotaIcon from '@assets/South Dakota_1754172607630.png';
+import tennesseeIcon from '@assets/Tennessee_1754172607631.png';
+import texasIcon from '@assets/TEXAS_1754172607632.png';
+import utahIcon from '@assets/Utah_1754172607633.png';
+import vermontIcon from '@assets/Vermont_1754172607635.png';
+import virginiaIcon from '@assets/Virginia_1754172607636.png';
+import washingtonIcon from '@assets/Washington_1754172607637.png';
+import westVirginiaIcon from '@assets/West Virginia_1754172607637.png';
+import wisconsinIcon from '@assets/Wisconsin_1754172607638.png';
+import wyomingIcon from '@assets/Wyoming_1754172607638.png';
+
 interface StormEvent {
   id: string;
   eventType: string;
@@ -80,6 +132,60 @@ const eventTypeIcons: Record<string, any> = {
   'Blizzard': Snowflake,
   'Hail Storm': Cloud,
   'Ice Storm': Snowflake
+};
+
+// State icon mapping
+const stateIconMapping: Record<string, string> = {
+  'Alaska': alaskaIcon,
+  'Arizona': arizonaIcon,
+  'Arkansas': arkansasIcon,
+  'California': californiaIcon,
+  'Colorado': coloradoIcon,
+  'Connecticut': connecticutIcon,
+  'Delaware': delawareIcon,
+  'District of Columbia': dcIcon,
+  'Florida': floridaIcon,
+  'Georgia': georgiaIcon,
+  'Hawaii': hawaiiIcon,
+  'Idaho': idahoIcon,
+  'Illinois': illinoisIcon,
+  'Indiana': indianaIcon,
+  'Iowa': iowaIcon,
+  'Kansas': kansasIcon,
+  'Kentucky': kentuckyIcon,
+  'Louisiana': louisianaIcon,
+  'Maine': maineIcon,
+  'Maryland': marylandIcon,
+  'Massachusetts': massachusettsIcon,
+  'Michigan': michiganIcon,
+  'Minnesota': minnesotaIcon,
+  'Mississippi': mississippiIcon,
+  'Missouri': missouriIcon,
+  'Montana': montanaIcon,
+  'Nebraska': nebraskaIcon,
+  'Nevada': nevadaIcon,
+  'New Hampshire': newHampshireIcon,
+  'New Jersey': newJerseyIcon,
+  'New Mexico': newMexicoIcon,
+  'New York': newYorkIcon,
+  'North Carolina': northCarolinaIcon,
+  'North Dakota': northDakotaIcon,
+  'Ohio': ohioIcon,
+  'Oklahoma': oklahomaIcon,
+  'Oregon': oregonIcon,
+  'Pennsylvania': pennsylvaniaIcon,
+  'Rhode Island': rhodeIslandIcon,
+  'South Carolina': southCarolinaIcon,
+  'South Dakota': southDakotaIcon,
+  'Tennessee': tennesseeIcon,
+  'Texas': texasIcon,
+  'Utah': utahIcon,
+  'Vermont': vermontIcon,
+  'Virginia': virginiaIcon,
+  'Washington': washingtonIcon,
+  'West Virginia': westVirginiaIcon,
+  'Wisconsin': wisconsinIcon,
+  'Wyoming': wyomingIcon
 };
 
 const severityColors = ['#22c55e', '#eab308', '#f97316', '#ef4444', '#dc2626'];
@@ -449,7 +555,18 @@ export default function ExtremeWeatherEvents() {
                     <SelectContent>
                       <SelectItem value="all">All States</SelectItem>
                       {uniqueStates.map(state => (
-                        <SelectItem key={state} value={state}>{state}</SelectItem>
+                        <SelectItem key={state} value={state}>
+                          <div className="flex items-center gap-2">
+                            {stateIconMapping[state] && (
+                              <img 
+                                src={stateIconMapping[state]} 
+                                alt={`${state} icon`}
+                                className="h-3 w-3 object-contain"
+                              />
+                            )}
+                            <span>{state}</span>
+                          </div>
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -477,8 +594,16 @@ export default function ExtremeWeatherEvents() {
                               <p className="text-xs text-gray-500 mb-2">{(event as any).stormSummary}</p>
                             )}
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm text-gray-600">
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-4 w-4" />
+                              <div className="flex items-center gap-2">
+                                {stateIconMapping[event.state] ? (
+                                  <img 
+                                    src={stateIconMapping[event.state]} 
+                                    alt={`${event.state} icon`}
+                                    className="h-4 w-4 object-contain"
+                                  />
+                                ) : (
+                                  <MapPin className="h-4 w-4" />
+                                )}
                                 <span>{event.county}, {event.state}</span>
                               </div>
                               <div className="flex items-center gap-1">
@@ -533,7 +658,8 @@ export default function ExtremeWeatherEvents() {
                                       <strong>Data Source:</strong> {(event as any).source || 'Official government reports'}<br/>
                                       <strong>Property Damage:</strong> {formatCurrency(event.damageProperty)}<br/>
                                       <strong>Crop Damage:</strong> {formatCurrency(event.damageCrops)}<br/>
-                                      <strong>Verified by:</strong> NOAA damage assessments, FEMA declarations, state agriculture departments
+                                      <strong>Total Damage:</strong> {formatCurrency(event.damageProperty + event.damageCrops)}<br/>
+                                      <strong>Verified by:</strong> NOAA damage assessments, FEMA declarations, state agriculture departments, USDA crop loss reports
                                     </p>
                                   </TooltipContent>
                                 </Tooltip>
