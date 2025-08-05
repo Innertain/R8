@@ -302,30 +302,60 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
             if (summaryResponse.ok) {
               const data = await summaryResponse.json();
               if (data.extract && data.extract.length > 50) { // Ensure substantial content
-                // Get additional detailed information
-                const detailResponse = await fetch(
-                  `https://en.wikipedia.org/w/api.php?action=query&format=json&titles=${encodeURIComponent(data.title)}&prop=extracts|images|pageimages&exintro=&explaintext=&piprop=thumbnail|name&pithumbsize=400&origin=*`
+                // Validate that this is actually about a disaster/weather event
+                const extract = data.extract.toLowerCase();
+                const title = data.title.toLowerCase();
+                
+                // Check if the content is actually about disasters/weather
+                const disasterKeywords = [
+                  'fire', 'wildfire', 'storm', 'hurricane', 'tornado', 'flood', 'earthquake', 
+                  'disaster', 'emergency', 'evacuation', 'damage', 'destroyed', 'casualties',
+                  'ice storm', 'winter storm', 'blizzard', 'drought', 'heat wave', 'typhoon',
+                  'cyclone', 'landslide', 'avalanche', 'volcanic', 'tsunami'
+                ];
+                
+                const irrelevantKeywords = [
+                  'album', 'song', 'band', 'music', 'movie', 'film', 'book', 'novel',
+                  'actor', 'actress', 'singer', 'musician', 'artist', 'guitarist'
+                ];
+                
+                // Check if it contains disaster-related content
+                const hasDisasterContent = disasterKeywords.some(keyword => 
+                  extract.includes(keyword) || title.includes(keyword)
                 );
                 
-                let additionalData: any = {};
-                if (detailResponse.ok) {
-                  const details = await detailResponse.json();
-                  const pages = details.query?.pages;
-                  if (pages) {
-                    const pageData = Object.values(pages)[0] as any;
-                    additionalData.images = pageData.images?.map((img: any) => img.title).slice(0, 5) || [];
+                // Check if it's clearly not about disasters
+                const hasIrrelevantContent = irrelevantKeywords.some(keyword => 
+                  extract.includes(keyword) || title.includes(keyword)
+                );
+                
+                // Only proceed if it's disaster-related and not irrelevant
+                if (hasDisasterContent && !hasIrrelevantContent) {
+                  // Get additional detailed information
+                  const detailResponse = await fetch(
+                    `https://en.wikipedia.org/w/api.php?action=query&format=json&titles=${encodeURIComponent(data.title)}&prop=extracts|images|pageimages&exintro=&explaintext=&piprop=thumbnail|name&pithumbsize=400&origin=*`
+                  );
+                  
+                  let additionalData: any = {};
+                  if (detailResponse.ok) {
+                    const details = await detailResponse.json();
+                    const pages = details.query?.pages;
+                    if (pages) {
+                      const pageData = Object.values(pages)[0] as any;
+                      additionalData.images = pageData.images?.map((img: any) => img.title).slice(0, 5) || [];
+                    }
                   }
-                }
 
-                return {
-                  title: data.title,
-                  extract: data.extract,
-                  thumbnail: data.thumbnail,
-                  pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
-                  verified: true,
-                  images: additionalData.images || [],
-                  infobox: await extractInfoboxData(data.title)
-                };
+                  return {
+                    title: data.title,
+                    extract: data.extract,
+                    thumbnail: data.thumbnail,
+                    pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
+                    verified: true,
+                    images: additionalData.images || [],
+                    infobox: await extractInfoboxData(data.title)
+                  };
+                }
               }
             }
 
@@ -346,15 +376,41 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
                   if (pageResponse.ok) {
                     const pageData = await pageResponse.json();
                     if (pageData.extract && pageData.extract.length > 50) {
-                      return {
-                        title: pageData.title,
-                        extract: pageData.extract,
-                        thumbnail: pageData.thumbnail,
-                        pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
-                        verified: true,
-                        images: [],
-                        infobox: await extractInfoboxData(pageData.title)
-                      };
+                      // Same validation for search results
+                      const extract = pageData.extract.toLowerCase();
+                      const title = pageData.title.toLowerCase();
+                      
+                      const disasterKeywords = [
+                        'fire', 'wildfire', 'storm', 'hurricane', 'tornado', 'flood', 'earthquake', 
+                        'disaster', 'emergency', 'evacuation', 'damage', 'destroyed', 'casualties',
+                        'ice storm', 'winter storm', 'blizzard', 'drought', 'heat wave', 'typhoon',
+                        'cyclone', 'landslide', 'avalanche', 'volcanic', 'tsunami'
+                      ];
+                      
+                      const irrelevantKeywords = [
+                        'album', 'song', 'band', 'music', 'movie', 'film', 'book', 'novel',
+                        'actor', 'actress', 'singer', 'musician', 'artist', 'guitarist'
+                      ];
+                      
+                      const hasDisasterContent = disasterKeywords.some(keyword => 
+                        extract.includes(keyword) || title.includes(keyword)
+                      );
+                      
+                      const hasIrrelevantContent = irrelevantKeywords.some(keyword => 
+                        extract.includes(keyword) || title.includes(keyword)
+                      );
+                      
+                      if (hasDisasterContent && !hasIrrelevantContent) {
+                        return {
+                          title: pageData.title,
+                          extract: pageData.extract,
+                          thumbnail: pageData.thumbnail,
+                          pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
+                          verified: true,
+                          images: [],
+                          infobox: await extractInfoboxData(pageData.title)
+                        };
+                      }
                     }
                   }
                 }
@@ -392,15 +448,27 @@ export default function ExtremeWeatherEvents() {
   const wikipediaQuery = selectedEvent ? (() => {
     const eventName = (selectedEvent as any).stormSummary || (selectedEvent as any).episodeNarrative || selectedEvent.eventType;
     const year = format(new Date(selectedEvent.beginDate), 'yyyy');
+    const state = selectedEvent.state;
     
     // Extract specific disaster name from description
     if (eventName && eventName !== selectedEvent.eventType) {
-      // Try to extract the specific fire/disaster name
-      const specificName = eventName.split(' ').slice(0, 2).join(' '); // Take first two words
-      return `${specificName} ${year}`;
+      const specificName = eventName.split(' ').slice(0, 2).join(' ');
+      return `${specificName} ${state} ${year}`;
     }
     
-    return `${selectedEvent.eventType} ${selectedEvent.state} ${year}`;
+    // More specific searches for different event types
+    const eventType = selectedEvent.eventType.toLowerCase();
+    if (eventType.includes('ice') || eventType.includes('winter')) {
+      return `${year} ${state} ice storm`;
+    } else if (eventType.includes('fire')) {
+      return `${year} ${state} wildfire`;
+    } else if (eventType.includes('hurricane')) {
+      return `${year} ${state} hurricane`;
+    } else if (eventType.includes('tornado')) {
+      return `${year} ${state} tornado outbreak`;
+    }
+    
+    return `${year} ${state} ${selectedEvent.eventType}`;
   })() : '';
   
   const { data: wikipediaData, isLoading: wikipediaLoading } = useWikipediaSearch(
