@@ -442,7 +442,7 @@ export default function ExtremeWeatherEvents() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {filteredEvents.slice(0, 20).map((event) => {
+                {filteredEvents.sort((a, b) => new Date(b.beginDate).getTime() - new Date(a.beginDate).getTime()).map((event) => {
                   const EventIcon = eventTypeIcons[event.eventType] || AlertTriangle;
                   const severity = getSeverityLevel(event);
                   
@@ -491,9 +491,9 @@ export default function ExtremeWeatherEvents() {
                   );
                 })}
               </div>
-              {filteredEvents.length > 20 && (
+              {filteredEvents.length > 0 && (
                 <div className="text-center mt-4 text-sm text-gray-500">
-                  Showing 20 of {filteredEvents.length} filtered events
+                  Showing all {filteredEvents.length} filtered events
                 </div>
               )}
               {filteredEvents.length === 0 && (
