@@ -72,26 +72,26 @@ function HeroSection() {
             <h1 className="text-6xl font-bold tracking-wide gradient-text-r8">R8</h1>
           </div>
 
-          <div className="space-y-8">
-            {/* Main 3 R's with Reactive Gradient Effects */}
+          <div className="space-y-6">
+            {/* Main 3 R's with Reactive Gradient Effects - More Compact */}
             <div className="text-center">
-              <h2 className="text-6xl font-bold text-white leading-tight mb-6">
-                <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:rotate-2">
-                  <span className="gradient-word-response drop-shadow-2xl">Response</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
+                <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:rotate-1">
+                  <span className="gradient-word-response drop-shadow-xl">Response</span>
                 </span>
-                <span className="mx-6 text-white/30 text-4xl animate-pulse">→</span>
-                <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:-rotate-1">
-                  <span className="gradient-word-resilience drop-shadow-2xl">Resilience</span>
+                <span className="mx-3 text-white/40 text-2xl">→</span>
+                <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:-rotate-1">
+                  <span className="gradient-word-resilience drop-shadow-xl">Resilience</span>
                 </span>
-                <span className="mx-6 text-white/30 text-4xl animate-pulse" style={{animationDelay: '1s'}}>→</span>
-                <span className="inline-block transform hover:scale-110 transition-all duration-500 hover:rotate-1">
-                  <span className="gradient-word-regeneration drop-shadow-2xl">Regeneration</span>
+                <span className="mx-3 text-white/40 text-2xl">→</span>
+                <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:rotate-1">
+                  <span className="gradient-word-regeneration drop-shadow-xl">Regeneration</span>
                 </span>
               </h2>
             </div>
 
-            {/* Continuous Scrolling R Words */}
-            <div className="relative overflow-hidden bg-black/20 backdrop-blur-sm rounded-lg border border-white/10 h-16">
+            {/* Continuous Scrolling R Words - More Compact */}
+            <div className="relative overflow-hidden bg-black/15 backdrop-blur-sm rounded-lg border border-white/10 h-12">
               <div className="absolute inset-0 flex items-center">
                 <div className="animate-scroll-seamless whitespace-nowrap flex items-center text-lg">
                   <span className="scroll-word-purple mx-8">
@@ -133,6 +133,12 @@ function HeroSection() {
                   <span className="scroll-word-red mx-8">
                     <span className="text-2xl font-black">R</span>ecycling
                   </span>
+                  <span className="scroll-word-emerald mx-8">
+                    <span className="text-2xl font-black">R</span>eforestation
+                  </span>
+                  <span className="scroll-word-purple mx-8 text-3xl">
+                    ∞
+                  </span>
                   {/* Seamless duplicate for continuous scroll */}
                   <span className="scroll-word-purple mx-8">
                     <span className="text-2xl font-black">R</span>esponsibility
@@ -173,15 +179,21 @@ function HeroSection() {
                   <span className="scroll-word-red mx-8">
                     <span className="text-2xl font-black">R</span>ecycling
                   </span>
+                  <span className="scroll-word-emerald mx-8">
+                    <span className="text-2xl font-black">R</span>eforestation
+                  </span>
+                  <span className="scroll-word-cyan mx-8 text-3xl">
+                    ∞
+                  </span>
                 </div>
               </div>
             </div>
 
-            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Eight principles driving community transformation and ecological regeneration.
+            <p className="text-lg text-white/90 max-w-2xl mx-auto leading-relaxed">
+              Driving community transformation and ecological regeneration.
             </p>
 
-            <div className="flex flex-wrap justify-center gap-4 pt-8">
+            <div className="flex flex-wrap justify-center gap-4 pt-6">
               <Link href="/map">
                 <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white text-lg px-8 py-4">
                   <Shield className="w-5 h-5 mr-2" />
