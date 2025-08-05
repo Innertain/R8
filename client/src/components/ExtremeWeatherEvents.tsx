@@ -230,10 +230,33 @@ async function extractInfoboxData(title: string): Promise<any> {
       status: /\|[\s]*status[\s]*=[\s]*([^|\n]+)/i
     };
     
+    // Function to clean Wikipedia markup
+    function cleanWikipediaText(text: string): string {
+      if (!text) return '';
+      
+      return text
+        // Remove citation references like {{cite web|...}} and <ref>...</ref>
+        .replace(/\{\{cite[^}]*\}\}/gi, '')
+        .replace(/<ref[^>]*>.*?<\/ref>/gi, '')
+        .replace(/<ref[^>]*\/>/gi, '')
+        .replace(/\{\{[^}]*\}\}/g, '') // Remove all template markup
+        // Clean up HTML tags
+        .replace(/<[^>]*>/g, '')
+        // Remove wiki links but keep the display text
+        .replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, '$2') // [[link|display]] -> display
+        .replace(/\[\[([^\]]+)\]\]/g, '$1') // [[link]] -> link
+        // Remove extra whitespace and trim
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
     for (const [key, pattern] of Object.entries(patterns)) {
       const match = content.match(pattern);
-      if (match) {
-        infobox[key] = match[1].trim().replace(/\[\[([^\]]+)\]\]/g, '$1').replace(/\{\{[^}]+\}\}/g, '');
+      if (match && match[1]) {
+        const cleanedValue = cleanWikipediaText(match[1]);
+        if (cleanedValue && cleanedValue.length > 0 && !cleanedValue.includes('{') && !cleanedValue.includes('<')) {
+          infobox[key] = cleanedValue;
+        }
       }
     }
     
@@ -1369,61 +1392,71 @@ export default function ExtremeWeatherEvents() {
                           <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded">
                             <h5 className="font-medium text-orange-900 mb-3 text-base">Statistics from Wikipedia</h5>
                             <div className="grid grid-cols-2 gap-3">
-                              {wikipediaData.infobox.status && (
+                              {/* Only show clean, readable data */}
+                              {wikipediaData.infobox.status && !wikipediaData.infobox.status.includes('{') && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Status</div>
                                   <div className="font-medium">{wikipediaData.infobox.status}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.burnedArea && (
+                              {wikipediaData.infobox.burnedArea && !wikipediaData.infobox.burnedArea.includes('{') && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Burned Area</div>
                                   <div className="font-medium">{wikipediaData.infobox.burnedArea}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.deaths && (
+                              {wikipediaData.infobox.deaths && !wikipediaData.infobox.deaths.includes('{') && wikipediaData.infobox.deaths.length < 50 && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Deaths</div>
                                   <div className="font-medium text-red-600">{wikipediaData.infobox.deaths}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.injuries && (
+                              {wikipediaData.infobox.injuries && !wikipediaData.infobox.injuries.includes('{') && wikipediaData.infobox.injuries.length < 50 && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Injuries</div>
                                   <div className="font-medium text-orange-600">{wikipediaData.infobox.injuries}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.missing && (
+                              {wikipediaData.infobox.missing && !wikipediaData.infobox.missing.includes('{') && wikipediaData.infobox.missing.length < 50 && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Missing</div>
                                   <div className="font-medium text-yellow-600">{wikipediaData.infobox.missing}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.evacuated && (
+                              {wikipediaData.infobox.evacuated && !wikipediaData.infobox.evacuated.includes('{') && wikipediaData.infobox.evacuated.length < 50 && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Evacuated</div>
                                   <div className="font-medium">{wikipediaData.infobox.evacuated}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.structuresDestroyed && (
+                              {wikipediaData.infobox.structuresDestroyed && !wikipediaData.infobox.structuresDestroyed.includes('{') && wikipediaData.infobox.structuresDestroyed.length < 100 && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Structures Destroyed</div>
                                   <div className="font-medium">{wikipediaData.infobox.structuresDestroyed}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.damage && (
+                              {wikipediaData.infobox.damage && !wikipediaData.infobox.damage.includes('{') && wikipediaData.infobox.damage.length < 50 && (
                                 <div className="bg-white p-2 rounded shadow-sm">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Damage</div>
                                   <div className="font-medium text-green-600">{wikipediaData.infobox.damage}</div>
                                 </div>
                               )}
-                              {wikipediaData.infobox.cause && (
+                              {wikipediaData.infobox.cause && !wikipediaData.infobox.cause.includes('{') && wikipediaData.infobox.cause.length < 100 && (
                                 <div className="bg-white p-2 rounded shadow-sm col-span-2">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">Cause</div>
                                   <div className="font-medium">{wikipediaData.infobox.cause}</div>
                                 </div>
                               )}
                             </div>
+                            
+                            {/* Show message if no clean statistics are available */}
+                            {(!wikipediaData.infobox.deaths || wikipediaData.infobox.deaths.includes('{')) && 
+                             (!wikipediaData.infobox.injuries || wikipediaData.infobox.injuries.includes('{')) && 
+                             (!wikipediaData.infobox.damage || wikipediaData.infobox.damage.includes('{')) && (
+                              <div className="text-center py-3 text-gray-500 text-sm">
+                                Wikipedia statistics not available in readable format
+                              </div>
+                            )}
                           </div>
                         )}
 
