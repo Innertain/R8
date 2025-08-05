@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, MessageSquare, Users, Building, PhoneCall, Zap, School, Church, Store } from "lucide-react";
+import { Check, MessageSquare, Users, Building, PhoneCall, Zap, School, Church, Store, AlertTriangle } from "lucide-react";
 
 export function AlertPricingPlans() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -32,7 +31,7 @@ export function AlertPricingPlans() {
       ],
       emergencyFeatures: [
         "FREE Emergency Weather Alerts",
-        "FREE Disaster Notifications", 
+        "FREE Disaster Notifications",
         "FREE Earthquake Updates",
         "Geographic filtering included"
       ],
@@ -89,7 +88,7 @@ export function AlertPricingPlans() {
       extraMessageFee: "$0.03 per additional message",
       features: [
         "150 recipients included",
-        "3,000 custom messages per month", 
+        "3,000 custom messages per month",
         "Email, SMS & voice calls",
         "Advanced message scheduling",
         "Custom message templates",
@@ -101,7 +100,7 @@ export function AlertPricingPlans() {
       emergencyFeatures: [
         "FREE Emergency Weather Alerts",
         "FREE Disaster Notifications",
-        "FREE Earthquake & Wildfire Updates", 
+        "FREE Earthquake & Wildfire Updates",
         "Advanced geographic filtering",
         "Emergency alert customization"
       ],
@@ -126,7 +125,7 @@ export function AlertPricingPlans() {
         "All delivery methods + webhooks",
         "Advanced automation & workflows",
         "White-label message templates",
-        "Multi-location management", 
+        "Multi-location management",
         "Advanced analytics & reporting",
         "Dedicated account manager",
         "Full API access & integrations",
@@ -168,7 +167,7 @@ export function AlertPricingPlans() {
       ],
       emergencyFeatures: [
         "FREE All Emergency Services",
-        "Custom emergency data feeds", 
+        "Custom emergency data feeds",
         "Priority emergency notifications",
         "Custom crisis management tools",
         "Emergency response integration"
@@ -189,7 +188,7 @@ export function AlertPricingPlans() {
           Instantly Connect With Your Entire Group
         </h2>
         <p className="text-lg text-gray-600 max-w-4xl mx-auto mb-6">
-          Send custom messages to your entire organization instantly via SMS, email, and voice calls. 
+          Send custom messages to your entire organization instantly via SMS, email, and voice calls.
           Perfect for schools, churches, businesses, and any group that needs reliable mass communication.
           <span className="font-semibold text-green-600"> Emergency alerts included at no extra cost.</span>
         </p>
@@ -217,7 +216,7 @@ export function AlertPricingPlans() {
             <span>Organizations</span>
           </div>
         </div>
-        
+
         {/* Billing Toggle */}
         <div className="flex items-center justify-center gap-4 mb-8">
           <span className={`text-sm ${billingCycle === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
@@ -248,8 +247,8 @@ export function AlertPricingPlans() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan) => (
-          <Card 
-            key={plan.name} 
+          <Card
+            key={plan.name}
             className={`relative hover:shadow-lg transition-shadow ${
               plan.popular ? 'ring-2 ring-green-500 shadow-lg' : ''
             }`}
@@ -261,7 +260,7 @@ export function AlertPricingPlans() {
                 </Badge>
               </div>
             )}
-            
+
             <CardHeader className="text-center pb-4">
               <div className="flex justify-center mb-3">
                 {plan.icon}
@@ -270,7 +269,7 @@ export function AlertPricingPlans() {
               <p className="text-sm text-gray-600 mt-2">{plan.description}</p>
               <div className="text-sm font-medium text-blue-600 mb-1">{plan.userLimit}</div>
               <div className="text-sm text-gray-600 mb-2">{plan.monthlyMessages}</div>
-              
+
               <div className="mt-4">
                 {plan.price !== null ? (
                   <div>
@@ -301,12 +300,12 @@ export function AlertPricingPlans() {
             </CardHeader>
 
             <CardContent className="pt-0">
-              <Button 
+              <Button
                 className={`w-full mb-6 ${
-                  plan.name === 'Custom Scale' 
-                    ? 'bg-orange-600 hover:bg-orange-700' 
-                    : plan.popular 
-                      ? 'bg-green-600 hover:bg-green-700' 
+                  plan.name === 'Custom Scale'
+                    ? 'bg-orange-600 hover:bg-orange-700'
+                    : plan.popular
+                      ? 'bg-green-600 hover:bg-green-700'
                       : ''
                 }`}
                 variant={plan.popular ? "default" : "outline"}
@@ -361,19 +360,85 @@ export function AlertPricingPlans() {
         ))}
       </div>
 
+      {/* Use Case Examples Section */}
+      <div className="mt-12 max-w-6xl mx-auto p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+        <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">Use Case Examples</h3>
+        <div className="space-y-8">
+          {/* Use Case 1: Welfare Check */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <AlertTriangle className="w-6 h-6 text-red-500" />
+              <h4 className="text-xl font-semibold text-red-700">Use Case 1: Welfare Check</h4>
+            </div>
+            <p className="text-gray-700 mb-2"><strong>Scenario:</strong> A tornado has struck your area.</p>
+            <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+              <h5 className="font-semibold text-gray-800 mb-2">SMS Template:</h5>
+              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
+                ⚡ WELFARE CHECK
+                There was a major tornado in your area. Please let us know if you’re okay.
+                1 – YES, I’m okay
+                2 – NO, I need help
+                Text STOP to opt out.
+              </pre>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <h5 className="font-semibold text-gray-800 mb-2">Follow-up (if they reply “2”):</h5>
+              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
+                We’re here to help. Please reply with your location or call our hotline at 123-456-7890.
+              </pre>
+            </div>
+          </div>
+
+          {/* Use Case 2: Business Closure Notice */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <AlertTriangle className="w-6 h-6 text-yellow-500" />
+              <h4 className="text-xl font-semibold text-yellow-700">Use Case 2: Business Closure Notice</h4>
+            </div>
+            <p className="text-gray-700 mb-2"><strong>Scenario:</strong> A hurricane is imminent.</p>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <h5 className="font-semibold text-gray-800 mb-2">SMS Template:</h5>
+              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
+                🌪️ BUSINESS CLOSURE
+                Due to the hurricane forecast (view alert), our business will be closed for the next 2 days. Please stay safe and follow local guidance.
+                Text STOP to opt out.
+              </pre>
+            </div>
+          </div>
+
+          {/* Use Case 3: Free Meal Alert */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <AlertTriangle className="w-6 h-6 text-blue-500" />
+              <h4 className="text-xl font-semibold text-blue-700">Use Case 3: Free Meal Alert</h4>
+            </div>
+            <p className="text-gray-700 mb-2"><strong>Scenario:</strong> You’re distributing hot meals to the community.</p>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <h5 className="font-semibold text-gray-800 mb-2">SMS Template:</h5>
+              <pre className="text-sm bg-gray-100 p-3 rounded whitespace-pre-wrap font-mono">
+                🍲 FREE HOT MEALS
+                We’re serving FREE hot meals at 123 Main St. from 11 AM–3 PM while supplies last.
+                Reply with any questions.
+                Text STOP to opt out.
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Value Proposition */}
       <div className="mt-12 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-8 max-w-6xl mx-auto">
         <div className="text-center mb-6">
           <h3 className="text-2xl font-bold text-gray-900 mb-2">Why Choose Our Platform?</h3>
           <p className="text-gray-700">The complete solution for group communication and emergency preparedness</p>
         </div>
-        
+
         <div className="grid md:grid-cols-3 gap-6">
           <div className="text-center">
             <MessageSquare className="w-12 h-12 text-blue-600 mx-auto mb-3" />
             <h4 className="font-semibold text-gray-900 mb-2">Custom Group Messaging</h4>
             <p className="text-sm text-gray-600">
-              Send instant messages to your entire group via SMS, email, and voice calls. 
+              Send instant messages to your entire group via SMS, email, and voice calls.
               Perfect for announcements, alerts, and important updates.
             </p>
           </div>
@@ -381,7 +446,7 @@ export function AlertPricingPlans() {
             <Zap className="w-12 h-12 text-green-600 mx-auto mb-3" />
             <h4 className="font-semibold text-gray-900 mb-2">FREE Emergency Alerts</h4>
             <p className="text-sm text-gray-600">
-              Automatic weather warnings, disaster notifications, and emergency updates 
+              Automatic weather warnings, disaster notifications, and emergency updates
               sent to your group at no additional cost.
             </p>
           </div>
@@ -389,7 +454,7 @@ export function AlertPricingPlans() {
             <Users className="w-12 h-12 text-purple-600 mx-auto mb-3" />
             <h4 className="font-semibold text-gray-900 mb-2">Easy Group Management</h4>
             <p className="text-sm text-gray-600">
-              Simple tools to manage your contact lists, create message templates, 
+              Simple tools to manage your contact lists, create message templates,
               and track delivery across all communication channels.
             </p>
           </div>
@@ -403,42 +468,42 @@ export function AlertPricingPlans() {
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">How does pricing work?</h4>
             <p className="text-sm text-gray-600">
-              Plans are based on the number of recipients in your group. You can send unlimited custom messages 
+              Plans are based on the number of recipients in your group. You can send unlimited custom messages
               to all recipients in your plan. Emergency alerts are always free.
             </p>
           </div>
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">What counts as a custom message?</h4>
             <p className="text-sm text-gray-600">
-              Any message you personally write and send to your group - announcements, reminders, 
+              Any message you personally write and send to your group - announcements, reminders,
               updates, etc. Emergency alerts from weather services don't count toward any limits.
             </p>
           </div>
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">Can I upgrade my plan?</h4>
             <p className="text-sm text-gray-600">
-              Yes! Upgrade anytime as your group grows. Your billing will be prorated, 
+              Yes! Upgrade anytime as your group grows. Your billing will be prorated,
               and you'll immediately get access to support more recipients.
             </p>
           </div>
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">Do you offer free trials?</h4>
             <p className="text-sm text-gray-600">
-              Yes! All plans include a 14-day free trial with full access to custom messaging 
+              Yes! All plans include a 14-day free trial with full access to custom messaging
               and emergency alerts. No credit card required to start.
             </p>
           </div>
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">How do I qualify for non-profit pricing?</h4>
             <p className="text-sm text-gray-600">
-              Valid 501(c)(3) status or equivalent NGO documentation required. 
+              Valid 501(c)(3) status or equivalent NGO documentation required.
               Apply with your tax-exempt certificate to receive 40% off regular pricing.
             </p>
           </div>
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">What happens if I exceed my monthly message limit?</h4>
             <p className="text-sm text-gray-600">
-              Additional custom messages beyond your plan limit are charged per message. 
+              Additional custom messages beyond your plan limit are charged per message.
               Emergency disaster alerts are always free within reasonable usage limits.
             </p>
           </div>
@@ -452,26 +517,26 @@ export function AlertPricingPlans() {
           <div>
             <h4 className="font-medium mb-2">Emergency Messaging</h4>
             <p className="mb-3">
-              Emergency disaster alerts in your area are provided free within reasonable usage limits. 
+              Emergency disaster alerts in your area are provided free within reasonable usage limits.
               These include weather warnings, natural disasters, and public safety notifications.
             </p>
-            
+
             <h4 className="font-medium mb-2">Carrier Charges</h4>
             <p className="mb-3">
-              Standard cellphone and carrier message/data charges may apply. 
+              Standard cellphone and carrier message/data charges may apply.
               Contact your mobile carrier for specific rates and terms.
             </p>
           </div>
           <div>
             <h4 className="font-medium mb-2">User Consent & Opt-Out</h4>
             <p className="mb-3">
-              All users must provide explicit permission to receive messages. 
+              All users must provide explicit permission to receive messages.
               Users may opt out at any time by replying STOP or through account settings.
             </p>
-            
+
             <h4 className="font-medium mb-2">Terms of Service</h4>
             <p>
-              By using our service, you agree to our Terms of Service and Privacy Policy. 
+              By using our service, you agree to our Terms of Service and Privacy Policy.
               User consent is required for all messaging services.
             </p>
           </div>
