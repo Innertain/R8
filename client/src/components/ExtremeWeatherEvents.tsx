@@ -214,20 +214,63 @@ async function extractInfoboxData(title: string): Promise<any> {
     // Extract infobox data using regex patterns
     const infobox: any = {};
     
-    // Common infobox patterns for disasters
+    // Comprehensive infobox patterns for different disaster types
     const patterns = {
-      date: /\|[\s]*date[\s]*=[\s]*([^|\n]+)/i,
-      location: /\|[\s]*location[\s]*=[\s]*([^|\n]+)/i,
-      coordinates: /\|[\s]*coordinates[\s]*=[\s]*([^|\n]+)/i,
-      deaths: /\|[\s]*deaths[\s]*=[\s]*([^|\n]+)/i,
-      injuries: /\|[\s]*(?:injuries|injured)[\s]*=[\s]*([^|\n]+)/i,
-      missing: /\|[\s]*missing[\s]*=[\s]*([^|\n]+)/i,
-      evacuated: /\|[\s]*evacuated[\s]*=[\s]*([^|\n]+)/i,
-      damage: /\|[\s]*damage[\s]*=[\s]*([^|\n]+)/i,
-      burnedArea: /\|[\s]*(?:burned|area)[\s]*=[\s]*([^|\n]+)/i,
-      structuresDestroyed: /\|[\s]*(?:structures|buildings)[\s]*=[\s]*([^|\n]+)/i,
-      cause: /\|[\s]*cause[\s]*=[\s]*([^|\n]+)/i,
-      status: /\|[\s]*status[\s]*=[\s]*([^|\n]+)/i
+      // Death/casualty patterns
+      deaths: [
+        /\|[\s]*(?:deaths|fatalities|casualties|killed)[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:death_toll|total_deaths)[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:confirmed_deaths)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      // Injury patterns  
+      injuries: [
+        /\|[\s]*(?:injuries|injured|wounded)[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:total_injuries|injury_count)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      // Missing patterns
+      missing: [
+        /\|[\s]*missing[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:missing_persons|unaccounted)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      // Damage patterns (multiple formats)
+      damage: [
+        /\|[\s]*damage[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:total_damage|economic_damage|cost)[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:damage_estimate|losses)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      // Evacuated patterns
+      evacuated: [
+        /\|[\s]*evacuated[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:evacuation|displaced)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      // Structure destruction patterns
+      structuresDestroyed: [
+        /\|[\s]*(?:structures|buildings|homes|houses)[\s]*(?:destroyed|lost|damaged)[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:destroyed_structures|buildings_destroyed)[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:homes_destroyed|houses_lost)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      // Fire-specific patterns
+      burnedArea: [
+        /\|[\s]*(?:burned|burnt|area|size)[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:total_area|burn_area)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      // General patterns
+      cause: [
+        /\|[\s]*cause[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:origin|source)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      status: [
+        /\|[\s]*status[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:current_status|containment)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      date: [
+        /\|[\s]*date[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:start_date|begin_date)[\s]*=[\s]*([^|\n]+)/i
+      ],
+      location: [
+        /\|[\s]*location[\s]*=[\s]*([^|\n]+)/i,
+        /\|[\s]*(?:affected_areas|region)[\s]*=[\s]*([^|\n]+)/i
+      ]
     };
     
     // Function to clean Wikipedia markup
@@ -245,17 +288,51 @@ async function extractInfoboxData(title: string): Promise<any> {
         // Remove wiki links but keep the display text
         .replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, '$2') // [[link|display]] -> display
         .replace(/\[\[([^\]]+)\]\]/g, '$1') // [[link]] -> link
+        // Clean up common Wikipedia formatting
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
         // Remove extra whitespace and trim
         .replace(/\s+/g, ' ')
         .trim();
     }
+    
+    // Function to format numbers nicely
+    function formatStatistic(value: string, type: string): string {
+      if (!value) return value;
+      
+      // For damage amounts, try to format currency
+      if (type === 'damage' && /^\$?\d+/.test(value)) {
+        const match = value.match(/\$?([\d,]+)/);
+        if (match) {
+          const number = parseInt(match[1].replace(/,/g, ''));
+          if (number >= 1000000000) {
+            return `$${(number / 1000000000).toFixed(1)}B`;
+          } else if (number >= 1000000) {
+            return `$${(number / 1000000).toFixed(1)}M`;
+          }
+        }
+      }
+      
+      // For other numbers, format with commas
+      if (/^\d+$/.test(value)) {
+        return parseInt(value).toLocaleString();
+      }
+      
+      return value;
+    }
 
-    for (const [key, pattern] of Object.entries(patterns)) {
-      const match = content.match(pattern);
-      if (match && match[1]) {
-        const cleanedValue = cleanWikipediaText(match[1]);
-        if (cleanedValue && cleanedValue.length > 0 && !cleanedValue.includes('{') && !cleanedValue.includes('<')) {
-          infobox[key] = cleanedValue;
+    // Try multiple patterns for each field type
+    for (const [key, patternArray] of Object.entries(patterns)) {
+      for (const pattern of patternArray) {
+        const match = content.match(pattern);
+        if (match && match[1]) {
+          const cleanedValue = cleanWikipediaText(match[1]);
+          if (cleanedValue && cleanedValue.length > 0 && !cleanedValue.includes('{') && !cleanedValue.includes('<')) {
+            infobox[key] = formatStatistic(cleanedValue, key);
+            break; // Use first successful match for each field
+          }
         }
       }
     }
