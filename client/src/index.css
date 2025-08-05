@@ -130,6 +130,25 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* R8 Scrolling Animation */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 20s linear infinite;
+}
+
+/* Pause scrolling on hover */
+.animate-scroll-left:hover {
+  animation-play-state: paused;
+}
+
 /* Icon glow effect on hover */
 .card-hover-effect:hover .activity-icon {
   filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));

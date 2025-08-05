@@ -72,33 +72,65 @@ function HeroSection() {
             <h1 className="text-6xl font-bold text-white tracking-wide">R8</h1>
           </div>
 
-          <div className="space-y-6">
-            {/* Main 3 R's - Clean Typography */}
-            <h2 className="text-5xl font-bold text-white leading-tight">
-              <span className="text-red-400">R</span>esponse • <span className="text-blue-400">R</span>esilience • <span className="text-green-400">R</span>egeneration
-            </h2>
-            
-            {/* Supporting R's - Simple Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto text-center">
-              <div className="text-white/80">
-                <span className="text-purple-300 font-medium">R</span>esponsibility
-              </div>
-              <div className="text-white/80">
-                <span className="text-amber-300 font-medium">R</span>esources
-              </div>
-              <div className="text-white/80">
-                <span className="text-teal-300 font-medium">R</span>ecovery
-              </div>
-              <div className="text-white/80">
-                <span className="text-emerald-300 font-medium">R</span>estoration
-              </div>
-              <div className="text-white/80 md:col-span-1 col-span-2">
-                <span className="text-indigo-300 font-medium">R</span>enewal
+          <div className="space-y-8">
+            {/* Main 3 R's with Bold Effects */}
+            <div className="text-center">
+              <h2 className="text-6xl font-bold text-white leading-tight mb-6">
+                <span className="inline-block transform hover:scale-110 transition-transform duration-300">
+                  <span className="text-7xl font-black text-red-500 drop-shadow-lg animate-pulse">R</span><span className="text-red-100">esponse</span>
+                </span>
+                <span className="mx-4 text-white/50">•</span>
+                <span className="inline-block transform hover:scale-110 transition-transform duration-300">
+                  <span className="text-7xl font-black text-blue-500 drop-shadow-lg animate-pulse" style={{animationDelay: '0.5s'}}>R</span><span className="text-blue-100">esilience</span>
+                </span>
+                <span className="mx-4 text-white/50">•</span>
+                <span className="inline-block transform hover:scale-110 transition-transform duration-300">
+                  <span className="text-7xl font-black text-green-500 drop-shadow-lg animate-pulse" style={{animationDelay: '1s'}}>R</span><span className="text-green-100">egeneration</span>
+                </span>
+              </h2>
+            </div>
+
+            {/* Scrolling Supporting R's */}
+            <div className="relative overflow-hidden bg-black/20 backdrop-blur-sm rounded-lg border border-white/10 h-16">
+              <div className="absolute inset-0 flex items-center">
+                <div className="animate-scroll-left whitespace-nowrap flex items-center space-x-8 text-lg">
+                  <span className="text-purple-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>esponsibility
+                  </span>
+                  <span className="text-amber-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>esources
+                  </span>
+                  <span className="text-teal-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>ecovery
+                  </span>
+                  <span className="text-emerald-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>estoration
+                  </span>
+                  <span className="text-indigo-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>enewal
+                  </span>
+                  {/* Duplicate for seamless loop */}
+                  <span className="text-purple-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>esponsibility
+                  </span>
+                  <span className="text-amber-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>esources
+                  </span>
+                  <span className="text-teal-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>ecovery
+                  </span>
+                  <span className="text-emerald-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>estoration
+                  </span>
+                  <span className="text-indigo-300 font-semibold">
+                    <span className="text-2xl font-black">R</span>enewal
+                  </span>
+                </div>
               </div>
             </div>
 
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Community resilience through emergency response, ecological regeneration, and collaborative action.
+              Eight principles driving community transformation and ecological regeneration.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 pt-8">
