@@ -981,9 +981,9 @@ export default function ExtremeWeatherEvents() {
               <div>
                 <p className="text-sm font-medium text-gray-500">Avg per Month</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {Math.round(totalEvents / 12)}
+                  {Math.round(totalEvents / 60)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">events per month</p>
+                <p className="text-xs text-gray-500 mt-1">events per month (2021-2025)</p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-500" />
             </div>
