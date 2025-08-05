@@ -72,66 +72,33 @@ function HeroSection() {
             <h1 className="text-6xl font-bold text-white tracking-wide">R8</h1>
           </div>
 
-          <div className="space-y-8">
-            {/* Main 3 R's - Large Display */}
-            <div className="text-center">
-              <h2 className="text-5xl font-bold text-white leading-tight mb-4">
-                <span className="text-red-400">R</span>esponse • <span className="text-blue-400">R</span>esilience • <span className="text-green-400">R</span>egeneration
-              </h2>
-              
-              {/* Creative 8 R-words Circular Display */}
-              <div className="relative max-w-2xl mx-auto mb-6">
-                <div className="relative w-80 h-80 mx-auto">
-                  {/* Center Logo */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
-                      <span className="text-2xl font-bold text-white">R8</span>
-                    </div>
-                  </div>
-                  
-                  {/* Supporting 5 R's - Orbiting around center */}
-                  <div className="absolute inset-0 animate-spin" style={{ animationDuration: '60s' }}>
-                    {/* Responsibility */}
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4">
-                      <div className="bg-purple-500/80 backdrop-blur-sm px-3 py-1 rounded-full border border-purple-300/50">
-                        <span className="text-sm font-medium text-white">Responsibility</span>
-                      </div>
-                    </div>
-                    
-                    {/* Resources */}
-                    <div className="absolute top-1/4 right-0 transform translate-x-4 -translate-y-1/2 rotate-45">
-                      <div className="bg-amber-500/80 backdrop-blur-sm px-3 py-1 rounded-full border border-amber-300/50 -rotate-45">
-                        <span className="text-sm font-medium text-white">Resources</span>
-                      </div>
-                    </div>
-                    
-                    {/* Recovery */}
-                    <div className="absolute bottom-1/4 right-0 transform translate-x-4 translate-y-1/2 rotate-90">
-                      <div className="bg-teal-500/80 backdrop-blur-sm px-3 py-1 rounded-full border border-teal-300/50 -rotate-90">
-                        <span className="text-sm font-medium text-white">Recovery</span>
-                      </div>
-                    </div>
-                    
-                    {/* Restoration */}
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-4 rotate-180">
-                      <div className="bg-emerald-500/80 backdrop-blur-sm px-3 py-1 rounded-full border border-emerald-300/50 -rotate-180">
-                        <span className="text-sm font-medium text-white">Restoration</span>
-                      </div>
-                    </div>
-                    
-                    {/* Renewal */}
-                    <div className="absolute top-1/4 left-0 transform -translate-x-4 -translate-y-1/2 -rotate-45">
-                      <div className="bg-indigo-500/80 backdrop-blur-sm px-3 py-1 rounded-full border border-indigo-300/50 rotate-45">
-                        <span className="text-sm font-medium text-white">Renewal</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div className="space-y-6">
+            {/* Main 3 R's - Clean Typography */}
+            <h2 className="text-5xl font-bold text-white leading-tight">
+              <span className="text-red-400">R</span>esponse • <span className="text-blue-400">R</span>esilience • <span className="text-green-400">R</span>egeneration
+            </h2>
+            
+            {/* Supporting R's - Simple Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto text-center">
+              <div className="text-white/80">
+                <span className="text-purple-300 font-medium">R</span>esponsibility
+              </div>
+              <div className="text-white/80">
+                <span className="text-amber-300 font-medium">R</span>esources
+              </div>
+              <div className="text-white/80">
+                <span className="text-teal-300 font-medium">R</span>ecovery
+              </div>
+              <div className="text-white/80">
+                <span className="text-emerald-300 font-medium">R</span>estoration
+              </div>
+              <div className="text-white/80 md:col-span-1 col-span-2">
+                <span className="text-indigo-300 font-medium">R</span>enewal
               </div>
             </div>
 
-            <p className="text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-              Eight R's for community transformation: Emergency <span className="text-red-400 font-semibold">Response</span>, Community <span className="text-blue-400 font-semibold">Resilience</span>, and Ecological <span className="text-green-400 font-semibold">Regeneration</span> — supported by <span className="text-purple-400 font-medium">Responsibility</span>, <span className="text-amber-400 font-medium">Resources</span>, <span className="text-teal-400 font-medium">Recovery</span>, <span className="text-emerald-400 font-medium">Restoration</span>, and <span className="text-indigo-400 font-medium">Renewal</span>.
+            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              Community resilience through emergency response, ecological regeneration, and collaborative action.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 pt-8">
