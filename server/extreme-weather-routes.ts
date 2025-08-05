@@ -791,11 +791,18 @@ async function fetchHistoricalStormEvents(events: any[], startYear: number, endY
     ];
 
     const allHistoricalEvents = [...historicalStormEvents, ...additional2024Events];
-    console.log(`📊 Loaded ${allHistoricalEvents.length} comprehensive historical storm events from NOAA Storm Database`);
-    console.log(`📊 Fetched ${allHistoricalEvents.length} historical storm events from NOAA Storm Database`);
     
-    // Push all events to the events array passed by reference
-    events.push(...allHistoricalEvents);
+    // Remove duplicates based on ID
+    const uniqueEvents = allHistoricalEvents.filter((event, index, self) => 
+      index === self.findIndex(e => e.id === event.id)
+    );
+    
+    console.log(`📊 Loaded ${allHistoricalEvents.length} comprehensive historical storm events from NOAA Storm Database`);
+    console.log(`📊 Filtered to ${uniqueEvents.length} unique events (removed ${allHistoricalEvents.length - uniqueEvents.length} duplicates)`);
+    console.log(`📊 Fetched ${uniqueEvents.length} historical storm events from NOAA Storm Database`);
+    
+    // Push unique events to the events array passed by reference
+    events.push(...uniqueEvents);
     
   } catch (error: any) {
     console.log(`⚠️ Storm events loading failed: ${error.message}`);
@@ -891,7 +898,13 @@ function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
     }
   });
 
-  return processed;
+  // Remove any final duplicates based on ID
+  const uniqueProcessed = processed.filter((event, index, self) => 
+    index === self.findIndex(e => e.id === event.id)
+  );
+  
+  console.log(`📈 Processed ${uniqueProcessed.length} extreme weather events (removed ${processed.length - uniqueProcessed.length} final duplicates)`);
+  return uniqueProcessed;
 }
 
 // Generate statistics for extreme weather events
