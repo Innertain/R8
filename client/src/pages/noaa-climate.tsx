@@ -1,5 +1,6 @@
 import NoaaClimateReports from '@/components/NoaaClimateReports';
 import NoaaClimateAnalytics from '@/components/NoaaClimateAnalytics';
+import ExtremeWeatherEvents from '@/components/ExtremeWeatherEvents';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Thermometer, Info } from 'lucide-react';
 
@@ -47,8 +48,8 @@ export default function NoaaClimatePage() {
         <div className="grid grid-cols-1 gap-8">
           <NoaaClimateAnalytics />
           <div className="border-t pt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Enhanced RSS Feed Reports</h2>
-            <NoaaClimateReports />
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Extreme Weather Events & Climate Reports</h2>
+            <ExtremeWeatherEvents />
           </div>
         </div>
       </div>

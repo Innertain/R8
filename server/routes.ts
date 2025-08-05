@@ -9,6 +9,7 @@ import { fetchShiftsFromAirtableServer } from "./airtable";
 import { getBioregionSpecies, getApiUsageStats } from "./inaturalist";
 import speciesRoutes from "./routes/species";
 import noaaRoutes from "./noaa-routes";
+import extremeWeatherRoutes from "./extreme-weather-routes";
 import { airQualityService } from "./services/airQualityService";
 import { airQualityStations, airQualityReadings } from "@shared/schema";
 
@@ -3872,6 +3873,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
   // Include NOAA climate routes from separate module
   app.use('/api', noaaRoutes);
+  
+  // Include extreme weather routes
+  app.use('/api', extremeWeatherRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
