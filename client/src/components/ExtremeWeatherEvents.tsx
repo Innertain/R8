@@ -305,15 +305,63 @@ function useWikipediaSearch(query: string, enabled: boolean = false) {
       try {
         // More targeted search strategies for disasters
         const queryParts = query.split(' ');
-        const searchStrategies = [
-          query, // Original query
-          `${queryParts[0]} fire`, // Just the fire name
-          `${queryParts[0]} ${queryParts[1]} fire`, // Fire name + location
-          `${queryParts.slice(0, 2).join(' ')} wildfire`, // First two words + wildfire
-          `${queryParts[0]} Fire`, // Capitalized fire name
-          `2025 California wildfires`, // Recent California fires context
-          `${queryParts[0]} disaster ${queryParts[queryParts.length - 1]}` // Name + year
-        ];
+        const searchStrategies = [];
+        
+        // Determine disaster type and create appropriate search strategies
+        if (query.toLowerCase().includes('hurricane')) {
+          // Hurricane-specific searches
+          console.log('Hurricane query:', query);
+          const hurricaneName = queryParts.find(part => 
+            ['milton', 'helene', 'ian', 'ida', 'michael', 'florence', 'dorian'].includes(part.toLowerCase())
+          );
+          const year = queryParts.find(part => /20\d{2}/.test(part));
+          
+          console.log('Hurricane name found:', hurricaneName, 'Year:', year);
+          
+          if (hurricaneName && year) {
+            searchStrategies.push(
+              `Hurricane ${hurricaneName.charAt(0).toUpperCase() + hurricaneName.slice(1)} (${year})`,
+              `Hurricane ${hurricaneName.charAt(0).toUpperCase() + hurricaneName.slice(1)}`,
+              `${hurricaneName.charAt(0).toUpperCase() + hurricaneName.slice(1)} ${year}`,
+              query
+            );
+          } else if (hurricaneName) {
+            searchStrategies.push(
+              `Hurricane ${hurricaneName.charAt(0).toUpperCase() + hurricaneName.slice(1)}`,
+              `${hurricaneName.charAt(0).toUpperCase() + hurricaneName.slice(1)}`,
+              query
+            );
+          } else {
+            // Try to extract from the query directly
+            const match = query.match(/Hurricane\s+(\w+)/i);
+            if (match) {
+              const name = match[1];
+              searchStrategies.push(
+                `Hurricane ${name}`,
+                name,
+                query
+              );
+            } else {
+              searchStrategies.push(query);
+            }
+          }
+        } else if (query.toLowerCase().includes('fire')) {
+          // Fire-specific searches
+          searchStrategies.push(
+            query,
+            `${queryParts[0]} fire`,
+            `${queryParts[0]} ${queryParts[1]} fire`,
+            `${queryParts.slice(0, 2).join(' ')} wildfire`,
+            `${queryParts[0]} Fire`,
+            `${queryParts[0]} disaster ${queryParts[queryParts.length - 1]}`
+          );
+        } else {
+          // General disaster searches
+          searchStrategies.push(
+            query,
+            `${queryParts[0]} disaster ${queryParts[queryParts.length - 1]}`
+          );
+        }
 
         for (const searchQuery of searchStrategies) {
           try {
