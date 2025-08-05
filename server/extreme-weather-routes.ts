@@ -848,6 +848,50 @@ function extractStateFromAreas(areaDesc: string): string {
   return matches ? matches[0] : 'Multiple States';
 }
 
+// Normalize event types to combine related events
+function normalizeEventType(eventType: string): string {
+  const type = eventType.toLowerCase();
+  
+  // Combine all flood types
+  if (type.includes('flood')) {
+    return 'Flood';
+  }
+  
+  // Combine storm types
+  if (type.includes('thunderstorm') || type.includes('severe storm')) {
+    return 'Thunderstorm';
+  }
+  
+  // Standardize other common types
+  const typeMap: { [key: string]: string } = {
+    'winter storm': 'Winter Storm',
+    'winter weather': 'Winter Storm',
+    'ice storm': 'Ice Storm',
+    'blizzard': 'Winter Storm',
+    'tornado': 'Tornado',
+    'hurricane': 'Hurricane',
+    'tropical storm': 'Hurricane',
+    'wildfire': 'Wildfire',
+    'fire': 'Wildfire',
+    'drought': 'Drought',
+    'heat': 'Heat',
+    'excessive heat': 'Heat',
+    'hail': 'Hail',
+    'wind': 'High Wind'
+  };
+  
+  for (const [key, value] of Object.entries(typeMap)) {
+    if (type.includes(key)) {
+      return value;
+    }
+  }
+  
+  // Return original with proper capitalization
+  return eventType.split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 // Process extreme weather data into standardized format
 function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
   const processed: StormEvent[] = [];
@@ -858,7 +902,7 @@ function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
       if (event.real_data) {
         processed.push({
           id: event.id || `real_${index}_${Date.now()}`,
-          eventType: event.event_type || 'Weather Event',
+          eventType: normalizeEventType(event.event_type || 'Weather Event'),
           state: event.state || 'Unknown',
           county: event.areas || event.county || 'Unknown',
           beginDate: event.begin_date || new Date().toISOString(),
@@ -881,7 +925,7 @@ function processExtremeWeatherData(rawEvents: any[]): StormEvent[] {
         // Handle CSV/legacy data format
         processed.push({
           id: `storm_${index}_${Date.now()}`,
-          eventType: event.eventType || event.EVENT_TYPE || 'Unknown',
+          eventType: normalizeEventType(event.eventType || event.EVENT_TYPE || 'Unknown'),
           state: event.state || event.STATE || 'Unknown',
           county: event.county || event.CZ_NAME || 'Unknown',
           beginDate: event.beginDate || event.BEGIN_DATE || new Date().toISOString(),
