@@ -18,9 +18,11 @@ export function AlertPricingPlans() {
       period: billingCycle === 'monthly' ? '/month' : '/year',
       savings: billingCycle === 'yearly' ? 'Save $30/year' : null,
       pricePerUser: billingCycle === 'monthly' ? '$0.60' : '$0.50',
+      monthlyMessages: "500 custom messages/month",
+      extraMessageFee: "$0.05 per additional message",
       features: [
         "25 recipients included",
-        "Unlimited custom messages",
+        "500 custom messages per month",
         "Email & SMS delivery",
         "Message scheduling",
         "Basic message templates",
@@ -48,9 +50,11 @@ export function AlertPricingPlans() {
       savings: billingCycle === 'yearly' ? 'Save $70/year' : null,
       pricePerUser: billingCycle === 'monthly' ? '$0.35' : '$0.29',
       specialNote: "501(c)(3) verification required",
+      monthlyMessages: "1,500 custom messages/month",
+      extraMessageFee: "$0.04 per additional message",
       features: [
         "100 recipients included",
-        "Unlimited custom messages",
+        "1,500 custom messages per month",
         "Email, SMS & voice calls",
         "Advanced message scheduling",
         "Custom message templates",
@@ -81,9 +85,11 @@ export function AlertPricingPlans() {
       period: billingCycle === 'monthly' ? '/month' : '/year',
       savings: billingCycle === 'yearly' ? 'Save $150/year' : null,
       pricePerUser: billingCycle === 'monthly' ? '$0.50' : '$0.42',
+      monthlyMessages: "3,000 custom messages/month",
+      extraMessageFee: "$0.03 per additional message",
       features: [
         "150 recipients included",
-        "Unlimited custom messages", 
+        "3,000 custom messages per month", 
         "Email, SMS & voice calls",
         "Advanced message scheduling",
         "Custom message templates",
@@ -112,9 +118,11 @@ export function AlertPricingPlans() {
       period: billingCycle === 'monthly' ? '/month' : '/year',
       savings: billingCycle === 'yearly' ? 'Save $600/year' : null,
       pricePerUser: billingCycle === 'monthly' ? '$0.30' : '$0.25',
+      monthlyMessages: "10,000 custom messages/month",
+      extraMessageFee: "$0.02 per additional message",
       features: [
         "1,000 recipients included",
-        "Unlimited custom messages",
+        "10,000 custom messages per month",
         "All delivery methods + webhooks",
         "Advanced automation & workflows",
         "White-label message templates",
@@ -144,9 +152,11 @@ export function AlertPricingPlans() {
       price: null,
       period: 'Custom pricing',
       pricePerUser: 'Volume discounts available',
+      monthlyMessages: "Unlimited custom messages",
+      extraMessageFee: "Volume pricing available",
       features: [
         "Unlimited recipients",
-        "Unlimited everything",
+        "Unlimited custom messages",
         "Custom delivery infrastructure",
         "Dedicated infrastructure",
         "Custom integrations & APIs",
@@ -258,7 +268,8 @@ export function AlertPricingPlans() {
               </div>
               <CardTitle className="text-xl">{plan.name}</CardTitle>
               <p className="text-sm text-gray-600 mt-2">{plan.description}</p>
-              <div className="text-sm font-medium text-blue-600 mb-2">{plan.userLimit}</div>
+              <div className="text-sm font-medium text-blue-600 mb-1">{plan.userLimit}</div>
+              <div className="text-sm text-gray-600 mb-2">{plan.monthlyMessages}</div>
               
               <div className="mt-4">
                 {plan.price !== null ? (
@@ -268,6 +279,7 @@ export function AlertPricingPlans() {
                       <span className="text-gray-600 ml-1">{plan.period}</span>
                     </div>
                     <div className="text-sm text-gray-500 mt-1">{plan.pricePerUser} per user</div>
+                    <div className="text-xs text-gray-500 mt-1">Extra: {plan.extraMessageFee}</div>
                     {plan.savings && (
                       <p className="text-sm text-green-600 mt-1">{plan.savings}</p>
                     )}
@@ -282,6 +294,7 @@ export function AlertPricingPlans() {
                   <div>
                     <div className="text-xl font-semibold text-gray-900">{plan.period}</div>
                     <div className="text-sm text-gray-500 mt-1">{plan.pricePerUser}</div>
+                    <div className="text-xs text-gray-500 mt-1">{plan.extraMessageFee}</div>
                   </div>
                 )}
               </div>
@@ -420,6 +433,46 @@ export function AlertPricingPlans() {
             <p className="text-sm text-gray-600">
               Valid 501(c)(3) status or equivalent NGO documentation required. 
               Apply with your tax-exempt certificate to receive 40% off regular pricing.
+            </p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-900 mb-2">What happens if I exceed my monthly message limit?</h4>
+            <p className="text-sm text-gray-600">
+              Additional custom messages beyond your plan limit are charged per message. 
+              Emergency disaster alerts are always free within reasonable usage limits.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Terms and Disclaimers */}
+      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-6xl mx-auto">
+        <h3 className="text-lg font-semibold text-blue-900 mb-4">Important Terms & Disclaimers</h3>
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
+          <div>
+            <h4 className="font-medium mb-2">Emergency Messaging</h4>
+            <p className="mb-3">
+              Emergency disaster alerts in your area are provided free within reasonable usage limits. 
+              These include weather warnings, natural disasters, and public safety notifications.
+            </p>
+            
+            <h4 className="font-medium mb-2">Carrier Charges</h4>
+            <p className="mb-3">
+              Standard cellphone and carrier message/data charges may apply. 
+              Contact your mobile carrier for specific rates and terms.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-medium mb-2">User Consent & Opt-Out</h4>
+            <p className="mb-3">
+              All users must provide explicit permission to receive messages. 
+              Users may opt out at any time by replying STOP or through account settings.
+            </p>
+            
+            <h4 className="font-medium mb-2">Terms of Service</h4>
+            <p>
+              By using our service, you agree to our Terms of Service and Privacy Policy. 
+              User consent is required for all messaging services.
             </p>
           </div>
         </div>
