@@ -1049,24 +1049,7 @@ export default function ExtremeWeatherEvents() {
             </Card>
           </div>
 
-          {/* Top Affected States */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Most Affected States</CardTitle>
-              <CardDescription>States with highest number of extreme weather events</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topStatesChart} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="state" type="category" width={80} />
-                  <Tooltip />
-                  <Bar dataKey="events" fill="#10b981" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+
         </TabsContent>
 
         <TabsContent value="events" className="space-y-4">
