@@ -22,6 +22,7 @@ import BioregionExplorerPage from "@/pages/bioregion-explorer";
 import HawaiiRegenerationPage from "@/pages/hawaii-regeneration";
 import AppalachianRegenerationPage from "@/pages/appalachian-regeneration";
 import AirQualityPage from "@/pages/air-quality";
+import NoaaClimatePage from "@/pages/noaa-climate";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
@@ -72,7 +73,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                ['/map', '/stats', '/alerts'].includes(location) 
+                ['/map', '/stats', '/alerts', '/air-quality', '/noaa-climate'].includes(location) 
                   ? "bg-red-500 text-white shadow-md" 
                   : "text-white hover:bg-red-500/20 hover:text-white"
               }`}>
@@ -125,6 +126,17 @@ function Navigation() {
                     <div>
                       <div className="font-medium text-gray-900">Air Quality Monitor</div>
                       <div className="text-sm text-gray-600">Environmental health alerts</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/noaa-climate" className="flex items-center gap-3 p-3 hover:bg-cyan-50 rounded-lg cursor-pointer">
+                    <div className="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center">
+                      <Wind className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">NOAA Climate Reports</div>
+                      <div className="text-sm text-gray-600">Monthly climate monitoring</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -373,6 +385,17 @@ function Navigation() {
                 Air Quality Monitor
               </Button>
             </Link>
+            <Link href="/noaa-climate">
+              <Button 
+                variant={location === "/noaa-climate" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start ml-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Wind className="h-4 w-4" />
+                NOAA Climate Reports
+              </Button>
+            </Link>
 
             {/* Regeneration Section */}
             <div className="text-xs font-medium text-stormy-light px-2 py-1 uppercase tracking-wide">
@@ -429,6 +452,7 @@ function Router() {
         <Route path="/stats" component={StatsDashboard} />
         <Route path="/alerts" component={AlertsPage} />
         <Route path="/air-quality" component={AirQualityPage} />
+        <Route path="/noaa-climate" component={NoaaClimatePage} />
         <Route path="/bioregions" component={BioregionExplorerPage} />
         <Route path="/hawaii" component={HawaiiRegenerationPage} />
         <Route path="/appalachian" component={AppalachianRegenerationPage} />

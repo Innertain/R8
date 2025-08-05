@@ -8,6 +8,7 @@ import { alertEngine, type EmergencyEvent } from "./alerting/alertEngine";
 import { fetchShiftsFromAirtableServer } from "./airtable";
 import { getBioregionSpecies, getApiUsageStats } from "./inaturalist";
 import speciesRoutes from "./routes/species";
+import noaaRoutes from "./noaa-routes";
 import { airQualityService } from "./services/airQualityService";
 import { airQualityStations, airQualityReadings } from "@shared/schema";
 
@@ -3868,6 +3869,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       console.error('Error in periodic air quality monitoring:', error);
     }
   }, 2 * 60 * 60 * 1000); // 2 hours
+
+  // Include NOAA climate routes from separate module
+  app.use('/api', noaaRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
