@@ -7,8 +7,9 @@ interface DataSourceProps {
   lastUpdated: string;
   dataType: string;
   url?: string;
-  reliability?: 'official' | 'research' | 'community';
+  reliability?: 'official' | 'research' | 'community' | 'encyclopedia';
   className?: string;
+  title?: string; // Unified title override
 }
 
 const DataSourceAttribution: React.FC<DataSourceProps> = ({
@@ -17,7 +18,8 @@ const DataSourceAttribution: React.FC<DataSourceProps> = ({
   dataType,
   url,
   reliability = 'official',
-  className = ''
+  className = '',
+  title
 }) => {
   const getReliabilityColor = (level: string) => {
     switch (level) {
@@ -27,6 +29,8 @@ const DataSourceAttribution: React.FC<DataSourceProps> = ({
         return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'community':
         return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'encyclopedia':
+        return 'bg-purple-50 text-purple-700 border-purple-200';
       default:
         return 'bg-gray-50 text-gray-700 border-gray-200';
     }
@@ -49,7 +53,7 @@ const DataSourceAttribution: React.FC<DataSourceProps> = ({
     <div className={`flex items-center gap-2 text-xs text-gray-600 ${className}`}>
       <div className="flex items-center gap-1">
         <Database className="w-3 h-3" />
-        <span className="font-medium">{source}</span>
+        <span className="font-medium">{title || source}</span>
       </div>
       
       <div className="flex items-center gap-1">
@@ -62,7 +66,8 @@ const DataSourceAttribution: React.FC<DataSourceProps> = ({
         className={`text-xs px-2 py-0 ${getReliabilityColor(reliability)}`}
       >
         {reliability === 'official' ? 'Official' : 
-         reliability === 'research' ? 'Research' : 'Community'}
+         reliability === 'research' ? 'Research' : 
+         reliability === 'encyclopedia' ? 'Encyclopedia' : 'Community'}
       </Badge>
       
       {url && (

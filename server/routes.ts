@@ -3876,6 +3876,10 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   
   // Include extreme weather routes
   app.use('/api', extremeWeatherRoutes);
+  
+  // Include Wikipedia routes
+  const wikipediaRoutes = (await import('./routes/wikipedia')).default;
+  app.use('/api', wikipediaRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
