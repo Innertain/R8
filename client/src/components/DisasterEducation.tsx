@@ -23,7 +23,8 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Leaf
+  Leaf,
+  BarChart3
 } from 'lucide-react';
 
 // Import custom disaster icons
