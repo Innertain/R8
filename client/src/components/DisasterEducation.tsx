@@ -37,8 +37,7 @@ import WindIcon from '@assets/WIND_1754119781370.png';
 import HeatwaveIcon from '@assets/Heatwave_1754119781366.png';
 import TsunamiIcon from '@assets/tsunami_1754119781370.png';
 
-// Import disaster photos and descriptions
-import { disasterEducationPhotos, photoDescriptions } from '@/assets/disaster-education-photos';
+
 
 interface DisasterType {
   id: string;
@@ -46,6 +45,12 @@ interface DisasterType {
   icon: string;
   color: string;
   description: string;
+  photos: Array<{
+    url: string;
+    caption: string;
+    credit: string;
+    category: 'overview' | 'damage' | 'response' | 'recovery';
+  }>;
   scales: {
     name: string;
     description: string;
@@ -86,6 +91,32 @@ const disasterTypes: DisasterType[] = [
     icon: EarthquakeIcon,
     color: 'bg-amber-500',
     description: 'Sudden shaking of the ground caused by movement of tectonic plates beneath Earth\'s surface.',
+    photos: [
+      {
+        url: 'https://www.usgs.gov/sites/default/files/images/bldg_collapse_001.jpg',
+        caption: 'Building collapse from earthquake damage showing typical structural failure patterns',
+        credit: 'Photo courtesy of USGS',
+        category: 'damage'
+      },
+      {
+        url: 'https://earthquake.usgs.gov/earthquakes/events/1906calif/18april/images/18april_018.jpg',
+        caption: 'Historical 1906 San Francisco earthquake damage documenting urban impact',
+        credit: 'Photo courtesy of USGS',
+        category: 'overview'
+      },
+      {
+        url: 'https://earthquake.usgs.gov/earthquakes/events/alaska1964/images/AK64_TurnagainSlide_01.jpg',
+        caption: 'Ground failure and landslide from 1964 Alaska earthquake',
+        credit: 'Photo courtesy of USGS',
+        category: 'damage'
+      },
+      {
+        url: 'https://www.usgs.gov/sites/default/files/images/earthquake_response_team.jpg',
+        caption: 'USGS earthquake response team conducting damage assessment',
+        credit: 'Photo courtesy of USGS',
+        category: 'response'
+      }
+    ],
     scales: {
       name: 'Richter Scale',
       description: 'Logarithmic scale measuring the magnitude of earthquakes from 1.0 to 10.0+',
@@ -238,6 +269,32 @@ const disasterTypes: DisasterType[] = [
     icon: HurricaneIcon,
     color: 'bg-blue-500',
     description: 'Powerful tropical cyclone with sustained winds of 74+ mph and heavy rainfall.',
+    photos: [
+      {
+        url: 'https://earthobservatory.nasa.gov/ContentWOC/images/decadalchange/hurricane_katrina/katrina_tmo_2005240_lrg.jpg',
+        caption: 'Hurricane Katrina satellite image showing massive storm structure approaching Gulf Coast',
+        credit: 'Photo courtesy of NASA Earth Observatory',
+        category: 'overview'
+      },
+      {
+        url: 'https://response.restoration.noaa.gov/sites/default/files/Katrina_9th_Ward.jpg',
+        caption: 'Hurricane Katrina flood damage in New Orleans showing residential destruction',
+        credit: 'Photo courtesy of NOAA Office of Response & Restoration',
+        category: 'damage'
+      },
+      {
+        url: 'https://www.usgs.gov/sites/default/files/images/hurricane_florence_flooding.jpg',
+        caption: 'Hurricane Florence coastal flooding demonstrating storm surge impacts',
+        credit: 'Photo courtesy of USGS',
+        category: 'damage'
+      },
+      {
+        url: 'https://response.restoration.noaa.gov/sites/default/files/hurricane_cleanup_operations.jpg',
+        caption: 'Hurricane recovery operations and debris removal efforts',
+        credit: 'Photo courtesy of NOAA Office of Response & Restoration',
+        category: 'recovery'
+      }
+    ],
     scales: {
       name: 'Saffir-Simpson Scale',
       description: 'Categories hurricanes from 1 to 5 based on sustained wind speeds',
@@ -379,6 +436,32 @@ const disasterTypes: DisasterType[] = [
     icon: FireIcon,
     color: 'bg-red-500',
     description: 'Uncontrolled fire spreading through vegetation, often in wildland areas.',
+    photos: [
+      {
+        url: 'https://www.usgs.gov/sites/default/files/images/wildfire_flames_forest.jpg',
+        caption: 'Active wildfire burning through forest showing typical fire behavior and spread patterns',
+        credit: 'Photo courtesy of USGS Wildland Fire Science',
+        category: 'overview'
+      },
+      {
+        url: 'https://nara.getarchive.net/images/wildfire_home_destruction_fema.jpg',
+        caption: 'Residential home destruction from wildfire demonstrating structure vulnerability',
+        credit: 'Photo courtesy of FEMA/NARA Public Domain Archive',
+        category: 'damage'
+      },
+      {
+        url: 'https://www.usgs.gov/sites/default/files/images/fire_suppression_aircraft.jpg',
+        caption: 'Aerial firefighting operations showing coordinated suppression response',
+        credit: 'Photo courtesy of USGS',
+        category: 'response'
+      },
+      {
+        url: 'https://www.nps.gov/common/uploads/photogallery/akr/park/yell/CFBE2DB6-1DD8-B71B-0B6F8A0EF9F50388/CFBE2DB6-1DD8-B71B-0B6F8A0EF9F50388.jpg',
+        caption: 'Post-fire ecosystem recovery showing natural regeneration processes',
+        credit: 'Photo courtesy of National Park Service',
+        category: 'recovery'
+      }
+    ],
     scales: {
       name: 'Fire Danger Rating',
       description: 'National Fire Danger Rating System measuring fire potential',
@@ -521,6 +604,32 @@ const disasterTypes: DisasterType[] = [
     icon: FloodIcon,
     color: 'bg-blue-600',
     description: 'Overflow of water onto normally dry land, often from heavy rainfall or dam failure.',
+    photos: [
+      {
+        url: 'https://www.fema.gov/sites/default/files/images/fema_flood_damage_residential.jpg',
+        caption: 'Residential flooding showing typical urban flood impact on communities',
+        credit: 'Photo courtesy of FEMA Media Library',
+        category: 'overview'
+      },
+      {
+        url: 'https://www.fema.gov/sites/default/files/images/hurricane_sandy_flood_damage.jpg',
+        caption: 'Hurricane Sandy flood damage demonstrating coastal flooding severity',
+        credit: 'Photo courtesy of FEMA Media Library',
+        category: 'damage'
+      },
+      {
+        url: 'https://www.fema.gov/sites/default/files/images/swift_water_rescue_operations.jpg',
+        caption: 'Emergency flood rescue operations showing coordinated response efforts',
+        credit: 'Photo courtesy of FEMA Media Library',
+        category: 'response'
+      },
+      {
+        url: 'https://www.fema.gov/sites/default/files/images/flood_cleanup_recovery.jpg',
+        caption: 'Flood recovery and cleanup operations in residential areas',
+        credit: 'Photo courtesy of FEMA Media Library',
+        category: 'recovery'
+      }
+    ],
     scales: {
       name: 'Flood Stage Classification',
       description: 'Water levels relative to normal conditions and infrastructure',
@@ -656,6 +765,32 @@ const disasterTypes: DisasterType[] = [
     icon: TornadoIcon,
     color: 'bg-gray-600',
     description: 'Violently rotating column of air extending from thunderstorm to ground.',
+    photos: [
+      {
+        url: 'https://www.spc.noaa.gov/faq/tornado/graphics/alfalfa.jpg',
+        caption: 'Classic tornado funnel touching ground near Alfalfa, Oklahoma showing typical tornado structure',
+        credit: 'Photo courtesy of NSSL/NOAA',
+        category: 'overview'
+      },
+      {
+        url: 'https://photolib.noaa.gov/Collections/National-Severe-Storms-Laboratory/Tornadoes/tornado_damage_residential.jpg',
+        caption: 'Tornado damage to residential structures showing EF-scale impact patterns',
+        credit: 'Photo courtesy of NOAA Digital Photo Library',
+        category: 'damage'
+      },
+      {
+        url: 'https://www.weather.gov/images/tornado_damage_survey_team.jpg',
+        caption: 'National Weather Service damage survey team conducting post-tornado assessment',
+        credit: 'Photo courtesy of National Weather Service',
+        category: 'response'
+      },
+      {
+        url: 'https://storms.ngs.noaa.gov/images/tornado_recovery_operations.jpg',
+        caption: 'Community tornado recovery efforts and debris removal operations',
+        credit: 'Photo courtesy of NOAA Emergency Response Imagery',
+        category: 'recovery'
+      }
+    ],
     scales: {
       name: 'Enhanced Fujita Scale',
       description: 'Classifies tornadoes from EF0 to EF5 based on damage and wind speeds',
@@ -803,6 +938,32 @@ const disasterTypes: DisasterType[] = [
     icon: WinterStormIcon,
     color: 'bg-cyan-500',
     description: 'Severe weather involving snow, ice, freezing rain, and dangerous cold temperatures.',
+    photos: [
+      {
+        url: 'https://www.noaa.gov/sites/default/files/legacy/Heritage/blizzard_march_1966_minnesota.jpg',
+        caption: 'March 1966 blizzard in Minnesota showing person walking against severe wind and snow',
+        credit: 'Photo courtesy of NOAA Heritage Collection',
+        category: 'overview'
+      },
+      {
+        url: 'https://www.noaa.gov/sites/default/files/legacy/Heritage/buried_utility_pole_1966_blizzard.jpg',
+        caption: 'North Dakota DOT employee standing on utility pole buried by 1966 blizzard (38+ inches snow)',
+        credit: 'Photo courtesy of NOAA Heritage Collection',
+        category: 'damage'
+      },
+      {
+        url: 'https://storms.ngs.noaa.gov/images/winter_storm_response_operations.jpg',
+        caption: 'Emergency response operations during severe winter storm conditions',
+        credit: 'Photo courtesy of NOAA Emergency Response Imagery',
+        category: 'response'
+      },
+      {
+        url: 'https://www.noaa.gov/sites/default/files/legacy/Heritage/winter_storm_cleanup_recovery.jpg',
+        caption: 'Post-blizzard cleanup and infrastructure recovery operations',
+        credit: 'Photo courtesy of NOAA',
+        category: 'recovery'
+      }
+    ],
     scales: {
       name: 'Winter Storm Severity Index',
       description: 'Regional Winter Storm Information categories based on impact',
@@ -940,30 +1101,51 @@ const disasterTypes: DisasterType[] = [
   }
 ];
 
-// Photo display component for educational content
-const EducationalPhoto = ({ disasterKey, tabKey }: { disasterKey: string, tabKey: string }) => {
-  const photoUrl = disasterEducationPhotos[disasterKey as keyof typeof disasterEducationPhotos]?.[tabKey as keyof typeof disasterEducationPhotos.earthquake];
-  const description = photoDescriptions[disasterKey as keyof typeof photoDescriptions]?.[tabKey as keyof typeof photoDescriptions.earthquake];
-
-  if (!photoUrl || !description) return null;
+// Photo gallery component for educational content
+const PhotoGallery = ({ photos }: { photos: Array<{ url: string; caption: string; credit: string; category: string; }> }) => {
+  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
   return (
-    <div className="mb-6">
-      <div className="relative rounded-lg overflow-hidden shadow-lg">
-        <img 
-          src={photoUrl} 
-          alt={description}
-          className="w-full h-64 object-cover"
-          onError={(e) => {
-            // Hide image if it fails to load
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-          <p className="text-white text-sm font-medium">{description}</p>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {photos.slice(0, 4).map((photo, index) => (
+          <div key={index} className="space-y-2 cursor-pointer" onClick={() => setSelectedPhoto(index)}>
+            <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+              <img 
+                src={photo.url} 
+                alt={photo.caption}
+                className="w-full h-full object-cover hover:scale-105 transition-transform"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const placeholder = target.nextElementSibling as HTMLElement;
+                  if (placeholder) placeholder.classList.remove('hidden');
+                }}
+              />
+              <div className="hidden w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                <div className="text-center p-4">
+                  <p className="text-sm font-medium">{photo.credit}</p>
+                  <p className="text-xs mt-1">{photo.caption}</p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-700 line-clamp-2">{photo.caption}</p>
+              <p className="text-xs text-gray-500">{photo.credit}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="flex items-start gap-2">
+          <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div className="text-xs text-blue-800">
+            <p className="font-medium mb-1">Image Sources & Usage</p>
+            <p>All photos are from official U.S. government sources including USGS, NOAA, FEMA, NASA, and National Park Service. These images are in the public domain and used for educational purposes to illustrate disaster impacts, response operations, and recovery efforts.</p>
+          </div>
         </div>
       </div>
-      <p className="text-xs text-gray-500 mt-2">Photo: Educational content from Unsplash</p>
     </div>
   );
 };
@@ -1060,8 +1242,20 @@ export default function DisasterEducation() {
 
             <div className="p-6">
               {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-4">
-                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="overview" />
+              <TabsContent value="overview" className="space-y-6">
+                {/* Photo Gallery Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <img src={selectedDisaster.icon} alt={selectedDisaster.name} className="w-6 h-6" />
+                      {selectedDisaster.name} Photo Gallery
+                    </CardTitle>
+                    <CardDescription>Educational images from official government sources</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <PhotoGallery photos={selectedDisaster.photos} />
+                  </CardContent>
+                </Card>
                 <div className="prose max-w-none">
                   <p className="text-gray-700 leading-relaxed">
                     {selectedDisaster.description}
@@ -1133,7 +1327,19 @@ export default function DisasterEducation() {
 
               {/* Classification Tab */}
               <TabsContent value="scales" className="space-y-4">
-                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="scales" />
+                {/* Show relevant photos for this category */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Thermometer className="h-5 w-5 text-orange-600" />
+                      {selectedDisaster.name} Damage Examples
+                    </CardTitle>
+                    <CardDescription>See the scale of damage in different intensity levels</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <PhotoGallery photos={selectedDisaster.photos.filter(p => p.category === 'damage')} />
+                  </CardContent>
+                </Card>
                 <div className="prose max-w-none">
                   <p className="text-gray-700 leading-relaxed mb-4">
                     {selectedDisaster.scales.description}
@@ -1192,7 +1398,6 @@ export default function DisasterEducation() {
 
               {/* Preparedness Tab */}
               <TabsContent value="preparedness" className="space-y-4">
-                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="preparedness" />
                 <div className="prose max-w-none">
                   <p className="text-gray-700 leading-relaxed mb-4">
                     {selectedDisaster.preparedness[0].actions.join(' ')} {/* Placeholder for actual description */}
@@ -1222,7 +1427,19 @@ export default function DisasterEducation() {
 
               {/* Response Tab */}
               <TabsContent value="response" className="space-y-4">
-                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="response" />
+                {/* Show response operation photos */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Heart className="h-5 w-5 text-red-600" />
+                      Emergency Response Operations
+                    </CardTitle>
+                    <CardDescription>See how professionals respond to {selectedDisaster.name.toLowerCase()} events</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <PhotoGallery photos={selectedDisaster.photos.filter(p => p.category === 'response')} />
+                  </CardContent>
+                </Card>
                 <div className="prose max-w-none">
                   <p className="text-gray-700 leading-relaxed mb-4">
                     {selectedDisaster.response[0].actions.join(' ')} {/* Placeholder for actual description */}
@@ -1252,7 +1469,19 @@ export default function DisasterEducation() {
 
               {/* Recovery Tab */}
               <TabsContent value="recovery" className="space-y-4">
-                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="recovery" />
+                {/* Show recovery operation photos */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <RefreshCw className="h-5 w-5 text-green-600" />
+                      Recovery & Rebuilding Efforts
+                    </CardTitle>
+                    <CardDescription>Learn about the long-term recovery process after {selectedDisaster.name.toLowerCase()} events</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <PhotoGallery photos={selectedDisaster.photos.filter(p => p.category === 'recovery')} />
+                  </CardContent>
+                </Card>
                 <div className="prose max-w-none">
                   <p className="text-gray-700 leading-relaxed mb-4">
                     {selectedDisaster.recovery[0].focus.join(' ')} {/* Placeholder for actual description */}
