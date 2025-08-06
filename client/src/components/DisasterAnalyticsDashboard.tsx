@@ -106,28 +106,28 @@ export function DisasterAnalyticsDashboard({ disasters, loading }: DisasterAnaly
     });
   }, [disasters, timeFilter, stateFilter, typeFilter]);
 
+  // Get actual data range from filtered disasters
+  const actualDataRange = useMemo(() => {
+    if (filteredDisasters.length === 0) return { start: null, end: null, years: [] };
+
+    const dates = filteredDisasters.map(d => new Date(d.declarationDate)).sort((a, b) => a.getTime() - b.getTime());
+    const start = dates[0];
+    const end = dates[dates.length - 1];
+
+    // Generate array of years that actually have data
+    const startYear = start.getFullYear();
+    const endYear = end.getFullYear();
+    const years = [];
+    for (let year = startYear; year <= endYear; year++) {
+      years.push(year);
+    }
+
+    return { start, end, years };
+  }, [filteredDisasters]);
+
   // Calculate analytics with improved year-over-year analysis
   const analytics = useMemo(() => {
     const total = filteredDisasters.length;
-
-    // Get actual data range from disasters
-    const actualDataRange = useMemo(() => {
-      if (filteredDisasters.length === 0) return { start: null, end: null, years: [] };
-
-      const dates = filteredDisasters.map(d => new Date(d.declarationDate)).sort((a, b) => a.getTime() - b.getTime());
-      const start = dates[0];
-      const end = dates[dates.length - 1];
-
-      // Generate array of years that actually have data
-      const startYear = start.getFullYear();
-      const endYear = end.getFullYear();
-      const years = [];
-      for (let year = startYear; year <= endYear; year++) {
-        years.push(year);
-      }
-
-      return { start, end, years };
-    }, [filteredDisasters]);
 
     // State statistics
     const stateStats = filteredDisasters.reduce((acc, disaster) => {
