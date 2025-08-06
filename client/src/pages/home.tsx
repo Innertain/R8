@@ -92,11 +92,7 @@ function HeroSection() {
 
             {/* Continuous Scrolling R Words - More Compact */}
             <div className="relative overflow-hidden h-12">
-              {/* Left fade gradient */}
-              <div className="absolute left-0 top-0 w-16 h-full bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent z-10 pointer-events-none"></div>
-              {/* Right fade gradient */}
-              <div className="absolute right-0 top-0 w-16 h-full bg-gradient-to-l from-slate-900/80 via-slate-900/40 to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 flex items-center">
+              <div className="absolute inset-0 flex items-center"></div>
                 <div className="animate-scroll-seamless whitespace-nowrap flex items-center text-lg">
                   <span className="scroll-word-purple mx-8">
                     <span className="text-2xl font-black">R</span>esponsibility

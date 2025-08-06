@@ -299,6 +299,16 @@
 .animate-scroll-seamless {
   animation: scroll-seamless 60s linear infinite;
   will-change: transform;
+  mask-image: linear-gradient(to right, 
+    transparent 0%, 
+    rgba(0,0,0,1) 10%, 
+    rgba(0,0,0,1) 90%, 
+    transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, 
+    transparent 0%, 
+    rgba(0,0,0,1) 10%, 
+    rgba(0,0,0,1) 90%, 
+    transparent 100%);
 }
 
 /* Subtle Scrolling R-word color effects */
