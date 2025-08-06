@@ -8,16 +8,12 @@ export function Footer() {
         <div className="flex flex-col items-center space-y-4">
           {/* Legal Links */}
           <div className="flex justify-center space-x-6">
-            <Link href="/privacy-policy">
-              <a className="text-white/70 hover:text-white text-sm font-medium transition-colors">
-                Privacy Policy
-              </a>
+            <Link href="/privacy-policy" className="text-white/70 hover:text-white text-sm font-medium transition-colors">
+              Privacy Policy
             </Link>
             <span className="text-white/30">|</span>
-            <Link href="/terms-of-service">
-              <a className="text-white/70 hover:text-white text-sm font-medium transition-colors">
-                Terms of Service
-              </a>
+            <Link href="/terms-of-service" className="text-white/70 hover:text-white text-sm font-medium transition-colors">
+              Terms of Service
             </Link>
           </div>
 
