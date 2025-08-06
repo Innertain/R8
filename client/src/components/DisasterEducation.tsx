@@ -27,17 +27,17 @@ import {
   BarChart3
 } from 'lucide-react';
 
-// Import custom disaster icons
-import FireIcon from '@assets/Fire_1754119781364.png';
-import FloodIcon from '@assets/FLOOD_1754119781365.png';
-import HurricaneIcon from '@assets/HURICAN_1754119781366.png';
-import EarthquakeIcon from '@assets/Earth Quake_1754119781363.png';
-import TornadoIcon from '@assets/TORNATOR_1754119781369.png';
-import WinterStormIcon from '@assets/ICE _ WINTER STORM_1754119781367.png';
-import StormIcon from '@assets/STORM_1754119781368.png';
-import WindIcon from '@assets/WIND_1754119781370.png';
-import HeatwaveIcon from '@assets/Heatwave_1754119781366.png';
-import TsunamiIcon from '@assets/tsunami_1754119781370.png';
+// Import custom disaster icons as URL strings
+import FireIconUrl from '@assets/Fire_1754119781364.png';
+import FloodIconUrl from '@assets/FLOOD_1754119781365.png';
+import HurricaneIconUrl from '@assets/HURICAN_1754119781366.png';
+import EarthquakeIconUrl from '@assets/Earth Quake_1754119781363.png';
+import TornadoIconUrl from '@assets/TORNATOR_1754119781369.png';
+import WinterStormIconUrl from '@assets/ICE _ WINTER STORM_1754119781367.png';
+import StormIconUrl from '@assets/STORM_1754119781368.png';
+import WindIconUrl from '@assets/WIND_1754119781370.png';
+import HeatwaveIconUrl from '@assets/Heatwave_1754119781366.png';
+import TsunamiIconUrl from '@assets/tsunami_1754119781370.png';
 
 // Import photo data - using placeholder data for now
 // import { disasterEducationPhotos, photoDescriptions } from '@assets/disaster-education-photos';
@@ -127,7 +127,7 @@ const disasterTypes: DisasterType[] = [
   {
     id: 'earthquake',
     name: 'Earthquake',
-    icon: EarthquakeIcon,
+    icon: EarthquakeIconUrl,
     color: 'bg-amber-500',
     description: 'Sudden shaking of the ground caused by movement of tectonic plates beneath Earth\'s surface.',
     photos: [
@@ -421,7 +421,7 @@ const disasterTypes: DisasterType[] = [
   {
     id: 'hurricane',
     name: 'Hurricane',
-    icon: HurricaneIcon,
+    icon: HurricaneIconUrl,
     color: 'bg-blue-500',
     description: 'Powerful tropical cyclone with sustained winds of 74+ mph and heavy rainfall.',
     photos: [
@@ -713,7 +713,7 @@ const disasterTypes: DisasterType[] = [
   {
     id: 'wildfire',
     name: 'Wildfire',
-    icon: FireIcon,
+    icon: FireIconUrl,
     color: 'bg-red-500',
     description: 'Uncontrolled fire spreading through vegetation, often in wildland areas.',
     photos: [
@@ -1010,7 +1010,7 @@ const disasterTypes: DisasterType[] = [
   {
     id: 'flood',
     name: 'Flood',
-    icon: FloodIcon,
+    icon: FloodIconUrl,
     color: 'bg-blue-600',
     description: 'Overflow of water onto normally dry land, often from heavy rainfall or dam failure.',
     photos: [
@@ -1297,7 +1297,7 @@ const disasterTypes: DisasterType[] = [
   {
     id: 'tornado',
     name: 'Tornado',
-    icon: TornadoIcon,
+    icon: TornadoIconUrl,
     color: 'bg-gray-600',
     description: 'Violently rotating column of air extending from thunderstorm to ground.',
     photos: [
@@ -1570,7 +1570,7 @@ const disasterTypes: DisasterType[] = [
   {
     id: 'winter-storm',
     name: 'Winter Storm',
-    icon: WinterStormIcon,
+    icon: WinterStormIconUrl,
     color: 'bg-cyan-500',
     description: 'Severe weather involving snow, ice, freezing rain, and dangerous cold temperatures.',
     photos: [
@@ -2012,7 +2012,7 @@ export default function DisasterEducation() {
                   variant="outline" 
                   size="sm"
                   onClick={() => window.open('/map', '_blank')}
-                  className="text-xs"
+                  className="text-xs bg-white border-blue-300 text-blue-700 hover:bg-blue-50"
                 >
                   <BarChart3 className="w-3 h-3 mr-1" />
                   Disaster Analytics Dashboard
@@ -2021,7 +2021,7 @@ export default function DisasterEducation() {
                   variant="outline" 
                   size="sm"
                   onClick={() => window.open('/alerts', '_blank')}
-                  className="text-xs"
+                  className="text-xs bg-white border-orange-300 text-orange-700 hover:bg-orange-50"
                 >
                   <AlertTriangle className="w-3 h-3 mr-1" />
                   Active Weather Alerts
@@ -2030,7 +2030,7 @@ export default function DisasterEducation() {
                   variant="outline" 
                   size="sm"
                   onClick={() => window.open('/noaa-climate', '_blank')}
-                  className="text-xs"
+                  className="text-xs bg-white border-green-300 text-green-700 hover:bg-green-50"
                 >
                   <Wind className="w-3 h-3 mr-1" />
                   Climate Analysis
@@ -2039,7 +2039,7 @@ export default function DisasterEducation() {
                   variant="outline" 
                   size="sm"
                   onClick={() => window.open('/air-quality', '_blank')}
-                  className="text-xs"
+                  className="text-xs bg-white border-purple-300 text-purple-700 hover:bg-purple-50"
                 >
                   <Leaf className="w-3 h-3 mr-1" />
                   Air Quality Monitor

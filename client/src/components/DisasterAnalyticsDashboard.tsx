@@ -41,6 +41,9 @@ export function DisasterAnalyticsDashboard({ disasters, loading }: DisasterAnaly
   const [timeRange, setTimeRange] = useState<'30d' | '90d' | '1y' | 'all'>('90d');
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [stateFilter, setStateFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [activeAnalysis, setActiveAnalysis] = useState<'overview' | 'trends' | 'geographic' | 'impact'>('overview');
 
   if (loading) {
     return (
@@ -64,11 +67,6 @@ export function DisasterAnalyticsDashboard({ disasters, loading }: DisasterAnaly
       </Card>
     );
   }
-
-  const [timeFilter, setTimeFilter] = useState<string>('all');
-  const [stateFilter, setStateFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [activeAnalysis, setActiveAnalysis] = useState<'overview' | 'trends' | 'geographic' | 'impact'>('overview');
 
   // Get data range info
   const dataRange = useMemo(() => {
