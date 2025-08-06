@@ -37,8 +37,26 @@ import WindIcon from '@assets/WIND_1754119781370.png';
 import HeatwaveIcon from '@assets/Heatwave_1754119781366.png';
 import TsunamiIcon from '@assets/tsunami_1754119781370.png';
 
-// Import photo data
-import { disasterEducationPhotos, photoDescriptions } from '@assets/disaster-education-photos';
+// Import photo data - using placeholder data for now
+// import { disasterEducationPhotos, photoDescriptions } from '@assets/disaster-education-photos';
+
+// Temporary placeholder data with proper types
+const disasterEducationPhotos: Record<string, Record<string, string>> = {
+  earthquake: {
+    overview: 'https://via.placeholder.com/600x400/a16207/ffffff?text=Earthquake+Overview',
+    damage: 'https://via.placeholder.com/600x400/a16207/ffffff?text=Earthquake+Damage',
+    response: 'https://via.placeholder.com/600x400/a16207/ffffff?text=Earthquake+Response',
+    recovery: 'https://via.placeholder.com/600x400/a16207/ffffff?text=Earthquake+Recovery'
+  }
+};
+const photoDescriptions: Record<string, Record<string, string>> = {
+  earthquake: {
+    overview: 'Seismic wave propagation and geological fault line characteristics',
+    damage: 'Structural damage patterns and infrastructure failure from seismic activity',
+    response: 'Search and rescue operations and emergency medical response',
+    recovery: 'Earthquake recovery including building code improvements and retrofitting'
+  }
+};
 
 
 

@@ -92,7 +92,7 @@ function HeroSection() {
 
             {/* Continuous Scrolling R Words - More Compact */}
             <div className="relative overflow-hidden h-12">
-              <div className="absolute inset-0 flex items-center"></div>
+              <div className="absolute inset-0 flex items-center">
                 <div className="animate-scroll-seamless whitespace-nowrap flex items-center text-lg">
                   <span className="scroll-word-purple mx-8">
                     <span className="text-2xl font-black">R</span>esponsibility
