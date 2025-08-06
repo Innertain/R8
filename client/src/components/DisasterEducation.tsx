@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,7 +22,8 @@ import {
   Calendar,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Leaf
 } from 'lucide-react';
 
 // Import custom disaster icons
@@ -1935,6 +1936,44 @@ export default function DisasterEducation() {
   const [selectedDisaster, setSelectedDisaster] = useState<DisasterType>(disasterTypes[0]);
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Handle URL parameters for direct navigation
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const disasterType = urlParams.get('type');
+    const tab = urlParams.get('tab');
+    
+    if (disasterType) {
+      // Map common disaster types to our disaster IDs
+      const typeMapping: Record<string, string> = {
+        'fire': 'wildfire',
+        'wildfire': 'wildfire',
+        'flood': 'flood',
+        'flooding': 'flood',
+        'hurricane': 'hurricane',
+        'tropical storm': 'hurricane',
+        'earthquake': 'earthquake',
+        'tornado': 'tornado',
+        'winter storm': 'winter-storm',
+        'severe storm': 'winter-storm',
+        'ice storm': 'winter-storm'
+      };
+      
+      const mappedType = typeMapping[disasterType.toLowerCase()] || disasterType.toLowerCase();
+      const foundDisaster = disasterTypes.find(d => 
+        d.id === mappedType || 
+        d.name.toLowerCase().includes(disasterType.toLowerCase())
+      );
+      
+      if (foundDisaster) {
+        setSelectedDisaster(foundDisaster);
+      }
+    }
+    
+    if (tab && ['overview', 'scales', 'alerts', 'hazards', 'preparedness', 'response', 'recovery'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, []);
+
   const tabConfig = [
     { id: 'overview', label: 'Overview', icon: Info },
     { id: 'scales', label: 'Classification', icon: Thermometer },
@@ -1959,14 +1998,43 @@ export default function DisasterEducation() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-4xl mx-auto">
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-blue-600 mt-0.5" />
-            <div className="text-left">
+            <div className="text-left flex-1">
               <h4 className="font-medium text-blue-900 mb-2">About This Educational Resource</h4>
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-blue-800 mb-3">
                 This interactive guide provides comprehensive information about natural disasters using 
                 official classification systems, government preparedness guidelines, and established 
                 emergency management protocols. All scales and procedures are based on authoritative 
                 sources including NOAA, FEMA, and other emergency management agencies.
               </p>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open('/map', '_blank')}
+                  className="text-xs"
+                >
+                  <AlertTriangle className="w-3 h-3 mr-1" />
+                  Live Disaster Monitoring
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open('/noaa-climate', '_blank')}
+                  className="text-xs"
+                >
+                  <Wind className="w-3 h-3 mr-1" />
+                  Climate Reports
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open('/air-quality', '_blank')}
+                  className="text-xs"
+                >
+                  <Leaf className="w-3 h-3 mr-1" />
+                  Air Quality Monitor
+                </Button>
+              </div>
             </div>
           </div>
         </div>

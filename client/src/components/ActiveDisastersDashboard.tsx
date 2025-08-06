@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { AlertTriangle, MapPin, Calendar, ExternalLink, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Home, Filter, TrendingUp, BarChart3 } from "lucide-react";
+import { AlertTriangle, MapPin, Calendar, ExternalLink, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Home, Filter, TrendingUp, BarChart3, Shield } from "lucide-react";
 import { StateIcon } from '@/components/StateIcon';
 import { getDisasterIcon as getCustomDisasterIcon } from '@/utils/disasterIcons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
@@ -369,9 +369,19 @@ export function ActiveDisastersDashboard({ disasters, loading }: ActiveDisasters
                           </div>
                         </div>
                         
-                        <Button variant="outline" size="sm">
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => window.open(`/disaster-education?type=${encodeURIComponent(disaster.incidentType || 'general')}`, '_blank')}
+                            title="Learn about this disaster type"
+                          >
+                            <Shield className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

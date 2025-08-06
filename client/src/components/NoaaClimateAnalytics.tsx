@@ -15,7 +15,8 @@ import {
   AlertTriangle,
   Info,
   Clock,
-  MapPin
+  MapPin,
+  Shield // Added Shield import
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, ReferenceLine } from 'recharts';
 import { format } from 'date-fns';

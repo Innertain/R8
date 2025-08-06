@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3, CloudRain, CloudSnow, CloudLightning, Thermometer } from "lucide-react";
+import { AlertTriangle, ExternalLink, Clock, MapPin, Filter, Download, Share2, TrendingUp, Activity, Flame, Zap, Waves, Wind, Mountain, Home, TreePine, Factory, Snowflake, Sun, Calendar, ChevronDown, ChevronUp, BarChart3, CloudRain, CloudSnow, CloudLightning, Thermometer, Shield } from "lucide-react";
 import { getWeatherAlertIcon } from '@/utils/disasterIcons';
 import DisasterAnalyticsDashboard from "./DisasterAnalyticsDashboard";
 import ActiveDisastersDashboard from "./ActiveDisastersDashboard";
@@ -56,11 +56,11 @@ interface EnhancedRssFeedProps {
   showAnalytics?: boolean;
 }
 
-export function EnhancedRssFeed({ 
-  stateFilter, 
-  maxItems = 50, 
-  showFilters = true, 
-  showAnalytics = true 
+export function EnhancedRssFeed({
+  stateFilter,
+  maxItems = 50,
+  showFilters = true,
+  showAnalytics = true
 }: EnhancedRssFeedProps) {
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [femaDisasters, setFemaDisasters] = useState<FemaDisasterItem[]>([]);
@@ -105,7 +105,7 @@ export function EnhancedRssFeed({
             setGlobalDisasters(globalData.items || []);
           }
         }
-        
+
       } catch (err) {
         console.error('Enhanced RSS feed error:', err);
         setError('Unable to load emergency data.');
@@ -115,7 +115,7 @@ export function EnhancedRssFeed({
     };
 
     fetchEmergencyData();
-    
+
     // Refresh every 5 minutes
     const interval = setInterval(fetchEmergencyData, 5 * 60 * 1000);
     return () => clearInterval(interval);
@@ -124,13 +124,13 @@ export function EnhancedRssFeed({
   // Function to get appropriate icon for alert type with enhanced weather icons
   const getAlertIcon = (alertType: string) => {
     if (!alertType) return AlertTriangle;
-    
+
     // Try custom disaster icons first
     const customIcon = getWeatherAlertIcon(alertType);
     if (customIcon) {
       return customIcon;
     }
-    
+
     // Fallback to lucide icons
     const type = alertType.toLowerCase();
     if (type.includes('fire')) return Flame;
@@ -237,9 +237,9 @@ export function EnhancedRssFeed({
     const data = activeTab === 'live' ? filteredAlerts : filteredFemaDisasters;
     const dataStr = JSON.stringify(data, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+
     const exportFileDefaultName = `emergency-${activeTab}-data-${new Date().toISOString().split('T')[0]}.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -432,7 +432,7 @@ export function EnhancedRssFeed({
                     'moderate': 'bg-yellow-100 border-yellow-300 text-yellow-800',
                     'minor': 'bg-blue-100 border-blue-300 text-blue-800'
                   };
-                  
+
                   return (
                     <div
                       key={`${alert.guid}-${index}`}
@@ -451,14 +451,14 @@ export function EnhancedRssFeed({
                             {alert.title}
                           </h3>
                         </div>
-                        <Badge className={`text-xs whitespace-nowrap font-bold shadow-sm ${alert.severity === 'Extreme' ? 'bg-red-600 text-white animate-pulse' : 
-                          alert.severity === 'Severe' ? 'bg-orange-600 text-white' : 
-                          alert.severity === 'Moderate' ? 'bg-yellow-600 text-white' : 
+                        <Badge className={`text-xs whitespace-nowrap font-bold shadow-sm ${alert.severity === 'Extreme' ? 'bg-red-600 text-white animate-pulse' :
+                          alert.severity === 'Severe' ? 'bg-orange-600 text-white' :
+                          alert.severity === 'Moderate' ? 'bg-yellow-600 text-white' :
                           'bg-blue-600 text-white'}`}>
                           {alert.severity}
                         </Badge>
                       </div>
-                      
+
                       <div className="flex items-center gap-4 mb-3 text-xs">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
@@ -470,19 +470,19 @@ export function EnhancedRssFeed({
                           </span>
                         </div>
                       </div>
-                      
+
                       {alert.description && (
                         <p className="text-xs text-gray-700 mb-3 leading-relaxed line-clamp-3">
                           {alert.description}
                         </p>
                       )}
-                      
+
                       <div className="flex items-center justify-between pt-2 border-t border-white/30">
                         <div className="flex items-center gap-1 text-xs opacity-75">
                           <Clock className="w-3 h-3" />
                           <span>{alert.pubDate && alert.pubDate !== 'Invalid Date' ? new Date(alert.pubDate).toLocaleDateString() : 'Current Alert'}</span>
                         </div>
-                        
+
                         {alert.link && (
                           <a
                             href={alert.link}
@@ -508,7 +508,7 @@ export function EnhancedRssFeed({
                 <DisasterAnalyticsDashboard disasters={femaDisasters} />
               </div>
             )}
-            
+
             {/* FEMA Statistics Dashboard */}
             {femaDisasters.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -526,7 +526,7 @@ export function EnhancedRssFeed({
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="bg-white rounded-lg p-4 border">
                   <div className="flex items-center gap-2 mb-3">
                     <MapPin className="w-4 h-4 text-green-600" />
@@ -541,7 +541,7 @@ export function EnhancedRssFeed({
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="bg-white rounded-lg p-4 border">
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp className="w-4 h-4 text-purple-600" />
@@ -558,7 +558,7 @@ export function EnhancedRssFeed({
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="bg-white rounded-lg p-4 border">
                   <div className="flex items-center gap-2 mb-3">
                     <AlertTriangle className="w-4 h-4 text-orange-600" />
@@ -651,11 +651,11 @@ export function EnhancedRssFeed({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredFemaDisasters.map((disaster, index) => {
                   const DisasterIcon = getDisasterIcon(disaster.incidentType);
-                  
+
                   // Skip duplicate disasters with same disaster number (show only unique ones)
                   const isDuplicate = index > 0 && filteredFemaDisasters.slice(0, index).some(d => d.disasterNumber === disaster.disasterNumber);
                   if (isDuplicate) return null;
-                  
+
                   return (
                     <div
                       key={`${disaster.guid}-${index}`}
@@ -673,8 +673,8 @@ export function EnhancedRssFeed({
                             <p className="text-xs text-gray-600 mt-1">#{disaster.disasterNumber}</p>
                           </div>
                         </div>
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className={`text-xs whitespace-nowrap ${
                             disaster.declarationType === 'DR' ? 'bg-red-100 text-red-800' :
                             disaster.declarationType === 'EM' ? 'bg-orange-100 text-orange-800' :
@@ -685,7 +685,7 @@ export function EnhancedRssFeed({
                            disaster.declarationType === 'EM' ? 'EMERGENCY' : 'FIRE MGMT'}
                         </Badge>
                       </div>
-                      
+
                       <div className="space-y-2 mb-3">
                         {disaster.incidentType && (
                           <div className="flex items-center gap-1 text-xs">
@@ -694,7 +694,7 @@ export function EnhancedRssFeed({
                             </span>
                           </div>
                         )}
-                        
+
                         {/* Simplified Date Information */}
                         <div className="text-xs text-gray-600">
                           <div className="flex items-center gap-1 mb-1">
@@ -709,19 +709,19 @@ export function EnhancedRssFeed({
                           )}
                         </div>
                       </div>
-                      
+
                       {disaster.description && (
                         <p className="text-xs text-gray-700 mb-3 leading-relaxed line-clamp-3">
                           {disaster.description}
                         </p>
                       )}
-                      
+
                       <div className="flex items-center justify-between pt-2 border-t">
                         <div className="flex items-center gap-1 text-xs text-gray-500">
                           <Clock className="w-3 h-3" />
                           <span>{formatDate(disaster.declarationDate)}</span>
                         </div>
-                        
+
                         <div className="text-xs text-blue-700 font-medium">
                           FEMA-{disaster.disasterNumber}
                         </div>
@@ -768,7 +768,7 @@ export function EnhancedRssFeed({
                           {disaster.disasterType}
                         </Badge>
                       </div>
-                      
+
                       <div className="flex items-center gap-4 mb-3 text-xs text-gray-600">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
@@ -780,19 +780,19 @@ export function EnhancedRssFeed({
                           </div>
                         )}
                       </div>
-                      
+
                       {disaster.description && (
                         <p className="text-xs text-gray-700 mb-3 leading-relaxed">
                           {disaster.description}
                         </p>
                       )}
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 text-xs text-gray-600">
                           <Clock className="w-3 h-3" />
                           <span>{new Date(disaster.pubDate).toLocaleDateString()}</span>
                         </div>
-                        
+
                         <a
                           href={disaster.link}
                           target="_blank"
