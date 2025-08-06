@@ -37,6 +37,9 @@ import WindIcon from '@assets/WIND_1754119781370.png';
 import HeatwaveIcon from '@assets/Heatwave_1754119781366.png';
 import TsunamiIcon from '@assets/tsunami_1754119781370.png';
 
+// Import photo data
+import { disasterEducationPhotos, photoDescriptions } from '@assets/disaster-education-photos';
+
 
 
 interface DisasterType {
@@ -1102,40 +1105,78 @@ const disasterTypes: DisasterType[] = [
 ];
 
 // Photo gallery component for educational content
-const PhotoGallery = ({ photos }: { photos: Array<{ url: string; caption: string; credit: string; category: string; }> }) => {
+const PhotoGallery = ({ disasterType, category = 'overview' }: { disasterType: string; category?: string }) => {
+  const getPhotoForDisaster = (disaster: string, cat: string) => {
+    const normalizedDisaster = disaster.toLowerCase().replace(/[^a-z]/g, '');
+    const photoData = disasterEducationPhotos[normalizedDisaster as keyof typeof disasterEducationPhotos];
+    const descData = photoDescriptions[normalizedDisaster as keyof typeof photoDescriptions];
+    
+    if (photoData && descData) {
+      return {
+        url: photoData[cat as keyof typeof photoData] || photoData.overview,
+        description: descData[cat as keyof typeof descData] || descData.overview
+      };
+    }
+    
+    return null;
+  };
+
+  const photo = getPhotoForDisaster(disasterType, category);
+  
+  if (!photo) {
+    return (
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="text-center p-4">
+          <div className="text-4xl text-gray-400 mb-3">📷</div>
+          <div className="text-sm text-gray-600">Educational content for {disasterType}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {photos.slice(0, 4).map((photo, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
-            <div className="relative h-48 bg-gradient-to-br from-blue-50 to-gray-100 rounded-t-lg overflow-hidden flex items-center justify-center">
+      <div className="grid grid-cols-1 gap-4">
+        <Card className="hover:shadow-lg transition-shadow">
+          <div className="relative h-64 bg-gradient-to-br from-blue-50 to-gray-100 rounded-t-lg overflow-hidden">
+            <img 
+              src={photo.url} 
+              alt={photo.description}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const placeholder = target.parentElement?.querySelector('.placeholder');
+                if (placeholder) {
+                  (placeholder as HTMLElement).style.display = 'flex';
+                }
+              }}
+            />
+            <div className="placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100" style={{ display: 'none' }}>
               <div className="text-center p-4">
                 <div className="text-4xl text-blue-600 mb-3">📷</div>
-                <div className="text-sm font-semibold text-gray-700 mb-1">Official Government Photo</div>
-                <div className="text-xs text-gray-500">{photo.credit}</div>
+                <div className="text-sm font-semibold text-gray-700">Educational Photo</div>
               </div>
             </div>
-            <CardContent className="p-4 space-y-2">
-              <p className="text-sm text-gray-700 font-medium line-clamp-2">{photo.caption}</p>
-              <p className="text-xs text-gray-500">{photo.credit}</p>
-              <Badge variant="outline" className="text-xs">
-                {photo.category}
-              </Badge>
-            </CardContent>
-          </Card>
-        ))}
+          </div>
+          <CardContent className="p-4 space-y-2">
+            <p className="text-sm text-gray-700 font-medium">{photo.description}</p>
+            <Badge variant="outline" className="text-xs">
+              {category}
+            </Badge>
+          </CardContent>
+        </Card>
       </div>
       
       <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
         <div className="flex items-start gap-3">
           <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-blue-800">
-            <p className="font-semibold mb-2">Authentic Educational Documentation</p>
+            <p className="font-semibold mb-2">Educational Resource</p>
             <p className="leading-relaxed">
-              These represent real disaster documentation from official U.S. government sources including USGS, NOAA, FEMA, NASA, 
-              and National Park Service. All photos are public domain and specifically curated for educational purposes to 
-              illustrate disaster impacts, emergency response procedures, and recovery operations. Each image provides authentic 
-              visual learning about disaster science and emergency management.
+              These images are carefully selected from educational sources to illustrate disaster characteristics, 
+              impacts, and response procedures. They serve as authentic visual aids for learning about disaster 
+              science and emergency management.
             </p>
           </div>
         </div>
@@ -1244,10 +1285,10 @@ export default function DisasterEducation() {
                       <img src={selectedDisaster.icon} alt={selectedDisaster.name} className="w-6 h-6" />
                       {selectedDisaster.name} Photo Gallery
                     </CardTitle>
-                    <CardDescription>Educational images from official government sources</CardDescription>
+                    <CardDescription>Educational images from official sources</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <PhotoGallery photos={selectedDisaster.photos} />
+                    <PhotoGallery disasterType={selectedDisaster.name} category="overview" />
                   </CardContent>
                 </Card>
                 <div className="prose max-w-none">
@@ -1326,12 +1367,12 @@ export default function DisasterEducation() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Thermometer className="h-5 w-5 text-orange-600" />
-                      {selectedDisaster.name} Damage Examples
+                      {selectedDisaster.name} Classification Examples
                     </CardTitle>
-                    <CardDescription>See the scale of damage in different intensity levels</CardDescription>
+                    <CardDescription>Visual examples of different intensity levels</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <PhotoGallery photos={selectedDisaster.photos.filter(p => p.category === 'damage')} />
+                    <PhotoGallery disasterType={selectedDisaster.name} category="classification" />
                   </CardContent>
                 </Card>
                 <div className="prose max-w-none">
@@ -1431,7 +1472,7 @@ export default function DisasterEducation() {
                     <CardDescription>See how professionals respond to {selectedDisaster.name.toLowerCase()} events</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <PhotoGallery photos={selectedDisaster.photos.filter(p => p.category === 'response')} />
+                    <PhotoGallery disasterType={selectedDisaster.name} category="response" />
                   </CardContent>
                 </Card>
                 <div className="prose max-w-none">
@@ -1473,7 +1514,7 @@ export default function DisasterEducation() {
                     <CardDescription>Learn about the long-term recovery process after {selectedDisaster.name.toLowerCase()} events</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <PhotoGallery photos={selectedDisaster.photos.filter(p => p.category === 'recovery')} />
+                    <PhotoGallery disasterType={selectedDisaster.name} category="recovery" />
                   </CardContent>
                 </Card>
                 <div className="prose max-w-none">
