@@ -43,6 +43,7 @@ export function DisasterAnalyticsDashboard({ disasters, loading }: DisasterAnaly
   const [selectedType, setSelectedType] = useState<string>('all');
   const [stateFilter, setStateFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [timeFilter, setTimeFilter] = useState<string>('all');
   const [activeAnalysis, setActiveAnalysis] = useState<'overview' | 'trends' | 'geographic' | 'impact'>('overview');
 
   if (loading) {
@@ -276,10 +277,10 @@ export function DisasterAnalyticsDashboard({ disasters, loading }: DisasterAnaly
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Available Data</SelectItem>
-                <SelectItem value="recent">Last 12 Months</SelectItem>
-                <SelectItem value="2025">2025 Only</SelectItem>
-                <SelectItem value="2024">2024 Only</SelectItem>
-                <SelectItem value="since2022">Since 2022</SelectItem>
+                <SelectItem value="12">Last 12 Months</SelectItem>
+                <SelectItem value="6">Last 6 Months</SelectItem>
+                <SelectItem value="3">Last 3 Months</SelectItem>
+                <SelectItem value="1">Last Month</SelectItem>
               </SelectContent>
             </Select>
 
