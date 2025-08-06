@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, ReferenceLine } from 'recharts';
 import { format } from 'date-fns';
+import TemperatureAnomalyExplainer from './TemperatureAnomalyExplainer';
 
 interface ClimateDataPoint {
   id: string;
@@ -429,7 +430,7 @@ export default function NoaaClimateAnalytics() {
                     </p>
                   </div>
                 )}
-                
+
                 {analysis.temperatureTrends.records.coldestYear && (
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <div className="flex items-center justify-between">
@@ -479,6 +480,9 @@ export default function NoaaClimateAnalytics() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Temperature Anomaly Educational Component */}
+      <TemperatureAnomalyExplainer />
 
       {/* Data Sources Info */}
       <Card className="border-blue-200 bg-blue-50">
