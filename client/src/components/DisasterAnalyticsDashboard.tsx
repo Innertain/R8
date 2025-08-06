@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock, Info as InfoIcon } from "lucide-react";
+import { BarChart3, TrendingUp, MapPin, Calendar, AlertTriangle, Flame, Waves, Wind, Mountain, Sun, Snowflake, Zap, Download, PieChart, Clock, Info as InfoIcon, Activity } from "lucide-react";
 import { getDisasterIcon } from '@/utils/disasterIcons';
 import { StateIcon } from '@/components/StateIcon';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -34,9 +34,37 @@ interface FemaDisasterItem {
 
 interface DisasterAnalyticsDashboardProps {
   disasters: FemaDisasterItem[];
+  loading: boolean;
 }
 
-export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashboardProps) {
+export function DisasterAnalyticsDashboard({ disasters, loading }: DisasterAnalyticsDashboardProps) {
+  const [timeRange, setTimeRange] = useState<'30d' | '90d' | '1y' | 'all'>('90d');
+  const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="w-5 h-5 animate-pulse" />
+            Loading Analytics...
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-20 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [stateFilter, setStateFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -168,7 +196,10 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
       topStates,
       topTypes,
       avgPerYear,
-      recentYears
+      recentYears,
+      totalCasualties: 0, // Placeholder, assuming these would be calculated if data existed
+      totalDamage: 0,     // Placeholder
+      avgEventsPerMonth: 0 // Placeholder
     };
   }, [filteredDisasters]);
 
@@ -231,9 +262,9 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                   About FEMA Disaster Types
                 </h4>
                 <p className="text-xs text-green-700 leading-relaxed">
-                  <strong>Major Disasters (DR)</strong> trigger federal aid for individuals and communities, 
-                  <strong> Emergency Declarations (EM)</strong> provide immediate federal assistance, and 
-                  <strong>Fire Management Assistance (FM)</strong> helps states fight wildfires.
+                  <strong>Major Disasters (DR)</strong> trigger federal aid for individuals and communities,
+                  <strong> Emergency Declarations (EM)</strong> provide immediate federal assistance, and
+                  <strong> Fire Management Assistance (FM)</strong> helps states fight wildfires.
                 </p>
               </div>
             </div>
@@ -379,8 +410,8 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-gray-600">{count}</span>
                           <div className="w-16 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
+                            <div
+                              className="bg-blue-600 h-2 rounded-full"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
@@ -415,8 +446,8 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-gray-600">{count} declarations</span>
                           <div className="w-16 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-green-600 h-2 rounded-full" 
+                            <div
+                              className="bg-green-600 h-2 rounded-full"
                               style={{ width: `${Math.min(100, (count / maxStateCount) * 100)}%` }}
                             />
                           </div>
@@ -466,12 +497,12 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                   </div>
                   <div className="bg-white rounded-lg p-3 shadow-sm">
                     <div className="text-2xl font-bold text-orange-600">
-                      <AnimatedCounter 
-                        end={analytics.totalDamage / 1000000000} 
-                        duration={2800} 
-                        decimals={1} 
-                        prefix="$" 
-                        suffix="B" 
+                      <AnimatedCounter
+                        end={analytics.totalDamage / 1000000000}
+                        duration={2800}
+                        decimals={1}
+                        prefix="$"
+                        suffix="B"
                       />
                     </div>
                     <div className="text-xs text-gray-600">Total Damage</div>
@@ -497,7 +528,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <div className="text-sm font-medium text-blue-800">
-                  Data Coverage: {analytics.actualDataRange.start?.getFullYear() || 'N/A'}-{analytics.actualDataRange.end?.getFullYear() || 'N/A'} 
+                  Data Coverage: {analytics.actualDataRange.start?.getFullYear() || 'N/A'}-{analytics.actualDataRange.end?.getFullYear() || 'N/A'}
                   ({analytics.total} total declarations across {analytics.actualDataRange.years.length} years)
                 </div>
                 <div className="text-sm text-blue-700 mt-1">
@@ -514,7 +545,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                       {analytics.total} declarations • {analytics.actualDataRange.years.length} years of data
                     </div>
                     <div className="text-xs text-gray-500 mt-2">
-                      Peak: {Math.max(...Object.values(analytics.yearlyStats))} disasters • 
+                      Peak: {Math.max(...Object.values(analytics.yearlyStats))} disasters •
                       Avg: {Math.round(analytics.avgPerYear)}/year
                     </div>
                   </div>
@@ -616,7 +647,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <div className={`w-3 h-3 rounded-full ${
-                              type === 'DR' ? 'bg-red-500' : 
+                              type === 'DR' ? 'bg-red-500' :
                               type === 'EM' ? 'bg-orange-500' : 'bg-yellow-500'
                             }`} />
                             <span className="font-medium text-gray-900">{label}</span>
@@ -627,9 +658,9 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                           </div>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
+                          <div
                             className={`h-2 rounded-full transition-all duration-500 ${
-                              type === 'DR' ? 'bg-red-500' : 
+                              type === 'DR' ? 'bg-red-500' :
                               type === 'EM' ? 'bg-orange-500' : 'bg-yellow-500'
                             }`}
                             style={{ width: `${percentage}%` }}
@@ -768,8 +799,8 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                       <div key={state} className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105">
                         <div className="text-center">
                           <div className={`inline-flex w-10 h-10 rounded-full items-center justify-center text-white font-bold text-lg mb-3 ${
-                            index === 0 ? 'bg-red-500' : 
-                            index === 1 ? 'bg-orange-500' : 
+                            index === 0 ? 'bg-red-500' :
+                            index === 1 ? 'bg-orange-500' :
                             index === 2 ? 'bg-yellow-500' : 'bg-blue-500'
                           }`}>
                             {index + 1}
@@ -1057,7 +1088,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                           <span>Peak Month Activity:</span>
                           <span className="font-medium">
                             {Object.entries(analytics.monthlyStats)
-                              .sort(([,a], [,b]) => b - a)[0]?.[0]?.split('-')[1] || 'N/A'} 
+                              .sort(([,a], [,b]) => b - a)[0]?.[0]?.split('-')[1] || 'N/A'}
                             ({Object.entries(analytics.monthlyStats)
                               .sort(([,a], [,b]) => b - a)[0]?.[1] || 0} declarations)
                           </span>
