@@ -52,7 +52,7 @@ interface DisasterType {
     url: string;
     caption: string;
     credit: string;
-    category: 'overview' | 'damage' | 'response' | 'recovery';
+    category: 'overview' | 'damage' | 'response' | 'recovery' | 'classification';
   }>;
   scales: {
     name: string;
@@ -85,6 +85,22 @@ interface DisasterType {
     focus: string[];
     timeline: string;
   }>;
+  hazards: {
+    primaryHazards: Array<{
+      name: string;
+      description: string;
+      riskLevel: 'Low' | 'Moderate' | 'High' | 'Extreme';
+      timeframe: string;
+      safetyActions: string[];
+    }>;
+    secondaryHazards: Array<{
+      name: string;
+      description: string;
+      riskLevel: 'Low' | 'Moderate' | 'High' | 'Extreme';
+      timeframe: string;
+      safetyActions: string[];
+    }>;
+  };
 }
 
 const disasterTypes: DisasterType[] = [
@@ -264,7 +280,75 @@ const disasterTypes: DisasterType[] = [
         ],
         timeline: '6 months - 10+ years'
       }
-    ]
+    ],
+    hazards: {
+      primaryHazards: [
+        {
+          name: 'Ground Shaking',
+          description: 'Violent movement of the ground that can cause structural damage and injury',
+          riskLevel: 'Extreme',
+          timeframe: '15-60 seconds during earthquake',
+          safetyActions: [
+            'Drop, Cover, and Hold On immediately',
+            'Stay where you are - do not run outside',
+            'Get under a sturdy desk or table if available',
+            'Protect your head and neck with your arms',
+            'Stay away from windows, mirrors, and heavy objects'
+          ]
+        },
+        {
+          name: 'Structural Collapse',
+          description: 'Buildings, bridges, and infrastructure may fail during strong shaking',
+          riskLevel: 'High',
+          timeframe: 'During and immediately after earthquake',
+          safetyActions: [
+            'Exit building only if it is severely damaged',
+            'Use stairs, never elevators',
+            'Watch for falling debris when exiting',
+            'Stay away from damaged structures',
+            'Do not enter damaged buildings'
+          ]
+        }
+      ],
+      secondaryHazards: [
+        {
+          name: 'Aftershocks',
+          description: 'Smaller earthquakes following the main event, can cause additional damage',
+          riskLevel: 'High',
+          timeframe: 'Hours to months after main earthquake',
+          safetyActions: [
+            'Be prepared for aftershocks at any time',
+            'Take cover immediately when shaking starts',
+            'Avoid weakened structures during aftershock period',
+            'Keep emergency supplies accessible'
+          ]
+        },
+        {
+          name: 'Tsunami Risk',
+          description: 'Large underwater earthquakes can generate tsunami waves',
+          riskLevel: 'Extreme',
+          timeframe: 'Minutes to hours after earthquake',
+          safetyActions: [
+            'Move to high ground immediately if near coast',
+            'Do not wait for official tsunami warning',
+            'Stay away from beaches and waterways',
+            'Listen for emergency broadcasts'
+          ]
+        },
+        {
+          name: 'Landslides',
+          description: 'Ground shaking can trigger landslides in mountainous areas',
+          riskLevel: 'High',
+          timeframe: 'During and after earthquake',
+          safetyActions: [
+            'Avoid steep slopes and cliff areas',
+            'Listen for unusual sounds like trees cracking',
+            'Watch for tilted trees, poles, or fences',
+            'Be alert for sudden changes in water flow'
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'hurricane',
@@ -431,7 +515,84 @@ const disasterTypes: DisasterType[] = [
         ],
         timeline: '3 months - 5+ years'
       }
-    ]
+    ],
+    hazards: {
+      primaryHazards: [
+        {
+          name: 'High Winds',
+          description: 'Sustained winds of 74 mph or higher can cause significant structural damage and uproot trees',
+          riskLevel: 'Extreme',
+          timeframe: 'Several hours to days',
+          safetyActions: [
+            'Stay indoors and away from windows and doors',
+            'Secure loose outdoor items that could become projectiles',
+            'Listen to NOAA Weather Radio or local news for updates',
+            'Have flashlights and batteries ready for power outages'
+          ]
+        },
+        {
+          name: 'Heavy Rainfall and Inland Flooding',
+          description: 'Hurricanes can drop 6-12 inches of rain or more, leading to flash floods and riverine flooding',
+          riskLevel: 'Extreme',
+          timeframe: 'During and after hurricane passage',
+          safetyActions: [
+            'Never drive or walk through flood waters',
+            'Move to higher ground if flooding occurs',
+            'Be aware of potential for landslides in hilly areas',
+            'Turn around, don\'t drown!'
+          ]
+        },
+        {
+          name: 'Storm Surge',
+          description: 'A rise in sea level caused by the storm\'s winds pushing water onshore, most dangerous on the coast',
+          riskLevel: 'Extreme',
+          timeframe: 'During hurricane landfall',
+          safetyActions: [
+            'Evacuate coastal areas immediately if ordered by authorities',
+            'Move inland to pre-determined safe locations',
+            'Do not return until authorities declare it safe',
+            'Be aware that storm surge can cause flooding far inland'
+          ]
+        }
+      ],
+      secondaryHazards: [
+        {
+          name: 'Tornadoes',
+          description: 'Hurricanes can spawn tornadoes, especially in the right-rear quadrant of the storm',
+          riskLevel: 'High',
+          timeframe: 'During hurricane passage',
+          safetyActions: [
+            'Seek shelter in an interior room on the lowest floor',
+            'Get under sturdy furniture and cover your head',
+            'Stay away from windows'
+          ]
+        },
+        {
+          name: 'Power Outages',
+          description: 'Widespread and prolonged power outages are common due to wind and flooding damage',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Keep essential devices charged',
+            'Have alternative lighting and power sources',
+            'Keep refrigerators and freezers closed to preserve food',
+            'Use generators safely outdoors'
+          ]
+        },
+        {
+          name: 'Disruption of Services',
+          description: 'Essential services like water, sewer, and transportation can be severely impacted',
+          riskLevel: 'Moderate',
+          timeframe: 'Weeks to months',
+          safetyActions: [
+            'Store adequate water and non-perishable food',
+            'Have a supply of necessary medications',
+            'Follow public health guidance for water and food safety',
+            'Be patient with recovery efforts'
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'wildfire',
@@ -521,6 +682,87 @@ const disasterTypes: DisasterType[] = [
         color: 'bg-red-200 text-red-900'
       }
     ],
+    hazards: {
+      primaryHazards: [
+        {
+          name: 'Fast-Moving Fire',
+          description: 'Wildfires can spread at speeds of 14+ mph, faster than a person can run',
+          riskLevel: 'Extreme',
+          timeframe: 'Minutes to hours for fire to reach structures',
+          safetyActions: [
+            'Evacuate immediately when ordered',
+            'Have multiple evacuation routes planned',
+            'Leave early - do not wait until fire is visible',
+            'Take evacuation routes away from fire direction',
+            'Monitor emergency radio and alerts constantly'
+          ]
+        },
+        {
+          name: 'Smoke and Poor Air Quality',
+          description: 'Wildfire smoke contains harmful particles and gases that can cause serious health problems',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks during active fires',
+          safetyActions: [
+            'Stay indoors with windows and doors closed',
+            'Use air conditioning on recirculate mode',
+            'Avoid outdoor activities, especially exercise',
+            'Use N95 or P100 masks when outdoors',
+            'Seek medical attention for breathing difficulties'
+          ]
+        },
+        {
+          name: 'Flying Embers',
+          description: 'Wind-blown burning debris can travel over a mile ahead of main fire',
+          riskLevel: 'High',
+          timeframe: 'Hours before main fire arrival',
+          safetyActions: [
+            'Clear roof and gutters of flammable debris',
+            'Close all windows and vents',
+            'Remove outdoor furniture and decorations',
+            'Wet down landscaping if time permits',
+            'Be ready to extinguish spot fires around property'
+          ]
+        }
+      ],
+      secondaryHazards: [
+        {
+          name: 'Extreme Heat',
+          description: 'Wildfires generate intense heat that can ignite structures from a distance',
+          riskLevel: 'High',
+          timeframe: 'During fire passage near structures',
+          safetyActions: [
+            'Stay inside air-conditioned buildings',
+            'Keep structure wet if defending property',
+            'Wear protective clothing if outside',
+            'Have water sources readily available'
+          ]
+        },
+        {
+          name: 'Power Outages',
+          description: 'Fire damage to power lines creates widespread outages affecting communications',
+          riskLevel: 'Moderate',
+          timeframe: 'During and after fire passage',
+          safetyActions: [
+            'Keep cell phones charged',
+            'Have battery-powered radio available',
+            'Use flashlights instead of candles',
+            'Keep generators outside and away from windows'
+          ]
+        },
+        {
+          name: 'Mudslides and Erosion',
+          description: 'Burned areas are susceptible to mudslides during heavy rains',
+          riskLevel: 'High',
+          timeframe: 'Months to years after fire in burned areas',
+          safetyActions: [
+            'Monitor weather forecasts for heavy rain',
+            'Avoid camping or hiking in burned areas during rain',
+            'Have evacuation plan for homes below burned slopes',
+            'Watch for debris flows in channels and washes'
+          ]
+        }
+      ]
+    },
     preparedness: [
       {
         phase: 'Defensible Space',
@@ -760,7 +1002,85 @@ const disasterTypes: DisasterType[] = [
         ],
         timeline: '6 months - 5+ years'
       }
-    ]
+    ],
+    hazards: {
+      primaryHazards: [
+        {
+          name: 'Flash Flooding',
+          description: 'Rapidly rising water levels, often due to intense rainfall or dam failures, posing an immediate life threat',
+          riskLevel: 'Extreme',
+          timeframe: 'Minutes to hours',
+          safetyActions: [
+            'Move to higher ground immediately',
+            'Never attempt to walk or drive through moving water',
+            'Listen for NOAA Weather Radio or local alerts',
+            'Be aware of water depth and current speed'
+          ]
+        },
+        {
+          name: 'Riverine Flooding',
+          description: 'Gradual rise of water levels in rivers and streams, can inundate large areas for extended periods',
+          riskLevel: 'High',
+          timeframe: 'Hours to days',
+          safetyActions: [
+            'Monitor river forecasts and advisories',
+            'Prepare to evacuate if flooding is imminent',
+            'Secure property and move valuables to higher floors',
+            'Stay informed through official channels'
+          ]
+        },
+        {
+          name: 'Storm Surge',
+          description: 'Coastal flooding caused by hurricane winds pushing seawater onshore',
+          riskLevel: 'Extreme',
+          timeframe: 'During hurricane landfall (coastal areas)',
+          safetyActions: [
+            'Heed all evacuation orders for coastal zones',
+            'Move inland to designated shelters or higher ground',
+            'Be aware of the potential for surge to reach miles inland',
+            'Avoid returning until authorities declare the area safe'
+          ]
+        }
+      ],
+      secondaryHazards: [
+        {
+          name: 'Contaminated Water and Food',
+          description: 'Floodwaters can spread sewage and chemicals, contaminating water and food supplies',
+          riskLevel: 'High',
+          timeframe: 'During and after flood event',
+          safetyActions: [
+            'Use bottled or disinfected water for drinking and cooking',
+            'Discard food that has come into contact with floodwater',
+            'Clean and sanitize contaminated surfaces',
+            'Follow guidance from public health officials'
+          ]
+        },
+        {
+          name: 'Electrical Hazards',
+          description: 'Floodwaters can energize submerged electrical equipment, posing electrocution risk',
+          riskLevel: 'High',
+          timeframe: 'During and after flood event',
+          safetyActions: [
+            'Turn off electricity at the main breaker if safe to do so',
+            'Stay away from power lines and submerged electrical equipment',
+            'Do not touch anything that is wet and could be electrified',
+            'Have electrical systems checked by a qualified electrician after flooding'
+          ]
+        },
+        {
+          name: 'Mold Growth',
+          description: 'Damp conditions after flooding promote mold growth, which can cause respiratory problems',
+          riskLevel: 'Moderate',
+          timeframe: 'Weeks to months after flooding',
+          safetyActions: [
+            'Dry out buildings as quickly as possible',
+            'Remove and discard all porous materials damaged by water',
+            'Use fans and dehumidifiers to reduce moisture',
+            'Wear protective gear when cleaning mold'
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'tornado',
@@ -933,7 +1253,71 @@ const disasterTypes: DisasterType[] = [
         ],
         timeline: '3 months - 3+ years'
       }
-    ]
+    ],
+    hazards: {
+      primaryHazards: [
+        {
+          name: 'High Winds',
+          description: 'Violent rotating winds can exceed 200 mph, capable of destroying well-built structures',
+          riskLevel: 'Extreme',
+          timeframe: 'Minutes to an hour',
+          safetyActions: [
+            'Seek shelter in a basement, storm cellar, or interior room on the lowest floor',
+            'Get under sturdy furniture and cover your head and neck with your arms',
+            'Stay away from windows, doors, and outside walls',
+            'Protect yourself from flying debris'
+          ]
+        },
+        {
+          name: 'Flying Debris',
+          description: 'Tornadoes pick up and hurl objects at high speeds, acting as dangerous projectiles',
+          riskLevel: 'Extreme',
+          timeframe: 'During tornado passage',
+          safetyActions: [
+            'Ensure your shelter has a solid roof and walls',
+            'Wear a helmet if possible',
+            'Stay away from windows and doors, even in interior rooms',
+            'Listen for the sound of a tornado (often described as a freight train)'
+          ]
+        }
+      ],
+      secondaryHazards: [
+        {
+          name: 'Hail',
+          description: 'Large hailstones can accompany severe thunderstorms that produce tornadoes',
+          riskLevel: 'High',
+          timeframe: 'During thunderstorm',
+          safetyActions: [
+            'Stay indoors and away from windows',
+            'If in a vehicle, pull over safely and duck down',
+            'Consider storing vehicles in a garage or under cover'
+          ]
+        },
+        {
+          name: 'Heavy Rainfall and Flooding',
+          description: 'Tornado-producing storms can also bring heavy rain and localized flooding',
+          riskLevel: 'Moderate',
+          timeframe: 'During and after thunderstorm',
+          safetyActions: [
+            'Avoid driving through flooded areas',
+            'Be aware of potential for lightning strikes',
+            'Turn around, don\'t drown!'
+          ]
+        },
+        {
+          name: 'Power Outages',
+          description: 'Damage to power infrastructure can cause widespread and prolonged outages',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Keep essential devices charged',
+            'Have alternative lighting and power sources',
+            'Keep refrigerators and freezers closed to preserve food',
+            'Use generators safely outdoors'
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'winter-storm',
@@ -1100,7 +1484,85 @@ const disasterTypes: DisasterType[] = [
         ],
         timeline: '2 months - 1 year'
       }
-    ]
+    ],
+    hazards: {
+      primaryHazards: [
+        {
+          name: 'Heavy Snowfall',
+          description: 'Accumulation of snow can bury roads, cause structural collapse, and disrupt essential services',
+          riskLevel: 'Extreme',
+          timeframe: 'Hours to days',
+          safetyActions: [
+            'Stay indoors and avoid unnecessary travel',
+            'Conserve heat and wear layers of clothing',
+            'Keep blankets and warm clothing accessible',
+            'Ensure heating systems are functioning properly'
+          ]
+        },
+        {
+          name: 'Ice Storms (Freezing Rain)',
+          description: 'Rain that freezes on contact, coating surfaces with a glaze of ice, making travel treacherous and causing power outages',
+          riskLevel: 'Extreme',
+          timeframe: 'Hours',
+          safetyActions: [
+            'Stay indoors and avoid any travel',
+            'Walk carefully on icy surfaces, take short steps',
+            'Use salt or sand for traction if you must go outside',
+            'Secure loose items that could be damaged by ice buildup'
+          ]
+        },
+        {
+          name: 'Strong Winds',
+          description: 'Winds accompanying winter storms can cause drifting snow, damage structures, and increase the risk of hypothermia',
+          riskLevel: 'High',
+          timeframe: 'Throughout the storm',
+          safetyActions: [
+            'Secure outdoor items that could be blown away',
+            'Stay indoors and avoid going out in high winds',
+            'Be aware of wind chill factors, which can increase the risk of frostbite',
+            'Check on vulnerable neighbors and relatives'
+          ]
+        }
+      ],
+      secondaryHazards: [
+        {
+          name: 'Power Outages',
+          description: 'Ice and wind can bring down power lines, leading to extended outages and loss of heat',
+          riskLevel: 'High',
+          timeframe: 'Days',
+          safetyActions: [
+            'Keep essential devices charged',
+            'Have alternative lighting and power sources',
+            'Keep refrigerators and freezers closed to preserve food',
+            'Use generators safely outdoors, never inside'
+          ]
+        },
+        {
+          name: 'Carbon Monoxide Poisoning',
+          description: 'Improper use of alternative heating sources can lead to deadly carbon monoxide buildup',
+          riskLevel: 'Extreme',
+          timeframe: 'During power outages',
+          safetyActions: [
+            'Ensure carbon monoxide detectors are installed and working',
+            'Never use generators, charcoal grills, or propane heaters indoors',
+            'Keep vehicle exhaust pipes clear of snow when running engine',
+            'Ventilate any heating appliances properly'
+          ]
+        },
+        {
+          name: 'Hypothermia and Frostbite',
+          description: 'Exposure to cold temperatures, especially with wind, can lead to dangerous body temperature drops',
+          riskLevel: 'High',
+          timeframe: 'During and after storm',
+          safetyActions: [
+            'Dress in multiple layers of warm clothing',
+            'Cover exposed skin to prevent frostbite',
+            'Stay hydrated and eat regularly',
+            'Recognize symptoms of hypothermia and frostbite in yourself and others'
+          ]
+        }
+      ]
+    }
   }
 ];
 
@@ -1110,19 +1572,21 @@ const PhotoGallery = ({ disasterType, category = 'overview' }: { disasterType: s
     const normalizedDisaster = disaster.toLowerCase().replace(/[^a-z]/g, '');
     const photoData = disasterEducationPhotos[normalizedDisaster as keyof typeof disasterEducationPhotos];
     const descData = photoDescriptions[normalizedDisaster as keyof typeof photoDescriptions];
-    
+
     if (photoData && descData) {
+      // Ensure the category exists, fallback to 'overview' if not
+      const validCategory = cat in photoData ? cat : 'overview';
       return {
-        url: photoData[cat as keyof typeof photoData] || photoData.overview,
-        description: descData[cat as keyof typeof descData] || descData.overview
+        url: photoData[validCategory as keyof typeof photoData] || photoData.overview,
+        description: descData[validCategory as keyof typeof descData] || descData.overview
       };
     }
-    
+
     return null;
   };
 
   const photo = getPhotoForDisaster(disasterType, category);
-  
+
   if (!photo) {
     return (
       <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -1167,7 +1631,7 @@ const PhotoGallery = ({ disasterType, category = 'overview' }: { disasterType: s
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
         <div className="flex items-start gap-3">
           <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -1193,6 +1657,7 @@ export default function DisasterEducation() {
     { id: 'overview', label: 'Overview', icon: Info },
     { id: 'scales', label: 'Classification', icon: Thermometer },
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
+    { id: 'hazards', label: 'Hazards', icon: Mountain }, // Added Hazards tab
     { id: 'preparedness', label: 'Preparedness', icon: Shield },
     { id: 'response', label: 'Response', icon: Heart },
     { id: 'recovery', label: 'Recovery', icon: RefreshCw }
@@ -1429,6 +1894,65 @@ export default function DisasterEducation() {
                     ))}
                   </div>
                 </div>
+              </TabsContent>
+
+              {/* Hazards Tab */}
+              <TabsContent value="hazards" className="space-y-6">
+                {/* Primary Hazards */}
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Primary Hazards</h3>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {selectedDisaster.hazards.primaryHazards.map((hazard, index) => (
+                      <Card key={index} className="border-l-4" style={{ borderLeftColor: '#EF4444' /* Red for high risk */ }}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 mb-2">
+                            <Badge variant="outline" className={`border-red-500 text-red-500`}>
+                              {hazard.riskLevel}
+                            </Badge>
+                            <span className="text-sm text-gray-500">{hazard.timeframe}</span>
+                          </div>
+                          <h4 className="font-semibold text-gray-900 mb-1">{hazard.name}</h4>
+                          <p className="text-sm text-gray-700 mb-3">{hazard.description}</p>
+                          <div className="text-sm text-gray-700 font-medium">Safety Actions:</div>
+                          <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            {hazard.safetyActions.map((action, actionIndex) => (
+                              <li key={actionIndex}>{action}</li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Secondary Hazards */}
+                {selectedDisaster.hazards.secondaryHazards.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Secondary Hazards</h3>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {selectedDisaster.hazards.secondaryHazards.map((hazard, index) => (
+                        <Card key={index} className="border-l-4" style={{ borderLeftColor: '#F59E0B' /* Orange for moderate risk */ }}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Badge variant="outline" className={`border-orange-500 text-orange-500`}>
+                                {hazard.riskLevel}
+                              </Badge>
+                              <span className="text-sm text-gray-500">{hazard.timeframe}</span>
+                            </div>
+                            <h4 className="font-semibold text-gray-900 mb-1">{hazard.name}</h4>
+                            <p className="text-sm text-gray-700 mb-3">{hazard.description}</p>
+                            <div className="text-sm text-gray-700 font-medium">Safety Actions:</div>
+                            <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                              {hazard.safetyActions.map((action, actionIndex) => (
+                                <li key={actionIndex}>{action}</li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </TabsContent>
 
               {/* Preparedness Tab */}
