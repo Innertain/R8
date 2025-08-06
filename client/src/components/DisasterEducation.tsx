@@ -37,6 +37,9 @@ import WindIcon from '@assets/WIND_1754119781370.png';
 import HeatwaveIcon from '@assets/Heatwave_1754119781366.png';
 import TsunamiIcon from '@assets/tsunami_1754119781370.png';
 
+// Import disaster photos and descriptions
+import { disasterEducationPhotos, photoDescriptions } from '@/assets/disaster-education-photos';
+
 interface DisasterType {
   id: string;
   name: string;
@@ -937,9 +940,46 @@ const disasterTypes: DisasterType[] = [
   }
 ];
 
+// Photo display component for educational content
+const EducationalPhoto = ({ disasterKey, tabKey }: { disasterKey: string, tabKey: string }) => {
+  const photoUrl = disasterEducationPhotos[disasterKey as keyof typeof disasterEducationPhotos]?.[tabKey as keyof typeof disasterEducationPhotos.earthquake];
+  const description = photoDescriptions[disasterKey as keyof typeof photoDescriptions]?.[tabKey as keyof typeof photoDescriptions.earthquake];
+
+  if (!photoUrl || !description) return null;
+
+  return (
+    <div className="mb-6">
+      <div className="relative rounded-lg overflow-hidden shadow-lg">
+        <img 
+          src={photoUrl} 
+          alt={description}
+          className="w-full h-64 object-cover"
+          onError={(e) => {
+            // Hide image if it fails to load
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+          <p className="text-white text-sm font-medium">{description}</p>
+        </div>
+      </div>
+      <p className="text-xs text-gray-500 mt-2">Photo: Educational content from Unsplash</p>
+    </div>
+  );
+};
+
 export default function DisasterEducation() {
   const [selectedDisaster, setSelectedDisaster] = useState<DisasterType>(disasterTypes[0]);
   const [activeTab, setActiveTab] = useState('overview');
+
+  const tabConfig = [
+    { id: 'overview', label: 'Overview', icon: Info },
+    { id: 'scales', label: 'Classification', icon: Thermometer },
+    { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
+    { id: 'preparedness', label: 'Preparedness', icon: Shield },
+    { id: 'response', label: 'Response', icon: Heart },
+    { id: 'recovery', label: 'Recovery', icon: RefreshCw }
+  ];
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -950,7 +990,7 @@ export default function DisasterEducation() {
           Learn about different types of disasters, their classification systems, alert levels, 
           and comprehensive preparedness, response, and recovery strategies.
         </p>
-        
+
         {/* Educational Info Box */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-4xl mx-auto">
           <div className="flex items-start gap-3">
@@ -1005,280 +1045,239 @@ export default function DisasterEducation() {
         <CardContent className="p-0">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full justify-start h-12 bg-gray-50 rounded-none border-b">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="scales" className="flex items-center gap-2">
-                <Thermometer className="h-4 w-4" />
-                Classification
-              </TabsTrigger>
-              <TabsTrigger value="alerts" className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Alerts
-              </TabsTrigger>
-              <TabsTrigger value="preparedness" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                Preparedness
-              </TabsTrigger>
-              <TabsTrigger value="response" className="flex items-center gap-2">
-                <Heart className="h-4 w-4" />
-                Response
-              </TabsTrigger>
-              <TabsTrigger value="recovery" className="flex items-center gap-2">
-                <RefreshCw className="h-4 w-4" />
-                Recovery
-              </TabsTrigger>
+              {tabConfig.map((tab) => (
+                <TabsTrigger 
+                  key={tab.id} 
+                  value={tab.id} 
+                  className="flex items-center gap-2"
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <tab.icon className="h-4 w-4" />
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
             <div className="p-6">
-              <TabsContent value="overview" className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Info className="h-5 w-5 text-blue-600" />
-                        What is a {selectedDisaster.name}?
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-700 leading-relaxed">{selectedDisaster.description}</p>
-                    </CardContent>
-                  </Card>
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="space-y-4">
+                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="overview" />
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed">
+                    {selectedDisaster.description}
+                  </p>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Thermometer className="h-5 w-5 text-orange-600" />
-                        Measurement Scale
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <h4 className="font-semibold mb-2">{selectedDisaster.scales.name}</h4>
-                      <p className="text-sm text-gray-600 mb-4">{selectedDisaster.scales.description}</p>
-                      <div className="space-y-2">
-                        {selectedDisaster.scales.levels.slice(0, 3).map((level, index) => (
-                          <div key={index} className={`p-2 rounded text-xs ${level.color}`}>
-                            <strong>{level.level}</strong> - {level.description}
-                          </div>
-                        ))}
-                        {selectedDisaster.scales.levels.length > 3 && (
-                          <p className="text-xs text-gray-500 mt-2">
-                            + {selectedDisaster.scales.levels.length - 3} more levels (see Classification tab)
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {/* Displaying characteristics based on disaster type */}
+                  {selectedDisaster.id === 'earthquake' && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Key Characteristics:</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        <li className="text-gray-700">Sudden shaking of the ground</li>
+                        <li className="text-gray-700">Caused by tectonic plate movement</li>
+                        <li className="text-gray-700">Can trigger landslides and tsunamis</li>
+                      </ul>
+                    </div>
+                  )}
+                  {selectedDisaster.id === 'hurricane' && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Key Characteristics:</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        <li className="text-gray-700">Large rotating storm system</li>
+                        <li className="text-gray-700">Sustained winds of 74 mph or higher</li>
+                        <li className="text-gray-700">Heavy rainfall and storm surge</li>
+                      </ul>
+                    </div>
+                  )}
+                  {selectedDisaster.id === 'wildfire' && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Key Characteristics:</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        <li className="text-gray-700">Uncontrolled fire in vegetation</li>
+                        <li className="text-gray-700">Fueled by dry conditions and wind</li>
+                        <li className="text-gray-700">Threatens structures and ecosystems</li>
+                      </ul>
+                    </div>
+                  )}
+                  {selectedDisaster.id === 'flood' && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Key Characteristics:</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        <li className="text-gray-700">Excessive water accumulation</li>
+                        <li className="text-gray-700">Caused by heavy rain, dam failure, or storm surge</li>
+                        <li className="text-gray-700">Can lead to widespread damage and displacement</li>
+                      </ul>
+                    </div>
+                  )}
+                  {selectedDisaster.id === 'tornado' && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Key Characteristics:</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        <li className="text-gray-700">Violent rotating column of air</li>
+                        <li className="text-gray-700">Extends from thunderstorm to ground</li>
+                        <li className="text-gray-700">Characterized by high wind speeds and destructive power</li>
+                      </ul>
+                    </div>
+                  )}
+                  {selectedDisaster.id === 'winter-storm' && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Key Characteristics:</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        <li className="text-gray-700">Heavy snow, ice, or sleet</li>
+                        <li className="text-gray-700">Strong winds and low temperatures</li>
+                        <li className="text-gray-700">Can cause power outages and travel disruptions</li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-green-600" />
-                      Emergency Management Phases
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Shield className="h-8 w-8 text-blue-600" />
-                        </div>
-                        <h4 className="font-semibold mb-2">Preparedness</h4>
-                        <p className="text-sm text-gray-600">Planning and preparation before disaster strikes</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Heart className="h-8 w-8 text-red-600" />
-                        </div>
-                        <h4 className="font-semibold mb-2">Response</h4>
-                        <p className="text-sm text-gray-600">Immediate actions during and after the disaster</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <RefreshCw className="h-8 w-8 text-green-600" />
-                        </div>
-                        <h4 className="font-semibold mb-2">Recovery</h4>
-                        <p className="text-sm text-gray-600">Long-term rebuilding and improvement efforts</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
 
+              {/* Classification Tab */}
               <TabsContent value="scales" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Thermometer className="h-5 w-5 text-orange-600" />
-                      {selectedDisaster.scales.name}
-                    </CardTitle>
-                    <CardDescription>{selectedDisaster.scales.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="scales" />
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    {selectedDisaster.scales.description}
+                  </p>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h4 className="font-semibold text-blue-900 mb-2">{selectedDisaster.scales.name}</h4>
+                    <p className="text-blue-800 text-sm mb-3">{selectedDisaster.scales.description}</p>
+
+                    <div className="grid gap-2">
                       {selectedDisaster.scales.levels.map((level, index) => (
-                        <Card key={index} className="border-l-4" style={{ borderLeftColor: level.color.includes('bg-') ? '#' + level.color.split('-')[1] : '#gray' }}>
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <Badge className={level.color}>{level.level}</Badge>
-                                  <span className="font-semibold">{level.description}</span>
-                                </div>
-                                <p className="text-gray-700">{level.effects}</p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                        <div key={index} className="flex items-center gap-3 p-2 bg-white rounded border">
+                          <Badge variant="outline" className={`${level.color} text-white font-medium`}>
+                            {level.level}
+                          </Badge>
+                          <div className="flex-1">
+                            <span className="font-medium">{level.description}</span>
+                            <p className="text-sm text-gray-600">{level.effects}</p>
+                          </div>
+                        </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
 
+              {/* Alerts Tab */}
               <TabsContent value="alerts" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-amber-600" />
-                      Alert Types & Meanings
-                    </CardTitle>
-                    <CardDescription>Understanding different levels of weather alerts and warnings</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {selectedDisaster.alerts.map((alert, index) => (
-                        <Card key={index} className="border-l-4" style={{ borderLeftColor: alert.color.includes('bg-') ? '#' + alert.color.split('-')[1] : '#gray' }}>
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <Badge className={alert.color}>{alert.type}</Badge>
-                                  <span className={`text-sm px-2 py-1 rounded ${
-                                    alert.urgency === 'Critical' ? 'bg-red-100 text-red-800' :
-                                    alert.urgency === 'High' ? 'bg-orange-100 text-orange-800' :
-                                    alert.urgency === 'Moderate' ? 'bg-yellow-100 text-yellow-800' :
-                                    'bg-gray-100 text-gray-800'
-                                  }`}>
-                                    {alert.urgency} Urgency
-                                  </span>
-                                </div>
-                                <p className="text-gray-700">{alert.description}</p>
+                <div className="prose max-w-none">
+                  <div className="space-y-4">
+                    {selectedDisaster.alerts.map((alert, index) => (
+                      <Card key={index} className="border-l-4" style={{ borderLeftColor: alert.color.includes('bg-') ? '#' + alert.color.split('-')[1] : '#gray' }}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <Badge className={alert.color}>{alert.type}</Badge>
+                                <span className={`text-sm px-2 py-1 rounded ${
+                                  alert.urgency === 'Critical' ? 'bg-red-100 text-red-800' :
+                                  alert.urgency === 'High' ? 'bg-orange-100 text-orange-800' :
+                                  alert.urgency === 'Moderate' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {alert.urgency} Urgency
+                                </span>
                               </div>
+                              <p className="text-gray-700">{alert.description}</p>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
               </TabsContent>
 
+              {/* Preparedness Tab */}
               <TabsContent value="preparedness" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Shield className="h-5 w-5 text-blue-600" />
-                      Preparedness Planning
-                    </CardTitle>
-                    <CardDescription>Essential steps to prepare for {selectedDisaster.name.toLowerCase()}s</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {selectedDisaster.preparedness.map((phase, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-blue-600" />
-                              <span className="font-semibold text-lg">{phase.phase}</span>
-                            </div>
-                            <Badge variant="outline">{phase.timeframe}</Badge>
-                          </div>
-                          <div className="grid gap-2">
-                            {phase.actions.map((action, actionIndex) => (
-                              <div key={actionIndex} className="flex items-start gap-3">
-                                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-700">{action}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="preparedness" />
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    {selectedDisaster.preparedness[0].actions.join(' ')} {/* Placeholder for actual description */}
+                  </p>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Emergency Kit Essentials</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {selectedDisaster.preparedness[0].actions.map((item, index) => (
+                          <li key={index} className="text-gray-700">{item}</li>
+                        ))}
+                      </ul>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Preparation Steps</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {selectedDisaster.preparedness[1].actions.map((step, index) => (
+                          <li key={index} className="text-gray-700">{step}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </TabsContent>
 
+              {/* Response Tab */}
               <TabsContent value="response" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Heart className="h-5 w-5 text-red-600" />
-                      Emergency Response
-                    </CardTitle>
-                    <CardDescription>Critical actions during and immediately after a {selectedDisaster.name.toLowerCase()}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {selectedDisaster.response.map((priority, index) => (
-                        <div key={index} className="border rounded-lg p-4 bg-red-50 border-red-200">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="flex items-center gap-2">
-                              <AlertTriangle className="h-4 w-4 text-red-600" />
-                              <span className="font-semibold text-lg">{priority.priority}</span>
-                            </div>
-                            <Badge variant="destructive">{priority.duration}</Badge>
-                          </div>
-                          <div className="grid gap-2">
-                            {priority.actions.map((action, actionIndex) => (
-                              <div key={actionIndex} className="flex items-start gap-3">
-                                <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-700">{action}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="response" />
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    {selectedDisaster.response[0].actions.join(' ')} {/* Placeholder for actual description */}
+                  </p>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Immediate Actions</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {selectedDisaster.response[0].actions.map((action, index) => (
+                          <li key={index} className="text-gray-700">{action}</li>
+                        ))}
+                      </ul>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Safety Guidelines</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {selectedDisaster.response[1].actions.map((guideline, index) => (
+                          <li key={index} className="text-gray-700">{guideline}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </TabsContent>
 
+              {/* Recovery Tab */}
               <TabsContent value="recovery" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <RefreshCw className="h-5 w-5 text-green-600" />
-                      Recovery Process
-                    </CardTitle>
-                    <CardDescription>Long-term recovery and rebuilding after a {selectedDisaster.name.toLowerCase()}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {selectedDisaster.recovery.map((stage, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="flex items-center gap-2">
-                              <RefreshCw className="h-4 w-4 text-green-600" />
-                              <span className="font-semibold text-lg">{stage.stage}</span>
-                            </div>
-                            <Badge className="bg-green-100 text-green-800">{stage.timeline}</Badge>
-                          </div>
-                          <div className="grid gap-2">
-                            {stage.focus.map((focus, focusIndex) => (
-                              <div key={focusIndex} className="flex items-start gap-3">
-                                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-700">{focus}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                <EducationalPhoto disasterKey={selectedDisaster.id} tabKey="recovery" />
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    {selectedDisaster.recovery[0].focus.join(' ')} {/* Placeholder for actual description */}
+                  </p>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Recovery Phases</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {selectedDisaster.recovery.map((phase, index) => (
+                          <li key={index} className="text-gray-700">{phase.stage}</li>
+                        ))}
+                      </ul>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Support Resources</h4>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {selectedDisaster.recovery[0].focus.map((resource, index) => (
+                          <li key={index} className="text-gray-700">{resource}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </TabsContent>
             </div>
           </Tabs>
