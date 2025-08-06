@@ -61,16 +61,11 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
       const declarationDate = new Date(disaster.declarationDate);
 
       // Time filter
-      if (timeFilter === 'recent') {
-        // Last 12 months
-        const twelveMonthsAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-        if (declarationDate < twelveMonthsAgo) return false;
-      } else if (timeFilter === '2024') {
-        if (declarationDate.getFullYear() !== 2024) return false;
-      } else if (timeFilter === '2025') {
-        if (declarationDate.getFullYear() !== 2025) return false;
-      } else if (timeFilter === 'since2022') {
-        if (declarationDate.getFullYear() < 2022) return false;
+      if (timeFilter !== 'all') {
+        const monthsAgo = parseInt(timeFilter);
+        const cutoffDate = new Date();
+        cutoffDate.setMonth(cutoffDate.getMonth() - monthsAgo);
+        if (declarationDate < cutoffDate) return false;
       }
 
       // State filter
@@ -83,30 +78,61 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
     });
   }, [disasters, timeFilter, stateFilter, typeFilter]);
 
-  // Analytics calculations
+  // Calculate analytics with improved year-over-year analysis
   const analytics = useMemo(() => {
+    const total = filteredDisasters.length;
+
+    // Get actual data range from disasters
+    const actualDataRange = useMemo(() => {
+      if (filteredDisasters.length === 0) return { start: null, end: null, years: [] };
+
+      const dates = filteredDisasters.map(d => new Date(d.declarationDate)).sort((a, b) => a.getTime() - b.getTime());
+      const start = dates[0];
+      const end = dates[dates.length - 1];
+
+      // Generate array of years that actually have data
+      const startYear = start.getFullYear();
+      const endYear = end.getFullYear();
+      const years = [];
+      for (let year = startYear; year <= endYear; year++) {
+        years.push(year);
+      }
+
+      return { start, end, years };
+    }, [filteredDisasters]);
+
+    // State statistics
     const stateStats = filteredDisasters.reduce((acc, disaster) => {
       acc[disaster.state] = (acc[disaster.state] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
+    // Type statistics
     const typeStats = filteredDisasters.reduce((acc, disaster) => {
-      const type = disaster.incidentType || 'Unknown';
-      acc[type] = (acc[type] || 0) + 1;
+      acc[disaster.incidentType] = (acc[disaster.incidentType] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
+    // Declaration type statistics
     const declarationTypeStats = filteredDisasters.reduce((acc, disaster) => {
       acc[disaster.declarationType] = (acc[disaster.declarationType] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
+    // Monthly statistics
     const monthlyStats = filteredDisasters.reduce((acc, disaster) => {
       const date = new Date(disaster.declarationDate);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       acc[monthKey] = (acc[monthKey] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
+
+    // Yearly statistics based on actual data
+    const yearlyStats = filteredDisasters.reduce((acc, disaster) => {
+      const year = new Date(disaster.declarationDate).getFullYear();
+      acc[year] = (acc[year] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
 
     // Calculate severity indicators
     const majorDisasters = filteredDisasters.filter(d => d.declarationType === 'DR').length;
@@ -123,34 +149,13 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
       .sort(([,a], [,b]) => b - a)
       .slice(0, 8);
 
-    // Timeline analysis - exclude fire incidents and sort by incident date when available
-    const recentDisasters = filteredDisasters
-      .filter(d => d.declarationType !== 'FM') // Remove fire management
-      .sort((a, b) => {
-        // Use incident date if available, fallback to declaration date
-        const dateA = a.incidentBeginDate ? new Date(a.incidentBeginDate) : new Date(a.declarationDate);
-        const dateB = b.incidentBeginDate ? new Date(b.incidentBeginDate) : new Date(b.declarationDate);
-        return dateB.getTime() - dateA.getTime();
-      });
-      
-    // Calculate total events, casualties, damage, and average events per month
-    const totalEvents = filteredDisasters.length;
-    const totalCasualties = filteredDisasters.reduce((sum, d) => sum + (Math.random() > 0.5 ? Math.floor(Math.random() * 100) : 0), 0); // Placeholder for actual casualty data
-    const totalDeaths = Math.floor(totalCasualties * 0.3); // Placeholder
-    const totalInjuries = totalCasualties - totalDeaths; // Placeholder
-    const totalDamage = filteredDisasters.reduce((sum, d) => sum + Math.random() * 1e9, 0); // Placeholder for actual damage data
-    const avgEventsPerMonth = totalEvents > 0 && dataRange.years > 0 ? Math.ceil(totalEvents / (dataRange.years * 12)) : 0;
-
-    // Placeholder for specific disaster types counts
-    const severeStorm = filteredDisasters.filter(d => d.incidentType?.includes('Severe Storm') || d.incidentType?.includes('Thunderstorm')).length;
-    const hurricane = filteredDisasters.filter(d => d.incidentType?.includes('Hurricane') || d.incidentType?.includes('Tropical Storm')).length;
-    const flood = filteredDisasters.filter(d => d.incidentType?.includes('Flood') || d.incidentType?.includes('Coastal Storm')).length;
-    const earthquake = filteredDisasters.filter(d => d.incidentType?.includes('Earthquake')).length;
-    const wildfire = filteredDisasters.filter(d => d.incidentType?.includes('Wildfire') || d.incidentType?.includes('Fire')).length;
-
+    // Calculate trend indicators
+    const recentYears = actualDataRange.years.slice(-3); // Last 3 years with data
+    const recentTotal = recentYears.reduce((sum, year) => sum + (yearlyStats[year] || 0), 0);
+    const avgPerYear = recentTotal / Math.max(recentYears.length, 1);
 
     return {
-      total: filteredDisasters.length,
+      total,
       majorDisasters,
       emergencies,
       fireManagement,
@@ -158,20 +163,12 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
       typeStats,
       declarationTypeStats,
       monthlyStats,
+      yearlyStats,
+      actualDataRange,
       topStates,
       topTypes,
-      recentDisasters,
-      totalEvents,
-      totalCasualties,
-      totalDeaths,
-      totalInjuries,
-      totalDamage,
-      avgEventsPerMonth,
-      severeStorm,
-      hurricane,
-      flood,
-      earthquake,
-      wildfire,
+      avgPerYear,
+      recentYears
     };
   }, [filteredDisasters]);
 
@@ -312,7 +309,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <div>
                 <p className="text-sm text-gray-600">Major Disasters</p>
                 <p className="text-2xl font-bold text-orange-600">{analytics.majorDisasters}</p>
-                <p className="text-xs text-gray-500">{((analytics.majorDisasters / analytics.total) * 100).toFixed(1)}% of total</p>
+                <p className="text-xs text-gray-500">{analytics.total > 0 ? ((analytics.majorDisasters / analytics.total) * 100).toFixed(1) : '0.0'}% of total</p>
               </div>
             </div>
           </CardContent>
@@ -327,7 +324,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <div>
                 <p className="text-sm text-gray-600">Emergencies</p>
                 <p className="text-2xl font-bold text-yellow-600">{analytics.emergencies}</p>
-                <p className="text-xs text-gray-500">{((analytics.emergencies / analytics.total) * 100).toFixed(1)}% of total</p>
+                <p className="text-xs text-gray-500">{analytics.total > 0 ? ((analytics.emergencies / analytics.total) * 100).toFixed(1) : '0.0'}% of total</p>
               </div>
             </div>
           </CardContent>
@@ -372,12 +369,12 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                 <div className="space-y-3">
                   {analytics.topTypes.map(([type, count]) => {
                     const IconComponent = getDisasterIconComponent(type);
-                    const percentage = ((count / analytics.total) * 100).toFixed(1);
+                    const percentage = analytics.total > 0 ? ((count / analytics.total) * 100).toFixed(1) : '0.0';
                     return (
                       <div key={type} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <IconComponent className="w-4 h-4 text-gray-600" />
-                          <span className="text-sm font-medium">{type}</span>
+                          <span className="text-sm font-medium">{type || 'Unknown'}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-gray-600">{count}</span>
@@ -407,7 +404,8 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <CardContent>
                 <div className="space-y-3">
                   {analytics.topStates.slice(0, 8).map(([state, count]) => {
-                    const percentage = ((count / analytics.total) * 100).toFixed(1);
+                    const percentage = analytics.total > 0 ? ((count / analytics.total) * 100).toFixed(1) : '0.0';
+                    const maxStateCount = analytics.topStates.length > 0 ? analytics.topStates[0][1] : 1;
                     return (
                       <div key={state} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -419,7 +417,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                           <div className="w-16 bg-gray-200 rounded-full h-2">
                             <div 
                               className="bg-green-600 h-2 rounded-full" 
-                              style={{ width: `${Math.min(100, (count / analytics.topStates[0][1]) * 100)}%` }}
+                              style={{ width: `${Math.min(100, (count / maxStateCount) * 100)}%` }}
                             />
                           </div>
                           <span className="text-xs text-gray-500 w-10">{percentage}%</span>
@@ -437,7 +435,6 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
 
           {/* NASA EONET Natural Events - Phase 1 Implementation */}
           <NasaEonetEvents />
-
 
 
 
@@ -491,149 +488,110 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
           </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Yearly Trend Chart */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  Disaster Declarations Trend (2020-2025)
-                </CardTitle>
-                <p className="text-sm text-gray-600">
-                  Analysis of disaster frequency from 2020 to 2025
-                </p>
-                <div className="bg-green-50 border border-green-200 rounded-lg p-2 mt-2">
-                  <p className="text-xs text-green-700">
-                    <strong>Data Coverage:</strong> 2020-2025 (data aggregated from declarations)
-                  </p>
+            {/* Year-over-Year Trend */}
+            <div>
+              <h4 className="font-medium mb-4">Disaster Declarations Trend ({analytics.actualDataRange.start?.getFullYear() || 'N/A'}-{analytics.actualDataRange.end?.getFullYear() || 'N/A'})</h4>
+              <div className="text-sm text-gray-600 mb-4">
+                Analysis of disaster frequency from {analytics.actualDataRange.start?.getFullYear() || 'N/A'} to {analytics.actualDataRange.end?.getFullYear() || 'N/A'}
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div className="text-sm font-medium text-blue-800">
+                  Data Coverage: {analytics.actualDataRange.start?.getFullYear() || 'N/A'}-{analytics.actualDataRange.end?.getFullYear() || 'N/A'} 
+                  ({analytics.total} total declarations across {analytics.actualDataRange.years.length} years)
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={(() => {
-                        const yearData: Record<string, number> = {
-                          '2020': 0,
-                          '2021': 0,
-                          '2022': 0,
-                          '2023': 0,
-                          '2024': 0,
-                          '2025': 0,
-                        };
-                        filteredDisasters.forEach(disaster => {
-                          const year = new Date(disaster.declarationDate).getFullYear().toString();
-                          if (yearData[year] !== undefined) { // Only count years in our range
-                            yearData[year] = yearData[year] + 1;
-                          }
-                        });
+                <div className="text-sm text-blue-700 mt-1">
+                  Average: {Math.round(analytics.avgPerYear)} declarations per year
+                </div>
+              </div>
 
-                        return Object.entries(yearData)
-                          .map(([year, count]) => ({ year, count }))
-                          .sort((a, b) => parseInt(a.year) - parseInt(b.year));
-                      })()}
-                      margin={{
-                        top: 20,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
-                      <XAxis 
-                        dataKey="year" 
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 12, fill: '#6b7280', fontWeight: 'bold' }}
-                      />
-                      <YAxis 
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 12, fill: '#6b7280' }}
-                      />
-                      <Tooltip 
-                        content={({ active, payload, label }) => {
-                          if (active && payload && payload.length) {
-                            const year = parseInt(label);
-                            const count = payload[0].value;
-                            let context = '';
-                            if (year === 2020) context = 'Initial data year';
-                            else if (year === 2021) context = 'Continued activity';
-                            else if (year === 2022) context = '82 declarations - Baseline activity';
-                            else if (year === 2023) context = '114 declarations - High activity year';
-                            else if (year === 2024) context = '111 declarations - Consistent high activity';
-                            else if (year === 2025) context = '82 declarations - Ongoing activity (through July)';
-
-                            return (
-                              <div className="bg-white p-3 border rounded-lg shadow-lg max-w-xs">
-                                <p className="font-bold text-gray-900 text-lg">{label}</p>
-                                <p className="text-blue-600 font-semibold">
-                                  {`${count} declarations`}
-                                </p>
-                                {context && (
-                                  <p className="text-xs text-gray-600 mt-1">{context}</p>
-                                )}
-                              </div>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                      <Bar 
-                        dataKey="declarations" 
-                        fill="#2563eb"
-                        radius={[4, 4, 0, 0]}
-                        className="hover:opacity-80 transition-opacity"
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+              <div className="space-y-4">
+                <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600 mb-2">📈</div>
+                    <div className="text-sm text-gray-700 font-medium">FEMA Disaster Trends</div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {analytics.total} declarations • {analytics.actualDataRange.years.length} years of data
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      Peak: {Math.max(...Object.values(analytics.yearlyStats))} disasters • 
+                      Avg: {Math.round(analytics.avgPerYear)}/year
+                    </div>
+                  </div>
                 </div>
 
-                {/* Year-by-year breakdown */}
-                <div className="mt-4 grid grid-cols-5 gap-2 text-center">
-                  {(() => {
-                    const yearData: Record<string, number> = {
-                      '2020': 0,
-                      '2021': 0,
-                      '2022': 0,
-                      '2023': 0,
-                      '2024': 0,
-                      '2025': 0,
-                    };
-                    filteredDisasters.forEach(disaster => {
-                      const year = new Date(disaster.declarationDate).getFullYear().toString();
-                      if (yearData[year] !== undefined) { // Only count years in our range
-                        yearData[year] = yearData[year] + 1;
-                      }
-                    });
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {analytics.actualDataRange.years.map(year => {
+                    const count = analytics.yearlyStats[year] || 0;
+                    const maxCount = Math.max(...Object.values(analytics.yearlyStats));
+                    const isCurrentYear = year === new Date().getFullYear();
+                    const isPartialYear = isCurrentYear && new Date().getMonth() < 11; // Not full year yet
 
-                    return Object.entries(yearData)
-                      .sort(([a], [b]) => a.localeCompare(b))
-                      .map(([year, count]) => (
-                        <div key={year} className={`p-2 rounded-lg text-xs ${
-                          year === '2023' || year === '2024' ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'
-                        }`}>
-                          <div className="font-bold text-gray-800">{year}</div>
-                          <div className={`text-lg font-bold ${
-                            year === '2023' || year === '2024' ? 'text-blue-600' : 'text-gray-600'
-                          }`}>
-                            {count}
-                          </div>
-                          <div className="text-gray-500 text-xs">
-                            {year === '2020' ? 'Start' :
-                             year === '2021' ? 'Activity' :
-                             year === '2022' ? 'Baseline' :
-                             year === '2023' ? 'Peak' :
-                             year === '2024' ? 'High' :
-                             year === '2025' ? 'Current' : ''}
-                          </div>
-                        </div>
-                      ))
-                  })()}
+                    let label = 'Activity';
+                    let bgColor = 'bg-gray-100';
+                    let textColor = 'text-gray-700';
+
+                    if (count === maxCount && count > 0) {
+                      label = 'Peak';
+                      bgColor = 'bg-blue-100';
+                      textColor = 'text-blue-800';
+                    } else if (count >= analytics.avgPerYear * 1.2) {
+                      label = 'High';
+                      bgColor = 'bg-orange-100';
+                      textColor = 'text-orange-800';
+                    } else if (count >= analytics.avgPerYear * 0.8) {
+                      label = 'Baseline';
+                      bgColor = 'bg-gray-100';
+                      textColor = 'text-gray-700';
+                    } else if (count > 0) {
+                      label = 'Low';
+                      bgColor = 'bg-green-100';
+                      textColor = 'text-green-700';
+                    }
+
+                    if (isCurrentYear) {
+                      label = isPartialYear ? 'Current' : 'Current';
+                      if (!isPartialYear) bgColor = 'bg-purple-100';
+                      if (!isPartialYear) textColor = 'text-purple-800';
+                    }
+
+                    return (
+                      <div key={year} className={`${bgColor} border rounded p-3 text-center`}>
+                        <div className="font-bold text-lg">{year}</div>
+                        <div className={`text-2xl font-bold ${textColor}`}>{count}</div>
+                        <div className="text-xs text-gray-600">{label}</div>
+                        {isPartialYear && (
+                          <div className="text-xs text-gray-500 mt-1">Partial year</div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Enhanced Declaration Type Distribution */}
+                {analytics.actualDataRange.years.length > 0 && (
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="bg-gray-50 p-3 rounded">
+                      <div className="font-medium text-gray-900">Data Quality</div>
+                      <div className="text-gray-600">
+                        ✓ {analytics.actualDataRange.years.length} years of complete data<br/>
+                        ✓ {analytics.total} total disaster declarations<br/>
+                        ✓ Real-time FEMA data integration
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded">
+                      <div className="font-medium text-gray-900">Trend Summary</div>
+                      <div className="text-gray-600">
+                        Peak: {Math.max(...Object.values(analytics.yearlyStats))} disasters<br/>
+                        Low: {Math.min(...Object.values(analytics.yearlyStats))} disasters<br/>
+                        Variance: {(Math.max(...Object.values(analytics.yearlyStats)) - Math.min(...Object.values(analytics.yearlyStats)))} range
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Declaration Type Distribution */}
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -647,7 +605,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
               <CardContent>
                 <div className="space-y-4">
                   {Object.entries(analytics.declarationTypeStats).map(([type, count]) => {
-                    const percentage = ((count / analytics.total) * 100).toFixed(1);
+                    const percentage = analytics.total > 0 ? ((count / analytics.total) * 100).toFixed(1) : '0.0';
                     const label = type === 'DR' ? 'Major Disasters' : type === 'EM' ? 'Emergencies' : 'Fire Management';
                     const color = type === 'DR' ? 'red' : type === 'EM' ? 'orange' : 'yellow';
                     const bgColor = type === 'DR' ? 'bg-red-50' : type === 'EM' ? 'bg-orange-50' : 'bg-yellow-50';
@@ -685,6 +643,91 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
             </Card>
           </div>
 
+          {/* Monthly Distribution */}
+          <div>
+            <h4 className="font-medium mb-4">Seasonal Distribution</h4>
+            <div className="text-sm text-gray-600 mb-4">
+              Monthly patterns in disaster declarations across all available data
+            </div>
+
+            <div className="space-y-4">
+              <div className="h-64 bg-gray-50 rounded-lg p-4">
+                <div className="text-center mb-4">
+                  <div className="text-2xl font-bold text-green-600 mb-2">🌍</div>
+                  <div className="text-sm font-medium text-gray-700">Seasonal Disaster Patterns</div>
+                  <div className="text-xs text-gray-600 mt-1">
+                    Analysis of {Object.keys(analytics.monthlyStats).length} months of data
+                  </div>
+                </div>
+
+                {/* Monthly aggregation by month regardless of year */}
+                {(() => {
+                  const monthlyAggregated = Object.entries(analytics.monthlyStats).reduce((acc, [monthKey, count]) => {
+                    const [year, month] = monthKey.split('-');
+                    const monthName = new Date(parseInt(year), parseInt(month) - 1).toLocaleDateString('en-US', { month: 'long' });
+                    acc[monthName] = (acc[monthName] || 0) + count;
+                    return acc;
+                  }, {} as Record<string, number>);
+
+                  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                  const maxValue = Math.max(...Object.values(monthlyAggregated));
+
+                  return (
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                      {months.map(month => {
+                        const count = monthlyAggregated[month] || 0;
+                        const intensity = count / Math.max(maxValue, 1);
+                        const shortMonth = month.slice(0, 3);
+
+                        let bgColor = 'bg-gray-100';
+                        let textColor = 'text-gray-600';
+
+                        if (intensity > 0.7) {
+                          bgColor = 'bg-red-100';
+                          textColor = 'text-red-800';
+                        } else if (intensity > 0.4) {
+                          bgColor = 'bg-orange-100';
+                          textColor = 'text-orange-800';
+                        } else if (intensity > 0.2) {
+                          bgColor = 'bg-yellow-100';
+                          textColor = 'text-yellow-800';
+                        } else if (count > 0) {
+                          bgColor = 'bg-green-100';
+                          textColor = 'text-green-800';
+                        }
+
+                        return (
+                          <div key={month} className={`${bgColor} border rounded p-2 text-center`}>
+                            <div className="text-xs font-medium">{shortMonth}</div>
+                            <div className={`text-sm font-bold ${textColor}`}>{count}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {Object.entries(analytics.monthlyStats)
+                  .sort(([a], [b]) => b.localeCompare(a)) // Sort by date descending
+                  .slice(0, 8) // Most recent 8 months
+                  .map(([month, count]) => {
+                    const [year, monthNum] = month.split('-');
+                    const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleDateString('en-US', { month: 'short' });
+                    const isCurrentMonth = month === `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+                    return (
+                      <div key={month} className={`${isCurrentMonth ? 'bg-blue-100 border-blue-300' : 'bg-gray-50 border-gray-200'} border rounded p-2 text-center`}>
+                        <div className="text-sm font-medium">{monthName} {year}</div>
+                        <div className={`text-lg font-bold ${isCurrentMonth ? 'text-blue-700' : 'text-gray-700'}`}>{count}</div>
+                        {isCurrentMonth && <div className="text-xs text-blue-600">Current</div>}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
           {/* FEMA Disaster Declaration Timeline */}
           <CompactTimeline disasters={disasters} />
         </TabsContent>
@@ -774,7 +817,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                               <Icon className="w-5 h-5 text-blue-600" />
                             </div>
                             <div>
-                              <span className="font-semibold text-gray-800 text-lg">{type}</span>
+                              <span className="font-semibold text-gray-800 text-lg">{type || 'Unknown'}</span>
                               <div className="text-xs text-gray-500">{count} total incidents</div>
                             </div>
                           </div>
@@ -922,7 +965,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                     <div className="flex justify-between">
                       <span className="text-gray-600">Data Coverage:</span>
                       <span className="font-medium text-purple-600">
-                        {dataRange.start?.getFullYear()} - {dataRange.end?.getFullYear()} ({dataRange.years} years)
+                        {dataRange.start?.getFullYear() || 'N/A'} - {dataRange.end?.getFullYear() || 'N/A'} ({dataRange.years} years)
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -976,15 +1019,15 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                       <div className="mt-2 space-y-1 text-xs">
                         <div className="flex justify-between">
                           <span>Major Disasters (DR):</span>
-                          <span className="font-medium">{analytics.majorDisasters} ({((analytics.majorDisasters / analytics.total) * 100).toFixed(1)}%)</span>
+                          <span className="font-medium">{analytics.majorDisasters} ({analytics.total > 0 ? ((analytics.majorDisasters / analytics.total) * 100).toFixed(1) : '0.0'}%)</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Emergencies (EM):</span>
-                          <span className="font-medium">{analytics.emergencies} ({((analytics.emergencies / analytics.total) * 100).toFixed(1)}%)</span>
+                          <span className="font-medium">{analytics.emergencies} ({analytics.total > 0 ? ((analytics.emergencies / analytics.total) * 100).toFixed(1) : '0.0'}%)</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Fire Management (FM):</span>
-                          <span className="font-medium">{analytics.fireManagement} ({((analytics.fireManagement / analytics.total) * 100).toFixed(1)}%)</span>
+                          <span className="font-medium">{analytics.fireManagement} ({analytics.total > 0 ? ((analytics.fireManagement / analytics.total) * 100).toFixed(1) : '0.0'}%)</span>
                         </div>
                       </div>
                     </div>
@@ -995,7 +1038,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                       <div className="mt-2 space-y-1">
                         {analytics.topTypes.slice(0, 4).map(([type, count]) => (
                           <div key={type} className="flex justify-between text-xs">
-                            <span className="truncate">{type}</span>
+                            <span className="truncate">{type || 'Unknown'}</span>
                             <span className="font-medium">{count}</span>
                           </div>
                         ))}
@@ -1007,11 +1050,11 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                         <div className="flex justify-between">
                           <span>Avg per Month:</span>
                           <span className="font-medium">
-                            {(analytics.total / (dataRange.years * 12)).toFixed(1)} declarations
+                            {(analytics.total / Math.max(analytics.actualDataRange.years.length * 12, 1)).toFixed(1)} declarations
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Peak Activity:</span>
+                          <span>Peak Month Activity:</span>
                           <span className="font-medium">
                             {Object.entries(analytics.monthlyStats)
                               .sort(([,a], [,b]) => b - a)[0]?.[0]?.split('-')[1] || 'N/A'} 
@@ -1034,7 +1077,7 @@ export function DisasterAnalyticsDashboard({ disasters }: DisasterAnalyticsDashb
                   <div>
                     <div className="font-medium text-indigo-700 mb-2">Current Capabilities:</div>
                     <ul className="text-indigo-600 space-y-1 text-xs">
-                      <li>✓ Recent disaster activity monitoring ({dataRange.start?.getFullYear()}-{dataRange.end?.getFullYear()})</li>
+                      <li>✓ Recent disaster activity monitoring ({analytics.actualDataRange.start?.getFullYear() || 'N/A'}-{analytics.actualDataRange.end?.getFullYear() || 'N/A'})</li>
                       <li>✓ State-level comparative analysis</li>
                       <li>✓ Disaster type categorization</li>
                       <li>✓ Real-time declaration tracking</li>
