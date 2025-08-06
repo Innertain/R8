@@ -336,6 +336,54 @@ const disasterTypes: DisasterType[] = [
           ]
         },
         {
+          name: 'Communication Infrastructure Collapse',
+          description: 'Cell towers and communication lines can be damaged, disrupting emergency communications',
+          riskLevel: 'High',
+          timeframe: 'Hours to weeks',
+          safetyActions: [
+            'Have battery-powered radio for emergency information',
+            'Keep backup power sources for communication devices',
+            'Plan family meeting points in advance',
+            'Know locations of emergency information centers'
+          ]
+        },
+        {
+          name: 'Water System Failure',
+          description: 'Broken water mains and damaged treatment facilities can disrupt water supply',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Store emergency water supplies',
+            'Know how to shut off main water valve',
+            'Have water purification methods available',
+            'Conserve any available clean water'
+          ]
+        },
+        {
+          name: 'Transportation Network Damage',
+          description: 'Cracked roads, collapsed bridges, and damaged airports can isolate communities',
+          riskLevel: 'High',
+          timeframe: 'Days to months',
+          safetyActions: [
+            'Avoid driving immediately after earthquake',
+            'Know alternate routes from your location',
+            'Keep emergency supplies in vehicles',
+            'Be prepared for extended isolation'
+          ]
+        },
+        {
+          name: 'Gas Line Ruptures and Fire Risk',
+          description: 'Broken gas lines can create fire and explosion hazards throughout affected areas',
+          riskLevel: 'Extreme',
+          timeframe: 'Immediately after earthquake',
+          safetyActions: [
+            'Know how to turn off gas at the meter',
+            'Listen and smell for gas leaks',
+            'Evacuate immediately if gas leak is suspected',
+            'Do not use matches, lighters, or electrical switches near gas leaks'
+          ]
+        },
+        {
           name: 'Landslides',
           description: 'Ground shaking can trigger landslides in mountainous areas',
           riskLevel: 'High',
@@ -568,27 +616,75 @@ const disasterTypes: DisasterType[] = [
           ]
         },
         {
-          name: 'Power Outages',
-          description: 'Widespread and prolonged power outages are common due to wind and flooding damage',
-          riskLevel: 'High',
-          timeframe: 'Days to weeks',
+          name: 'Power Grid Failure',
+          description: 'Widespread and prolonged power outages are common due to wind and flooding damage to electrical infrastructure',
+          riskLevel: 'Extreme',
+          timeframe: 'Days to months',
           safetyActions: [
-            'Keep essential devices charged',
+            'Keep essential devices charged before storm arrival',
             'Have alternative lighting and power sources',
             'Keep refrigerators and freezers closed to preserve food',
-            'Use generators safely outdoors'
+            'Use generators safely outdoors, never inside'
           ]
         },
         {
-          name: 'Disruption of Services',
-          description: 'Essential services like water, sewer, and transportation can be severely impacted',
-          riskLevel: 'Moderate',
+          name: 'Communication System Breakdown',
+          description: 'Cell towers and internet infrastructure can be destroyed, isolating communities from emergency services',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Have battery-powered or hand-crank emergency radio',
+            'Keep physical maps as GPS may be unavailable',
+            'Establish family meeting points in advance',
+            'Consider satellite communication devices'
+          ]
+        },
+        {
+          name: 'Water Treatment and Distribution Failure',
+          description: 'Hurricane damage can compromise water treatment plants and distribution systems',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Store 1 gallon of water per person per day for at least 3 days',
+            'Have water purification tablets or filters',
+            'Follow all boil-water notices from authorities',
+            'Collect rainwater safely if needed for non-drinking uses'
+          ]
+        },
+        {
+          name: 'Sewage and Waste Management Disruption',
+          description: 'Flooding can overwhelm sewage systems and disrupt waste collection services',
+          riskLevel: 'High',
           timeframe: 'Weeks to months',
           safetyActions: [
-            'Store adequate water and non-perishable food',
-            'Have a supply of necessary medications',
-            'Follow public health guidance for water and food safety',
-            'Be patient with recovery efforts'
+            'Avoid contact with floodwater that may contain sewage',
+            'Have supplies for sanitary waste disposal',
+            'Follow public health guidance for waste management',
+            'Disinfect areas contaminated by sewage backup'
+          ]
+        },
+        {
+          name: 'Transportation Network Collapse',
+          description: 'Damaged bridges, flooded roads, and closed airports can isolate areas and disrupt supply chains',
+          riskLevel: 'High',
+          timeframe: 'Weeks to months',
+          safetyActions: [
+            'Stock emergency supplies for extended isolation',
+            'Keep vehicles fueled before storm arrival',
+            'Know multiple evacuation routes',
+            'Keep emergency cash as electronic payment systems may fail'
+          ]
+        },
+        {
+          name: 'Banking and Financial Services Disruption',
+          description: 'Power outages and damaged infrastructure can disrupt ATMs and electronic payment systems',
+          riskLevel: 'Moderate',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Keep emergency cash in small bills',
+            'Have copies of important financial documents',
+            'Know how to contact banks and insurance companies',
+            'Take photos of property before storm for insurance claims'
           ]
         }
       ]
@@ -738,15 +834,63 @@ const disasterTypes: DisasterType[] = [
           ]
         },
         {
-          name: 'Power Outages',
-          description: 'Fire damage to power lines creates widespread outages affecting communications',
-          riskLevel: 'Moderate',
-          timeframe: 'During and after fire passage',
+          name: 'Power Grid Destruction',
+          description: 'Fire damage to power lines and substations creates widespread outages affecting communications and emergency services',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
           safetyActions: [
-            'Keep cell phones charged',
-            'Have battery-powered radio available',
+            'Keep cell phones charged and have backup batteries',
+            'Have battery-powered or hand-crank radio available',
             'Use flashlights instead of candles',
             'Keep generators outside and away from windows'
+          ]
+        },
+        {
+          name: 'Communication Tower Damage',
+          description: 'Cell towers and communication infrastructure can be destroyed by fire, isolating communities',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Have multiple ways to receive emergency information',
+            'Know locations of emergency evacuation centers',
+            'Have backup communication plans with family',
+            'Consider satellite communication devices in high-risk areas'
+          ]
+        },
+        {
+          name: 'Water System Compromise',
+          description: 'Fire can damage water treatment plants and distribution systems, affecting firefighting efforts',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Store emergency water supplies',
+            'Have water purification methods available',
+            'Know location of alternative water sources',
+            'Follow boil-water notices if systems are restored'
+          ]
+        },
+        {
+          name: 'Transportation Network Closure',
+          description: 'Highways and roads may be closed due to fire danger, blocking evacuation and emergency access',
+          riskLevel: 'Extreme',
+          timeframe: 'Hours to days',
+          safetyActions: [
+            'Know multiple evacuation routes',
+            'Keep vehicles fueled during fire season',
+            'Have emergency supplies in vehicles',
+            'Monitor road closure information constantly'
+          ]
+        },
+        {
+          name: 'Air Quality Degradation',
+          description: 'Smoke can persist for weeks, creating health hazards even far from fire zones',
+          riskLevel: 'High',
+          timeframe: 'Weeks to months',
+          safetyActions: [
+            'Have N95 or P100 masks available',
+            'Create clean air spaces indoors',
+            'Limit outdoor activities when air quality is poor',
+            'Have air filtration systems if possible'
           ]
         },
         {
@@ -1068,6 +1212,54 @@ const disasterTypes: DisasterType[] = [
           ]
         },
         {
+          name: 'Communication Infrastructure Damage',
+          description: 'Flooded communication centers and damaged cell towers can disrupt emergency communications',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Keep waterproof emergency radio with extra batteries',
+            'Have backup communication plans with family',
+            'Know locations of emergency shelters and information centers',
+            'Consider satellite communication devices in flood-prone areas'
+          ]
+        },
+        {
+          name: 'Water Treatment Plant Failures',
+          description: 'Flooding can overwhelm water treatment facilities, compromising public water supply',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Store at least 3 days of drinking water per person',
+            'Have water purification tablets or boiling capability',
+            'Follow boil-water notices from authorities',
+            'Use only bottled or treated water for drinking, cooking, and brushing teeth'
+          ]
+        },
+        {
+          name: 'Sewage System Overflow',
+          description: 'Floodwater can cause sewage systems to back up, creating serious health hazards',
+          riskLevel: 'High',
+          timeframe: 'During and weeks after flooding',
+          safetyActions: [
+            'Avoid contact with floodwater contaminated by sewage',
+            'Wear protective clothing when cleaning flood-damaged areas',
+            'Disinfect all surfaces that contacted floodwater',
+            'Seek medical attention for any illness after flood exposure'
+          ]
+        },
+        {
+          name: 'Transportation System Collapse',
+          description: 'Washed-out bridges and flooded roads can isolate communities and disrupt supply chains',
+          riskLevel: 'Moderate',
+          timeframe: 'Days to months',
+          safetyActions: [
+            'Maintain emergency supplies for extended isolation',
+            'Know multiple evacuation routes from your area',
+            'Never drive through flooded roadways',
+            'Keep emergency cash as electronic payment systems may be down'
+          ]
+        },
+        {
           name: 'Mold Growth',
           description: 'Damp conditions after flooding promote mold growth, which can cause respiratory problems',
           riskLevel: 'Moderate',
@@ -1315,6 +1507,42 @@ const disasterTypes: DisasterType[] = [
             'Keep refrigerators and freezers closed to preserve food',
             'Use generators safely outdoors'
           ]
+        },
+        {
+          name: 'Communication System Failure',
+          description: 'Cell towers and communication infrastructure can be destroyed by tornado winds',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Have multiple ways to receive emergency information',
+            'Keep battery-powered radio available',
+            'Plan meeting points with family in advance',
+            'Consider amateur radio for emergency communication'
+          ]
+        },
+        {
+          name: 'Water and Sewer System Damage',
+          description: 'Underground utilities can be severed by tornado debris and ground movement',
+          riskLevel: 'Moderate',
+          timeframe: 'Days to months',
+          safetyActions: [
+            'Store emergency water supplies',
+            'Know location of main water shutoff valve',
+            'Have water purification methods available',
+            'Follow public health guidance for sanitation'
+          ]
+        },
+        {
+          name: 'Transportation Network Disruption',
+          description: 'Roads blocked by debris can isolate communities and delay emergency response',
+          riskLevel: 'Moderate',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Maintain supplies for several days of isolation',
+            'Know alternate evacuation routes',
+            'Avoid sightseeing in damaged areas',
+            'Keep important documents in portable emergency kit'
+          ]
         }
       ]
     }
@@ -1529,12 +1757,48 @@ const disasterTypes: DisasterType[] = [
           name: 'Power Outages',
           description: 'Ice and wind can bring down power lines, leading to extended outages and loss of heat',
           riskLevel: 'High',
-          timeframe: 'Days',
+          timeframe: 'Days to weeks',
           safetyActions: [
             'Keep essential devices charged',
             'Have alternative lighting and power sources',
             'Keep refrigerators and freezers closed to preserve food',
             'Use generators safely outdoors, never inside'
+          ]
+        },
+        {
+          name: 'Loss of Communication Systems',
+          description: 'Cell towers and internet infrastructure can be damaged, leaving communities isolated',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Have battery-powered or hand-crank radio for emergency information',
+            'Establish meeting points with family members in advance',
+            'Keep written copies of important contact information',
+            'Consider satellite communication devices for remote areas'
+          ]
+        },
+        {
+          name: 'Water System Disruption',
+          description: 'Frozen or damaged pipes can disrupt water supply and sewage systems',
+          riskLevel: 'High',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Store adequate drinking water (1 gallon per person per day)',
+            'Know how to shut off water mains to prevent flooding',
+            'Have water purification tablets or filters available',
+            'Conserve body heat if water for heating is unavailable'
+          ]
+        },
+        {
+          name: 'Transportation Disruption',
+          description: 'Blocked roads and closed airports can prevent emergency services and supply deliveries',
+          riskLevel: 'Moderate',
+          timeframe: 'Days to weeks',
+          safetyActions: [
+            'Maintain emergency supplies for extended isolation',
+            'Keep vehicles fueled and equipped with winter emergency kits',
+            'Avoid unnecessary travel during and after storms',
+            'Have alternative transportation plans'
           ]
         },
         {
