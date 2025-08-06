@@ -38,7 +38,7 @@ import HeatwaveIcon from '@assets/Heatwave_1754119781366.png';
 import TsunamiIcon from '@assets/tsunami_1754119781370.png';
 
 // Import photo data
-import { disasterEducationPhotos, photoDescriptions } from '@assets/disaster-education-photos';
+import { disasterEducationPhotos, photoDescriptions } from '@assets/disaster-education-photos.ts';
 
 
 
