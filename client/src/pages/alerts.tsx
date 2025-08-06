@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertTriangle, Plus, Settings, Bell, Clock, MapPin, Trash2, Edit, TestTube, CheckCircle, XCircle } from "lucide-react";
+import { AlertTriangle, Plus, Settings, Bell, Clock, MapPin, Trash2, Edit, TestTube, CheckCircle, XCircle, Shield, BarChart3, Wind } from "lucide-react";
 import { AlertRuleForm } from "@/components/AlertRuleForm";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { AlertHistory } from "@/components/AlertHistory";
 import { AlertPricingPlans } from "@/components/AlertPricingPlans";
 import { useToast } from "@/hooks/use-toast";
 import type { AlertRule } from "@shared/schema";
+import RealTimeAlerts from '@/components/RealTimeAlerts';
 
 export default function AlertsPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -192,6 +193,49 @@ export default function AlertsPage() {
               </p>
             </div>
 
+            {/* Cross-linking header */}
+            <Card className="mb-6 border-orange-200 bg-orange-50">
+              <CardHeader>
+                <CardTitle className="text-orange-900">
+                  Stay Informed & Prepared
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-orange-800 text-sm mb-4">
+                  Get the full picture: monitor live alerts, understand the science, and learn how to stay safe.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.open('/disaster-education', '_blank')}
+                    className="bg-white"
+                  >
+                    <Shield className="w-4 h-4 mr-1" />
+                    Disaster Preparedness Guide
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.open('/map', '_blank')}
+                    className="bg-white"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-1" />
+                    Analytics Dashboard
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.open('/noaa-climate', '_blank')}
+                    className="bg-white"
+                  >
+                    <Wind className="w-4 h-4 mr-1" />
+                    Climate Data Analysis
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
         <Tabs defaultValue="pricing" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="pricing">Pricing Plans</TabsTrigger>
@@ -291,7 +335,7 @@ export default function AlertsPage() {
                           <p className="text-sm text-gray-900">{rule.maxAlertsPerDay} alerts</p>
                         </div>
                       </div>
-                      
+
                       <div className="mb-4">
                         <p className="text-sm font-medium text-gray-500 mb-2">Notification Methods</p>
                         <div className="flex flex-wrap gap-2">

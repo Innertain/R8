@@ -499,10 +499,43 @@ export default function NoaaClimateAnalytics() {
             Climate Data Online APIs. Temperature anomalies are calculated against the 20th century 
             baseline period (1901-2000).
           </p>
-          <p>
+          <p className="mb-4">
             Global warming trends are determined using statistical analysis of decadal temperature 
             changes. Data is updated automatically and cached for performance.
           </p>
+          
+          <div className="bg-white rounded-lg p-3 border border-blue-300">
+            <h4 className="font-semibold text-blue-900 mb-2">Related Resources</h4>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.open('/disaster-education?type=hurricane&tab=overview', '_blank')}
+                className="text-xs bg-blue-100"
+              >
+                <Shield className="w-3 h-3 mr-1" />
+                Extreme Weather Education
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.open('/alerts', '_blank')}
+                className="text-xs bg-blue-100"
+              >
+                <AlertTriangle className="w-3 h-3 mr-1" />
+                Current Weather Alerts
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.open('/map', '_blank')}
+                className="text-xs bg-blue-100"
+              >
+                <BarChart3 className="w-3 h-3 mr-1" />
+                Disaster Analytics
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

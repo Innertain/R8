@@ -2013,8 +2013,17 @@ export default function DisasterEducation() {
                   onClick={() => window.open('/map', '_blank')}
                   className="text-xs"
                 >
+                  <BarChart3 className="w-3 h-3 mr-1" />
+                  Disaster Analytics Dashboard
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open('/alerts', '_blank')}
+                  className="text-xs"
+                >
                   <AlertTriangle className="w-3 h-3 mr-1" />
-                  Live Disaster Monitoring
+                  Active Weather Alerts
                 </Button>
                 <Button 
                   variant="outline" 
@@ -2023,7 +2032,7 @@ export default function DisasterEducation() {
                   className="text-xs"
                 >
                   <Wind className="w-3 h-3 mr-1" />
-                  Climate Reports
+                  Climate Analysis
                 </Button>
                 <Button 
                   variant="outline" 
@@ -2309,7 +2318,7 @@ export default function DisasterEducation() {
               <TabsContent value="preparedness" className="space-y-4">
                 <div className="prose max-w-none">
                   <p className="text-gray-700 leading-relaxed mb-4">
-                    {selectedDisaster.preparedness[0].actions.join(' ')} {/* Placeholder for actual description */}
+                    Proper preparation is essential for {selectedDisaster.name.toLowerCase()} events. Follow these guidelines to protect yourself and your family.
                   </p>
 
                   <div className="grid md:grid-cols-2 gap-6">
@@ -2331,6 +2340,41 @@ export default function DisasterEducation() {
                       </ul>
                     </div>
                   </div>
+
+                  {/* Active Alerts Cross-Link */}
+                  <Card className="bg-orange-50 border border-orange-200 mt-6">
+                    <CardHeader>
+                      <CardTitle className="flex items-center text-orange-900">
+                        <AlertTriangle className="h-5 w-5 mr-2" />
+                        Check Current Conditions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-orange-800 text-sm mb-3">
+                        Stay informed about current {selectedDisaster.name.toLowerCase()} conditions and warnings in your area.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open('/alerts', '_blank')}
+                          className="bg-white"
+                        >
+                          <AlertTriangle className="w-4 h-4 mr-1" />
+                          View Active Alerts
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open('/map', '_blank')}
+                          className="bg-white"
+                        >
+                          <BarChart3 className="w-4 h-4 mr-1" />
+                          Monitor Live Data
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 
