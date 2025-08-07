@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
 import WildlifeActivityFeed from '@/components/WildlifeActivityFeed';
-import cascadiaLandscape from '../assets/cascadia-landscape.jpg';
+import cascadiaLandscapeUrl from '../assets/cascadia-landscape.jpg?url';
 
 // Cascadia restoration regions - temperate rainforest and watershed ecosystems
 const cascadiaProjects = [
@@ -115,14 +115,14 @@ const CascadiaRegenerationPage: React.FC = () => {
       <div className="relative h-96 overflow-hidden">
         {/* Beautiful Cascadia mountain landscape */}
         <img 
-          src={cascadiaLandscape} 
+          src={cascadiaLandscapeUrl} 
           alt="Cascadia temperate rainforest and snow-capped mountains"
           className="w-full h-full object-cover"
           onError={(e) => {
-            console.error('Image failed to load:', cascadiaLandscape);
+            console.error('Image failed to load:', cascadiaLandscapeUrl);
             e.currentTarget.style.display = 'none';
           }}
-          onLoad={() => console.log('Image loaded successfully:', cascadiaLandscape)}
+          onLoad={() => console.log('Image loaded successfully:', cascadiaLandscapeUrl)}
         />
         <div className="absolute inset-0 bg-black bg-opacity-40" />
         <div className="absolute inset-0 flex items-center justify-center">
