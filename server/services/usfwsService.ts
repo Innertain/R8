@@ -37,26 +37,49 @@ class USFWSService {
     const threatenedSpecies: Set<string> = new Set();
 
     try {
-      // Get all threatened and endangered species (no state filter for now)
-      const response = await this.makeRequest<any>('', {
-        columns: 'COMNAME,SCINAME,STATUS',
-        filter: "STATUS='E' OR STATUS='T'", // Endangered or Threatened
-      });
+      // Multiple API calls to get comprehensive data
+      const queries = [
+        { filter: "STATUS='E'", label: 'Endangered' },
+        { filter: "STATUS='T'", label: 'Threatened' }, 
+        { filter: "STATUS='C'", label: 'Candidate' },
+        { filter: "STATUS='EXPN'", label: 'Experimental Non-Essential' },
+        { filter: "STATUS='SAE'", label: 'Similarity of Appearance (Endangered)' },
+        { filter: "STATUS='SAT'", label: 'Similarity of Appearance (Threatened)' }
+      ];
 
-      if (response && Array.isArray(response)) {
-        response.forEach((species: any) => {
-          if (species.COMNAME && (species.STATUS === 'E' || species.STATUS === 'T')) {
-            threatenedSpecies.add(species.COMNAME);
-          }
+      for (const query of queries) {
+        console.log(`Fetching USFWS ${query.label} species...`);
+        const response = await this.makeRequest<any>('', {
+          columns: 'COMNAME,SCINAME,STATUS,DPS,LISTING_DATE',
+          filter: query.filter,
         });
+
+        if (response && Array.isArray(response)) {
+          response.forEach((species: any) => {
+            if (species.COMNAME) {
+              // Include DPS (Distinct Population Segment) info if available
+              const speciesName = species.DPS 
+                ? `${species.COMNAME} (${species.DPS})`
+                : species.COMNAME;
+              threatenedSpecies.add(speciesName);
+            }
+            // Also add scientific names for species without common names
+            if (!species.COMNAME && species.SCINAME) {
+              threatenedSpecies.add(species.SCINAME);
+            }
+          });
+        }
+
+        // Add delay between requests to respect rate limits
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (error) {
       console.log(`Failed to get USFWS data:`, error);
     }
 
-    // Return comprehensive list of threatened species
     const allSpecies = Array.from(threatenedSpecies);
-    return allSpecies.slice(0, 100); // Increased to 100 species for comprehensive coverage
+    console.log(`📊 USFWS API returned ${allSpecies.length} threatened/endangered species`);
+    return allSpecies.slice(0, 200); // Increased limit for comprehensive coverage
   }
 
   async getRegionalThreatenedSpecies(bioregionId: string): Promise<string[]> {
@@ -99,15 +122,45 @@ class USFWSService {
   private getFallbackSpeciesForBioregion(bioregionId: string): string[] {
     const fallbackData: Record<string, string[]> = {
       'cascadia_bioregion': [
-        'Northern Spotted Owl', 'Marbled Murrelet', 'Chinook Salmon', 'Coho Salmon', 'Steelhead Trout', 
-        'Bull Trout', 'Orca', 'Steller Sea Lion', 'Grizzly Bear', 'Wolverine', 'Canada Lynx', 'Fisher',
-        'Western Snowy Plover', 'Streaked Horned Lark', 'Taylor\'s Checkerspot Butterfly', 
-        'Oregon Silverspot Butterfly', 'Western Painted Turtle', 'Oregon Chub', 'Lost River Sucker',
-        'Shortnose Sucker', 'Bradshaw\'s Lomatium', 'Willamette Daisy', 'Kincaid\'s Lupine',
-        'Nelson\'s Checker-mallow', 'Cook\'s Lomatium', 'Rough Popcornflower', 'Large-flowered Woolly Meadowfoam',
-        'Dwarf Woolly Meadowfoam', 'Golden Paintbrush', 'Showy Stickseed', 'Wenatchee Mountains Checker-mallow',
-        'Pacific Lamprey', 'Green Sturgeon', 'Eulachon', 'Leatherback Sea Turtle', 'Stellar Jay',
-        'Cassin\'s Auklet', 'Common Murre', 'Tufted Puffin', 'Peregrine Falcon', 'Bald Eagle'
+        // Marine Species
+        'Southern Resident Killer Whale', 'Steller Sea Lion', 'Leatherback Sea Turtle', 'Green Sturgeon', 
+        'Eulachon', 'Pacific Lamprey', 'Bocaccio Rockfish', 'Yelloweye Rockfish', 'Canary Rockfish',
+        'Marbled Murrelet', 'Short-tailed Albatross', 'Western Snowy Plover',
+        
+        // Anadromous Fish
+        'Chinook Salmon (Puget Sound ESU)', 'Chinook Salmon (Hood Canal Summer-run ESU)', 
+        'Coho Salmon (Lower Columbia River ESU)', 'Coho Salmon (Oregon Coast ESU)',
+        'Steelhead Trout (Puget Sound DPS)', 'Steelhead Trout (Lower Columbia River DPS)',
+        'Steelhead Trout (Upper Columbia River DPS)', 'Steelhead Trout (Snake River Basin DPS)',
+        'Bull Trout', 'Chum Salmon (Hood Canal Summer-run ESU)', 'Sockeye Salmon (Snake River ESU)',
+        
+        // Terrestrial Mammals
+        'Northern Spotted Owl', 'Grizzly Bear', 'Canada Lynx', 'Wolverine', 'Fisher', 
+        'Columbian White-tailed Deer', 'Gray Wolf', 'Woodland Caribou',
+        
+        // Birds
+        'Streaked Horned Lark', 'Yellow-billed Cuckoo', 'Least Bell\'s Vireo', 'Northern Goshawk',
+        'Spotted Owl', 'Great Blue Heron', 'Sandhill Crane', 'Trumpeter Swan',
+        
+        // Butterflies & Insects
+        'Taylor\'s Checkerspot Butterfly', 'Oregon Silverspot Butterfly', 'Fender\'s Blue Butterfly',
+        'Island Marble Butterfly', 'Johnson\'s Hairstreak', 'Puget Blue Butterfly',
+        
+        // Freshwater Fish
+        'Oregon Chub', 'Lost River Sucker', 'Shortnose Sucker', 'Modoc Sucker', 'Warner Sucker',
+        'Hutton Tui Chub', 'Foskett Speckled Dace', 'Borax Lake Chub',
+        
+        // Reptiles & Amphibians  
+        'Western Painted Turtle', 'Northern Red-legged Frog', 'Oregon Spotted Frog',
+        'Cascade Torrent Salamander', 'Larch Mountain Salamander', 'Scott Bar Salamander',
+        
+        // Plants
+        'Bradshaw\'s Lomatium', 'Willamette Daisy', 'Kincaid\'s Lupine', 'Nelson\'s Checker-mallow',
+        'Cook\'s Lomatium', 'Rough Popcornflower', 'Large-flowered Woolly Meadowfoam',
+        'Dwarf Woolly Meadowfoam', 'Golden Paintbrush', 'Showy Stickseed', 
+        'Wenatchee Mountains Checker-mallow', 'Water Howellia', 'Spalding\'s Catchfly',
+        'White-topped Aster', 'Marsh Sandwort', 'Western Lily', 'Applegate\'s Milk-vetch',
+        'McDonald\'s Rock-cress', 'Umtanum Desert Buckwheat', 'Ute Ladies\'-tresses'
       ],
       'na_cascadia': [
         'Northern Spotted Owl', 'Marbled Murrelet', 'Chinook Salmon', 'Coho Salmon', 'Steelhead Trout',

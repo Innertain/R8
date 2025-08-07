@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { inaturalistService } from '../services/inaturalistService';
 import { gbifService } from '../services/gbifService';
 import { iucnService } from '../services/iucnService';
+import { usfwsService } from '../services/usfwsService';
+// Uncomment when NOAA service is ready:
+// import { noaaFisheriesService } from '../services/noaaFisheriesService';
 import { db } from '../db';
 import { bioregionSpeciesCache } from '@shared/schema';
 import { eq } from 'drizzle-orm';
@@ -239,6 +242,61 @@ router.get('/climate-refugees/:bioregionId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching climate refugees:', error);
     res.status(500).json({ error: 'Failed to fetch climate refugees data' });
+  }
+});
+
+// GET /api/species/threatened-comprehensive/:bioregionId
+router.get('/threatened-comprehensive/:bioregionId', async (req, res) => {
+  try {
+    const { bioregionId } = req.params;
+    
+    const bounds = BIOREGION_BOUNDS[bioregionId];
+    if (!bounds) {
+      return res.status(404).json({ error: 'Bioregion not found' });
+    }
+
+    console.log(`Fetching comprehensive threatened species data for: ${bioregionId}`);
+    
+    // Get data from all sources in parallel
+    const [usfwsSpecies, iucnFallbackSpecies, inaturalistData] = await Promise.all([
+      usfwsService.getRegionalThreatenedSpecies(bioregionId),
+      Promise.resolve(iucnService.getFallbackThreatenedSpecies(bioregionId)),
+      inaturalistService.getSpeciesForBioregion(bioregionId, bounds)
+    ]);
+    
+    // Combine all sources
+    const allThreatenedSpecies = [
+      ...usfwsSpecies,
+      ...iucnFallbackSpecies,
+      ...(inaturalistData.threatenedSpecies || [])
+    ];
+    
+    // Remove duplicates and categorize
+    const uniqueSpecies = [...new Set(allThreatenedSpecies)];
+    
+    // Get photos for the species
+    const speciesWithPhotos = uniqueSpecies.filter(species => 
+      inaturalistData.speciesPhotos?.[species]
+    );
+    
+    res.json({
+      bioregionId,
+      bioregionName: bounds.name,
+      totalThreatenedSpecies: uniqueSpecies.length,
+      speciesWithPhotos: speciesWithPhotos.length,
+      sources: {
+        usfws: usfwsSpecies.length,
+        iucn: iucnFallbackSpecies.length,
+        inaturalist: inaturalistData.threatenedSpecies?.length || 0
+      },
+      threatenedSpecies: uniqueSpecies.slice(0, 200),
+      speciesPhotos: inaturalistData.speciesPhotos || {},
+      dataSource: 'USFWS + IUCN Red List + iNaturalist',
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Error fetching comprehensive threatened species:', error);
+    res.status(500).json({ error: 'Failed to fetch comprehensive threatened species data' });
   }
 });
 
