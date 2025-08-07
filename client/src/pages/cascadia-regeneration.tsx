@@ -118,6 +118,11 @@ const CascadiaRegenerationPage: React.FC = () => {
           src={cascadiaLandscape} 
           alt="Cascadia temperate rainforest and snow-capped mountains"
           className="w-full h-full object-cover"
+          onError={(e) => {
+            console.error('Image failed to load:', cascadiaLandscape);
+            e.currentTarget.style.display = 'none';
+          }}
+          onLoad={() => console.log('Image loaded successfully:', cascadiaLandscape)}
         />
         <div className="absolute inset-0 bg-black bg-opacity-40" />
         <div className="absolute inset-0 flex items-center justify-center">
