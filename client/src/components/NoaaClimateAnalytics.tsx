@@ -99,6 +99,121 @@ export default function NoaaClimateAnalytics() {
     refetchInterval: 2 * 60 * 60 * 1000, // Refetch every 2 hours
   });
 
+  // Process climate data and perform analysis
+  // This section is crucial for preparing the data for display and analysis.
+  // It involves filtering, mapping, and calculating trends.
+  // The goal is to transform the raw climateData into a structured format
+  // that can be easily consumed by the charting and display components.
+  const processedAnalysis = (() => {
+    if (!data?.climateData) {
+      return undefined; // Return undefined if no data is available
+    }
+
+    const tempAnomalyData = data.climateData
+      .filter(d => d.dataType === 'Temperature Anomaly' && d.source === 'NOAA')
+      .sort((a, b) => a.year - b.year); // Ensure data is sorted by year
+
+    // Initialize analysis object with default or fetched values
+    const analysis: ClimateAnalysis = {
+      temperatureTrends: {
+        recent: [],
+        historical: [],
+        records: {
+          hottestYear: null,
+          coldestYear: null,
+          greatestWarmingAnomaly: null,
+          greatestCoolingAnomaly: null,
+        },
+      },
+      timeSeriesData: tempAnomalyData.map(d => ({
+        date: d.date,
+        year: d.year,
+        value: d.temperatureAnomaly,
+        region: d.region,
+        baseline: data.analysis?.timeSeriesData?.find(ts => ts.year === d.year)?.baseline || 0, // Fallback baseline if not available
+        significance: d.significance
+      })),
+      baselineComparisons: {
+        currentDecade: 0,
+        previousDecade: 0,
+        historical20th: 0,
+        preIndustrial: 0,
+      },
+      climateTrends: {
+        globalWarming: false,
+        decadalTrend: 0,
+        acceleratingTrend: false,
+      },
+    };
+
+    // Populate historical trends
+    analysis.temperatureTrends.historical = tempAnomalyData.map(d => ({
+      year: d.year,
+      anomaly: d.temperatureAnomaly,
+      region: d.region
+    }));
+
+    // Find extreme records
+    if (tempAnomalyData.length > 0) {
+      let hottest = tempAnomalyData[0];
+      let coldest = tempAnomalyData[0];
+      let greatestWarming = tempAnomalyData[0];
+      let greatestCooling = tempAnomalyData[0];
+
+      for (const d of tempAnomalyData) {
+        if (d.temperatureAnomaly > hottest.temperatureAnomaly) hottest = d;
+        if (d.temperatureAnomaly < coldest.temperatureAnomaly) coldest = d;
+        if (d.temperatureAnomaly > greatestWarming.temperatureAnomaly) greatestWarming = d;
+        if (d.temperatureAnomaly < greatestCooling.temperatureAnomaly) greatestCooling = d;
+      }
+      analysis.temperatureTrends.records = {
+        hottestYear: hottest,
+        coldestYear: coldest,
+        greatestWarmingAnomaly: greatestWarming,
+        greatestCoolingAnomaly: greatestCooling,
+      };
+    }
+
+    // Recent trends (last 20 years)
+    const recentData = tempAnomalyData.slice(-20);
+    analysis.temperatureTrends.recent = recentData.map(d => ({
+      year: d.year,
+      anomaly: d.temperatureAnomaly,
+      region: d.region,
+      significance: d.significance
+    }));
+
+    // Calculate baseline comparisons
+    const currentTwoDecadesData = tempAnomalyData.filter(d => d.year >= 2005);
+    const previousTwoDecadesData = tempAnomalyData.filter(d => d.year >= 1985 && d.year < 2005);
+    const historical20thData = tempAnomalyData.filter(d => d.year >= 1901 && d.year <= 2000);
+
+    analysis.baselineComparisons.currentDecade = currentTwoDecadesData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / currentTwoDecadesData.length || 0;
+    analysis.baselineComparisons.previousDecade = previousTwoDecadesData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / previousTwoDecadesData.length || 0;
+    analysis.baselineComparisons.historical20th = historical20thData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / historical20thData.length || 0;
+
+    // Calculate climate trends
+    if (tempAnomalyData.length >= 2) {
+      const firstTwoDecades = tempAnomalyData.slice(0, 20);
+      const lastTwoDecades = tempAnomalyData.slice(-20);
+
+      const firstAvg = firstTwoDecades.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / firstTwoDecades.length;
+      const lastAvg = lastTwoDecades.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / lastTwoDecades.length;
+
+      analysis.climateTrends.decadalTrend = lastAvg - firstAvg;
+      analysis.climateTrends.globalWarming = analysis.climateTrends.decadalTrend > 0;
+
+      // Check for accelerating trend (comparing recent vs mid-period)
+      if (tempAnomalyData.length >= 60) {
+        const midPeriod = tempAnomalyData.slice(20, 40);
+        const midAvg = midPeriod.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / midPeriod.length;
+        analysis.climateTrends.acceleratingTrend = (lastAvg - midAvg) > (midAvg - firstAvg);
+      }
+    }
+    
+    return analysis;
+  })();
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -119,7 +234,7 @@ export default function NoaaClimateAnalytics() {
     );
   }
 
-  if (error || !data?.success) {
+  if (error || !data?.success || !processedAnalysis) {
     return (
       <Alert className="border-red-200 bg-red-50">
         <AlertTriangle className="h-4 w-4" />
@@ -130,7 +245,8 @@ export default function NoaaClimateAnalytics() {
     );
   }
 
-  const { climateData, analysis, totalDataPoints, sources, lastUpdated, cached } = data;
+  const { climateData, totalDataPoints, sources, lastUpdated, cached } = data;
+  const { analysis } = data; // Use original analysis for some fields if needed
 
   return (
     <div className="space-y-8">
@@ -154,7 +270,7 @@ export default function NoaaClimateAnalytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Global Warming Trend</CardTitle>
-            {analysis.climateTrends.globalWarming ? (
+            {processedAnalysis.climateTrends.globalWarming ? (
               <TrendingUp className="h-4 w-4 text-red-500" />
             ) : (
               <TrendingDown className="h-4 w-4 text-blue-500" />
@@ -162,10 +278,10 @@ export default function NoaaClimateAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {analysis.climateTrends.globalWarming ? '+' : ''}{analysis.climateTrends.decadalTrend.toFixed(2)}°C
+              {processedAnalysis.climateTrends.globalWarming ? '+' : ''}{processedAnalysis.climateTrends.decadalTrend.toFixed(2)}°C
             </div>
             <p className="text-xs text-gray-500">
-              Decadal trend {analysis.climateTrends.acceleratingTrend ? '(accelerating)' : '(stable)'}
+              Decadal trend {processedAnalysis.climateTrends.acceleratingTrend ? '(accelerating)' : '(stable)'}
             </p>
           </CardContent>
         </Card>
@@ -177,7 +293,7 @@ export default function NoaaClimateAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {analysis.baselineComparisons.currentDecade > 0 ? '+' : ''}{analysis.baselineComparisons.currentDecade.toFixed(2)}°C
+              {processedAnalysis.baselineComparisons.currentDecade > 0 ? '+' : ''}{processedAnalysis.baselineComparisons.currentDecade.toFixed(2)}°C
             </div>
             <p className="text-xs text-gray-500">
               vs. 20th century average
@@ -192,11 +308,11 @@ export default function NoaaClimateAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {analysis.temperatureTrends.records.hottestYear?.year || 'N/A'}
+              {processedAnalysis.temperatureTrends.records.hottestYear?.year || 'N/A'}
             </div>
             <p className="text-xs text-gray-500">
-              {analysis.temperatureTrends.records.hottestYear ? 
-                `+${analysis.temperatureTrends.records.hottestYear.temperatureAnomaly.toFixed(2)}°C anomaly` : 
+              {processedAnalysis.temperatureTrends.records.hottestYear ? 
+                `+${processedAnalysis.temperatureTrends.records.hottestYear.temperatureAnomaly.toFixed(2)}°C anomaly` : 
                 'No data available'}
             </p>
           </CardContent>
@@ -237,7 +353,7 @@ export default function NoaaClimateAnalytics() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <AreaChart data={analysis.timeSeriesData}>
+                <AreaChart data={processedAnalysis.timeSeriesData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis 
@@ -266,12 +382,12 @@ export default function NoaaClimateAnalytics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Trends (Last 10 Years)</CardTitle>
+                <CardTitle>Recent Trends (Last 20 Years)</CardTitle>
                 <CardDescription>Temperature anomalies by significance level</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={analysis.temperatureTrends.recent}>
+                  <BarChart data={processedAnalysis.temperatureTrends.recent}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" />
                     <YAxis />
@@ -295,20 +411,20 @@ export default function NoaaClimateAnalytics() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Global Warming Detection</span>
-                  <Badge variant={analysis.climateTrends.globalWarming ? "destructive" : "default"}>
-                    {analysis.climateTrends.globalWarming ? 'Yes' : 'No'}
+                  <Badge variant={processedAnalysis.climateTrends.globalWarming ? "destructive" : "default"}>
+                    {processedAnalysis.climateTrends.globalWarming ? 'Yes' : 'No'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Decadal Trend</span>
                   <span className="text-sm">
-                    {analysis.climateTrends.decadalTrend > 0 ? '+' : ''}{analysis.climateTrends.decadalTrend.toFixed(3)}°C
+                    {processedAnalysis.climateTrends.decadalTrend > 0 ? '+' : ''}{processedAnalysis.climateTrends.decadalTrend.toFixed(3)}°C
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Accelerating Trend</span>
-                  <Badge variant={analysis.climateTrends.acceleratingTrend ? "destructive" : "secondary"}>
-                    {analysis.climateTrends.acceleratingTrend ? 'Yes' : 'No'}
+                  <Badge variant={processedAnalysis.climateTrends.acceleratingTrend ? "destructive" : "secondary"}>
+                    {processedAnalysis.climateTrends.acceleratingTrend ? 'Yes' : 'No'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
@@ -333,7 +449,7 @@ export default function NoaaClimateAnalytics() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={analysis.temperatureTrends.historical}>
+                <LineChart data={processedAnalysis.temperatureTrends.historical}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis label={{ value: 'Temperature Anomaly (°C)', angle: -90, position: 'insideLeft' }} />
@@ -368,15 +484,15 @@ export default function NoaaClimateAnalytics() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                    <span className="font-medium">Current Decade (2020s)</span>
+                    <span className="font-medium">Current 20-Year Period (2005-Present)</span>
                     <span className="text-lg font-bold text-red-600">
-                      {analysis.baselineComparisons.currentDecade > 0 ? '+' : ''}{analysis.baselineComparisons.currentDecade.toFixed(2)}°C
+                      {processedAnalysis.baselineComparisons.currentDecade > 0 ? '+' : ''}{processedAnalysis.baselineComparisons.currentDecade.toFixed(2)}°C
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                    <span className="font-medium">Previous Decade (2010s)</span>
+                    <span className="font-medium">Previous 20-Year Period (1985-2004)</span>
                     <span className="text-lg font-bold text-orange-600">
-                      {analysis.baselineComparisons.previousDecade > 0 ? '+' : ''}{analysis.baselineComparisons.previousDecade.toFixed(2)}°C
+                      {processedAnalysis.baselineComparisons.previousDecade > 0 ? '+' : ''}{processedAnalysis.baselineComparisons.previousDecade.toFixed(2)}°C
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -417,32 +533,32 @@ export default function NoaaClimateAnalytics() {
                 <CardDescription>Extreme temperature anomaly events</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {analysis.temperatureTrends.records.hottestYear && (
+                {processedAnalysis.temperatureTrends.records.hottestYear && (
                   <div className="p-4 bg-red-50 rounded-lg">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-red-800">Hottest Year</span>
-                      <Badge variant="destructive">{analysis.temperatureTrends.records.hottestYear.year}</Badge>
+                      <Badge variant="destructive">{processedAnalysis.temperatureTrends.records.hottestYear.year}</Badge>
                     </div>
                     <p className="text-sm text-red-600 mt-1">
-                      +{analysis.temperatureTrends.records.hottestYear.temperatureAnomaly.toFixed(2)}°C above baseline
+                      +{processedAnalysis.temperatureTrends.records.hottestYear.temperatureAnomaly.toFixed(2)}°C above baseline
                     </p>
                     <p className="text-xs text-red-500 mt-1">
-                      Region: {analysis.temperatureTrends.records.hottestYear.region}
+                      Region: {processedAnalysis.temperatureTrends.records.hottestYear.region}
                     </p>
                   </div>
                 )}
 
-                {analysis.temperatureTrends.records.coldestYear && (
+                {processedAnalysis.temperatureTrends.records.coldestYear && (
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-blue-800">Coldest Year</span>
-                      <Badge variant="secondary">{analysis.temperatureTrends.records.coldestYear.year}</Badge>
+                      <Badge variant="secondary">{processedAnalysis.temperatureTrends.records.coldestYear.year}</Badge>
                     </div>
                     <p className="text-sm text-blue-600 mt-1">
-                      {analysis.temperatureTrends.records.coldestYear.temperatureAnomaly.toFixed(2)}°C below baseline
+                      {processedAnalysis.temperatureTrends.records.coldestYear.temperatureAnomaly.toFixed(2)}°C below baseline
                     </p>
                     <p className="text-xs text-blue-500 mt-1">
-                      Region: {analysis.temperatureTrends.records.coldestYear.region}
+                      Region: {processedAnalysis.temperatureTrends.records.coldestYear.region}
                     </p>
                   </div>
                 )}
@@ -503,7 +619,7 @@ export default function NoaaClimateAnalytics() {
             Global warming trends are determined using statistical analysis of decadal temperature 
             changes. Data is updated automatically and cached for performance.
           </p>
-          
+
           <div className="bg-white rounded-lg p-3 border border-blue-300">
             <h4 className="font-semibold text-blue-900 mb-2">Related Resources</h4>
             <div className="flex flex-wrap gap-2">

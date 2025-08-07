@@ -182,7 +182,7 @@ export default function NoaaClimateReports() {
   // Extract temperature trends from recent reports
   const temperatureTrends = categorized.temperature
     .filter(report => report.temperatureAnomaly)
-    .slice(0, 12)
+    .slice(0, 24)
     .map((report, index) => ({
       month: format(new Date(report.pubDate), 'MMM'),
       anomaly: report.temperatureAnomaly?.value || 0,

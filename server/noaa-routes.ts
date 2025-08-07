@@ -320,8 +320,8 @@ function generateClimateAnalysis(climateData: any[]): any {
     // Sort by year
     tempAnomalyData.sort((a, b) => a.year - b.year);
 
-    // Recent trends (last 10 years)
-    const recentData = tempAnomalyData.slice(-10);
+    // Recent trends (last 20 years)
+    const recentData = tempAnomalyData.slice(-20);
     analysis.temperatureTrends.recent = recentData.map(d => ({
       year: d.year,
       anomaly: d.temperatureAnomaly,
@@ -344,28 +344,28 @@ function generateClimateAnalysis(climateData: any[]): any {
     analysis.temperatureTrends.records.greatestCoolingAnomaly = sortedByTemp[sortedByTemp.length - 1];
 
     // Calculate baseline comparisons
-    const currentDecadeData = tempAnomalyData.filter(d => d.year >= 2020);
-    const previousDecadeData = tempAnomalyData.filter(d => d.year >= 2010 && d.year < 2020);
+    const currentTwoDecadesData = tempAnomalyData.filter(d => d.year >= 2005);
+    const previousTwoDecadesData = tempAnomalyData.filter(d => d.year >= 1985 && d.year < 2005);
     const historical20thData = tempAnomalyData.filter(d => d.year >= 1901 && d.year <= 2000);
 
-    analysis.baselineComparisons.currentDecade = currentDecadeData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / currentDecadeData.length || 0;
-    analysis.baselineComparisons.previousDecade = previousDecadeData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / previousDecadeData.length || 0;
+    analysis.baselineComparisons.currentDecade = currentTwoDecadesData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / currentTwoDecadesData.length || 0;
+    analysis.baselineComparisons.previousDecade = previousTwoDecadesData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / previousTwoDecadesData.length || 0;
     analysis.baselineComparisons.historical20th = historical20thData.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / historical20thData.length || 0;
 
     // Calculate climate trends
     if (tempAnomalyData.length >= 2) {
-      const firstDecade = tempAnomalyData.slice(0, 10);
-      const lastDecade = tempAnomalyData.slice(-10);
+      const firstTwoDecades = tempAnomalyData.slice(0, 20);
+      const lastTwoDecades = tempAnomalyData.slice(-20);
 
-      const firstAvg = firstDecade.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / firstDecade.length;
-      const lastAvg = lastDecade.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / lastDecade.length;
+      const firstAvg = firstTwoDecades.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / firstTwoDecades.length;
+      const lastAvg = lastTwoDecades.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / lastTwoDecades.length;
 
       analysis.climateTrends.decadalTrend = lastAvg - firstAvg;
       analysis.climateTrends.globalWarming = analysis.climateTrends.decadalTrend > 0;
 
       // Check for accelerating trend (comparing recent vs mid-period)
-      if (tempAnomalyData.length >= 30) {
-        const midPeriod = tempAnomalyData.slice(10, 20);
+      if (tempAnomalyData.length >= 60) {
+        const midPeriod = tempAnomalyData.slice(20, 40);
         const midAvg = midPeriod.reduce((sum, d) => sum + d.temperatureAnomaly, 0) / midPeriod.length;
         analysis.climateTrends.acceleratingTrend = (lastAvg - midAvg) > (midAvg - firstAvg);
       }
