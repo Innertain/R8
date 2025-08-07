@@ -210,7 +210,7 @@ export default function NoaaClimateAnalytics() {
         analysis.climateTrends.acceleratingTrend = (lastAvg - midAvg) > (midAvg - firstAvg);
       }
     }
-    
+
     return analysis;
   })();
 
