@@ -860,9 +860,16 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                               ⚠️ This region has exceptionally high biodiversity conservation priority.
                             </span>
                           )}
-                          <span className="block mt-1 text-xs text-red-600">
-                            📸 Showing only species with verified photos from iNaturalist community
-                          </span>
+                          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                            <span className="block text-xs text-yellow-800 font-medium">
+                              ⚠️ DATA SOURCE NOTICE
+                            </span>
+                            <span className="block text-xs text-yellow-700">
+                              📸 Photos: Real iNaturalist community data<br/>
+                              📋 Species List: Mix of official USFWS/IUCN data and educational fallback data<br/>
+                              🔬 When official APIs are unavailable, comprehensive fallback species lists are used for educational purposes
+                            </span>
+                          </div>
                         </div>
                       </div>
                       

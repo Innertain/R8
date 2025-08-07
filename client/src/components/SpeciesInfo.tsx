@@ -199,6 +199,12 @@ export default function SpeciesInfo({
             <p className="text-sm text-gray-600 mt-1">
               Threatened or vulnerable species requiring protection
             </p>
+            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+              <span className="font-medium text-yellow-800">⚠️ Data Sources:</span>
+              <span className="text-yellow-700 ml-1">
+                Official USFWS/IUCN databases supplemented with educational fallback data when APIs are unavailable
+              </span>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
