@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import DataSourceAttribution from '@/components/DataSourceAttribution';
 import WildlifeActivityFeed from '@/components/WildlifeActivityFeed';
-import cascadiaLandscape from '@/assets/cascadia-landscape.jpg';
+import cascadiaLandscape from '../assets/cascadia-landscape.jpg';
 
 // Cascadia restoration regions - temperate rainforest and watershed ecosystems
 const cascadiaProjects = [
