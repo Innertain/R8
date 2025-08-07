@@ -112,9 +112,13 @@ const CascadiaRegenerationPage: React.FC = () => {
     <div className="space-y-0">
       {/* Hero Section with Landscape */}
       <div className="relative h-96 overflow-hidden">
-        {/* Using a gradient placeholder for now - user can add their own Cascadia landscape image */}
-        <div className="w-full h-full bg-gradient-to-r from-emerald-600 via-green-700 to-teal-800" />
-        <div className="absolute inset-0 bg-black bg-opacity-30" />
+        {/* Beautiful Cascadia mountain landscape */}
+        <img 
+          src="/src/assets/cascadia-landscape.jpg" 
+          alt="Cascadia temperate rainforest and snow-capped mountains"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-40" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center space-y-4 text-white px-6">
             <h1 className="text-5xl font-bold drop-shadow-lg">
