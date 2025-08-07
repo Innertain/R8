@@ -83,7 +83,7 @@ class IUCNService {
 
   async getSpeciesByRegion(countryCode: string): Promise<string[]> {
     const response = await this.makeRequest<any>(`/country/getspecies/${countryCode}`);
-    
+
     if (!response?.result) return [];
 
     return response.result
@@ -96,7 +96,7 @@ class IUCNService {
 
   async getSpeciesAssessment(speciesName: string): Promise<IUCNAssessment | null> {
     const response = await this.makeRequest<any>(`/species/${encodeURIComponent(speciesName)}`);
-    
+
     if (!response?.result?.[0]) return null;
 
     const species = response.result[0];
@@ -112,7 +112,7 @@ class IUCNService {
 
   async getSpeciesThreats(speciesName: string): Promise<Array<{code: string; title: string; timing: string; scope: string; severity: string}>> {
     const response = await this.makeRequest<any>(`/threats/species/name/${encodeURIComponent(speciesName)}`);
-    
+
     if (!response?.result) return [];
 
     return response.result.map((threat: any) => ({
@@ -126,7 +126,7 @@ class IUCNService {
 
   async getSpeciesConservationMeasures(speciesName: string): Promise<Array<{code: string; title: string}>> {
     const response = await this.makeRequest<any>(`/measures/species/name/${encodeURIComponent(speciesName)}`);
-    
+
     if (!response?.result) return [];
 
     return response.result.map((measure: any) => ({
@@ -149,7 +149,7 @@ class IUCNService {
     const batchSize = 10;
     for (let i = 0; i < speciesNames.length; i += batchSize) {
       const batch = speciesNames.slice(i, i + batchSize);
-      
+
       await Promise.all(batch.map(async (speciesName) => {
         try {
           const [assessment, threats, measures] = await Promise.all([
@@ -214,6 +214,34 @@ class IUCNService {
         'Dwarf Wedgemussel', 'Clubshell', 'Northern Riffleshell',
         'American Chestnut', 'Running Buffalo Clover', 'Virginia Spiraea',
         'Shale Barren Rock-cress', 'Small Whorled Pogonia', 'Northeastern Bulrush'
+      ],
+      'cascadia_bioregion': [
+        'Northern Spotted Owl', 'Marbled Murrelet', 'Chinook Salmon', 'Coho Salmon',
+        'Steelhead Trout', 'Bull Trout', 'Orca', 'Steller Sea Lion', 'Grizzly Bear',
+        'Wolverine', 'Canada Lynx', 'Fisher', 'Western Snowy Plover', 'Streaked Horned Lark',
+        'Taylor\'s Checkerspot Butterfly', 'Oregon Silverspot Butterfly', 'Western Painted Turtle',
+        'Oregon Chub', 'Lost River Sucker', 'Shortnose Sucker', 'Bradshaw\'s Lomatium',
+        'Willamette Daisy', 'Kincaid\'s Lupine', 'Nelson\'s Checker-mallow', 'Cook\'s Lomatium',
+        'Rough Popcornflower', 'Large-flowered Woolly Meadowfoam', 'Dwarf Woolly Meadowfoam',
+        'Golden Paintbrush', 'Showy Stickseed', 'Wenatchee Mountains Checker-mallow'
+      ],
+      'na_cascadia': [
+        'Northern Spotted Owl', 'Marbled Murrelet', 'Chinook Salmon', 'Coho Salmon',
+        'Steelhead Trout', 'Bull Trout', 'Orca', 'Steller Sea Lion', 'Grizzly Bear',
+        'Wolverine', 'Canada Lynx', 'Fisher', 'Western Snowy Plover', 'Streaked Horned Lark',
+        'Taylor\'s Checkerspot Butterfly', 'Oregon Silverspot Butterfly', 'Western Painted Turtle',
+        'Oregon Chub', 'Lost River Sucker', 'Shortnose Sucker', 'Bradshaw\'s Lomatium',
+        'Willamette Daisy', 'Kincaid\'s Lupine', 'Nelson\'s Checker-mallow', 'Cook\'s Lomatium'
+      ],
+      'na_california_chaparral': [
+        'California Condor', 'San Joaquin Kit Fox', 'Sierra Nevada Red Fox', 'Morro Bay Kangaroo Rat',
+        'Salt Marsh Harvest Mouse', 'Giant Kangaroo Rat', 'Blunt-nosed Leopard Lizard',
+        'Alameda Whipsnake', 'Smith\'s Blue Butterfly', 'Monarch Butterfly',
+        'California Tiger Salamander', 'Foothill Yellow-legged Frog', 'Arroyo Toad',
+        'Southwestern Willow Flycatcher', 'Least Bell\'s Vireo', 'California Gnatcatcher',
+        'Island Fox', 'Black Swift', 'Yellow Rail', 'American White Pelican',
+        'California Red-legged Frog', 'Ramona Lilac', 'California Poppy', 'Coastal Sage Scrub',
+        'Indian Tiger Lily', 'San Diego Thornmint', 'Palmer\'s Ericameria', 'Munz\'s Sage'
       ]
     };
 

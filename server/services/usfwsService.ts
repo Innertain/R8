@@ -72,6 +72,8 @@ class USFWSService {
       'na_sonoran_desert': ['AZ', 'CA', 'NV'],
       'na_pacific_northwest': ['WA', 'OR', 'ID', 'MT'],
       'na_great_plains': ['ND', 'SD', 'NE', 'KS', 'OK', 'TX', 'MT', 'WY', 'CO', 'NM'],
+      'cascadia_bioregion': ['WA', 'OR', 'CA', 'ID', 'MT', 'BC'],
+      'na_cascadia': ['WA', 'OR', 'CA', 'ID', 'MT'],
     };
 
     const states = bioregionToStates[bioregionId];
