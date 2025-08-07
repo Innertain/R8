@@ -80,6 +80,13 @@ const BIOREGION_BOUNDS: Record<string, {north: number, south: number, east: numb
     west: -180.0,
     name: 'Alaska Boreal Interior'
   },
+  'cascadia_bioregion': {
+    north: 56.0,
+    south: 40.0,
+    east: -110.0,
+    west: -130.0,
+    name: 'Cascadia Bioregion'
+  },
 };
 
 // GET /api/species/bioregion/:bioregionId

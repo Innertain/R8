@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield, Wind } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield, Wind, TreePine } from "lucide-react";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -21,6 +21,7 @@ import AlertsPage from "@/pages/alerts";
 import BioregionExplorerPage from "@/pages/bioregion-explorer";
 import HawaiiRegenerationPage from "@/pages/hawaii-regeneration";
 import AppalachianRegenerationPage from "@/pages/appalachian-regeneration";
+import CascadiaRegenerationPage from "@/pages/cascadia-regeneration";
 import AirQualityPage from "@/pages/air-quality";
 import NoaaClimatePage from "@/pages/noaa-climate";
 import DisasterEducationPage from "@/pages/disaster-education";
@@ -159,7 +160,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                ['/bioregions', '/hawaii', '/appalachian'].includes(location) 
+                ['/bioregions', '/hawaii', '/appalachian', '/cascadia'].includes(location) 
                   ? "bg-green-500 text-white shadow-md" 
                   : "text-white hover:bg-green-500/20 hover:text-white"
               }`}>
@@ -201,6 +202,17 @@ function Navigation() {
                     <div>
                       <div className="font-medium text-gray-900">Appalachian Regeneration</div>
                       <div className="text-sm text-gray-600">Mountain heritage</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/cascadia" className="flex items-center gap-3 p-3 hover:bg-teal-50 rounded-lg cursor-pointer">
+                    <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center">
+                      <TreePine className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">Cascadia Bioregion</div>
+                      <div className="text-sm text-gray-600">Temperate rainforest</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -273,7 +285,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
-                variant={['/bioregions', '/hawaii', '/appalachian'].includes(location) ? "default" : "outline"} 
+                variant={['/bioregions', '/hawaii', '/appalachian', '/cascadia'].includes(location) ? "default" : "outline"} 
                 size="sm"
                 className="flex items-center gap-2"
               >
@@ -299,6 +311,12 @@ function Navigation() {
                 <Link href="/appalachian" className="flex items-center gap-2 w-full p-2">
                   <Mountain className="h-4 w-4" />
                   Appalachian
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/cascadia" className="flex items-center gap-2 w-full p-2">
+                  <TreePine className="h-4 w-4" />
+                  Cascadia
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -457,6 +475,17 @@ function Navigation() {
                 Appalachian Regeneration
               </Button>
             </Link>
+            <Link href="/cascadia">
+              <Button 
+                variant={location === "/cascadia" ? "default" : "outline"} 
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start ml-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <TreePine className="h-4 w-4" />
+                Cascadia Bioregion
+              </Button>
+            </Link>
 
           </div>
         </div>
@@ -480,6 +509,7 @@ function Router() {
         <Route path="/bioregions" component={BioregionExplorerPage} />
         <Route path="/hawaii" component={HawaiiRegenerationPage} />
         <Route path="/appalachian" component={AppalachianRegenerationPage} />
+        <Route path="/cascadia" component={CascadiaRegenerationPage} />
         <Route path="/privacy-policy" component={PrivacyPolicyPage} />
         <Route path="/terms-of-service" component={TermsOfServicePage} />
 
