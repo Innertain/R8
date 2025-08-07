@@ -383,7 +383,7 @@ export default function NoaaClimateAnalytics() {
             <Card>
               <CardHeader>
                 <CardTitle>Recent Trends (Last 20 Years)</CardTitle>
-                <CardDescription>Temperature anomalies by significance level</CardDescription>
+                <CardDescription>Temperature anomalies showing 20-year climate patterns</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={250}>
