@@ -102,21 +102,36 @@ router.get('/bioregion/:bioregionId', async (req, res) => {
       return res.status(404).json({ error: 'Bioregion not found' });
     }
 
-    console.log(`Fetching species data for bioregion: ${bioregionId}`);
+    console.log(`Fetching comprehensive species data for bioregion: ${bioregionId}`);
     
-    const speciesData = await inaturalistService.getSpeciesForBioregion(bioregionId, bounds);
+    // Get data from all sources in parallel
+    const [usfwsSpecies, iucnFallbackSpecies, inaturalistData] = await Promise.all([
+      usfwsService.getRegionalThreatenedSpecies(bioregionId),
+      Promise.resolve(iucnService.getFallbackThreatenedSpecies(bioregionId)),
+      inaturalistService.getSpeciesForBioregion(bioregionId, bounds)
+    ]);
+    
+    // Combine all threatened species sources
+    const allThreatenedSpecies = [
+      ...usfwsSpecies,
+      ...iucnFallbackSpecies,
+      ...(inaturalistData.threatenedSpecies || [])
+    ];
+    
+    // Remove duplicates
+    const uniqueThreatenedSpecies = [...new Set(allThreatenedSpecies)];
     
     // Also fetch conservation projects
     const conservationProjects = await inaturalistService.getConservationProjects(bounds.name);
     
     // Enhance with GBIF climate and conservation data
     let climateData = null;
-    if (speciesData.threatenedSpecies && speciesData.threatenedSpecies.length > 0) {
+    if (uniqueThreatenedSpecies.length > 0) {
       try {
         climateData = await gbifService.enhanceSpeciesWithClimateData(
           bioregionId,
           bounds,
-          speciesData.threatenedSpecies
+          uniqueThreatenedSpecies.slice(0, 30) // Limit for performance
         );
       } catch (error) {
         console.error('Error fetching GBIF climate data:', error);
@@ -127,13 +142,21 @@ router.get('/bioregion/:bioregionId', async (req, res) => {
       bioregionId,
       bioregionName: bounds.name,
       species: {
-        ...speciesData,
+        ...inaturalistData,
+        threatenedSpecies: uniqueThreatenedSpecies.slice(0, 200), // Increased limit
         climateRefugees: climateData?.climateRefugees || [],
         conservationStatuses: climateData?.conservationStatuses || []
       },
       conservationProjects,
-      dataSource: 'iNaturalist + GBIF',
+      dataSource: 'USFWS + IUCN Red List + iNaturalist + GBIF',
       lastUpdated: new Date().toISOString(),
+      dataQuality: {
+        totalSources: 3,
+        usfwsSpecies: usfwsSpecies.length,
+        iucnSpecies: iucnFallbackSpecies.length,
+        inaturalistSpecies: inaturalistData.threatenedSpecies?.length || 0,
+        combinedUnique: uniqueThreatenedSpecies.length
+      }
     });
   } catch (error) {
     console.error('Error fetching species data:', error);

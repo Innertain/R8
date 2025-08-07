@@ -860,15 +860,17 @@ export default function WildlifeActivityFeed({ bioregionName, bioregionId }: Wil
                               ⚠️ This region has exceptionally high biodiversity conservation priority.
                             </span>
                           )}
-                          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                            <span className="block text-xs text-yellow-800 font-medium">
-                              ⚠️ DATA SOURCE NOTICE
+                          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                            <span className="block text-xs text-blue-800 font-medium">
+                              📊 DATA QUALITY METRICS
                             </span>
-                            <span className="block text-xs text-yellow-700">
-                              📸 Photos: Real iNaturalist community data<br/>
-                              📋 Species List: Mix of official USFWS/IUCN data and educational fallback data<br/>
-                              🔬 When official APIs are unavailable, comprehensive fallback species lists are used for educational purposes
-                            </span>
+                            {speciesData.dataQuality && (
+                              <div className="text-xs text-blue-700 mt-1">
+                                🔗 Sources: USFWS ({speciesData.dataQuality.usfwsSpecies}) + IUCN ({speciesData.dataQuality.iucnSpecies}) + iNaturalist ({speciesData.dataQuality.inaturalistSpecies})<br/>
+                                📈 Combined unique species: {speciesData.dataQuality.combinedUnique} from {speciesData.dataQuality.totalSources} official databases<br/>
+                                📸 Photos: Real iNaturalist community data • 🔬 Educational fallback data when APIs unavailable
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
