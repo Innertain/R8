@@ -102,6 +102,12 @@ const getSeverityColor = (severity: string) => {
   }
 };
 
+// Mapping of state codes to full state names for more robust filtering
+const stateNames: Record<string, string> = {};
+Object.entries(US_STATES).forEach(([code, state]) => {
+  stateNames[code] = state.name;
+});
+
 interface InteractiveWeatherMapProps {
   stateFilter?: string;
   onStateFilterChange?: (state: string) => void;
@@ -135,10 +141,15 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
 
   // Group alerts by state
   const statesWithAlerts = alerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
-    // Extract state from location
+    // Extract state from location or title/description using a more robust approach
     const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
-    const state = stateMatch ? stateMatch[1] : null;
+    const titleStateMatch = alert.title?.match(/\b([A-Z]{2})\b/);
+    const descriptionStateMatch = alert.description?.match(/\b([A-Z]{2})\b/);
     
+    let state = stateMatch ? stateMatch[1] : null;
+    if (!state && titleStateMatch) state = titleStateMatch[1];
+    if (!state && descriptionStateMatch) state = descriptionStateMatch[1];
+
     if (state && US_STATES[state as keyof typeof US_STATES]) {
       if (!acc[state]) acc[state] = [];
       acc[state].push(alert);
@@ -146,13 +157,45 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
     return acc;
   }, {});
 
+  // Helper function to filter alerts for a specific state
+  const getAlertsForState = (stateCode: string): WeatherAlert[] => {
+    if (!alerts || alerts.length === 0) return [];
+
+    return alerts.filter((alert: WeatherAlert) => {
+      // Check if alert location exactly matches the state code
+      const alertLocation = alert.location?.trim() || '';
+
+      // First check for exact state code match
+      if (alertLocation === stateCode) {
+        return true;
+      }
+
+      // Check for NWS office pattern "NWS [City] [State]"
+      const nwsPattern = new RegExp(`NWS\\s+\\w+\\s+${stateCode}\\b`, 'i');
+      if (nwsPattern.test(alert.title || '') || nwsPattern.test(alert.description || '')) {
+        return true;
+      }
+
+      // Check for state name in title/description but be more specific
+      const stateName = stateNames[stateCode]?.toLowerCase() || '';
+      const alertTitle = alert.title?.toLowerCase() || '';
+      const alertDescription = alert.description?.toLowerCase() || '';
+
+      // Only match if state name appears as a word boundary (not part of another word)
+      const stateNamePattern = new RegExp(`\\b${stateName}\\b`, 'i');
+
+      return stateNamePattern.test(alertTitle) || stateNamePattern.test(alertDescription);
+    });
+  };
+
+
   // Filter alerts based on selected state and severity
   const filteredAlerts = alerts.filter((alert: WeatherAlert) => {
     // State filter
     if (selectedState !== 'all') {
-      const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
-      const alertState = stateMatch ? stateMatch[1] : null;
-      if (alertState !== selectedState) return false;
+      // Use the helper function for state filtering
+      const stateAlerts = getAlertsForState(selectedState);
+      if (!stateAlerts.includes(alert)) return false;
     }
 
     // Severity filter
@@ -303,7 +346,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                   </span>
                 )}
               </h3>
-              
+
               {Object.keys(statesWithAlerts).length === 0 ? (
                 <div className="text-center py-8">
                   <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
@@ -413,7 +456,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                                       </div>
                                     </div>
                                   </div>
-                                  
+
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
                                     <div className="flex items-center gap-1">
                                       <MapPin className="w-3 h-3" />
@@ -424,11 +467,11 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
                                       <span>{alert.sent ? new Date(alert.sent).toLocaleString() : 'Current Alert'}</span>
                                     </div>
                                   </div>
-                                  
+
                                   <p className="text-sm text-gray-700 mb-3 line-clamp-3">
                                     {alert.description}
                                   </p>
-                                  
+
                                   <div className="flex items-center justify-between">
                                     <span className="text-xs text-gray-500">
                                       {alert.senderName} • {alert.event}
@@ -506,7 +549,7 @@ export function InteractiveWeatherMap({ stateFilter, onStateFilterChange }: Inte
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Real-time API Debugger */}
       <RealtimeApiDebugger />
     </div>

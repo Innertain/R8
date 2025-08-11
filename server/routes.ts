@@ -22,7 +22,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/airtable-debug", async (req, res) => {
     const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
     const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period if present
-    
+
     if (!AIRTABLE_TOKEN || !BASE_ID) {
       return res.json({ error: 'Missing credentials' });
     }
@@ -63,15 +63,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Clear stats cache
       statsCache = null;
-      
+
       // Clear recent updates cache
       recentUpdatesCache = null;
       recentUpdatesCacheTime = 0;
-      
+
       // Clear FEMA disasters cache
       femaDisastersCache = null;
       femaDisastersCacheTime = 0;
-      
+
       // Clear Airtable cache if available
       try {
         const { clearAirtableCache } = await import('./airtable');
@@ -79,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (e) {
         // Ignore if clearAirtableCache doesn't exist
       }
-      
+
       res.json({ success: true, message: 'All caches cleared successfully' });
     } catch (error) {
       console.error('Error clearing cache:', error);
@@ -143,14 +143,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Testing token access to metadata endpoint...');
       console.log('Token exists:', !!process.env.AIRTABLE_TOKEN);
       console.log('Token starts with:', process.env.AIRTABLE_TOKEN?.substring(0, 8) + '...');
-      
+
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period
       const metaResponse = await fetch(`https://api.airtable.com/v0/meta/bases/${baseId}/tables`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      
+
       console.log('Metadata response status:', metaResponse.status);
-      
+
       if (metaResponse.ok) {
         const metaData = await metaResponse.json();
         res.json({ success: true, tables: metaData.tables });
@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Test endpoints for new Airtable tables with dynamic table detection
   app.get('/api/test/drivers', async (req, res) => {
     const possibleNames = ['Drivers', 'Driver', 'drivers'];
-    
+
     for (const tableName of possibleNames) {
       try {
         console.log(`Trying drivers table: "${tableName}"`);
@@ -177,7 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
         });
         console.log(`Drivers "${tableName}" response:`, response.status);
-        
+
         if (response.ok) {
           const data = await response.json();
           console.log(`✓ Drivers success: ${data.records?.length || 0} records`);
@@ -196,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/test/volunteers', async (req, res) => {
     const possibleNames = ['Volunteer Applications', 'Volunteers', 'volunteers', 'Volunteer_Applications'];
-    
+
     for (const tableName of possibleNames) {
       try {
         const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
@@ -215,7 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/test/availability', async (req, res) => {
     const possibleNames = ['V Availability', 'Availability', 'V_Availability', 'availability'];
-    
+
     for (const tableName of possibleNames) {
       try {
         const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
@@ -234,7 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/test/assignments', async (req, res) => {
     const possibleNames = ['V Shift Assignment', 'Shift Assignment', 'V_Shift_Assignment', 'assignments'];
-    
+
     for (const tableName of possibleNames) {
       try {
         const response = await fetch(`https://api.airtable.com/v0/${process.env.VITE_BASE_ID}/${encodeURIComponent(tableName)}`, {
@@ -256,14 +256,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const tableName = decodeURIComponent(req.params.tableName);
       console.log(`Testing direct access to table: "${tableName}"`);
-      
+
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period
       const response = await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      
+
       console.log(`Response for "${tableName}":`, response.status);
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log(`✓ Success for "${tableName}": ${data.records?.length || 0} records`);
@@ -304,13 +304,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const phone = req.params.phoneNumber;
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-      
+
       // Helper function to normalize phone numbers for comparison
       const normalizePhone = (phoneStr: string) => phoneStr.replace(/\D/g, '');
       const normalizedSearchPhone = normalizePhone(phone);
-      
+
       console.log(`Searching for phone: "${phone}" (normalized: "${normalizedSearchPhone}")`);
-      
+
       // Create flexible search formula that handles different phone formats
       const phoneSearchFormula = `OR(
         SEARCH("${phone}",{Phone}),
@@ -319,22 +319,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         REGEX_REPLACE({Phone},"[^0-9]","","g")="${normalizedSearchPhone}",
         FIND("${normalizedSearchPhone}",REGEX_REPLACE({Phone},"[^0-9]","","g"))>0
       )`;
-      
+
       // Search in Volunteer Applications table first
       const volunteerResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications?filterByFormula=${encodeURIComponent(phoneSearchFormula)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      
+
       console.log('Volunteer Applications search status:', volunteerResponse.status);
-      
+
       if (volunteerResponse.ok) {
         const volunteerData = await volunteerResponse.json();
         console.log(`Found ${volunteerData.records.length} volunteer records`);
-        
+
         if (volunteerData.records.length > 0) {
           const record = volunteerData.records[0];
           const fields = record.fields;
-          
+
           return res.json({
             id: record.id,
             name: `${fields['First Name'] || ''} ${fields['Last Name'] || ''}`.trim(),
@@ -346,22 +346,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       // Also search in Drivers table with same flexible formula
       const driverResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Drivers?filterByFormula=${encodeURIComponent(phoneSearchFormula)}`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      
+
       console.log('Drivers search status:', driverResponse.status);
-      
+
       if (driverResponse.ok) {
         const driverData = await driverResponse.json();
         console.log(`Found ${driverData.records.length} driver records`);
-        
+
         if (driverData.records.length > 0) {
           const record = driverData.records[0];
           const fields = record.fields;
-          
+
           return res.json({
             id: record.id,
             name: `${fields['First Name'] || ''} ${fields['Last Name'] || ''}`.trim(),
@@ -376,7 +376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       // Special handling for demo account
       if (phone === "555-DEMO" || normalizedSearchPhone === "555DEMO") {
         console.log('Providing demo account fallback');
@@ -391,16 +391,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           source: 'demo'
         });
       }
-      
+
       // Fallback to storage (includes demo account)
       const volunteer = await storage.getVolunteerByPhone(phone);
       if (volunteer) {
         return res.json(volunteer);
       }
-      
+
       console.log(`No volunteer found for phone: ${phone}`);
       res.status(404).json({ error: "Volunteer not found" });
-      
+
     } catch (error: any) {
       console.error('Error looking up volunteer:', error);
       res.status(500).json({ error: error.message || 'Server error' });
@@ -411,14 +411,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/availability", async (req, res) => {
     try {
       const { insertAvailabilitySchema } = await import("@shared/schema");
-      
+
       // Convert date strings to Date objects
       const requestData = {
         ...req.body,
         startTime: new Date(req.body.startTime),
         endTime: new Date(req.body.endTime)
       };
-      
+
       const availabilityData = insertAvailabilitySchema.parse(requestData);
       const availability = await storage.createAvailability(availabilityData);
       res.json(availability);
@@ -432,14 +432,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { startTime, endTime } = req.body;
-      
+
       if (!startTime || !endTime) {
         return res.status(400).json({ error: 'Start time and end time are required' });
       }
 
       // Find the availability record by ID
       const availability = await storage.getAvailabilityById(id);
-      
+
       if (!availability) {
         return res.status(404).json({ error: 'Availability not found' });
       }
@@ -474,15 +474,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const volunteerId = req.params.volunteerId;
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-      
+
       // Get real availability from Airtable
       const availabilityResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Availability?filterByFormula=OR(SEARCH("${volunteerId}",ARRAYJOIN({Volunteer})),{Volunteer}="${volunteerId}")`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      
+
       if (availabilityResponse.ok) {
         const availabilityData = await availabilityResponse.json();
-        
+
         if (availabilityData.records.length > 0) {
           const availability = availabilityData.records.map((record: any) => ({
             id: record.id,
@@ -494,11 +494,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             notes: record.fields['Notes'] || '',
             createdAt: new Date(record.fields['Created Date'])
           }));
-          
+
           return res.json(availability);
         }
       }
-      
+
       // Fallback to storage for demo user
       const availability = await storage.getVolunteerAvailability(volunteerId);
       res.json(availability);
@@ -539,18 +539,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { insertShiftAssignmentSchema } = await import("@shared/schema");
       const assignmentData = insertShiftAssignmentSchema.parse(req.body);
-      
+
       console.log('Assignment request received:', assignmentData);
       console.log('Volunteer ID:', assignmentData.volunteerId);
-      
+
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-      
+
       // Check for existing active assignments for this volunteer and shift
       console.log('🔍 Checking for existing active assignments...');
       const existingAssignmentsResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment?filterByFormula=AND(SEARCH("${assignmentData.volunteerId}",ARRAYJOIN({Volunteer})),SEARCH("${assignmentData.shiftId}",ARRAYJOIN({Shift ID})),{Status}!="cancelled")`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      
+
       if (existingAssignmentsResponse.ok) {
         const existingData = await existingAssignmentsResponse.json();
         if (existingData.records && existingData.records.length > 0) {
@@ -561,9 +561,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       console.log('✅ No existing active assignments found, proceeding with creation');
-      
+
       // Create assignment in Airtable if volunteer exists in Airtable
       if (assignmentData.volunteerId !== 'demo-volunteer-123') {
         console.log('✓ Volunteer ID is not demo, proceeding with Airtable creation');
@@ -581,9 +581,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }]
         };
-        
+
         console.log('Creating assignment in Airtable with payload:', JSON.stringify(assignmentPayload, null, 2));
-        
+
         const airtableResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment`, {
           method: 'POST',
           headers: { 
@@ -592,15 +592,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           body: JSON.stringify(assignmentPayload)
         });
-        
+
         console.log('Airtable response status:', airtableResponse.status);
         const responseText = await airtableResponse.text();
         console.log('Airtable response body:', responseText);
-        
+
         if (airtableResponse.ok) {
           const airtableData = JSON.parse(responseText);
           const record = airtableData.records[0];
-          
+
           const assignment = {
             id: record.id,
             volunteerId: assignmentData.volunteerId,
@@ -609,7 +609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             assignedDate: new Date(record.createdTime),
             notes: record.fields['Notes'] || ''
           };
-          
+
           console.log('✅ Assignment created in Airtable:', assignment);
           return res.json(assignment);
         } else {
@@ -618,7 +618,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         console.log('Using demo volunteer, skipping Airtable');
       }
-      
+
       // Fallback to storage for demo users or failed Airtable requests
       console.log('Creating assignment in local storage as fallback');
       const assignment = await storage.createShiftAssignment(assignmentData);
@@ -634,10 +634,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const updateData = req.body;
-      
+
       const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
       const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-      
+
       if (!AIRTABLE_TOKEN || !BASE_ID) {
         return res.status(500).json({ error: 'Missing Airtable credentials' });
       }
@@ -685,32 +685,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const volunteerId = req.params.volunteerId;
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-      
+
       // Get real assignments from Airtable first with simplified search
       console.log(`Searching for assignments for volunteer: ${volunteerId}`);
       const assignmentResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
-      
+
       if (assignmentResponse.ok) {
         const assignmentData = await assignmentResponse.json();
         console.log(`Found ${assignmentData.records.length} total assignments`);
-        
+
         // Filter assignments for this volunteer manually since formula search is complex
         const volunteerAssignments = assignmentData.records.filter((record: any) => {
           const volunteerField = record.fields['Volunteer'];
           console.log(`Record ${record.id}: volunteer field =`, volunteerField, 'target:', volunteerId);
           return volunteerField && Array.isArray(volunteerField) && volunteerField.includes(volunteerId);
         });
-        
+
         console.log(`Filtered to ${volunteerAssignments.length} assignments for this volunteer`);
-        
+
         if (volunteerAssignments.length > 0) {
           // Fetch shift names for assignments that don't have them
           const shiftsResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shifts`, {
             headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
           });
-          
+
           let shiftsData = {};
           if (shiftsResponse.ok) {
             const shifts = await shiftsResponse.json();
@@ -729,11 +729,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             assignedDate: new Date(record.fields['Assigned Date'] || record.createdTime),
             notes: record.fields['Notes'] || ''
           }));
-          
+
           return res.json(assignments);
         }
       }
-      
+
       // Fallback to storage
       const assignments = await storage.getVolunteerAssignments(volunteerId);
       res.json(assignments);
@@ -756,7 +756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/assignments/:assignmentId", async (req, res) => {
     try {
       const assignmentId = req.params.assignmentId;
-      
+
       // Try to update status in Airtable first if it's a real assignment
       if (assignmentId.startsWith('rec')) {
         const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
@@ -766,7 +766,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             'Notes': 'Assignment cancelled by volunteer'
           }
         };
-        
+
         const updateResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment/${assignmentId}`, {
           method: 'PATCH',
           headers: { 
@@ -775,7 +775,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           body: JSON.stringify(updatePayload)
         });
-        
+
         if (updateResponse.ok) {
           const updatedRecord = await updateResponse.json();
           console.log(`✅ Assignment ${assignmentId} status updated to cancelled in Airtable`);
@@ -787,7 +787,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('Update payload was:', JSON.stringify(updatePayload, null, 2));
         }
       }
-      
+
       // Fallback to storage for demo assignments
       await storage.updateShiftAssignment(assignmentId, { status: 'cancelled' });
       res.json({ success: true, message: 'Assignment cancelled successfully' });
@@ -851,7 +851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             isDriver: volunteerData.fields['Is Driver'] || false,
             ...profileData // Include all profile updates
           };
-          
+
           return res.json(updatedVolunteer);
         } else {
           console.log(`Volunteer ${id} not found in Airtable, status: ${volunteerResponse.status}`);
@@ -860,7 +860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('Airtable lookup failed:', airtableError);
         }
       }
-      
+
       // Fallback to local storage for demo volunteers
       const updatedVolunteer = await storage.updateVolunteerProfile(id, profileData);
       res.json(updatedVolunteer);
@@ -874,7 +874,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/volunteer-skills', async (req, res) => {
     try {
       const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-      
+
       if (baseId) {
         const response = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications`, {
           headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
@@ -882,14 +882,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         if (response.ok) {
           const data = await response.json();
-          
+
           // Extract all unique skills/tags from volunteer records
           const allSkills = new Set<string>();
           const allInterests = new Set<string>();
-          
+
           data.records.forEach((record: any) => {
             const fields = record.fields;
-            
+
             // Look for skill-related fields
             if (fields.Skills && Array.isArray(fields.Skills)) {
               fields.Skills.forEach((skill: string) => allSkills.add(skill.trim()));
@@ -900,7 +900,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (fields['Volunteer Skills'] && Array.isArray(fields['Volunteer Skills'])) {
               fields['Volunteer Skills'].forEach((skill: string) => allSkills.add(skill.trim()));
             }
-            
+
             // Look for interest-related fields
             if (fields.Interests && Array.isArray(fields.Interests)) {
               fields.Interests.forEach((interest: string) => allInterests.add(interest.trim()));
@@ -967,7 +967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Convert Airtable format to our application format
       const partners = data.records.map((record: any) => {
         const fields = record.fields;
-        
+
         return {
           id: record.id,
           name: fields.Name || 'Unknown Partner',
@@ -993,7 +993,7 @@ app.get('/api/stats', async (req, res) => {
   try {
     const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
     const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-    
+
     if (!AIRTABLE_TOKEN || !baseId) {
       return res.status(500).json({ 
         success: false, 
@@ -1018,23 +1018,23 @@ app.get('/api/stats', async (req, res) => {
     const fetchAllRecords = async (tableName: string) => {
       let allRecords: any[] = [];
       let offset = '';
-      
+
       do {
         const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}${offset ? `?offset=${offset}` : ''}`;
         const response = await fetch(url, {
           headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
         });
-        
+
         if (!response.ok) {
           console.log(`Failed to fetch ${tableName}: ${response.status}`);
           return [];
         }
-        
+
         const data = await response.json();
         allRecords = allRecords.concat(data.records || []);
         offset = data.offset || '';
       } while (offset);
-      
+
       return allRecords;
     };
 
@@ -1076,18 +1076,18 @@ app.get('/api/stats', async (req, res) => {
       const count = parseInt(String(familiesEstimate)) || 0;
       return sum + count;
     }, 0);
-    
+
     // Count sites with actual family data for verification
     const sitesWithFamilyData = transformedSites.filter(site => site['Weekly Served'] && site['Weekly Served'] > 0).length;
 
-    // Calculate active sites within last 60 days based on inventory updates
+    // Count active sites within last 60 days based on inventory updates
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-    
+
     const activeSitesLast60Days = transformedSites.filter(site => {
       const lastModified = site['Last Modified'] || site['Date Modified'] || site['Last Update'];
       if (!lastModified) return false;
-      
+
       const lastModifiedDate = new Date(lastModified);
       return lastModifiedDate >= sixtyDaysAgo;
     }).length;
@@ -1105,14 +1105,14 @@ app.get('/api/stats', async (req, res) => {
     const sitesWithRecentActivity = transformedSites.filter(site => {
       const needsCount = parseInt(String(site['Needs Count'] || 0));
       const lastUpdate = site['Last Update'] || site['Last Modified'];
-      
+
       if (needsCount > 0) return true; // Has current needs
-      
+
       if (lastUpdate) {
         const updateDate = new Date(lastUpdate);
         return updateDate >= sixtyDaysAgo; // Recent activity
       }
-      
+
       return false;
     }).length;
 
@@ -1154,7 +1154,7 @@ app.get('/api/stats', async (req, res) => {
     };
 
     return res.json(responseData);
-    
+
   } catch (error: any) {
     console.error('Error fetching stats:', error);
     return res.status(500).json({ 
@@ -1169,7 +1169,7 @@ app.get('/api/debug/site-fields', async (req, res) => {
   try {
     const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
     const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-    
+
     if (!AIRTABLE_TOKEN || !baseId) {
       return res.status(500).json({ success: false, error: 'Missing Airtable configuration' });
     }
@@ -1208,7 +1208,7 @@ app.get('/api/debug/delivery-statuses', async (req, res) => {
   try {
     const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
     const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-    
+
     if (!AIRTABLE_TOKEN || !baseId) {
       return res.status(500).json({ 
         success: false, 
@@ -1252,7 +1252,7 @@ app.get('/api/debug/delivery-statuses', async (req, res) => {
     };
 
     return res.json({ success: true, analysis: statusAnalysis });
-    
+
   } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
@@ -1279,7 +1279,7 @@ app.get('/api/recent-updates', async (req, res) => {
 
     const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
     const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-    
+
     if (!AIRTABLE_TOKEN || !baseId) {
       return res.status(500).json({ 
         success: false, 
@@ -1300,16 +1300,16 @@ app.get('/api/recent-updates', async (req, res) => {
         // Use filterByFormula to get records modified in last 30 days
         const formula = `IS_AFTER({Last Modified}, '${dateFilter}')`;
         const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?filterByFormula=${encodeURIComponent(formula)}&maxRecords=200`;
-        
+
         const response = await fetch(url, {
           headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
         });
-        
+
         if (!response.ok) {
           console.log(`Failed to fetch recent ${tableName}: ${response.status}`);
           return [];
         }
-        
+
         const data = await response.json();
         return data.records?.map((r: any) => ({ 
           id: r.id, 
@@ -1358,7 +1358,7 @@ app.get('/api/recent-updates', async (req, res) => {
     console.log('✓ Recent updates cached successfully for 6 hours');
 
     return res.json(responseData);
-    
+
   } catch (error: any) {
     console.error('Error fetching recent updates:', error);
     return res.status(500).json({ 
@@ -1373,12 +1373,12 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   try {
     const { tableName } = req.params;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
-    
+
     console.log(`Fetching data from Airtable table: ${tableName}`);
-    
+
     const airtableToken = process.env.AIRTABLE_TOKEN;
     const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
-    
+
     if (!airtableToken || !baseId) {
       return res.status(500).json({ 
         success: false, 
@@ -1407,7 +1407,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
     const data = await response.json();
     console.log(`✓ Successfully fetched ${data.records?.length || 0} records from ${tableName}`);
-    
+
     // Transform records to include flattened fields
     const transformedRecords = data.records?.map((record: any) => ({
       id: record.id,
@@ -1415,7 +1415,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     })) || [];
 
     return res.json(transformedRecords);
-    
+
   } catch (error: any) {
     console.error(`Error fetching table ${req.params.tableName}:`, error);
     return res.status(500).json({ 
@@ -1435,15 +1435,15 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         '$orderby': 'sent desc',
         '$filter': `sent ge '${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()}'` // Last 7 days
       });
-      
+
       const response = await fetch(`${ipawsUrl}?${params}`);
-      
+
       if (!response.ok) {
         throw new Error(`IPAWS API failed: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       // Process IPAWS alerts into simplified format
       const alerts = (data.IpawsArchivedAlerts || []).map((alert: any) => ({
         id: alert.alertId || alert.id,
@@ -1458,7 +1458,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         senderName: alert.senderName,
         web: alert.web
       }));
-      
+
       res.json({
         success: true,
         alerts: alerts.slice(0, 10),
@@ -1467,7 +1467,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       });
     } catch (error) {
       console.error('Emergency alerts API error:', error);
-      
+
       // Fallback to National Weather Service alerts
       try {
         const nwsResponse = await fetch('https://api.weather.gov/alerts/active');
@@ -1486,7 +1486,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             senderName: 'National Weather Service',
             web: feature.properties?.web
           }));
-          
+
           return res.json({
             success: true,
             alerts: nwsAlerts,
@@ -1497,7 +1497,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       } catch (fallbackError) {
         console.error('NWS fallback also failed:', fallbackError);
       }
-      
+
       res.status(500).json({
         success: false,
         error: 'Failed to fetch emergency alerts',
@@ -1510,17 +1510,17 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   app.get('/api/wildfire-incidents', async (req, res) => {
     try {
       console.log('Fetching wildfire incidents from InciWeb RSS feed...');
-      
+
       const response = await fetch('https://inciweb.wildfire.gov/incidents/rss.xml', {
         headers: { 'User-Agent': 'DisasterApp/1.0 (wildfire-monitoring@example.com)' }
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const xmlText = await response.text();
-      
+
       // Parse XML manually since we don't have DOMParser in Node.js
       const parseXMLItem = (itemText: string) => {
         const getTagContent = (tag: string): string => {
@@ -1528,7 +1528,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           const match = itemText.match(regex);
           return match ? match[1].trim() : '';
         };
-        
+
         return {
           title: getTagContent('title'),
           description: getTagContent('description'),
@@ -1537,13 +1537,13 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           guid: getTagContent('guid')
         };
       };
-      
+
       // Extract items from XML
       const itemMatches = xmlText.match(/<item[^>]*>(.*?)<\/item>/gis) || [];
-      
+
       const incidents = itemMatches.map((itemXml, index) => {
         const item = parseXMLItem(itemXml);
-        
+
         // Valid US state codes
         const validStates = new Set([
           'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
@@ -1555,7 +1555,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
         // Extract state from title/description - improved extraction logic
         let state = '';
-        
+
         // First, try to extract from agency prefixes in titles like "CAMDF", "UTMLF", "OR98S"
         const agencyPrefixMatch = item.title.match(/^([A-Z]{2,6})\s/);
         if (agencyPrefixMatch) {
@@ -1589,7 +1589,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             // Wyoming agencies
             'WYFIRE': 'WY', 'WYBLM': 'WY'
           };
-          
+
           if (agencyToState[prefix]) {
             state = agencyToState[prefix];
           } else {
@@ -1600,12 +1600,12 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             }
           }
         }
-        
+
         // If no state found from agency codes, try standard 2-letter extraction
         if (!state) {
           const titleStateMatches = item.title.match(/\b([A-Z]{2})\b/g) || [];
           const descStateMatches = item.description.match(/\b([A-Z]{2})\b/g) || [];
-          
+
           // Find first valid state code
           for (const match of [...titleStateMatches, ...descStateMatches]) {
             if (validStates.has(match)) {
@@ -1614,12 +1614,12 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             }
           }
         }
-        
+
         // Also try to extract from location patterns like "State: CA" or "California"
         if (!state) {
           const stateNamePattern = /(?:State:|Location:|in )(Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)/i;
           const stateNameMatch = item.title.match(stateNamePattern) || item.description.match(stateNamePattern);
-          
+
           if (stateNameMatch) {
             const stateNameMap: { [key: string]: string } = {
               'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA',
@@ -1636,29 +1636,29 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             state = stateNameMap[stateNameMatch[1].toLowerCase()] || '';
           }
         }
-        
+
         // Clean and parse the description for better readability
         const cleanDescription = (rawDesc: string): string => {
           // Remove HTML tags and excessive whitespace
           let cleaned = rawDesc.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-          
+
           // Remove common technical prefixes and suffixes
           cleaned = cleaned.replace(/^(Incident Summary:|Summary:|Description:|Update:)/i, '');
           cleaned = cleaned.replace(/\s*(For more information.*|Visit.*|Contact.*|Additional details.*)$/i, '');
-          
+
           // Split into sentences and take the most relevant ones
           const sentences = cleaned.split(/[.!?]+/).filter(s => s.trim().length > 20);
-          
+
           // Prioritize sentences with key information
           const prioritySentences = sentences.filter(s => 
             /acres|percent|contained|controlled|firefighters|evacuation|threat|damage/i.test(s)
           );
-          
+
           // Return the best summary (max 2-3 sentences)
           const selectedSentences = prioritySentences.length > 0 
             ? prioritySentences.slice(0, 2) 
             : sentences.slice(0, 2);
-            
+
           return selectedSentences.join('. ').trim() + (selectedSentences.length > 0 ? '.' : '');
         };
 
@@ -1673,11 +1673,11 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           });
           acres = Math.max(...acreageValues);
         }
-        
+
         // Extract containment percentage
         const containmentMatch = item.description.match(/(\d+)\s*%?\s*contain/i);
         const containmentPercent = containmentMatch ? parseInt(containmentMatch[1]) : null;
-        
+
         // Extract status with more sophisticated parsing
         let status = 'Active';
         const desc = item.description.toLowerCase();
@@ -1692,7 +1692,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         } else if (desc.includes('contained') || containmentPercent) {
           status = 'Partially Contained';
         }
-        
+
         // Extract incident type with better detection
         let incidentType = 'Wildfire';
         if (desc.includes('prescribed') || desc.includes('planned burn')) {
@@ -1704,42 +1704,42 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         } else if (desc.includes('brush') || desc.includes('vegetation')) {
           incidentType = 'Brush Fire';
         }
-        
+
         // Extract personnel count
         const personnelMatch = item.description.match(/(\d+)\s*(?:firefighters?|personnel|crew)/i);
         const personnelCount = personnelMatch ? parseInt(personnelMatch[1]) : null;
-        
+
         // Extract threat information
         const threatKeywords = ['evacuation', 'threatened', 'at risk', 'danger', 'smoke'];
         const hasThreat = threatKeywords.some(keyword => desc.includes(keyword));
-        
+
         // Create human-readable summary
         const createSummary = (): string => {
           let summary = '';
-          
+
           if (acres) {
             summary += `${acres.toLocaleString()} acre ${incidentType.toLowerCase()}`;
           } else {
             summary += incidentType;
           }
-          
+
           if (containmentPercent) {
             summary += ` is ${containmentPercent}% contained`;
           } else {
             summary += ` is currently ${status.toLowerCase()}`;
           }
-          
+
           if (personnelCount) {
             summary += `. ${personnelCount} firefighters are responding`;
           }
-          
+
           if (hasThreat) {
             summary += '. Area residents may be affected';
           }
-          
+
           return summary + '.';
         };
-        
+
         return {
           id: item.guid || `incident-${index}`,
           title: item.title.trim(),
@@ -1759,9 +1759,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           severity: acres && acres > 1000 ? 'severe' : acres && acres > 100 ? 'moderate' : 'minor'
         };
       });
-      
+
       console.log(`✓ Wildfire incidents processed: ${incidents.length} incidents found`);
-      
+
       res.json({
         success: true,
         incidents,
@@ -1783,25 +1783,25 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   app.get('/api/earthquake-incidents', async (req, res) => {
     try {
       console.log('Fetching earthquake incidents from USGS GeoJSON feed...');
-      
+
       // Get significant earthquakes from the past 7 days
       const response = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_week.geojson', {
         headers: { 'User-Agent': 'DisasterApp/1.0 (earthquake-monitoring@example.com)' }
       });
-      
+
       if (!response.ok) {
         // Fallback to all earthquakes magnitude 4.5+ in the past 7 days if significant fails
         const fallbackResponse = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson', {
           headers: { 'User-Agent': 'DisasterApp/1.0 (earthquake-monitoring@example.com)' }
         });
-        
+
         if (!fallbackResponse.ok) {
           throw new Error(`HTTP error! status: ${fallbackResponse.status}`);
         }
-        
+
         const data = await fallbackResponse.json();
         const earthquakes = processEarthquakeData(data);
-        
+
         return res.json({
           success: true,
           incidents: earthquakes,
@@ -1810,12 +1810,12 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           source: 'USGS Earthquake GeoJSON Feed (4.5+ Magnitude)'
         });
       }
-      
+
       const data = await response.json();
       const earthquakes = processEarthquakeData(data);
-      
+
       console.log(`✓ Earthquake incidents processed: ${earthquakes.length} earthquakes found`);
-      
+
       res.json({
         success: true,
         incidents: earthquakes,
@@ -1914,15 +1914,15 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       const magnitude = props.mag || 0;
       const time = props.time ? new Date(props.time).toISOString() : new Date().toISOString();
-      
+
       // Determine severity based on magnitude
       let severity = 'minor';
       if (magnitude >= 7.0) severity = 'severe';
       else if (magnitude >= 5.0) severity = 'moderate';
-      
+
       // Determine alert level
       let alertLevel = props.alert || 'green';
-      
+
       return {
         id: props.ids || feature.id || `earthquake-${index}`,
         title: props.title || `M${magnitude} Earthquake`,
@@ -1983,17 +1983,17 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   app.get("/api/states-under-emergency", async (req, res) => {
     try {
       console.log('Fetching states under emergency status...');
-      
+
       // Get current FEMA active emergency declarations
-      const femaResponse = await fetch('https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentEndDate eq null&$top=1000', {
+      const femaResponse = await fetch('https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=incidentEndDate eq null&$top=1000',{
         headers: { 'User-Agent': 'DisasterApp/1.0 (monitoring@example.com)' }
       });
-      
+
       // Get current NWS active alerts
       const nwsResponse = await fetch('https://api.weather.gov/alerts/active', {
         headers: { 'User-Agent': 'DisasterApp/1.0 (monitoring@example.com)' }
       });
-      
+
       const emergencyStates = new Map();
       const stateNames = {
         'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
@@ -2008,15 +2008,15 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming',
         'DC': 'District of Columbia', 'PR': 'Puerto Rico', 'VI': 'Virgin Islands', 'GU': 'Guam', 'AS': 'American Samoa'
       };
-      
+
       // Process FEMA active declarations
       if (femaResponse.ok) {
         const femaData = await femaResponse.json();
-        
+
         femaData.DisasterDeclarationsSummaries?.forEach((declaration: any) => {
           const state = declaration.state;
           if (!state || !stateNames[state]) return;
-          
+
           if (!emergencyStates.has(state)) {
             emergencyStates.set(state, {
               state,
@@ -2027,7 +2027,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
               lastUpdated: new Date().toISOString()
             });
           }
-          
+
           const stateInfo = emergencyStates.get(state);
           stateInfo.femaDeclarations.push({
             disasterNumber: declaration.disasterNumber,
@@ -2037,7 +2037,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             declarationDate: declaration.declarationDate,
             incidentBeginDate: declaration.incidentBeginDate
           });
-          
+
           // Determine emergency level based on declaration type
           if (declaration.declarationType === 'DR') {
             stateInfo.emergencyLevel = 'severe'; // Major Disaster
@@ -2046,21 +2046,21 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           }
         });
       }
-      
+
       // Process NWS active alerts
       if (nwsResponse.ok) {
         const nwsData = await nwsResponse.json();
-        
+
         nwsData.features?.forEach((alert: any) => {
           const properties = alert.properties || {};
           const areas = properties.areaDesc || '';
-          
+
           // Extract state codes from area description
           const stateMatches = areas.match(/\b([A-Z]{2})\b/g) || [];
-          
+
           stateMatches.forEach((state: string) => {
             if (!stateNames[state]) return;
-            
+
             if (!emergencyStates.has(state)) {
               emergencyStates.set(state, {
                 state,
@@ -2071,7 +2071,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                 lastUpdated: new Date().toISOString()
               });
             }
-            
+
             const stateInfo = emergencyStates.get(state);
             stateInfo.weatherAlerts.push({
               event: properties.event,
@@ -2083,7 +2083,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
               expires: properties.expires,
               headline: properties.headline
             });
-            
+
             // Update emergency level based on weather severity
             const severity = properties.severity?.toLowerCase();
             if ((severity === 'extreme' || severity === 'severe') && stateInfo.emergencyLevel === 'minor') {
@@ -2092,16 +2092,16 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           });
         });
       }
-      
+
       // Convert map to array and sort by emergency level and state name
       const statesArray = Array.from(emergencyStates.values()).sort((a, b) => {
         const levelOrder = { 'severe': 3, 'moderate': 2, 'minor': 1 };
         const levelDiff = levelOrder[b.emergencyLevel] - levelOrder[a.emergencyLevel];
         return levelDiff !== 0 ? levelDiff : a.stateName.localeCompare(b.stateName);
       });
-      
+
       console.log(`✓ States under emergency processed: ${statesArray.length} states found`);
-      
+
       res.json({
         success: true,
         states: statesArray,
@@ -2138,7 +2138,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       ];
 
       console.log('Fetching comprehensive weather alerts from NWS RSS feeds...');
-      
+
       let allAlerts: any[] = [];
       let processedCount = { nws: 0, hurricane: 0, spc: 0 };
 
@@ -2147,7 +2147,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         const feedUrl = nwsFeeds[i];
         try {
           let feedData;
-          
+
           if (feedUrl === 'https://api.weather.gov/alerts/active') {
             // Handle NWS API format
             const response = await fetch(feedUrl, {
@@ -2155,7 +2155,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                 'User-Agent': 'DisasterWatch/1.0 (contact@example.com)'
               }
             });
-            
+
             if (response.ok) {
               const data = await response.json();
               if (data.features) {
@@ -2176,7 +2176,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                   category: feature.properties.category?.[0] || 'Weather',
                   alertType: 'warning'
                 }));
-                
+
                 // Only include warnings and watches, filter out advisories
                 const activeAlerts = nwsAlerts.filter((alert: any) => 
                   alert.title.toLowerCase().includes('warning') || 
@@ -2184,7 +2184,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                   alert.event.toLowerCase().includes('warning') ||
                   alert.event.toLowerCase().includes('watch')
                 );
-                
+
                 allAlerts.push(...activeAlerts);
               }
             }
@@ -2196,7 +2196,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
               const Parser = (await import('rss-parser')).default;
               const parser = new Parser();
               const feed = await parser.parseString(xml);
-              
+
               if (feed.items) {
                 const count = feed.items.length;
                 if (feedUrl.includes('nhc.noaa.gov')) {
@@ -2204,7 +2204,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                 } else if (feedUrl.includes('spc.noaa.gov')) {
                   processedCount.spc = count;
                 }
-                
+
                 const rssAlerts = feed.items.map((item: any) => ({
                   id: item.guid || `rss-${Date.now()}-${Math.random()}`,
                   title: item.title || 'Weather Alert',
@@ -2220,7 +2220,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                   category: 'Weather',
                   alertType: 'warning'
                 }));
-                
+
                 allAlerts.push(...rssAlerts);
               }
             }
@@ -2232,7 +2232,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       // Remove duplicates based on title and location similarity
       const uniqueAlerts = removeDuplicateAlerts(allAlerts);
-      
+
       // Sort by severity (Extreme > Severe > Moderate > Minor)
       const severityOrder = { 'extreme': 4, 'severe': 3, 'moderate': 2, 'minor': 1 };
       uniqueAlerts.sort((a: any, b: any) => {
@@ -2267,9 +2267,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           lastUpdated: new Date().toISOString()
         }
       });
-      
+
     } catch (error: any) {
-      console.error('Weather alerts error:', error);
+      console.error('Weather alerts RSS API error:', error);
       res.status(500).json({ 
         success: false, 
         error: error.message,
@@ -2290,18 +2290,18 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         // Severe Weather from Storm Prediction Center
         'https://www.spc.noaa.gov/products/spcrss.xml'
       ];
-      
+
       console.log('Fetching comprehensive weather alerts from NWS RSS feeds...');
-      
+
       // Fetch primary NWS API alerts
       let allAlerts: any[] = [];
       let sourceCounts: string[] = [];
-      
+
       try {
         const nwsResponse = await fetch(nwsFeeds[0], {
           headers: { 'User-Agent': 'DisasterApp/1.0 (weather-monitoring@example.com)' }
         });
-        
+
         if (nwsResponse.ok) {
           const nwsData = await nwsResponse.json();
           const nwsAlerts = (nwsData.features || []).map((feature: any) => ({
@@ -2319,7 +2319,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             event: feature.properties?.event || 'Weather Alert',
             category: 'Weather'
           }));
-          
+
           allAlerts.push(...nwsAlerts);
           sourceCounts.push(`NWS API: ${nwsAlerts.length}`);
         }
@@ -2327,40 +2327,40 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         console.log('NWS API failed, trying RSS feeds...');
         sourceCounts.push('NWS API: failed');
       }
-      
+
       // Fetch RSS feeds for additional coverage
       const rssFeedPromises = nwsFeeds.slice(1).map(async (url, index) => {
         try {
           const response = await fetch(url, {
             headers: { 'User-Agent': 'DisasterApp/1.0 (weather-monitoring@example.com)' }
           });
-          
+
           if (!response.ok) {
             return { alerts: [], source: url, error: response.status };
           }
-          
+
           const text = await response.text();
           const alerts = parseRSSFeed(text, url, index + 1);
-          
+
           return { alerts, source: url, error: null };
-          
+
         } catch (error: any) {
           return { alerts: [], source: url, error: error.message };
         }
       });
-      
+
       const rssResults = await Promise.all(rssFeedPromises);
-      
+
       // Process RSS results
       rssResults.forEach((result, index) => {
         allAlerts.push(...result.alerts);
         const feedTypes = ['Hurricane Center', 'Storm Prediction Center'];
         sourceCounts.push(`${feedTypes[index]}: ${result.alerts.length}${result.error ? ' (error)' : ''}`);
       });
-      
+
       // Remove duplicates and sort by severity
       const uniqueAlerts = removeDuplicateAlerts(allAlerts);
-      
+
       // Filter for only active warnings and watches (no advisories, statements, or outlooks)
       const activeAlerts = uniqueAlerts.filter(alert => {
         const alertType = (alert.alertType || alert.event || '').toLowerCase();
@@ -2370,13 +2370,13 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
                !alertType.includes('advisory') &&
                !alertType.includes('summary');
       });
-      
+
       const sortedAlerts = sortAlertsBySeverity(activeAlerts);
-      
+
       console.log(`✓ Weather alerts processed: ${sourceCounts.join(', ')}`);
       console.log(`✓ Total unique alerts: ${uniqueAlerts.length}`);
       console.log(`✓ Active warnings/watches: ${sortedAlerts.length}`);
-      
+
       res.json({
         success: true,
         alerts: sortedAlerts,
@@ -2387,10 +2387,10 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         totalProcessed: uniqueAlerts.length,
         feedCounts: sourceCounts
       });
-      
+
     } catch (error) {
       console.error('Weather alerts RSS API error:', error);
-      
+
       res.json({
         success: true,
         alerts: [
@@ -2421,14 +2421,14 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   // Helper function to parse RSS/XML feeds from NWS sources
   function parseRSSFeed(xmlText: string, source: string, feedIndex: number): any[] {
     const alerts: any[] = [];
-    
+
     try {
       // Parse RSS items or entries depending on feed format
       let itemMatches = xmlText.match(/<item[^>]*>(.*?)<\/item>/gs) || [];
       if (itemMatches.length === 0) {
         itemMatches = xmlText.match(/<entry[^>]*>(.*?)<\/entry>/gs) || [];
       }
-      
+
       itemMatches.forEach((item, index) => {
         try {
           const titleMatch = item.match(/<title[^>]*>(.*?)<\/title>/s);
@@ -2437,16 +2437,16 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           const pubDateMatch = item.match(/<pubDate[^>]*>(.*?)<\/pubDate>/s) ||
                               item.match(/<updated[^>]*>(.*?)<\/updated>/s);
           const linkMatch = item.match(/<link[^>]*>(.*?)<\/link>/s);
-          
+
           if (titleMatch) {
             const title = titleMatch[1]?.replace(/<[^>]*>/g, '').trim() || 'Weather Alert';
             const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || 'Weather alert issued';
-            
+
             // Determine alert characteristics from content
             const severity = determineSeverity(title, description);
             const alertType = determineAlertType(title, description);
             const areas = extractAreas(title, description);
-            
+
             alerts.push({
               id: `nws-rss-${feedIndex}-${Date.now()}-${index}`,
               title: title,
@@ -2467,11 +2467,11 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           console.log(`Error parsing RSS item ${index}:`, itemError);
         }
       });
-      
+
     } catch (error) {
       console.log(`Error parsing RSS feed from ${source}:`, error);
     }
-    
+
     return alerts;
   }
 
@@ -2497,13 +2497,13 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
   function extractAreas(title: string, description: string): string {
     const text = title + ' ' + description;
-    
+
     // Look for state abbreviations
     const stateMatches = text.match(/\b[A-Z]{2}\b/g);
     if (stateMatches && stateMatches.length > 0) {
       return stateMatches.slice(0, 3).join(', ');
     }
-    
+
     // Look for common geographic terms
     const geoTerms = ['county', 'parish', 'region', 'coast', 'valley', 'mountains'];
     for (const term of geoTerms) {
@@ -2511,7 +2511,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         return `Regional (${term})`;
       }
     }
-    
+
     return 'Multiple areas';
   }
 
@@ -2554,21 +2554,21 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
       const response = await fetch('https://reliefweb.int/disasters/rss.xml');
-      
+
       if (!response.ok) {
         throw new Error(`ReliefWeb RSS fetch failed: ${response.status}`);
       }
-      
+
       const xmlData = await response.text();
-      
+
       // Parse ReliefWeb RSS items with enhanced parsing
       const itemMatches = xmlData.match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
-      
+
       const reliefWebItems = itemMatches.map((itemXml, index) => {
         const getTagContent = (tag: string): string => {
           const match = itemXml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
           if (!match) return '';
-          
+
           let content = match[1].trim();
           content = content.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1');
           content = content
@@ -2578,7 +2578,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             .replace(/&nbsp;/g, ' ')
             .replace(/&quot;/g, '"')
             .replace(/&#39;/g, "'");
-          
+
           return content;
         };
 
@@ -2592,7 +2592,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         const categories = [...itemXml.matchAll(/<category>([^<]+)<\/category>/gi)];
         let country = '';
         let glideCode = '';
-        
+
         categories.forEach(([, categoryText]) => {
           const category = categoryText.trim();
           if (category.includes('-') && category.includes('202')) {
@@ -2619,7 +2619,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         let disasterType = 'other';
         const titleLower = title.toLowerCase();
         const glideLower = glideCode.toLowerCase();
-        
+
         for (const [type, keywords] of Object.entries(disasterTypes)) {
           if (keywords.some(keyword => titleLower.includes(keyword) || glideLower.includes(keyword))) {
             disasterType = type;
@@ -2644,9 +2644,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           disasterType
         };
       });
-      
+
       console.log(`✓ ReliefWeb disasters: ${reliefWebItems.length} global disasters loaded`);
-      
+
       const responseData = {
         success: true,
         items: reliefWebItems,
@@ -2658,7 +2658,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       reliefWebCache = responseData;
       reliefWebCacheTime = now;
-      
+
       res.json(responseData);
     } catch (error) {
       console.error('ReliefWeb RSS error:', error);
@@ -2691,21 +2691,21 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         });
       }
       const response = await fetch('https://www.thenewhumanitarian.org/rss/all.xml');
-      
+
       if (!response.ok) {
         throw new Error(`Humanitarian RSS fetch failed: ${response.status}`);
       }
-      
+
       const xmlData = await response.text();
-      
+
       // Parse humanitarian news RSS items
       const itemMatches = xmlData.match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
-      
+
       const humanitarianItems = itemMatches.map((itemXml, index) => {
         const getTagContent = (tag: string): string => {
           const match = itemXml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
           if (!match) return '';
-          
+
           let content = match[1].trim();
           content = content.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1');
           content = content
@@ -2715,7 +2715,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             .replace(/&nbsp;/g, ' ')
             .replace(/&quot;/g, '"')
             .replace(/&#39;/g, "'");
-          
+
           return content;
         };
 
@@ -2729,7 +2729,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         // Extract location/region from title or description
         const locations = ['Africa', 'Asia', 'Europe', 'Americas', 'Middle East', 'Pacific', 'Global'];
         let region = 'Global';
-        
+
         const titleAndDesc = (title + ' ' + description).toLowerCase();
         for (const loc of locations) {
           if (titleAndDesc.includes(loc.toLowerCase())) {
@@ -2774,9 +2774,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           newsType
         };
       });
-      
+
       console.log(`✓ Humanitarian news: ${humanitarianItems.length} articles loaded`);
-      
+
       const responseData = {
         success: true,
         items: humanitarianItems,
@@ -2788,7 +2788,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       humanitarianNewsCache = responseData;
       humanitarianNewsCacheTime = now;
-      
+
       res.json(responseData);
     } catch (error) {
       console.error('Humanitarian RSS error:', error);
@@ -2839,15 +2839,15 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         // Historical context (2021-2022) 
         `https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=declarationDate ge 2021-01-01T00:00:00.000Z and declarationDate le 2022-12-31T23:59:59.000Z&$orderby=declarationDate desc&$top=1000&$format=json`
       ];
-      
+
       console.log('Fetching comprehensive FEMA disaster data across all disaster types and years...');
-      
+
       // Fetch all datasets simultaneously for maximum coverage
       const responses = await Promise.all(queries.map(url => fetch(url).catch(e => ({ ok: false, error: e }))));
-      
+
       let allDeclarations: any[] = [];
       let queryCounts: string[] = [];
-      
+
       for (let i = 0; i < responses.length; i++) {
         const response = responses[i];
         if (response.ok) {
@@ -2855,7 +2855,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             const data = await response.json();
             const declarations = data.DisasterDeclarationsSummaries || [];
             allDeclarations.push(...declarations);
-            
+
             const queryTypes = ['2023 H1', '2023 H2', '2024 H1', '2024 H2', '2025 Current', '2021-2022 Historical'];
             queryCounts.push(`${queryTypes[i]}: ${declarations.length}`);
           } catch (e) {
@@ -2863,19 +2863,19 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           }
         }
       }
-      
+
       // Remove duplicates based on disaster number (keep most recent)
       const uniqueDeclarations = allDeclarations.filter((declaration, index, self) => 
         index === self.findIndex(d => d.disasterNumber === declaration.disasterNumber)
       );
-      
+
       console.log(`✓ FEMA comprehensive data loaded: ${queryCounts.join(', ')}`);
       console.log(`✓ Total disasters fetched: ${allDeclarations.length}, Unique: ${uniqueDeclarations.length}`);
-      
-      const declarations = uniqueDeclarations;
-      
 
-      
+      const declarations = uniqueDeclarations;
+
+
+
       // Transform FEMA data to our format
       const transformedDeclarations = declarations.map((declaration: any, index: number) => ({
         title: `${declaration.declarationType === 'DR' ? 'Major Disaster' : declaration.declarationType === 'EM' ? 'Emergency' : 'Fire Management'}: ${declaration.title || declaration.disasterNumber}`,
@@ -2895,9 +2895,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         placeCode: declaration.placeCode,
         designatedArea: declaration.designatedArea
       }));
-      
+
       console.log(`✓ FEMA OpenData: ${transformedDeclarations.length} disaster declarations loaded`);
-      
+
       // Debug: Log major disasters for verification
       const majorDisasters = transformedDeclarations.filter(d => 
         d.state === 'CA' || d.state === 'NC' || 
@@ -2909,7 +2909,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       );
       console.log(`🔍 Major disasters found: ${majorDisasters.length}`);
       majorDisasters.forEach(d => console.log(`  - ${d.state}: ${d.title} (${d.incidentType}) - ${d.disasterNumber} - ${d.declarationDate}`));
-      
+
       const responseData = {
         success: true,
         items: transformedDeclarations,
@@ -2923,9 +2923,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       femaDisastersCache = responseData;
       femaDisastersCacheTime = now;
-      
+
       res.json(responseData);
-      
+
     } catch (error) {
       console.error('FEMA OpenData API error:', error);
       res.json({
@@ -2953,24 +2953,24 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       }
 
       console.log('Fetching NASA EONET natural events...');
-      
+
       // Get query parameters for filtering
       const { category, limit, days } = req.query;
-      
+
       // Build URL with filters
       let url = 'https://eonet.gsfc.nasa.gov/api/v3/events';
       const params = new URLSearchParams();
-      
+
       if (category) params.append('category', category.toString());
       if (limit) params.append('limit', limit.toString());
       if (days) params.append('days', days.toString());
-      
+
       if (params.toString()) {
         url += '?' + params.toString();
       }
 
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         console.error('NASA EONET API failed:', response.status, response.statusText);
         throw new Error(`NASA EONET API failed: ${response.status}`);
@@ -2978,7 +2978,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       const data = await response.json();
       const events = data.events || [];
-      
+
       console.log(`✓ NASA EONET events processed: ${events.length} events found`);
 
       // Process events for better frontend consumption
@@ -3012,11 +3012,11 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
           try {
             // Use Esri World Imagery tiles - highly reliable satellite imagery service
             const zoom = 14; // Higher zoom for better detail (was 12)
-            
+
             // Convert lat/lng to tile coordinates
             const tileX = Math.floor((longitude + 180) / 360 * Math.pow(2, zoom));
             const tileY = Math.floor((1 - Math.log(Math.tan(latitude * Math.PI / 180) + 1 / Math.cos(latitude * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
-            
+
             // Generate Esri World Imagery tile URL (free, reliable satellite imagery)
             satelliteImageUrl = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${zoom}/${tileY}/${tileX}`;
           } catch (error) {
@@ -3078,7 +3078,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       eonetEventsCache = responseData;
       eonetEventsCacheTime = now;
-      
+
       res.json(responseData);
     } catch (error) {
       console.error('NASA EONET API error:', error);
@@ -3116,17 +3116,17 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       }
 
       const femaUrl = 'https://www.fema.gov/api/open/v2/MissionAssignments?$orderby=missionAssignmentDate desc&$top=25&$format=json';
-      
+
       console.log('Fetching FEMA mission assignments...');
       const response = await fetch(femaUrl);
-      
+
       if (!response.ok) {
         throw new Error(`FEMA Mission API failed: ${response.status}`);
       }
-      
+
       const missionData = await response.json();
       const missions = missionData.MissionAssignments || [];
-      
+
       const transformedMissions = missions.map((mission: any, index: number) => ({
         id: mission.id || `mission-${index}`,
         disasterNumber: mission.disasterNumber,
@@ -3141,9 +3141,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         county: mission.county || '',
         workOrderType: mission.workOrderType || 'Emergency Response'
       }));
-      
+
       console.log(`✓ FEMA Missions: ${transformedMissions.length} active mission assignments loaded`);
-      
+
       const responseData = {
         success: true,
         items: transformedMissions,
@@ -3156,9 +3156,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       femaMissionCache = responseData;
       femaMissionCacheTime = now;
-      
+
       res.json(responseData);
-      
+
     } catch (error) {
       console.error('FEMA Mission Assignments API error:', error);
       res.json({
@@ -3192,17 +3192,17 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       const currentYear = new Date().getFullYear();
       const femaUrl = `https://www.fema.gov/api/open/v2/HousingAssistanceProgramDataOwners?$filter=year(declarationDate) eq ${currentYear}&$orderby=declarationDate desc&$top=100&$format=json`;
-      
+
       console.log('Fetching FEMA housing assistance data...');
       const response = await fetch(femaUrl);
-      
+
       if (!response.ok) {
         throw new Error(`FEMA Housing API failed: ${response.status}`);
       }
-      
+
       const housingData = await response.json();
       const assistanceRecords = housingData.HousingAssistanceProgramDataOwners || [];
-      
+
       // Aggregate stats
       const stats = assistanceRecords.reduce((acc: any, record: any) => {
         acc.totalApplicants += record.approvedBetween1And10000 || 0;
@@ -3216,9 +3216,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         totalAmount: 0, 
         byState: {} as Record<string, number> 
       });
-      
+
       console.log(`✓ FEMA Housing: ${assistanceRecords.length} housing assistance records loaded`);
-      
+
       const responseData = {
         success: true,
         items: assistanceRecords.slice(0, 20), // Limit for display
@@ -3232,9 +3232,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       femaHousingCache = responseData;
       femaHousingCacheTime = now;
-      
+
       res.json(responseData);
-      
+
     } catch (error) {
       console.error('FEMA Housing Assistance API error:', error);
       res.json({
@@ -3269,17 +3269,17 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       const currentYear = new Date().getFullYear();
       const femaUrl = `https://www.fema.gov/api/open/v1/PublicAssistanceFundedProjectsDetails?$filter=year(declarationDate) eq ${currentYear}&$orderby=declarationDate desc&$top=50&$format=json`;
-      
+
       console.log('Fetching FEMA public assistance projects...');
       const response = await fetch(femaUrl);
-      
+
       if (!response.ok) {
         throw new Error(`FEMA Public Assistance API failed: ${response.status}`);
       }
-      
+
       const paData = await response.json();
       const projects = paData.PublicAssistanceFundedProjectsDetails || [];
-      
+
       // Calculate statistics
       const stats = projects.reduce((acc: any, project: any) => {
         acc.totalProjects += 1;
@@ -3295,9 +3295,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         byState: {} as Record<string, number>,
         byWorkType: {} as Record<string, number>
       });
-      
+
       console.log(`✓ FEMA Public Assistance: ${projects.length} funded projects loaded`);
-      
+
       const responseData = {
         success: true,
         items: projects.slice(0, 25), // Limit for display
@@ -3311,9 +3311,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       femaPublicAssistanceCache = responseData;
       femaPublicAssistanceCacheTime = now;
-      
+
       res.json(responseData);
-      
+
     } catch (error) {
       console.error('FEMA Public Assistance API error:', error);
       res.json({
@@ -3348,17 +3348,17 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       const currentYear = new Date().getFullYear();
       const femaUrl = `https://www.fema.gov/api/open/v2/FimaNfipRedactedClaims?$filter=year(dateLossFrom) eq ${currentYear}&$orderby=dateLossFrom desc&$top=100&$format=json`;
-      
+
       console.log('Fetching FEMA NFIP claims data...');
       const response = await fetch(femaUrl);
-      
+
       if (!response.ok) {
         throw new Error(`FEMA NFIP API failed: ${response.status}`);
       }
-      
+
       const nfipData = await response.json();
       const claims = nfipData.FimaNfipRedactedClaims || [];
-      
+
       // Calculate flood insurance statistics
       const stats = claims.reduce((acc: any, claim: any) => {
         acc.totalClaims += 1;
@@ -3374,9 +3374,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         byState: {} as Record<string, number>,
         byCounty: {} as Record<string, number>
       });
-      
+
       console.log(`✓ FEMA NFIP: ${claims.length} flood insurance claims loaded`);
-      
+
       const responseData = {
         success: true,
         items: claims.slice(0, 20), // Limit for display
@@ -3390,9 +3390,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       // Cache the response
       femaNfipCache = responseData;
       femaNfipCacheTime = now;
-      
+
       res.json(responseData);
-      
+
     } catch (error) {
       console.error('FEMA NFIP Claims API error:', error);
       res.json({
@@ -3413,7 +3413,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     try {
       // For demo purposes, use a default user ID (in production, get from auth)
       const userId = 'demo-user';
-      
+
       const rules = await db
         .select()
         .from(alertRules)
@@ -3431,7 +3431,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   app.post('/api/alerts/rules', async (req, res) => {
     try {
       const userId = 'demo-user'; // Demo user ID
-      
+
       // Validate the request body
       const validatedData = insertAlertRuleSchema.parse({
         ...req.body,
@@ -3523,7 +3523,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   app.get('/api/alerts/settings', async (req, res) => {
     try {
       const userId = 'demo-user';
-      
+
       const settings = await db
         .select()
         .from(userNotificationSettings)
@@ -3571,7 +3571,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   app.post('/api/alerts/test/:ruleId', async (req, res) => {
     try {
       const { ruleId } = req.params;
-      
+
       // Create a test event
       const testEvent: EmergencyEvent = {
         id: 'test-' + Date.now(),
@@ -3587,7 +3587,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
       };
 
       const wouldTrigger = await alertEngine.testAlert(ruleId, testEvent);
-      
+
       if (wouldTrigger) {
         // Actually trigger the alert for testing
         await alertEngine.processEvent(testEvent);
@@ -3609,7 +3609,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   app.get("/api/social-media-emergency", async (req, res) => {
     try {
       console.log('Social media monitoring temporarily disabled to conserve API tokens');
-      
+
       // Return disabled status
       res.json({
         success: true,
@@ -3643,28 +3643,28 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
   function determineUrgencyLevel(text: string): string {
     const lowerText = text.toLowerCase();
-    
+
     // Critical keywords
     if (lowerText.includes('evacuate') || lowerText.includes('immediate danger') || 
         lowerText.includes('life threatening') || lowerText.includes('emergency shelter') ||
         lowerText.includes('tornado warning') || lowerText.includes('hurricane warning')) {
       return 'critical';
     }
-    
+
     // High urgency keywords
     if (lowerText.includes('severe weather') || lowerText.includes('flood warning') ||
         lowerText.includes('state of emergency') || lowerText.includes('emergency response') ||
         lowerText.includes('power outage') || lowerText.includes('road closure')) {
       return 'high';
     }
-    
+
     // Medium urgency keywords
     if (lowerText.includes('weather alert') || lowerText.includes('storm watch') ||
         lowerText.includes('advisory') || lowerText.includes('prepare for') ||
         lowerText.includes('monitor conditions')) {
       return 'medium';
     }
-    
+
     return 'low';
   }
 
@@ -3673,17 +3673,17 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     try {
       const bioregionId = req.params.id;
       const bbox = req.query.bbox ? (req.query.bbox as string).split(',').map(Number) as [number, number, number, number] : undefined;
-      
+
       if (!bbox) {
         return res.status(400).json({ 
           success: false, 
           error: 'Bounding box required (format: sw_lng,sw_lat,ne_lng,ne_lat)' 
         });
       }
-      
+
       console.log(`🔬 Fetching species data for bioregion ${bioregionId}`);
       const species = await getBioregionSpecies(bioregionId, bbox);
-      
+
       res.json({
         success: true,
         bioregion_id: bioregionId,
@@ -3734,7 +3734,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     try {
       console.log('🌬️ Fetching current air quality alerts...');
       const alerts = await airQualityService.getCurrentAirQualityAlerts();
-      
+
       res.json({
         success: true,
         alerts,
@@ -3774,7 +3774,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         .where(eq(airQualityReadings.stationId, stationId))
         .orderBy(desc(airQualityReadings.timestamp))
         .limit(24); // Last 24 readings
-      
+
       res.json({
         success: true,
         readings,
@@ -3791,7 +3791,7 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     try {
       console.log('🔍 Manually triggering air quality monitoring...');
       const alerts = await airQualityService.monitorAirQuality();
-      
+
       // Process each alert through the alert engine
       for (const alert of alerts) {
         const emergencyEvent: EmergencyEvent = {
@@ -3813,10 +3813,10 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             dataSource: alert.dataSource
           }
         };
-        
+
         await alertEngine.processEvent(emergencyEvent);
       }
-      
+
       res.json({
         success: true,
         message: `Processed ${alerts.length} air quality alerts`,
@@ -3837,10 +3837,10 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     try {
       console.log('🕒 Periodic air quality monitoring...');
       const alerts = await airQualityService.monitorAirQuality();
-      
+
       // Only process significant alerts (AQI > 150)
       const significantAlerts = alerts.filter(alert => alert.aqi > 150);
-      
+
       for (const alert of significantAlerts) {
         const emergencyEvent: EmergencyEvent = {
           id: alert.id,
@@ -3859,10 +3859,10 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
             dataSource: alert.dataSource
           }
         };
-        
+
         await alertEngine.processEvent(emergencyEvent);
       }
-      
+
       if (significantAlerts.length > 0) {
         console.log(`✓ Processed ${significantAlerts.length} significant air quality alerts`);
       }
@@ -3873,10 +3873,10 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
   // Include NOAA climate routes from separate module
   app.use('/api', noaaRoutes);
-  
+
   // Include extreme weather routes
   app.use('/api', extremeWeatherRoutes);
-  
+
   // Include Wikipedia routes
   const wikipediaRoutes = (await import('./routes/wikipedia')).default;
   app.use('/api', wikipediaRoutes);
