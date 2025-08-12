@@ -65,7 +65,7 @@ const DataSourceAttribution: React.FC<DataSourceProps> = ({
         variant="outline" 
         className={`text-xs px-2 py-0 ${getReliabilityColor(reliability)}`}
       >
-        {reliability === 'official' ? 'Official' : 
+        {reliability === 'official' ? 'Demo Data' : 
          reliability === 'research' ? 'Research' : 
          reliability === 'encyclopedia' ? 'Encyclopedia' : 'Community'}
       </Badge>
