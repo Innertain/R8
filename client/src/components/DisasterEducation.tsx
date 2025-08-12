@@ -83,6 +83,13 @@ interface DisasterType {
       effects: string;
       color: string;
     }>;
+    frequencyClassifications?: Array<{
+      level: string;
+      description: string;
+      effects: string;
+      color: string;
+      probability: string;
+    }>;
   };
   alerts: Array<{
     type: string;
@@ -1067,6 +1074,36 @@ const disasterTypes: DisasterType[] = [
           effects: 'Life-threatening, catastrophic damage',
           color: 'bg-red-400 text-white'
         }
+      ],
+      frequencyClassifications: [
+        {
+          level: '10-year Flood',
+          description: 'Flood event with a 10% chance of occurring in any given year',
+          effects: 'Significant inundation in flood-prone areas',
+          color: 'bg-blue-100 text-blue-800',
+          probability: '10%'
+        },
+        {
+          level: '50-year Flood',
+          description: 'Flood event with a 2% chance of occurring in any given year',
+          effects: 'Widespread flooding, major infrastructure impacts',
+          color: 'bg-orange-100 text-orange-800',
+          probability: '2%'
+        },
+        {
+          level: '100-year Flood',
+          description: 'Flood event with a 1% chance of occurring in any given year',
+          effects: 'Catastrophic flooding, extensive damage and displacement',
+          color: 'bg-red-200 text-red-800',
+          probability: '1%'
+        },
+        {
+          level: '500-year Flood',
+          description: 'Flood event with a 0.2% chance of occurring in any given year',
+          effects: 'Extreme and rare flooding events, severe regional impacts',
+          color: 'bg-red-400 text-white',
+          probability: '0.2%'
+        }
       ]
     },
     alerts: [
@@ -1942,7 +1979,7 @@ export default function DisasterEducation() {
     const urlParams = new URLSearchParams(window.location.search);
     const disasterType = urlParams.get('type');
     const tab = urlParams.get('tab');
-    
+
     if (disasterType) {
       // Map common disaster types to our disaster IDs
       const typeMapping: Record<string, string> = {
@@ -1958,18 +1995,18 @@ export default function DisasterEducation() {
         'severe storm': 'winter-storm',
         'ice storm': 'winter-storm'
       };
-      
+
       const mappedType = typeMapping[disasterType.toLowerCase()] || disasterType.toLowerCase();
       const foundDisaster = disasterTypes.find(d => 
         d.id === mappedType || 
         d.name.toLowerCase().includes(disasterType.toLowerCase())
       );
-      
+
       if (foundDisaster) {
         setSelectedDisaster(foundDisaster);
       }
     }
-    
+
     if (tab && ['overview', 'scales', 'alerts', 'hazards', 'preparedness', 'response', 'recovery'].includes(tab)) {
       setActiveTab(tab);
     }
@@ -2205,24 +2242,44 @@ export default function DisasterEducation() {
                     {selectedDisaster.scales.description}
                   </p>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <h4 className="font-semibold text-blue-900 mb-2">{selectedDisaster.scales.name}</h4>
-                    <p className="text-blue-800 text-sm mb-3">{selectedDisaster.scales.description}</p>
-
-                    <div className="grid gap-2">
+                  {/* Stage Classifications */}
+                  <div className="mb-6">
+                    <h5 className="font-medium text-blue-900 mb-3">River Stage Classifications</h5>
+                    <div className="grid gap-3">
                       {selectedDisaster.scales.levels.map((level, index) => (
-                        <div key={index} className="flex items-center gap-3 p-2 bg-white rounded border">
-                          <Badge variant="outline" className={`${level.color} text-white font-medium`}>
-                            {level.level}
-                          </Badge>
-                          <div className="flex-1">
-                            <span className="font-medium">{level.description}</span>
-                            <p className="text-sm text-gray-600">{level.effects}</p>
+                        <div key={index} className={`p-3 rounded-lg border ${level.color}`}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium">{level.level}</span>
+                            <span className="text-xs font-semibold">{level.description}</span>
                           </div>
+                          <p className="text-sm">{level.effects}</p>
                         </div>
                       ))}
                     </div>
                   </div>
+
+                  {/* Frequency Classifications */}
+                  {selectedDisaster.scales.frequencyClassifications && (
+                    <div>
+                      <h5 className="font-medium text-blue-900 mb-3">Flood Frequency Classifications</h5>
+                      <div className="text-xs text-blue-700 mb-3 bg-blue-100 p-2 rounded">
+                        <strong>Important Note:</strong> A "100-year flood" doesn't mean it only happens once every 100 years. 
+                        It means there's a 1% chance of this level of flooding occurring in any given year.
+                      </div>
+                      <div className="grid gap-3">
+                        {selectedDisaster.scales.frequencyClassifications.map((freq, index) => (
+                          <div key={index} className={`p-3 rounded-lg border ${freq.color}`}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium">{freq.level}</span>
+                              <span className="text-xs font-semibold">{freq.description}</span>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-1">Probability: {freq.probability}</p>
+                            <p className="text-sm">{freq.effects}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
