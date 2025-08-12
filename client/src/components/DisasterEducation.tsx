@@ -1103,6 +1103,13 @@ const disasterTypes: DisasterType[] = [
           effects: 'Extreme and rare flooding events, severe regional impacts',
           color: 'bg-red-400 text-white',
           probability: '0.2%'
+        },
+        {
+          level: '1000-year Flood',
+          description: 'Flood event with a 0.1% chance of occurring in any given year',
+          effects: 'Unprecedented flooding, catastrophic regional devastation, long-term recovery required',
+          color: 'bg-red-600 text-white',
+          probability: '0.1%'
         }
       ]
     },
