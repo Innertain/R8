@@ -4,11 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Thermometer, 
-  TrendingUp, 
-  TrendingDown, 
-  Globe, 
+import {
+  Thermometer,
+  TrendingUp,
+  TrendingDown,
+  Globe,
   Calendar,
   BarChart3,
   Activity,
@@ -244,15 +244,15 @@ export default function NoaaClimateAnalytics() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <AreaChart data={data.analysis?.temperatureTrends || []}>
+                <AreaChart data={data.analysis?.temperatureTrends?.historical || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
-                  <YAxis 
+                  <YAxis
                     label={{ value: 'Temperature Anomaly (°C)', angle: -90, position: 'insideLeft' }}
                   />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number, name: string) => [
-                      `${value > 0 ? '+' : ''}${value.toFixed(2)}°C`, 
+                      `${value > 0 ? '+' : ''}${value.toFixed(2)}°C`,
                       'Temperature Anomaly'
                     ]}
                     labelFormatter={(year) => `Year: ${year}`}
@@ -278,15 +278,15 @@ export default function NoaaClimateAnalytics() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={data.analysis?.temperatureTrends?.slice(-20) || []}>
+                  <BarChart data={data.analysis?.temperatureTrends?.recent?.slice(-20) || []}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" />
                     <YAxis />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: number) => [`${value > 0 ? '+' : ''}${value.toFixed(2)}°C`, 'Anomaly']}
                     />
-                    <Bar 
-                      dataKey="anomaly" 
+                    <Bar
+                      dataKey="anomaly"
                       fill="#3498db"
                     />
                   </BarChart>
@@ -309,13 +309,13 @@ export default function NoaaClimateAnalytics() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Decadal Trend</span>
                   <span className="text-sm">
-                    +{data.analysis?.globalWarming?.trend?.toFixed(3) || '1.060'}°C
+                    +{data.analysis?.climateTrends?.decadalTrend?.toFixed(3) || '1.060'}°C
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Accelerating Trend</span>
-                  <Badge variant="destructive">
-                    Yes
+                  <Badge variant={data.analysis?.climateTrends?.acceleratingTrend ? "destructive" : "secondary"}>
+                    {data.analysis?.climateTrends?.acceleratingTrend ? 'Yes' : 'No'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
@@ -340,13 +340,13 @@ export default function NoaaClimateAnalytics() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={data.analysis?.temperatureTrends || []}>
+                <LineChart data={data.analysis?.temperatureTrends?.historical || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis label={{ value: 'Temperature Anomaly (°C)', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number, name: string) => [
-                      `${value > 0 ? '+' : ''}${value.toFixed(2)}°C`, 
+                      `${value > 0 ? '+' : ''}${value.toFixed(2)}°C`,
                       'Temperature Anomaly'
                     ]}
                     labelFormatter={(year) => `Year: ${year}`}
@@ -427,26 +427,26 @@ export default function NoaaClimateAnalytics() {
                 <div className="p-4 bg-red-50 rounded-lg">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-red-800">Hottest Year</span>
-                    <Badge variant="destructive">2023</Badge>
+                    <Badge variant="destructive">{data.analysis?.records?.hottestYear?.year || '2023'}</Badge>
                   </div>
                   <p className="text-sm text-red-600 mt-1">
-                    +1.18°C above baseline
+                    {data.analysis?.records?.hottestYear?.temperatureAnomaly?.toFixed(2)}°C above baseline
                   </p>
                   <p className="text-xs text-red-500 mt-1">
-                    Region: Global
+                    Region: {data.analysis?.records?.hottestYear?.region || 'Global'}
                   </p>
                 </div>
 
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-blue-800">Coldest Year</span>
-                    <Badge variant="secondary">1904</Badge>
+                    <Badge variant="secondary">{data.analysis?.records?.coldestYear?.year || '1904'}</Badge>
                   </div>
                   <p className="text-sm text-blue-600 mt-1">
-                    -0.47°C below baseline
+                    {data.analysis?.records?.coldestYear?.temperatureAnomaly?.toFixed(2)}°C below baseline
                   </p>
                   <p className="text-xs text-blue-500 mt-1">
-                    Region: Global
+                    Region: {data.analysis?.records?.coldestYear?.region || 'Global'}
                   </p>
                 </div>
               </CardContent>
@@ -498,20 +498,20 @@ export default function NoaaClimateAnalytics() {
         </CardHeader>
         <CardContent className="text-sm text-blue-800">
           <p className="mb-2">
-            This climate data comes directly from official NOAA sources including Climate at a Glance and 
-            Climate Data Online APIs. Temperature anomalies are calculated against the 20th century 
+            This climate data comes directly from official NOAA sources including Climate at a Glance and
+            Climate Data Online APIs. Temperature anomalies are calculated against the 20th century
             baseline period (1901-2000).
           </p>
           <p className="mb-4">
-            Global warming trends are determined using statistical analysis of decadal temperature 
+            Global warming trends are determined using statistical analysis of decadal temperature
             changes. Data is updated automatically and cached for performance.
           </p>
 
           <div className="bg-white rounded-lg p-3 border border-blue-300">
             <h4 className="font-semibold text-blue-900 mb-2">Related Resources</h4>
             <div className="flex flex-wrap gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => window.open('/disaster-education?type=hurricane&tab=overview', '_blank')}
                 className="text-xs bg-blue-100"
@@ -519,8 +519,8 @@ export default function NoaaClimateAnalytics() {
                 <Shield className="w-3 h-3 mr-1" />
                 Extreme Weather Education
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => window.open('/alerts', '_blank')}
                 className="text-xs bg-blue-100"
@@ -528,8 +528,8 @@ export default function NoaaClimateAnalytics() {
                 <AlertTriangle className="w-3 h-3 mr-1" />
                 Current Weather Alerts
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => window.open('/map', '_blank')}
                 className="text-xs bg-blue-100"
