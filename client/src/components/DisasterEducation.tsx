@@ -1219,6 +1219,32 @@ const disasterTypes: DisasterType[] = [
           ]
         },
         {
+          name: 'Dam Failure',
+          description: 'Catastrophic release of water when dams breach or fail, creating walls of water that can devastate downstream communities',
+          riskLevel: 'Extreme',
+          timeframe: 'Minutes to hours once failure occurs',
+          safetyActions: [
+            'Evacuate immediately if you live downstream from a dam',
+            'Move to the highest ground possible - dam breaks create walls of water',
+            'Never try to outrun flood waters in a vehicle',
+            'Follow evacuation routes away from the river valley',
+            'Listen for emergency sirens and evacuation orders'
+          ]
+        },
+        {
+          name: 'Levee and Levee System Failure',
+          description: 'Engineered flood protection systems can be overtopped or breached, suddenly releasing large volumes of water into protected areas',
+          riskLevel: 'Extreme',
+          timeframe: 'Minutes to hours when systems are overwhelmed',
+          safetyActions: [
+            'Know if you live in a levee-protected area and evacuation routes',
+            'Don\'t rely solely on levees for protection - they can fail',
+            'Move to higher ground immediately if levee failure is reported',
+            'Avoid driving near levees during high water events',
+            'Sign up for emergency alerts from local flood control districts'
+          ]
+        },
+        {
           name: 'Riverine Flooding',
           description: 'Gradual rise of water levels in rivers and streams, can inundate large areas for extended periods',
           riskLevel: 'High',
@@ -1244,6 +1270,19 @@ const disasterTypes: DisasterType[] = [
         }
       ],
       secondaryHazards: [
+        {
+          name: 'Bridge and Road Infrastructure Collapse',
+          description: 'Floodwaters can undermine bridge foundations, wash out roads, and cause structural failures, trapping people and blocking evacuation routes',
+          riskLevel: 'Extreme',
+          timeframe: 'During and immediately after flooding',
+          safetyActions: [
+            'Never drive across flooded bridges or roads - water may have undermined the structure',
+            'Avoid bridges during and after flooding until inspected by engineers',
+            'Know alternate evacuation routes in case primary bridges fail',
+            'Watch for signs of road washouts: cracks, subsidence, or missing pavement',
+            'Report damaged infrastructure to authorities immediately'
+          ]
+        },
         {
           name: 'Contaminated Water and Food',
           description: 'Floodwaters can spread sewage and chemicals, contaminating water and food supplies',
