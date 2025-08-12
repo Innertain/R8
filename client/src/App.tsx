@@ -88,68 +88,68 @@ function Navigation() {
               <div className="p-2">
                 <div className="text-sm font-semibold text-gray-900 mb-3 px-2">Emergency Response</div>
                 <DropdownMenuItem asChild>
-                  <Link href="/map" className="flex items-center gap-3 p-3 hover:bg-red-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
-                      <MapPin className="h-5 w-5 text-white" />
+                  <Link href="/map" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-red-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-red-600 group-hover:shadow-md group-hover:scale-110">
+                      <MapPin className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Disaster Watch Center</div>
-                      <div className="text-sm text-gray-600">Real-time monitoring</div>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/stats" className="flex items-center gap-3 p-3 hover:bg-red-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
-                      <BarChart3 className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Impact Statistics</div>
-                      <div className="text-sm text-gray-600">Analytics & metrics</div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-red-700 transition-colors duration-200">Disaster Watch Center</div>
+                      <div className="text-sm text-gray-600 group-hover:text-red-600 transition-colors duration-200">Real-time monitoring</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/alerts" className="flex items-center gap-3 p-3 hover:bg-red-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
-                      <Bell className="h-5 w-5 text-white" />
+                  <Link href="/stats" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-red-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-red-600 group-hover:shadow-md group-hover:scale-110">
+                      <BarChart3 className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Custom Alerts</div>
-                      <div className="text-sm text-gray-600">Personalized notifications</div>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/air-quality" className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <Wind className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Air Quality Monitor</div>
-                      <div className="text-sm text-gray-600">Environmental health alerts</div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-red-700 transition-colors duration-200">Impact Statistics</div>
+                      <div className="text-sm text-gray-600 group-hover:text-red-600 transition-colors duration-200">Analytics & metrics</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/noaa-climate" className="flex items-center gap-3 p-3 hover:bg-cyan-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center">
-                      <Wind className="h-5 w-5 text-white" />
+                  <Link href="/alerts" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-red-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-red-600 group-hover:shadow-md group-hover:scale-110">
+                      <Bell className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">NOAA Climate Reports</div>
-                      <div className="text-sm text-gray-600">Monthly climate monitoring</div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-red-700 transition-colors duration-200">Custom Alerts</div>
+                      <div className="text-sm text-gray-600 group-hover:text-red-600 transition-colors duration-200">Personalized notifications</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/disaster-education" className="flex items-center gap-3 p-3 hover:bg-orange-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                      <Shield className="h-5 w-5 text-white" />
+                  <Link href="/air-quality" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-blue-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-blue-600 group-hover:shadow-md group-hover:scale-110">
+                      <Wind className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Disaster Education</div>
-                      <div className="text-sm text-gray-600">Interactive learning center</div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors duration-200">Air Quality Monitor</div>
+                      <div className="text-sm text-gray-600 group-hover:text-blue-600 transition-colors duration-200">Environmental health alerts</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/noaa-climate" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-cyan-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-cyan-600 group-hover:shadow-md group-hover:scale-110">
+                      <Wind className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-cyan-700 transition-colors duration-200">NOAA Climate Reports</div>
+                      <div className="text-sm text-gray-600 group-hover:text-cyan-600 transition-colors duration-200">Monthly climate monitoring</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/disaster-education" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-orange-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-orange-600 group-hover:shadow-md group-hover:scale-110">
+                      <Shield className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-orange-700 transition-colors duration-200">Disaster Education</div>
+                      <div className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors duration-200">Interactive learning center</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -173,46 +173,46 @@ function Navigation() {
               <div className="p-2">
                 <div className="text-sm font-semibold text-gray-900 mb-3 px-2">Regenerative Solutions</div>
                 <DropdownMenuItem asChild>
-                  <Link href="/bioregions" className="flex items-center gap-3 p-3 hover:bg-green-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                      <Leaf className="h-5 w-5 text-white" />
+                  <Link href="/bioregions" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-green-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-green-600 group-hover:shadow-md group-hover:scale-110">
+                      <Leaf className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Bioregion Explorer</div>
-                      <div className="text-sm text-gray-600">Global ecosystems</div>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/hawaii" className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <Mountain className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Hawaiʻi Regeneration</div>
-                      <div className="text-sm text-gray-600">Island restoration</div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-green-700 transition-colors duration-200">Bioregion Explorer</div>
+                      <div className="text-sm text-gray-600 group-hover:text-green-600 transition-colors duration-200">Global ecosystems</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/appalachian" className="flex items-center gap-3 p-3 hover:bg-emerald-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-                      <Mountain className="h-5 w-5 text-white" />
+                  <Link href="/hawaii" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-blue-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-blue-600 group-hover:shadow-md group-hover:scale-110">
+                      <Mountain className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Appalachian Regeneration</div>
-                      <div className="text-sm text-gray-600">Mountain heritage</div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors duration-200">Hawaiʻi Regeneration</div>
+                      <div className="text-sm text-gray-600 group-hover:text-blue-600 transition-colors duration-200">Island restoration</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/cascadia" className="flex items-center gap-3 p-3 hover:bg-teal-50 rounded-lg cursor-pointer">
-                    <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center">
-                      <TreePine className="h-5 w-5 text-white" />
+                  <Link href="/appalachian" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-emerald-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-emerald-600 group-hover:shadow-md group-hover:scale-110">
+                      <Mountain className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Cascadia Bioregion</div>
-                      <div className="text-sm text-gray-600">Temperate rainforest</div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-emerald-700 transition-colors duration-200">Appalachian Regeneration</div>
+                      <div className="text-sm text-gray-600 group-hover:text-emerald-600 transition-colors duration-200">Mountain heritage</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/cascadia" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-teal-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-teal-600 group-hover:shadow-md group-hover:scale-110">
+                      <TreePine className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-teal-700 transition-colors duration-200">Cascadia Bioregion</div>
+                      <div className="text-sm text-gray-600 group-hover:text-teal-600 transition-colors duration-200">Temperate rainforest</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
