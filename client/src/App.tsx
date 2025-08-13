@@ -30,7 +30,8 @@ import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
 import { Footer } from "@/components/Footer";
 import { GlobalFilterIndicator } from "@/components/GlobalFilterIndicator";
-import ComingSoonPage from "@/pages/coming-soon"; // Import ComingSoonPage
+import ComingSoonPage from "@/pages/coming-soon";
+import AirtableTestPage from "@/pages/airtable-test";
 
 function Navigation() {
   const [location] = useLocation();
@@ -627,15 +628,6 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        refetchOnWindowFocus: false,
-      },
-    },
-  });
-
   // Check for platform access on app load
   useEffect(() => {
     const checkAccess = () => {
@@ -666,12 +658,12 @@ function App() {
   if (!hasAccess) {
     return (
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="*" element={<ComingSoonPage />} />
-          </Routes>
-        </BrowserRouter>
-        <Toaster />
+        <TooltipProvider>
+          <div className="min-h-screen flex flex-col bg-gradient-to-br from-stormy-dark via-stormy-medium to-stormy-dark">
+            <ComingSoonPage />
+            <Toaster />
+          </div>
+        </TooltipProvider>
       </QueryClientProvider>
     );
   }
