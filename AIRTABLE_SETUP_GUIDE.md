@@ -3,7 +3,7 @@
 ## Quick Setup Checklist
 
 ### ✅ Step 1: Add Required Tables
-Create these 3 new tables in your existing Airtable base:
+Create these 4 new tables in your existing Airtable base:
 
 **1. Volunteers Table**
 ```
@@ -43,6 +43,23 @@ Assigned Date       | Created time      | Include time
 Notes               | Long text         | Optional
 ```
 
+**4. Platform Whitelist Table**
+```
+Field Name          | Field Type        | Options/Settings
+--------------------|-------------------|------------------
+First Name          | Single line text  | Required
+Last Name           | Single line text  | Required
+Name                | Formula           | Formula: {First Name} & " " & {Last Name}
+Phone               | Phone number      | Required, Format: (000) 000-0000
+Email               | Email             | Optional
+Organization        | Single line text  | Optional
+Access Level        | Single select     | Options: demo, beta, admin, volunteer
+Is Active           | Checkbox          | Default: checked
+Notes               | Long text         | Optional for access details
+Date Added          | Created time      | Include time
+Last Updated        | Last modified time| Track changes
+```
+
 ### ✅ Step 2: Add Sample Data
 
 **Add to Volunteers Table:**
@@ -61,6 +78,18 @@ Create 3-4 sample availability slots for Demo User:
 2. Tomorrow 2:00 PM - 5:00 PM  
 3. Next Monday 9:00 AM - 5:00 PM (Is Recurring: Weekly)
 4. Next Wednesday 6:00 PM - 9:00 PM
+```
+
+**Add to Platform Whitelist Table:**
+```
+First Name: Demo
+Last Name: User
+Phone: 555-DEMO
+Email: demo@regenerative8.org
+Organization: Regenerative 8 Demo
+Access Level: demo
+Is Active: ✓ (checked)
+Notes: Demo account for testing platform access
 ```
 
 ### ✅ Step 3: Test the Integration
@@ -87,6 +116,10 @@ V Shifts (existing)
 Shift Assignments ← Volunteer → Volunteers
                               ↓
                     Volunteer Availability
+
+Platform Whitelist (access control)
+    ↓ (Phone verification)
+Coming Soon Page → Main Application
 ```
 
 ## Field Type Quick Reference

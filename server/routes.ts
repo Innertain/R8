@@ -870,6 +870,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Whitelist verification endpoint
+  app.get("/api/whitelist/verify/:phoneNumber", async (req, res) => {
+    try {
+      const phone = req.params.phoneNumber;
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+
+      // Helper function to normalize phone numbers for comparison
+      const normalizePhone = (phoneStr: string) => phoneStr.replace(/\D/g, '');
+      const normalizedSearchPhone = normalizePhone(phone);
+
+      console.log(`Checking whitelist for phone: "${phone}" (normalized: "${normalizedSearchPhone}")`);
+
+      // Create flexible search formula that handles different phone formats
+      const phoneSearchFormula = `OR(
+        SEARCH("${phone}",{Phone}),
+        SEARCH("${normalizedSearchPhone}",REGEX_REPLACE({Phone},"[^0-9]","","g")),
+        {Phone}="${phone}",
+        REGEX_REPLACE({Phone},"[^0-9]","","g")="${normalizedSearchPhone}",
+        FIND("${normalizedSearchPhone}",REGEX_REPLACE({Phone},"[^0-9]","","g"))>0
+      )`;
+
+      // Check Platform Whitelist table first
+      const whitelistResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Platform%20Whitelist?filterByFormula=${encodeURIComponent(phoneSearchFormula)}`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+
+      console.log('Platform Whitelist search status:', whitelistResponse.status);
+
+      if (whitelistResponse.ok) {
+        const whitelistData = await whitelistResponse.json();
+        console.log(`Found ${whitelistData.records.length} whitelist records`);
+
+        if (whitelistData.records.length > 0) {
+          const record = whitelistData.records[0];
+          const fields = record.fields;
+
+          // Check if access is active
+          const isActive = fields['Is Active'] !== false; // Default to true if not specified
+
+          if (isActive) {
+            return res.json({
+              success: true,
+              whitelisted: true,
+              user: {
+                id: record.id,
+                name: `${fields['First Name'] || ''} ${fields['Last Name'] || ''}`.trim() || fields['Name'] || 'Demo User',
+                phone: fields['Phone'] || phone,
+                email: fields['Email'] || '',
+                accessLevel: fields['Access Level'] || 'demo',
+                organization: fields['Organization'] || '',
+                notes: fields['Notes'] || '',
+                source: 'platform_whitelist'
+              }
+            });
+          } else {
+            return res.json({
+              success: true,
+              whitelisted: false,
+              message: 'Access has been suspended. Please contact support.'
+            });
+          }
+        }
+      }
+
+      // Fallback: Check existing volunteer/driver tables for backwards compatibility
+      const volunteerResponse = await fetch(`https://api.airtable.com/v0/${baseId}/Volunteer%20Applications?filterByFormula=${encodeURIComponent(phoneSearchFormula)}`, {
+        headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
+      });
+
+      if (volunteerResponse.ok) {
+        const volunteerData = await volunteerResponse.json();
+        if (volunteerData.records.length > 0) {
+          const record = volunteerData.records[0];
+          const fields = record.fields;
+
+          return res.json({
+            success: true,
+            whitelisted: true,
+            user: {
+              id: record.id,
+              name: `${fields['First Name'] || ''} ${fields['Last Name'] || ''}`.trim(),
+              phone: fields['Phone'] || phone,
+              email: fields['Email '] || fields['Email'] || '',
+              accessLevel: 'volunteer',
+              source: 'volunteer_applications'
+            }
+          });
+        }
+      }
+
+      // Special handling for demo account
+      if (phone === "555-DEMO" || normalizedSearchPhone === "555DEMO") {
+        console.log('Providing demo account access');
+        return res.json({
+          success: true,
+          whitelisted: true,
+          user: {
+            id: 'demo-user-whitelist',
+            name: 'Demo User',
+            phone: '555-DEMO',
+            email: 'demo@regenerative8.org',
+            accessLevel: 'demo',
+            organization: 'Regenerative 8 Demo',
+            source: 'demo'
+          }
+        });
+      }
+
+      console.log(`No whitelist entry found for phone: ${phone}`);
+      res.json({
+        success: true,
+        whitelisted: false,
+        message: 'Phone number not found in whitelist'
+      });
+
+    } catch (error: any) {
+      console.error('Error checking whitelist:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'Server error',
+        whitelisted: false 
+      });
+    }
+  });
+
   // Get volunteer skills/tags from Airtable
   app.get('/api/volunteer-skills', async (req, res) => {
     try {

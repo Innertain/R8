@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield, Wind, TreePine, BookOpen, CloudRain } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
@@ -30,7 +30,7 @@ import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
 import { Footer } from "@/components/Footer";
 import { GlobalFilterIndicator } from "@/components/GlobalFilterIndicator";
-
+import ComingSoonPage from "@/pages/coming-soon"; // Import ComingSoonPage
 
 function Navigation() {
   const [location] = useLocation();
@@ -40,9 +40,9 @@ function Navigation() {
     <nav className="bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <img 
+          <img
             src="/src/assets/r8-logo.png"
-            alt="R8 Logo" 
+            alt="R8 Logo"
             className="w-10 h-10"
           />
           <h1 className="text-2xl font-bold text-white">R8</h1>
@@ -52,8 +52,8 @@ function Navigation() {
         <div className="hidden lg:flex items-center gap-3">
           <Link href="/">
             <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              location === "/" 
-                ? "bg-white text-slate-900 shadow-md" 
+              location === "/"
+                ? "bg-white text-slate-900 shadow-md"
                 : "text-white hover:bg-white/10 hover:text-white"
             }`}>
               <HomeIcon className="h-4 w-4" />
@@ -63,8 +63,8 @@ function Navigation() {
 
           <Link href="/volunteer">
             <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              location === "/volunteer" 
-                ? "bg-blue-500 text-white shadow-md" 
+              location === "/volunteer"
+                ? "bg-blue-500 text-white shadow-md"
                 : "text-white hover:bg-blue-500/20 hover:text-white"
             }`}>
               <Calendar className="h-4 w-4" />
@@ -75,8 +75,8 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                ['/map', '/stats', '/alerts', '/air-quality', '/noaa-climate', '/disaster-education'].includes(location) 
-                  ? "bg-red-500 text-white shadow-md" 
+                ['/map', '/stats', '/alerts', '/air-quality', '/noaa-climate', '/disaster-education'].includes(location)
+                  ? "bg-red-500 text-white shadow-md"
                   : "text-white hover:bg-red-500/20 hover:text-white"
               }`}>
                 <Shield className="h-4 w-4" />
@@ -160,8 +160,8 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                ['/bioregions', '/hawaii', '/appalachian', '/cascadia'].includes(location) 
-                  ? "bg-green-500 text-white shadow-md" 
+                ['/bioregions', '/hawaii', '/appalachian', '/cascadia'].includes(location)
+                  ? "bg-green-500 text-white shadow-md"
                   : "text-white hover:bg-green-500/20 hover:text-white"
               }`}>
                 <Leaf className="h-4 w-4" />
@@ -224,8 +224,8 @@ function Navigation() {
         {/* Fallback for smaller screens - simplified buttons */}
         <div className="hidden md:flex lg:hidden gap-2">
           <Link href="/">
-            <Button 
-              variant={location === "/" ? "default" : "outline"} 
+            <Button
+              variant={location === "/" ? "default" : "outline"}
               size="sm"
               className="flex items-center gap-2"
             >
@@ -234,8 +234,8 @@ function Navigation() {
             </Button>
           </Link>
           <Link href="/volunteer">
-            <Button 
-              variant={location === "/volunteer" ? "default" : "outline"} 
+            <Button
+              variant={location === "/volunteer" ? "default" : "outline"}
               size="sm"
               className="flex items-center gap-2"
             >
@@ -245,8 +245,8 @@ function Navigation() {
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant={['/map', '/stats', '/alerts'].includes(location) ? "default" : "outline"} 
+              <Button
+                variant={['/map', '/stats', '/alerts'].includes(location) ? "default" : "outline"}
                 size="sm"
                 className="flex items-center gap-2"
               >
@@ -329,8 +329,8 @@ function Navigation() {
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant={['/bioregions', '/hawaii', '/appalachian', '/cascadia'].includes(location) ? "default" : "outline"} 
+              <Button
+                variant={['/bioregions', '/hawaii', '/appalachian', '/cascadia'].includes(location) ? "default" : "outline"}
                 size="sm"
                 className="flex items-center gap-2"
               >
@@ -413,8 +413,8 @@ function Navigation() {
         <div className="sm:hidden border-t border-stormy-light/30 mt-3 pt-3">
           <div className="flex flex-col gap-2">
             <Link href="/">
-              <Button 
-                variant={location === "/" ? "default" : "outline"} 
+              <Button
+                variant={location === "/" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start"
                 onClick={() => setMobileMenuOpen(false)}
@@ -424,8 +424,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/volunteer">
-              <Button 
-                variant={location === "/volunteer" ? "default" : "outline"} 
+              <Button
+                variant={location === "/volunteer" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start"
                 onClick={() => setMobileMenuOpen(false)}
@@ -440,8 +440,8 @@ function Navigation() {
               Disaster Response
             </div>
             <Link href="/map">
-              <Button 
-                variant={location === "/map" ? "default" : "outline"} 
+              <Button
+                variant={location === "/map" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -451,8 +451,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/stats">
-              <Button 
-                variant={location === "/stats" ? "default" : "outline"} 
+              <Button
+                variant={location === "/stats" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -462,8 +462,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/alerts">
-              <Button 
-                variant={location === "/alerts" ? "default" : "outline"} 
+              <Button
+                variant={location === "/alerts" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -473,8 +473,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/air-quality">
-              <Button 
-                variant={location === "/air-quality" ? "default" : "outline"} 
+              <Button
+                variant={location === "/air-quality" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -484,8 +484,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/noaa-climate">
-              <Button 
-                variant={location === "/noaa-climate" ? "default" : "outline"} 
+              <Button
+                variant={location === "/noaa-climate" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -495,8 +495,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/disaster-education">
-              <Button 
-                variant={location === "/disaster-education" ? "default" : "outline"} 
+              <Button
+                variant={location === "/disaster-education" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -511,8 +511,8 @@ function Navigation() {
               Regeneration
             </div>
             <Link href="/bioregions">
-              <Button 
-                variant={location === "/bioregions" ? "default" : "outline"} 
+              <Button
+                variant={location === "/bioregions" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -522,8 +522,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/hawaii">
-              <Button 
-                variant={location === "/hawaii" ? "default" : "outline"} 
+              <Button
+                variant={location === "/hawaii" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -533,8 +533,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/appalachian">
-              <Button 
-                variant={location === "/appalachian" ? "default" : "outline"} 
+              <Button
+                variant={location === "/appalachian" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -544,8 +544,8 @@ function Navigation() {
               </Button>
             </Link>
             <Link href="/cascadia">
-              <Button 
-                variant={location === "/cascadia" ? "default" : "outline"} 
+              <Button
+                variant={location === "/cascadia" ? "default" : "outline"}
                 size="sm"
                 className="w-full flex items-center gap-2 justify-start ml-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -563,61 +563,139 @@ function Navigation() {
 }
 
 function Router() {
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAccess = () => {
+      const accessGranted = sessionStorage.getItem('platformAccess');
+      setHasAccess(accessGranted === 'granted');
+    };
+
+    checkAccess();
+
+    window.addEventListener('storage', checkAccess);
+    return () => window.removeEventListener('storage', checkAccess);
+  }, []);
+
+  // Show loading while checking access
+  if (hasAccess === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading platform...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1">
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/volunteer" component={VolunteerPortal} />
-        <Route path="/map" component={InteractiveMap} />
-        <Route path="/stats" component={StatsDashboard} />
-        <Route path="/alerts" component={AlertsPage} />
-        <Route path="/air-quality" component={AirQualityPage} />
-        <Route path="/noaa-climate" component={NoaaClimatePage} />
-        <Route path="/disaster-education" component={DisasterEducationPage} />
-        <Route path="/bioregions" component={BioregionExplorerPage} />
-        <Route path="/hawaii" component={HawaiiRegenerationPage} />
-        <Route path="/appalachian" component={AppalachianRegenerationPage} />
-        <Route path="/cascadia" component={CascadiaRegenerationPage} />
+        {/* Public routes */}
         <Route path="/privacy-policy" component={PrivacyPolicyPage} />
         <Route path="/terms-of-service" component={TermsOfServicePage} />
 
-        <Route component={NotFound} />
+        {/* Protected routes */}
+        {hasAccess ? (
+          <>
+            <Route path="/" component={Home} />
+            <Route path="/volunteer" component={VolunteerPortal} />
+            <Route path="/map" component={InteractiveMap} />
+            <Route path="/stats" component={StatsDashboard} />
+            <Route path="/alerts" component={AlertsPage} />
+            <Route path="/air-quality" component={AirQualityPage} />
+            <Route path="/noaa-climate" component={NoaaClimatePage} />
+            <Route path="/disaster-education" component={DisasterEducationPage} />
+            <Route path="/bioregions" component={BioregionExplorerPage} />
+            <Route path="/hawaii" component={HawaiiRegenerationPage} />
+            <Route path="/appalachian" component={AppalachianRegenerationPage} />
+            <Route path="/cascadia" component={CascadiaRegenerationPage} />
+            <Route path="/airtable-test" component={AirtableTestPage} />
+            <Route component={NotFound} />
+          </>
+        ) : (
+          // Redirect to Coming Soon if no access
+          <Route path="*" component={ComingSoonPage} />
+        )}
       </Switch>
     </div>
   );
 }
 
 function App() {
-  const [globalStateFilter, setGlobalStateFilter] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
-  const clearGlobalFilter = () => {
-    setGlobalStateFilter(null);
-    // Clear any URL parameters or other filter state
-    if (window.location.search.includes('state=')) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('state');
-      window.history.replaceState({}, '', url.toString());
-    }
-  };
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
 
+  // Check for platform access on app load
+  useEffect(() => {
+    const checkAccess = () => {
+      const accessGranted = sessionStorage.getItem('platformAccess');
+      setHasAccess(accessGranted === 'granted');
+    };
+
+    checkAccess();
+
+    // Listen for storage changes (e.g., when access is granted in another tab)
+    window.addEventListener('storage', checkAccess);
+    return () => window.removeEventListener('storage', checkAccess);
+  }, []);
+
+  // Show loading while checking access
+  if (hasAccess === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading platform...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show coming soon page if no access
+  if (!hasAccess) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="*" element={<ComingSoonPage />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
+
+  // Render the app if access is granted
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-stormy-dark via-stormy-medium to-stormy-dark">
           <StateSVGDefs />
           <Navigation />
-          {globalStateFilter && (
-            <GlobalFilterIndicator 
+          {/* Global filter indicator is only shown if a filter is active */}
+          {/* {globalStateFilter && (
+            <GlobalFilterIndicator
               stateFilter={globalStateFilter}
               onClearFilter={clearGlobalFilter}
             />
-          )}
+          )} */}
           <Router />
           <Footer />
           <Toaster />
         </div>
       </TooltipProvider>
-    </QueryClientProvider>  
+    </QueryClientProvider>
   );
 }
 
