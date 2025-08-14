@@ -222,14 +222,7 @@ export default function ComingSoonPage() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/70 animate-bounce">
-          <div className="text-center">
-            <div className="text-sm mb-2">Request Access Below</div>
-            <ArrowRight className="w-6 h-6 mx-auto rotate-90" />
-          </div>
         </div>
-      </div>
 
       {/* Features Preview Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-dark/95 to-stormy-primary/30">
