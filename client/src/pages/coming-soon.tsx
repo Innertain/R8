@@ -221,7 +221,6 @@ export default function ComingSoonPage() {
             </div>
         </div>
       </div>
-
       {/* Mission Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-primary/30 to-stormy-dark/95">
         <div className="max-w-6xl mx-auto px-6">
@@ -253,13 +252,10 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-
-      
-
       {/* Platform Impact Statistics */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 mb-20">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Platform Impact</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Real Impact</h2>
           <p className="text-lg text-gray-300">
             Real numbers from communities using R8 for mutual aid and disaster response
           </p>
@@ -448,7 +444,6 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </div>
-
       {/* Driver Network & Logistics Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90">
         <div className="max-w-7xl mx-auto px-6">
@@ -597,7 +592,6 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-
       {/* Features Preview Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-dark/95 to-stormy-primary/30">
         <div className="max-w-7xl mx-auto px-6">
@@ -734,7 +728,6 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="bg-stormy-dark border-t border-stormy-light/30 py-12">
         <div className="max-w-7xl mx-auto px-6">
