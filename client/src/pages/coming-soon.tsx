@@ -615,7 +615,7 @@ export default function ComingSoonPage() {
                   <Users className="w-6 h-6 text-emerald-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-white">Volunteer Management</h3>
-                <p className="text-gray-400">Efficiently coordinate and schedule 69+ active volunteers across multiple disaster response and regeneration projects.</p>
+                <p className="text-gray-400">Comprehensive tools for volunteer coordination, scheduling, vetting, and management across disaster response and regeneration projects.</p>
               </CardContent>
             </Card>
 
