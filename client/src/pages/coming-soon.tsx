@@ -107,7 +107,7 @@ export default function ComingSoonPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
       {/* Hero Section with R8 Branding */}
-      <div className="relative min-h-screen overflow-hidden">
+      <div className="relative min-h-screen lg:min-h-screen hero-mobile overflow-hidden">
         {/* Dynamic Background Images */}
         <div className="absolute inset-0">
           <div 
@@ -128,7 +128,7 @@ export default function ComingSoonPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-dark/90" />
 
         {/* Hero Content */}
-        <div className="relative z-10 flex items-center justify-center min-h-screen px-6 py-12">
+        <div className="relative z-10 flex items-center justify-center min-h-[80vh] lg:min-h-screen px-4 lg:px-6 py-8 lg:py-12">
           <div className="text-center space-y-12 max-w-5xl mx-auto">
             {/* Prominent R8 Branding */}
             <div className="space-y-6">
@@ -231,7 +231,7 @@ export default function ComingSoonPage() {
       </div>
       
       {/* Mission Section */}
-      <section className="relative py-20 min-h-screen flex items-center overflow-hidden -mt-32">
+      <section className="relative py-8 lg:py-20 min-h-[50vh] lg:min-h-screen flex items-center overflow-hidden -mt-8 lg:-mt-32 mobile-section">
         {/* Extended Parallax Background */}
         <div 
           className="absolute inset-0 w-full"
@@ -240,10 +240,10 @@ export default function ComingSoonPage() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            transform: `translateY(${scrollY * 0.5}px)`,
+            transform: `translateY(${scrollY * 0.3}px)`,
             willChange: 'transform',
-            top: '-20px',
-            height: 'calc(100% + 40px)',
+            top: '-10px',
+            height: 'calc(100% + 20px)',
           }}
         />
         
@@ -251,26 +251,26 @@ export default function ComingSoonPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/40 via-slate-900/70 to-slate-900/80" />
         
         {/* Content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-6 w-full">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-6 w-full">
           <div className="text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 pt-20">Our Mission</h2>
-            <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl p-12 border border-slate-700/50 shadow-2xl">
-              <h3 className="text-2xl md:text-3xl font-semibold text-emerald-400 mb-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 lg:mb-8 pt-4 lg:pt-20">Our Mission</h2>
+            <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 lg:p-12 border border-slate-700/50 shadow-2xl">
+              <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold text-emerald-400 mb-6 lg:mb-8">
                 Empowering mutual aid for regenerative disaster response and recovery.
               </h3>
-              <div className="bg-slate-700/60 backdrop-blur-sm rounded-xl p-6 mb-8 border border-slate-600/50">
-                <p className="text-xl text-white font-medium text-center">
+              <div className="bg-slate-700/60 backdrop-blur-sm rounded-xl p-4 lg:p-6 mb-6 lg:mb-8 border border-slate-600/50">
+                <p className="text-lg lg:text-xl text-white font-medium text-center">
                   R8 is a resource matching platform for disaster relief, humanitarian aid, and regeneration.
                 </p>
               </div>
-              <div className="space-y-6 text-left max-w-5xl mx-auto">
-                <p className="text-xl text-gray-200 leading-relaxed">
+              <div className="space-y-4 lg:space-y-6 text-left max-w-5xl mx-auto">
+                <p className="text-lg lg:text-xl text-gray-200 leading-relaxed">
                   <span className="font-semibold text-white">Real talk:</span> The majority of people recognize that disasters—whether fueled by climate change, systemic failures, or sudden crises—are a growing emergency.
                 </p>
-                <p className="text-xl text-gray-200 leading-relaxed">
+                <p className="text-lg lg:text-xl text-gray-200 leading-relaxed">
                   Local grassroots communities have real, proven solutions that address root causes and help communities adapt.
                 </p>
-                <p className="text-xl text-gray-200 leading-relaxed">
+                <p className="text-lg lg:text-xl text-gray-200 leading-relaxed">
                   Yet, these efforts are largely invisible in mainstream media and receive 
                   <span className="font-bold text-red-400"> less than 2% of global funding</span>, 
                   despite being some of the most effective, scalable, and cost-efficient approaches to disaster response and long-term resilience.
@@ -488,19 +488,19 @@ export default function ComingSoonPage() {
         </div>
       </section>
       {/* Driver Network & Logistics Section */}
-      <section className="py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+      <section className="py-12 lg:py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6">
+          <div className="text-center mb-10 lg:mb-16">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 lg:mb-6">
               Driver Network & Distribution Logistics
             </h2>
-            <p className="text-xl text-white/80 max-w-4xl mx-auto">
+            <p className="text-base lg:text-xl text-white/80 max-w-4xl mx-auto px-4">
               Our coordinated driver network enables rapid, efficient distribution of aid from supply sites to communities. 
               We've established a proven logistics platform for mutual aid coordination and resource delivery.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-10 lg:mb-16">
             {/* Driver Network Overview */}
             <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
               <div className="flex items-center mb-6">

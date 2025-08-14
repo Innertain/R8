@@ -85,6 +85,25 @@
     font-size: 11px !important;
     line-height: 1.2 !important;
   }
+
+  /* Mobile section spacing improvements */
+  .mobile-section {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    margin-top: -2rem !important;
+    min-height: 40vh !important;
+  }
+  
+  .mobile-content {
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Hero section mobile adjustments */
+  .hero-mobile {
+    min-height: 80vh !important;
+    padding-bottom: 1rem !important;
+  }
 }
 
 .card-hover-effect:hover::before {
