@@ -281,7 +281,7 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Platform Impact Statistics - Still within the mountain background */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 mt-12 lg:mt-20">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 mt-12 lg:mt-20 stats-section-mobile">
           <div className="text-center mb-8 lg:mb-12">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 lg:mb-4">Real Impact</h2>
             <p className="text-base lg:text-lg text-gray-300 px-4">
@@ -290,7 +290,7 @@ export default function ComingSoonPage() {
           </div>
 
         {/* Main Stats Grid - Top Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6 mb-6 stats-grid-mobile">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 mb-4 lg:mb-6 stats-grid-mobile">
           {/* Supply Sites */}
           <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
@@ -365,7 +365,7 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Secondary Stats Grid - Bottom Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 stats-grid-mobile">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 stats-grid-mobile">
           {/* Active Sites (60 days) */}
           <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
@@ -433,7 +433,7 @@ export default function ComingSoonPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6 mt-6 lg:mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 mt-6 lg:mt-8">
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
                 <div className="text-lg lg:text-2xl font-bold text-emerald-400 mb-1">Valley Hope Foundation</div>
