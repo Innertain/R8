@@ -281,198 +281,198 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Platform Impact Statistics - Still within the mountain background */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 mt-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Real Impact</h2>
-            <p className="text-lg text-gray-300">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 mt-12 lg:mt-20">
+          <div className="text-center mb-8 lg:mb-12">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 lg:mb-4">Real Impact</h2>
+            <p className="text-base lg:text-lg text-gray-300 px-4">
               Real numbers from communities using R8 for mutual aid and disaster response
             </p>
           </div>
 
         {/* Main Stats Grid - Top Row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6 mb-6 stats-grid-mobile">
           {/* Supply Sites */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Supply Sites</h3>
-              <MapPin className="w-4 h-4 text-blue-500" />
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Supply Sites</h3>
+              <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-blue-500 flex-shrink-0" />
             </div>
-            <div className="text-3xl font-bold text-blue-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-blue-600 mb-1 stats-number">
               <AnimatedCounter end={425} duration={2000} />
             </div>
-            <p className="text-xs text-gray-500">Active locations</p>
+            <p className="text-xs lg:text-sm text-gray-500">Active locations</p>
           </div>
 
           {/* Completed Deliveries */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Completed Deliveries</h3>
-              <div className="w-4 h-4 text-green-500">✓</div>
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Completed Deliveries</h3>
+              <div className="w-4 h-4 lg:w-5 lg:h-5 text-green-500 flex-shrink-0">✓</div>
             </div>
-            <div className="text-3xl font-bold text-green-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-green-600 mb-1 stats-number">
               <AnimatedCounter end={1219} duration={2200} />
             </div>
-            <p className="text-xs text-gray-500">Successfully delivered</p>
+            <p className="text-xs lg:text-sm text-gray-500">Successfully delivered</p>
           </div>
 
           {/* Food Boxes */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Food Boxes</h3>
-              <div className="w-4 h-4 text-orange-500">📦</div>
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Food Boxes</h3>
+              <div className="w-4 h-4 lg:w-5 lg:h-5 text-orange-500 flex-shrink-0">📦</div>
             </div>
-            <div className="text-3xl font-bold text-orange-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-orange-600 mb-1 stats-number">
               <AnimatedCounter end={101790} duration={2400} />
             </div>
-            <p className="text-xs text-gray-500">Total distributed</p>
+            <p className="text-xs lg:text-sm text-gray-500">Total distributed</p>
           </div>
 
           {/* Volunteers */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Volunteers</h3>
-              <Users className="w-4 h-4 text-purple-500" />
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Volunteers</h3>
+              <Users className="w-4 h-4 lg:w-5 lg:h-5 text-purple-500 flex-shrink-0" />
             </div>
-            <div className="text-3xl font-bold text-purple-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-purple-600 mb-1 stats-number">
               <AnimatedCounter end={69} duration={2600} />
             </div>
-            <p className="text-xs text-gray-500">Active volunteers</p>
+            <p className="text-xs lg:text-sm text-gray-500">Active volunteers</p>
           </div>
 
           {/* Drivers */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Drivers</h3>
-              <TrendingUp className="w-4 h-4 text-orange-500" />
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Drivers</h3>
+              <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-orange-500 flex-shrink-0" />
             </div>
-            <div className="text-3xl font-bold text-orange-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-orange-600 mb-1 stats-number">
               <AnimatedCounter end={208} duration={2800} />
             </div>
-            <p className="text-xs text-gray-500">Available drivers</p>
+            <p className="text-xs lg:text-sm text-gray-500">Available drivers</p>
           </div>
 
           {/* Estimated Families Helped */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Estimated Families Helped</h3>
-              <Heart className="w-4 h-4 text-cyan-500" />
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Families Helped</h3>
+              <Heart className="w-4 h-4 lg:w-5 lg:h-5 text-cyan-500 flex-shrink-0" />
             </div>
-            <div className="text-3xl font-bold text-cyan-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-cyan-600 mb-1 stats-number">
               <AnimatedCounter end={23248} duration={3000} />
             </div>
-            <p className="text-xs text-gray-500">Site estimates*</p>
+            <p className="text-xs lg:text-sm text-gray-500">Site estimates*</p>
           </div>
         </div>
 
         {/* Secondary Stats Grid - Bottom Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 stats-grid-mobile">
           {/* Active Sites (60 days) */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Active Sites (60 days)</h3>
-              <MapPin className="w-4 h-4 text-green-500" />
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Active Sites (60 days)</h3>
+              <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-green-500 flex-shrink-0" />
             </div>
-            <div className="text-3xl font-bold text-green-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-green-600 mb-1 stats-number">
               <AnimatedCounter end={240} duration={2000} />
             </div>
-            <p className="text-xs text-gray-500">Updated inventory recently</p>
+            <p className="text-xs lg:text-sm text-gray-500">Updated inventory recently</p>
           </div>
 
           {/* Sites with Deliveries */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Sites with Deliveries</h3>
-              <div className="w-4 h-4 text-blue-500">🚚</div>
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Sites with Deliveries</h3>
+              <div className="w-4 h-4 lg:w-5 lg:h-5 text-blue-500 flex-shrink-0">🚚</div>
             </div>
-            <div className="text-3xl font-bold text-blue-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-blue-600 mb-1 stats-number">
               <AnimatedCounter end={1295} duration={2200} />
             </div>
-            <p className="text-xs text-gray-500">Received aid deliveries</p>
+            <p className="text-xs lg:text-sm text-gray-500">Received aid deliveries</p>
           </div>
 
           {/* Sites with Recent Activity */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Sites with Recent Activity</h3>
-              <Zap className="w-4 h-4 text-red-500" />
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Recent Activity</h3>
+              <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
             </div>
-            <div className="text-3xl font-bold text-red-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-red-600 mb-1 stats-number">
               <AnimatedCounter end={154} duration={2400} />
             </div>
-            <p className="text-xs text-gray-500">Active requests or needs</p>
+            <p className="text-xs lg:text-sm text-gray-500">Active requests or needs</p>
           </div>
 
           {/* Mutual Aid Partners */}
-          <div className="bg-white rounded-xl p-4 shadow-lg">
+          <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">Mutual Aid Partners</h3>
-              <Heart className="w-4 h-4 text-purple-500" />
+              <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Aid Partners</h3>
+              <Heart className="w-4 h-4 lg:w-5 lg:h-5 text-purple-500 flex-shrink-0" />
             </div>
-            <div className="text-3xl font-bold text-purple-600 mb-1">
+            <div className="text-2xl lg:text-3xl font-bold text-purple-600 mb-1 stats-number">
               <AnimatedCounter end={49} duration={2600} />
             </div>
-            <p className="text-xs text-gray-500">Partner organizations</p>
+            <p className="text-xs lg:text-sm text-gray-500">Partner organizations</p>
           </div>
         </div>
 
-        <div className="text-center mt-8">
-          <p className="text-sm text-gray-400">
+        <div className="text-center mt-6 lg:mt-8">
+          <p className="text-sm text-gray-400 px-4">
             Updated in real-time from active mutual aid networks
           </p>
         </div>
 
         {/* Mutual Aid Partners Attribution */}
-        <div className="mt-12 bg-slate-800/40 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+        <div className="mt-8 lg:mt-12 bg-slate-800/40 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-slate-700/50">
           <div className="text-center mb-6">
-            <h3 className="text-2xl font-semibold text-white mb-4">
+            <h3 className="text-xl lg:text-2xl font-semibold text-white mb-4">
               Grateful for Our Mutual Aid Partners
             </h3>
-            <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+            <p className="text-gray-300 text-base lg:text-lg max-w-3xl mx-auto px-4">
               These numbers represent the collaborative efforts of dedicated organizations working together 
               to build resilient communities and coordinate disaster response.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6 mt-6 lg:mt-8">
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-2xl font-bold text-emerald-400 mb-1">Valley Hope Foundation</div>
-                <p className="text-sm text-gray-400">Community resilience partner</p>
+                <div className="text-lg lg:text-2xl font-bold text-emerald-400 mb-1">Valley Hope Foundation</div>
+                <p className="text-xs lg:text-sm text-gray-400">Community resilience partner</p>
               </div>
             </div>
             
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-2xl font-bold text-blue-400 mb-1">R4 Reach</div>
-                <p className="text-sm text-gray-400">Resource coordination network</p>
+                <div className="text-lg lg:text-2xl font-bold text-blue-400 mb-1">R4 Reach</div>
+                <p className="text-xs lg:text-sm text-gray-400">Resource coordination network</p>
               </div>
             </div>
             
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-2xl font-bold text-cyan-400 mb-1">WNC Supply Sites</div>
-                <p className="text-sm text-gray-400">Western NC disaster relief</p>
+                <div className="text-lg lg:text-2xl font-bold text-cyan-400 mb-1">WNC Supply Sites</div>
+                <p className="text-xs lg:text-sm text-gray-400">Western NC disaster relief</p>
               </div>
             </div>
             
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-2xl font-bold text-red-400 mb-1">Aid Arena</div>
-                <p className="text-sm text-gray-400">Crisis response coordination platform</p>
+                <div className="text-lg lg:text-2xl font-bold text-red-400 mb-1">Aid Arena</div>
+                <p className="text-xs lg:text-sm text-gray-400">Crisis response coordination platform</p>
               </div>
             </div>
             
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-2xl font-bold text-purple-400 mb-1">Regional Networks</div>
-                <p className="text-sm text-gray-400">Local mutual aid groups</p>
+                <div className="text-lg lg:text-2xl font-bold text-purple-400 mb-1">Regional Networks</div>
+                <p className="text-xs lg:text-sm text-gray-400">Local mutual aid groups</p>
               </div>
             </div>
             
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-2xl font-bold text-orange-400 mb-1">Community Partners</div>
-                <p className="text-sm text-gray-400">Grassroots organizations</p>
+                <div className="text-lg lg:text-2xl font-bold text-orange-400 mb-1">Community Partners</div>
+                <p className="text-xs lg:text-sm text-gray-400">Grassroots organizations</p>
               </div>
             </div>
           </div>

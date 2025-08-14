@@ -59,6 +59,32 @@
     font-size: 12px;
     white-space: nowrap;
   }
+
+  /* Stats card mobile improvements */
+  .stats-grid-mobile {
+    gap: 12px !important;
+  }
+  
+  .stats-card-mobile {
+    min-height: 120px;
+    padding: 16px !important;
+  }
+  
+  .stats-card-mobile h3 {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    font-weight: 500 !important;
+  }
+  
+  .stats-card-mobile .stats-number {
+    font-size: 24px !important;
+    line-height: 1.1 !important;
+  }
+  
+  .stats-card-mobile p {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
 }
 
 .card-hover-effect:hover::before {
