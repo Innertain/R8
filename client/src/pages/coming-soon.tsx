@@ -3,7 +3,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Loader2, Phone, Shield, Users, Globe, ArrowRight, Leaf, Mountain, Waves, Eye, Heart, TrendingUp, Zap, Search, Database, Satellite, Network, TreePine, AlertTriangle, MapPin } from 'lucide-react';
+import { Loader2, Phone, Shield, Users, Globe, ArrowRight, Leaf, Mountain, Waves, Eye, Heart, TrendingUp, Zap, Search, Database, Satellite, Network, TreePine, AlertTriangle } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
@@ -199,23 +199,6 @@ export default function ComingSoonPage() {
                       <Globe className="w-4 h-4 mr-2" />
                       Email Us
                     </Button>
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
-                      onClick={() => setPhoneNumber("555-DEMO")}
-                    >
-                      <Users className="w-4 h-4 mr-2" />
-                      Try Demo
-                    </Button>
-                  </div>
-
-                  <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4 mt-6">
-                    <h5 className="text-sm font-semibold text-blue-300 mb-2">Demo Account</h5>
-                    <p className="text-xs text-blue-200">
-                      Use phone number <span className="font-mono bg-blue-800 px-2 py-1 rounded">555-DEMO</span> to explore the platform with sample data.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -262,7 +245,7 @@ export default function ComingSoonPage() {
             <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
               <CardContent className="p-6 text-center space-y-4">
                 <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto">
-                  <MapPin className="w-6 h-6 text-cyan-400" />
+                  <Database className="w-6 h-6 text-cyan-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-white">Supply Site Mapping</h3>
                 <p className="text-gray-400">Real-time mapping of disaster supply sites and resource availability.</p>
