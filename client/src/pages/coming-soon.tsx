@@ -130,8 +130,99 @@ export default function ComingSoonPage() {
               </p>
             </div>
 
-            {/* Mission Statement */}
+            {/* Login Section */}
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50">
+              <h3 className="text-2xl font-semibold text-white mb-6 text-center">Request Platform Access</h3>
+              
+              <form onSubmit={handlePhoneSubmit} className="max-w-md mx-auto space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+                      Phone Number
+                    </label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="(555) 123-4567"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="bg-slate-700/50 border-slate-600 text-white placeholder-gray-400 focus:border-emerald-400 focus:ring-emerald-400"
+                      disabled={loading}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Enter your phone number to check access eligibility
+                    </p>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={loading || !phoneNumber.trim()}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold py-3 transition-all duration-300"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Verifying Access...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-4 h-4 mr-2" />
+                        Request Access
+                      </>
+                    )}
+                  </Button>
+
+                  {message && (
+                    <Alert className={`${message.includes('granted') ? 'border-green-500 bg-green-500/10' : 'border-yellow-500 bg-yellow-500/10'}`}>
+                      <AlertDescription className={`${message.includes('granted') ? 'text-green-400' : 'text-yellow-400'}`}>
+                        {message}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              </form>
+
+              <div className="mt-8 pt-6 border-t border-slate-600">
+                <div className="text-center space-y-4">
+                  <h4 className="text-lg font-semibold text-white">Don't have access yet?</h4>
+                  <p className="text-gray-300 text-sm">
+                    R8 is currently in limited beta. Contact our team to request demo access for your organization.
+                  </p>
+                  
+                  <div className="flex flex-wrap justify-center gap-3 mt-4">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
+                      onClick={() => window.open('mailto:access@regenerative8.org?subject=Platform Access Request', '_blank')}
+                    >
+                      <Globe className="w-4 h-4 mr-2" />
+                      Email Us
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
+                      onClick={() => setPhoneNumber("555-DEMO")}
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Try Demo
+                    </Button>
+                  </div>
+
+                  <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4 mt-6">
+                    <h5 className="text-sm font-semibold text-blue-300 mb-2">Demo Account</h5>
+                    <p className="text-xs text-blue-200">
+                      Use phone number <span className="font-mono bg-blue-800 px-2 py-1 rounded">555-DEMO</span> to explore the platform with sample data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mission Statement */}
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50 mt-8">
               <h3 className="text-2xl font-semibold text-white mb-4">Our Mission</h3>
               <p className="text-gray-300 text-lg leading-relaxed">
                 R8 represents a paradigm shift in how communities prepare for, respond to, and recover from disasters. 
