@@ -282,7 +282,7 @@ export default function ComingSoonPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-white/90 mb-4">
-                  Connect 2,340+ active volunteers across 156 community partnerships for disaster relief and ecological restoration.
+                  Connect active volunteers across community partnerships for disaster relief and ecological restoration.
                 </p>
                 <div className="space-y-2 text-sm text-white/80">
                   <div>• Shift scheduling & availability</div>
