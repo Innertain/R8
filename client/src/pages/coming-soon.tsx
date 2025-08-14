@@ -205,9 +205,9 @@ export default function ComingSoonPage() {
             </div>
 
             {/* Mission Statement */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50 mt-8">
-              <h3 className="text-2xl font-semibold text-white mb-4">Our Mission</h3>
-              <p className="text-gray-300 text-lg leading-relaxed">
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50 mt-8 w-full">
+              <h3 className="text-2xl font-semibold text-white mb-6 text-center">Our Mission</h3>
+              <p className="text-gray-300 text-lg leading-relaxed text-center max-w-4xl mx-auto">
                 R8 represents a paradigm shift in how communities prepare for, respond to, and recover from disasters. 
                 By connecting mutual aid networks, coordinating volunteer efforts, and facilitating bioregional regeneration projects, 
                 we're building the infrastructure for truly resilient communities that can thrive in the face of climate change and other challenges.
