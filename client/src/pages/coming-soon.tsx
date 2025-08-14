@@ -107,7 +107,7 @@ export default function ComingSoonPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
       {/* Hero Section with R8 Branding */}
-      <div className="relative min-h-screen lg:min-h-screen hero-mobile overflow-hidden">
+      <div className="relative min-h-[50vh] lg:min-h-screen hero-mobile overflow-hidden">
         {/* Dynamic Background Images */}
         <div className="absolute inset-0">
           <div 
@@ -128,10 +128,10 @@ export default function ComingSoonPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-dark/90" />
 
         {/* Hero Content */}
-        <div className="relative z-10 flex items-center justify-center min-h-[70vh] lg:min-h-screen px-4 lg:px-6 py-6 lg:py-12">
-          <div className="text-center space-y-12 max-w-5xl mx-auto">
+        <div className="relative z-10 flex items-center justify-center min-h-[50vh] lg:min-h-screen px-4 lg:px-6 py-4 lg:py-12">
+          <div className="text-center space-y-6 lg:space-y-12 max-w-5xl mx-auto">
             {/* Prominent R8 Branding */}
-            <div className="space-y-6">
+            <div className="space-y-3 lg:space-y-6">
               <div className="flex items-center justify-center space-x-6">
                 <img 
                   src={r8LogoWhite}

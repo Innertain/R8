@@ -134,26 +134,48 @@
 
   /* Complete mobile layout override */
   @media (max-width: 768px) {
-    .min-h-screen {
-      min-height: 60vh !important;
-    }
-    
+    /* Remove all large heights and gaps */
+    .min-h-screen, 
+    .min-h-\[60vh\],
+    .min-h-\[70vh\],
+    .min-h-\[80vh\],
     .min-h-\[40vh\] {
-      min-height: 30vh !important;
+      min-height: auto !important;
     }
     
+    /* Aggressive section spacing reduction */
     section {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+      margin-top: -4rem !important;
+      margin-bottom: 0 !important;
+    }
+    
+    /* Hero section mobile - make it much smaller */
+    .hero-mobile {
+      min-height: 50vh !important;
+      padding-bottom: 0 !important;
+    }
+    
+    .hero-mobile .relative.z-10 {
+      min-height: 50vh !important;
       padding-top: 1rem !important;
       padding-bottom: 1rem !important;
+    }
+    
+    /* Mission section - eliminate all extra space */
+    section.relative {
+      min-height: auto !important;
+      padding-top: 0 !important;
+      padding-bottom: 1rem !important;
+      margin-top: -5rem !important;
+    }
+    
+    /* Content containers */
+    .relative.z-10.max-w-6xl,
+    .relative.z-10.max-w-7xl {
       margin-top: -3rem !important;
-    }
-    
-    .hero-mobile {
-      min-height: 60vh !important;
-    }
-    
-    .relative.z-10.max-w-6xl {
-      margin-top: -2rem !important;
+      padding-top: 0 !important;
     }
 
     /* Partner cards mobile fix */
@@ -174,6 +196,15 @@
     .bg-slate-700\/50 p {
       font-size: 10px !important;
       line-height: 1.1 !important;
+    }
+
+    /* Force tight spacing */
+    .space-y-12 {
+      gap: 1rem !important;
+    }
+    
+    .space-y-6 {
+      gap: 0.5rem !important;
     }
   }
 }
