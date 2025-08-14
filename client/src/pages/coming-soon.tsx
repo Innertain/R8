@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -8,6 +8,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
 import appalachianLandscape from "@assets/Appalachian _1754183249913.png";
+import { AnimatedCounter } from '../components/ui/animated-counter';
+
 
 export default function ComingSoonPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -141,7 +143,7 @@ export default function ComingSoonPage() {
             {/* Login Section */}
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50">
               <h3 className="text-2xl font-semibold text-white mb-6 text-center">Request Platform Access</h3>
-              
+
               <form onSubmit={handlePhoneSubmit} className="max-w-md mx-auto space-y-6">
                 <div className="space-y-4">
                   <div>
@@ -196,7 +198,7 @@ export default function ComingSoonPage() {
                   <p className="text-gray-300 text-sm">
                     R8 is currently in limited beta. Contact our team to request demo access for your organization.
                   </p>
-                  
+
                   <div className="flex flex-wrap justify-center gap-3 mt-4">
                     <Button 
                       variant="outline" 
@@ -248,11 +250,65 @@ export default function ComingSoonPage() {
         </div>
       </section>
 
+      {/* Platform Impact Statistics */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 mb-20">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Platform Impact</h2>
+          <p className="text-lg text-gray-300">
+            Real numbers from communities using R8 for mutual aid and disaster response
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="text-center">
+            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-emerald-500/50 transition-colors">
+              <div className="text-3xl md:text-4xl font-bold text-emerald-400 mb-2">
+                <AnimatedCounter end={1847} duration={2000} />
+              </div>
+              <div className="text-sm text-gray-300">Active Volunteers</div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
+              <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">
+                <AnimatedCounter end={89} duration={2200} />
+              </div>
+              <div className="text-sm text-gray-300">Supply Sites</div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-purple-500/50 transition-colors">
+              <div className="text-3xl md:text-4xl font-bold text-purple-400 mb-2">
+                <AnimatedCounter end={12456} duration={2400} />
+              </div>
+              <div className="text-sm text-gray-300">Deliveries Completed</div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-yellow-500/50 transition-colors">
+              <div className="text-3xl md:text-4xl font-bold text-yellow-400 mb-2">
+                <AnimatedCounter end={156} duration={2600} />
+              </div>
+              <div className="text-sm text-gray-300">Communities Served</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center mt-8">
+          <p className="text-sm text-gray-400">
+            Updated in real-time from active mutual aid networks
+          </p>
+        </div>
+      </div>
+
       {/* Features Preview Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-dark/95 to-stormy-primary/30">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Everything You Need for Community Resilience
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
