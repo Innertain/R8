@@ -3,7 +3,8 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Loader2, Phone, Shield, Users, Globe, ArrowRight, Leaf, Mountain, Waves, Eye, Heart, TrendingUp, Zap, Search, Database, Satellite } from 'lucide-react';
+import { Loader2, Phone, Shield, Users, Globe, ArrowRight, Leaf, Mountain, Waves, Eye, Heart, TrendingUp, Zap, Search, Database, Satellite, Network, TreePine, AlertTriangle } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
 import appalachianLandscape from "@assets/Appalachian _1754183249913.png";
@@ -20,10 +21,10 @@ export default function ComingSoonPage() {
     if (robotsMeta) {
       robotsMeta.setAttribute('content', 'index, follow');
     }
-    
+
     // Set page title and description for SEO
     document.title = 'R8 - Resilience, Response, Regeneration | Coming Soon';
-    
+
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', 'R8 platform connecting mutual aid networks with disaster supply sites, coordinating volunteers across bioregional regeneration projects. Coming soon - request demo access.');
@@ -114,139 +115,34 @@ export default function ComingSoonPage() {
 
         {/* Hero Content */}
         <div className="relative z-10 flex items-center justify-center h-full px-6">
-          <div className="text-center max-w-6xl mx-auto">
-            <div className="flex items-center justify-center mb-8">
-              <img 
-                src={r8LogoWhite}
-                alt="R8 Logo" 
-                className="w-20 h-20 mr-4"
-              />
-              <h1 className="text-6xl font-bold tracking-wide gradient-text-r8">R8</h1>
+          <div className="text-center space-y-8 max-w-4xl mx-auto">
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-500 to-blue-600 bg-clip-text text-transparent">
+                R8
+              </h1>
+              <h2 className="text-2xl md:text-4xl font-semibold text-white">
+                Resilience • Response • Regeneration
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                A comprehensive platform connecting mutual aid networks with disaster supply sites, 
+                coordinating volunteers across bioregional regeneration projects, and building resilient communities 
+                through integrated response systems.
+              </p>
             </div>
 
-            <div className="space-y-6">
-              {/* Main 3 R's with Reactive Gradient Effects */}
-              <div className="text-center">
-                <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-                  <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:rotate-1">
-                    <span className="gradient-word-resilience drop-shadow-xl">Resilience</span>
-                  </span>
-                  <span className="mx-3 text-white/40 text-2xl">→</span>
-                  <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:-rotate-1">
-                    <span className="gradient-word-response drop-shadow-xl">Response</span>
-                  </span>
-                  <span className="mx-3 text-white/40 text-2xl">→</span>
-                  <span className="inline-block transform hover:scale-105 transition-all duration-300 hover:rotate-1">
-                    <span className="gradient-word-regeneration drop-shadow-xl">Regeneration</span>
-                  </span>
-                </h2>
-              </div>
-
-              {/* Continuous Scrolling R Words */}
-              <div className="relative overflow-hidden h-12">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="animate-scroll-seamless whitespace-nowrap flex items-center text-lg">
-                    <span className="scroll-word-purple mx-8">
-                      <span className="text-2xl font-black">R</span>esponsibility
-                    </span>
-                    <span className="scroll-word-amber mx-8">
-                      <span className="text-2xl font-black">R</span>esources
-                    </span>
-                    <span className="scroll-word-teal mx-8">
-                      <span className="text-2xl font-black">R</span>ecovery
-                    </span>
-                    <span className="scroll-word-emerald mx-8">
-                      <span className="text-2xl font-black">R</span>estoration
-                    </span>
-                    <span className="scroll-word-indigo mx-8">
-                      <span className="text-2xl font-black">R</span>enewal
-                    </span>
-                    <span className="scroll-word-rose mx-8">
-                      <span className="text-2xl font-black">R</span>esilience
-                    </span>
-                    <span className="scroll-word-cyan mx-8">
-                      <span className="text-2xl font-black">R</span>egeneration
-                    </span>
-                    <span className="scroll-word-orange mx-8">
-                      <span className="text-2xl font-black">R</span>eadiness
-                    </span>
-                    <span className="scroll-word-purple mx-8 text-3xl">
-                      ∞
-                    </span>
-                    <span className="scroll-word-lime mx-8">
-                      <span className="text-2xl font-black">R</span>ehabilitation
-                    </span>
-                    <span className="scroll-word-pink mx-8">
-                      <span className="text-2xl font-black">R</span>evitalization
-                    </span>
-                    <span className="scroll-word-violet mx-8">
-                      <span className="text-2xl font-black">R</span>evolution
-                    </span>
-                    <span className="scroll-word-sky mx-8">
-                      <span className="text-2xl font-black">R</span>escue
-                    </span>
-                    <span className="scroll-word-red mx-8">
-                      <span className="text-2xl font-black">R</span>eclamation
-                    </span>
-                    <span className="scroll-word-emerald mx-8">
-                      <span className="text-2xl font-black">R</span>ejuvenation
-                    </span>
-                    <span className="scroll-word-teal mx-8">
-                      <span className="text-2xl font-black">R</span>eplenishment
-                    </span>
-                    <span className="scroll-word-amber mx-8">
-                      <span className="text-2xl font-black">R</span>elief
-                    </span>
-                    <span className="scroll-word-cyan mx-8 text-3xl">
-                      ∞
-                    </span>
-                    {/* Seamless duplicate for continuous scroll */}
-                    <span className="scroll-word-purple mx-8">
-                      <span className="text-2xl font-black">R</span>esponsibility
-                    </span>
-                    <span className="scroll-word-amber mx-8">
-                      <span className="text-2xl font-black">R</span>esources
-                    </span>
-                    <span className="scroll-word-teal mx-8">
-                      <span className="text-2xl font-black">R</span>ecovery
-                    </span>
-                    <span className="scroll-word-emerald mx-8">
-                      <span className="text-2xl font-black">R</span>estoration
-                    </span>
-                    <span className="scroll-word-indigo mx-8">
-                      <span className="text-2xl font-black">R</span>enewal
-                    </span>
-                    <span className="scroll-word-rose mx-8">
-                      <span className="text-2xl font-black">R</span>esilience
-                    </span>
-                    <span className="scroll-word-cyan mx-8">
-                      <span className="text-2xl font-black">R</span>egeneration
-                    </span>
-                    <span className="scroll-word-orange mx-8">
-                      <span className="text-2xl font-black">R</span>eadiness
-                    </span>
-                    <span className="scroll-word-purple mx-8 text-3xl">
-                      ∞
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Coming Soon Notice */}
-              <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 max-w-2xl mx-auto backdrop-blur-sm">
-                <p className="text-yellow-200 text-lg font-medium">
-                  🚧 Platform Coming Soon - Demo Access Available
-                </p>
-              </div>
-
-              <p className="text-lg text-white/90 max-w-2xl mx-auto leading-relaxed">
-                Driving community transformation and ecological regeneration through integrated disaster response and ecosystem restoration.
+            {/* Mission Statement */}
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50">
+              <h3 className="text-2xl font-semibold text-white mb-4">Our Mission</h3>
+              <p className="text-gray-300 text-lg leading-relaxed">
+                R8 represents a paradigm shift in how communities prepare for, respond to, and recover from disasters. 
+                By connecting mutual aid networks, coordinating volunteer efforts, and facilitating bioregional regeneration projects, 
+                we're building the infrastructure for truly resilient communities that can thrive in the face of climate change and other challenges.
               </p>
             </div>
           </div>
         </div>
 
-        </div>
+      </div>
 
       {/* Features Preview Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-dark/95 to-stormy-primary/30">
@@ -260,138 +156,128 @@ export default function ComingSoonPage() {
             </p>
           </div>
 
-          {/* Key Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {/* Real-time Emergency Monitoring */}
-            <Card className="bg-red-600/20 border-red-400/30 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-3 bg-red-600 rounded-lg">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white">Disaster Relief</h3>
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Users className="w-6 h-6 text-emerald-400" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/90 mb-4">
-                  Track active weather alerts, wildfire incidents, earthquakes, and disasters across all states. Providing supply distribution, delivery, and inventory logistics for community-led aid efforts.
-                </p>
-                <div className="space-y-2 text-sm text-white/80">
-                  <div>• Emergency response coordination</div>
-                  <div>• Supply chain management</div>
-                  <div>• Resource allocation tracking</div>
-                  <div>• Community network integration</div>
-                </div>
+                <h3 className="text-xl font-semibold text-white">Mutual Aid Networks</h3>
+                <p className="text-gray-400">Connect communities with disaster relief resources and volunteer coordination.</p>
               </CardContent>
             </Card>
 
-            {/* Volunteer Networks */}
-            <Card className="bg-blue-600/20 border-blue-400/30 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-3 bg-blue-600 rounded-lg">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white">Volunteer Networks</h3>
+            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <MapPin className="w-6 h-6 text-cyan-400" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/90 mb-4">
-                  Connect active volunteers across community partnerships for disaster relief and ecological restoration.
-                </p>
-                <div className="space-y-2 text-sm text-white/80">
-                  <div>• Shift scheduling & availability</div>
-                  <div>• Skills-based matching</div>
-                  <div>• Impact tracking</div>
-                  <div>• Community coordination</div>
-                </div>
+                <h3 className="text-xl font-semibold text-white">Supply Site Mapping</h3>
+                <p className="text-gray-400">Real-time mapping of disaster supply sites and resource availability.</p>
               </CardContent>
             </Card>
 
-            {/* Bioregional Restoration */}
-            <Card className="bg-emerald-600/20 border-emerald-400/30 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-3 bg-emerald-600 rounded-lg">
-                    <Globe className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white">Bioregional Regeneration</h3>
+            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Heart className="w-6 h-6 text-blue-400" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/90 mb-4">
-                  Explore 846 global ecoregions with traditional knowledge systems, active restoration projects, and indigenous partnerships.
-                </p>
-                <div className="space-y-2 text-sm text-white/80">
-                  <div>• Traditional ecological practices</div>
-                  <div>• Watershed management</div>
-                  <div>• Native species recovery</div>
-                  <div>• Cultural preservation</div>
+                <h3 className="text-xl font-semibold text-white">Bioregional Projects</h3>
+                <p className="text-gray-400">Coordinate long-term regeneration projects across bioregional boundaries.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <AlertTriangle className="w-6 h-6 text-orange-400" />
                 </div>
+                <h3 className="text-xl font-semibold text-white">Real-time Alerts</h3>
+                <p className="text-gray-400">Stay informed with real-time disaster alerts and emergency notifications.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Network className="w-6 h-6 text-purple-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white">Network Coordination</h3>
+                <p className="text-gray-400">Seamlessly coordinate between multiple organizations and response teams.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <TreePine className="w-6 h-6 text-green-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white">Regenerative Projects</h3>
+                <p className="text-gray-400">Build long-term community resilience through ecological restoration.</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Access Form */}
-          <Card className="max-w-md mx-auto bg-white/10 border-white/20 backdrop-blur-sm">
-            <CardHeader className="text-center">
-              <Phone className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-              <CardTitle className="text-white">Request Demo Access</CardTitle>
-              <CardDescription className="text-white/80">
-                Enter your phone number to check for demo access
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handlePhoneSubmit} className="space-y-4">
-                <div>
-                  <Input
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
-                    className="text-center text-xl py-3 bg-white/90 border-white/50 text-gray-900 placeholder-gray-600 font-medium tracking-wide focus:bg-white focus:border-blue-500"
-                  />
-                </div>
+          {/* FAQ Accordion */}
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-3xl font-semibold text-white mb-8 text-center">Frequently Asked Questions</h3>
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="what-is-r8" className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:text-emerald-400 text-left">
+                  What is R8 and how does it work?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-300 text-base leading-relaxed">
+                  R8 is a comprehensive platform that connects mutual aid networks with disaster supply sites and coordinates volunteers across bioregional regeneration projects. It works by creating a unified system where communities can share resources, coordinate response efforts, and build long-term resilience through integrated planning and communication tools.
+                </AccordionContent>
+              </AccordionItem>
 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
-                  disabled={loading || !phoneNumber}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    'Check Access'
-                  )}
-                </Button>
-              </form>
+              <AccordionItem value="who-can-use" className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:text-emerald-400 text-left">
+                  Who can use the R8 platform?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-300 text-base leading-relaxed">
+                  R8 is designed for mutual aid organizations, disaster response teams, community organizers, environmental groups, and individuals who want to contribute to community resilience. The platform serves both emergency response coordinators and long-term regeneration project managers.
+                </AccordionContent>
+              </AccordionItem>
 
-              {message && (
-                <Alert className={`mt-4 ${message.includes('granted') 
-                  ? 'border-green-500 bg-green-500/20 text-green-400' 
-                  : 'border-red-500 bg-red-500/20 text-red-400'
-                }`}>
-                  <AlertDescription>
-                    {message}
-                  </AlertDescription>
-                </Alert>
-              )}
+              <AccordionItem value="features" className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:text-emerald-400 text-left">
+                  What features does R8 include?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-300 text-base leading-relaxed">
+                  R8 includes real-time disaster mapping, volunteer coordination tools, supply site tracking, bioregional project management, emergency alert systems, mutual aid network integration, and long-term community resilience planning tools. The platform brings together immediate response capabilities with sustainable regeneration planning.
+                </AccordionContent>
+              </AccordionItem>
 
-              <div className="mt-6 pt-4 border-t border-white/20 text-center">
-                <p className="text-sm text-white/70 mb-2">
-                  Don't have access yet?
-                </p>
-                <p className="text-xs text-white/60">
-                  Contact our team for demo access: <br />
-                  <span className="font-medium text-blue-400">team@regenerative8.org</span>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+              <AccordionItem value="data-sources" className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:text-emerald-400 text-left">
+                  What data sources does R8 integrate?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-300 text-base leading-relaxed">
+                  R8 integrates multiple authoritative data sources including NOAA climate data, FEMA disaster declarations, NASA Earth observation data, USGS geological information, and real-time feeds from emergency management agencies. This ensures users have access to the most current and reliable information for decision-making.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="bioregions" className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:text-emerald-400 text-left">
+                  How does the bioregional approach work?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-300 text-base leading-relaxed">
+                  R8's bioregional approach recognizes that ecological and social systems extend beyond political boundaries. The platform organizes projects and resources around natural ecological regions, allowing for more effective coordination of regeneration efforts and resource sharing based on shared environmental and cultural characteristics.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="getting-started" className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:text-emerald-400 text-left">
+                  How can I get started with R8?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-300 text-base leading-relaxed">
+                  Request access through the form above to join our demo program. We're currently working with select organizations and communities to refine the platform before the full public launch. Early access users help us test features and provide feedback to ensure R8 meets real-world community needs.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
         </div>
       </section>
 
