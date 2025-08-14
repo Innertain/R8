@@ -611,11 +611,11 @@ export default function ComingSoonPage() {
 
             <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
               <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto">
-                  <Network className="w-6 h-6 text-purple-400" />
+                <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Users className="w-6 h-6 text-emerald-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white">Network Coordination</h3>
-                <p className="text-gray-400">Seamlessly coordinate between multiple organizations and response teams.</p>
+                <h3 className="text-xl font-semibold text-white">Volunteer Management</h3>
+                <p className="text-gray-400">Efficiently coordinate and schedule 69+ active volunteers across multiple disaster response and regeneration projects.</p>
               </CardContent>
             </Card>
 
