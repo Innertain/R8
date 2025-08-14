@@ -675,7 +675,7 @@ export default function ComingSoonPage() {
                   <div className="w-6 h-6 text-blue-400">🚚</div>
                 </div>
                 <h3 className="text-xl font-semibold text-white">Driver Network & Logistics</h3>
-                <p className="text-gray-400">Coordinate our network of 208+ active drivers to efficiently distribute aid from supply sites to communities in need.</p>
+                <p className="text-gray-400">Coordinate our driver network and logistics platform to efficiently distribute aid from supply sites to communities in need.</p>
               </CardContent>
             </Card>
 
