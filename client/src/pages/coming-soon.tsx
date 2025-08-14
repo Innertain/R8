@@ -760,7 +760,7 @@ export default function ComingSoonPage() {
                 <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
               </p>
               <p className="text-white/60 text-sm">
-                Building resilient communities through data-driven disaster response and bioregional coordination.
+                Empowering grassroots mutual aid with the best technology tools and network.
               </p>
             </div>
 
@@ -825,7 +825,7 @@ export default function ComingSoonPage() {
           {/* Bottom Bar */}
           <div className="border-t border-white/20 pt-8 text-center">
             <div className="text-sm text-white/60">
-              &copy; 2025 R8. Building resilient communities through data-driven response.
+              &copy; 2025 R8. Empowering grassroots mutual aid with the best technology tools and network.
             </div>
           </div>
         </div>
