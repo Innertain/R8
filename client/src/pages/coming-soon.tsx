@@ -229,11 +229,12 @@ export default function ComingSoonPage() {
             </div>
         </div>
       </div>
+      
       {/* Mission Section */}
-      <section className="relative py-20 min-h-screen flex items-center overflow-hidden">
-        {/* Parallax Background */}
+      <section className="relative py-20 min-h-screen flex items-center overflow-hidden -mt-32">
+        {/* Extended Parallax Background */}
         <div 
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full"
           style={{
             backgroundImage: `url(${appalachianLandscape})`,
             backgroundSize: 'cover',
@@ -241,16 +242,18 @@ export default function ComingSoonPage() {
             backgroundRepeat: 'no-repeat',
             transform: `translateY(${scrollY * 0.5}px)`,
             willChange: 'transform',
+            top: '-20px',
+            height: 'calc(100% + 40px)',
           }}
         />
         
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-slate-900/70" />
+        {/* Gradient Overlay for Smooth Transition */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/40 via-slate-900/70 to-slate-900/80" />
         
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-6 w-full">
           <div className="text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">Our Mission</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 pt-20">Our Mission</h2>
             <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl p-12 border border-slate-700/50 shadow-2xl">
               <h3 className="text-2xl md:text-3xl font-semibold text-emerald-400 mb-8">
                 Empowering mutual aid for regenerative disaster response and recovery.
