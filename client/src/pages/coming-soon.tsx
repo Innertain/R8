@@ -265,41 +265,129 @@ export default function ComingSoonPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="text-center">
-            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-emerald-500/50 transition-colors">
-              <div className="text-3xl md:text-4xl font-bold text-emerald-400 mb-2">
-                <AnimatedCounter end={1847} duration={2000} />
-              </div>
-              <div className="text-sm text-gray-300">Active Volunteers</div>
+        {/* Main Stats Grid - Top Row */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          {/* Supply Sites */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Supply Sites</h3>
+              <MapPin className="w-4 h-4 text-blue-500" />
             </div>
+            <div className="text-3xl font-bold text-blue-600 mb-1">
+              <AnimatedCounter end={425} duration={2000} />
+            </div>
+            <p className="text-xs text-gray-500">Active locations</p>
           </div>
 
-          <div className="text-center">
-            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
-              <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">
-                <AnimatedCounter end={89} duration={2200} />
-              </div>
-              <div className="text-sm text-gray-300">Supply Sites</div>
+          {/* Completed Deliveries */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Completed Deliveries</h3>
+              <div className="w-4 h-4 text-green-500">✓</div>
             </div>
+            <div className="text-3xl font-bold text-green-600 mb-1">
+              <AnimatedCounter end={1219} duration={2200} />
+            </div>
+            <p className="text-xs text-gray-500">Successfully delivered</p>
           </div>
 
-          <div className="text-center">
-            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-purple-500/50 transition-colors">
-              <div className="text-3xl md:text-4xl font-bold text-purple-400 mb-2">
-                <AnimatedCounter end={12456} duration={2400} />
-              </div>
-              <div className="text-sm text-gray-300">Deliveries Completed</div>
+          {/* Food Boxes */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Food Boxes</h3>
+              <div className="w-4 h-4 text-orange-500">📦</div>
             </div>
+            <div className="text-3xl font-bold text-orange-600 mb-1">
+              <AnimatedCounter end={101790} duration={2400} />
+            </div>
+            <p className="text-xs text-gray-500">Total distributed</p>
           </div>
 
-          <div className="text-center">
-            <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-yellow-500/50 transition-colors">
-              <div className="text-3xl md:text-4xl font-bold text-yellow-400 mb-2">
-                <AnimatedCounter end={156} duration={2600} />
-              </div>
-              <div className="text-sm text-gray-300">Communities Served</div>
+          {/* Volunteers */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Volunteers</h3>
+              <Users className="w-4 h-4 text-purple-500" />
             </div>
+            <div className="text-3xl font-bold text-purple-600 mb-1">
+              <AnimatedCounter end={69} duration={2600} />
+            </div>
+            <p className="text-xs text-gray-500">Active volunteers</p>
+          </div>
+
+          {/* Drivers */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Drivers</h3>
+              <TrendingUp className="w-4 h-4 text-orange-500" />
+            </div>
+            <div className="text-3xl font-bold text-orange-600 mb-1">
+              <AnimatedCounter end={208} duration={2800} />
+            </div>
+            <p className="text-xs text-gray-500">Available drivers</p>
+          </div>
+
+          {/* Estimated Families Helped */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Estimated Families Helped</h3>
+              <Heart className="w-4 h-4 text-cyan-500" />
+            </div>
+            <div className="text-3xl font-bold text-cyan-600 mb-1">
+              <AnimatedCounter end={23248} duration={3000} />
+            </div>
+            <p className="text-xs text-gray-500">Site estimates*</p>
+          </div>
+        </div>
+
+        {/* Secondary Stats Grid - Bottom Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Active Sites (60 days) */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Active Sites (60 days)</h3>
+              <MapPin className="w-4 h-4 text-green-500" />
+            </div>
+            <div className="text-3xl font-bold text-green-600 mb-1">
+              <AnimatedCounter end={240} duration={2000} />
+            </div>
+            <p className="text-xs text-gray-500">Updated inventory recently</p>
+          </div>
+
+          {/* Sites with Deliveries */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Sites with Deliveries</h3>
+              <div className="w-4 h-4 text-blue-500">🚚</div>
+            </div>
+            <div className="text-3xl font-bold text-blue-600 mb-1">
+              <AnimatedCounter end={1295} duration={2200} />
+            </div>
+            <p className="text-xs text-gray-500">Received aid deliveries</p>
+          </div>
+
+          {/* Sites with Recent Activity */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Sites with Recent Activity</h3>
+              <Zap className="w-4 h-4 text-red-500" />
+            </div>
+            <div className="text-3xl font-bold text-red-600 mb-1">
+              <AnimatedCounter end={154} duration={2400} />
+            </div>
+            <p className="text-xs text-gray-500">Active requests or needs</p>
+          </div>
+
+          {/* Mutual Aid Partners */}
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-600">Mutual Aid Partners</h3>
+              <Heart className="w-4 h-4 text-purple-500" />
+            </div>
+            <div className="text-3xl font-bold text-purple-600 mb-1">
+              <AnimatedCounter end={49} duration={2600} />
+            </div>
+            <p className="text-xs text-gray-500">Partner organizations</p>
           </div>
         </div>
 
