@@ -396,7 +396,7 @@ export default function ComingSoonPage() {
               <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
             </p>
             <div className="text-sm text-white/60">
-              &copy; 2025 Regenerative 8. Building resilient communities through data-driven response.
+              &copy; 2025 R8. Building resilient communities through data-driven response.
             </div>
           </div>
         </div>
