@@ -125,7 +125,7 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-dark/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-primary/60" />
 
         {/* Hero Content */}
         <div className="relative z-10 flex items-center justify-center lg:min-h-screen px-4 lg:px-6 py-4 lg:py-12">
@@ -230,8 +230,11 @@ export default function ComingSoonPage() {
         </div>
       </div>
       
+      {/* Smooth Transition Fade */}
+      <div className="relative -mt-2 lg:-mt-4 z-20 h-8 lg:h-16 bg-gradient-to-b from-stormy-primary/30 via-stormy-dark/50 to-transparent"></div>
+      
       {/* Mission Section */}
-<section className="relative py-6 lg:py-20 min-h-[35vh] lg:min-h-screen flex items-center overflow-hidden -mt-12 lg:-mt-32">
+<section className="relative py-6 lg:py-20 min-h-[35vh] lg:min-h-screen flex items-center overflow-hidden -mt-16 lg:-mt-36">
         {/* Extended Parallax Background */}
         <div 
           className="absolute inset-0 w-full"
@@ -247,8 +250,8 @@ export default function ComingSoonPage() {
           }}
         />
         
-        {/* Gradient Overlay for Smooth Transition */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/40 via-slate-900/70 to-slate-900/80" />
+        {/* Enhanced Gradient Overlay for Seamless Transition */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/60 via-stormy-dark/80 to-stormy-primary/40" />
         
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-6 w-full">
