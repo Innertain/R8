@@ -149,9 +149,9 @@
     
     /* Balanced section spacing */
     section {
-      padding-top: 2rem !important;
-      padding-bottom: 2rem !important;
-      margin-top: -2rem !important;
+      padding-top: 1.5rem !important;
+      padding-bottom: 1.5rem !important;
+      margin-top: -1.5rem !important;
       margin-bottom: 0 !important;
     }
     
@@ -171,7 +171,7 @@
     section.relative {
       min-height: 35vh !important;
       padding-top: 1rem !important;
-      padding-bottom: 2rem !important;
+      padding-bottom: 1.5rem !important;
       margin-top: -3rem !important;
     }
     

@@ -488,13 +488,13 @@ export default function ComingSoonPage() {
         </div>
       </section>
       {/* Driver Network & Logistics Section */}
-      <section className="py-8 lg:py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90 -mt-8 lg:mt-0">
+      <section className="py-6 lg:py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90 -mt-6 lg:mt-0">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-10 lg:mb-16">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 lg:mb-6">
+          <div className="text-center mb-8 lg:mb-16">
+            <h2 className="text-xl md:text-2xl lg:text-4xl font-bold text-white mb-3 lg:mb-6">
               Driver Network & Distribution Logistics
             </h2>
-            <p className="text-base lg:text-xl text-white/80 max-w-4xl mx-auto px-4">
+            <p className="text-sm lg:text-xl text-white/80 max-w-4xl mx-auto px-4">
               Our coordinated driver network enables rapid, efficient distribution of aid from supply sites to communities. 
               We've established a proven logistics platform for mutual aid coordination and resource delivery.
             </p>
