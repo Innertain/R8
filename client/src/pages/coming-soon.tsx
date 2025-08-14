@@ -222,11 +222,22 @@ export default function ComingSoonPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">Our Mission</h2>
             <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-12 border border-slate-700/50">
-              <p className="text-xl md:text-2xl text-gray-200 leading-relaxed max-w-5xl mx-auto">
-                R8 represents a paradigm shift in how communities prepare for, respond to, and recover from disasters. 
-                By connecting mutual aid networks, coordinating volunteer efforts, and facilitating bioregional regeneration projects, 
-                we're building the infrastructure for truly resilient communities that can thrive in the face of climate change and other challenges.
-              </p>
+              <h3 className="text-2xl md:text-3xl font-semibold text-emerald-400 mb-8">
+                Empowering mutual aid for regenerative disaster response and recovery.
+              </h3>
+              <div className="space-y-6 text-left max-w-5xl mx-auto">
+                <p className="text-xl text-gray-200 leading-relaxed">
+                  <span className="font-semibold text-white">Real talk:</span> The majority of people recognize that disasters—whether fueled by climate change, systemic failures, or sudden crises—are a growing emergency.
+                </p>
+                <p className="text-xl text-gray-200 leading-relaxed">
+                  Local grassroots communities have real, proven solutions that address root causes and help communities adapt.
+                </p>
+                <p className="text-xl text-gray-200 leading-relaxed">
+                  Yet, these efforts are largely invisible in mainstream media and receive 
+                  <span className="font-bold text-red-400"> less than 2% of global funding</span>, 
+                  despite being some of the most effective, scalable, and cost-efficient approaches to disaster response and long-term resilience.
+                </p>
+              </div>
             </div>
           </div>
         </div>
