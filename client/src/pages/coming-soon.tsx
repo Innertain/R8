@@ -284,14 +284,14 @@ export default function ComingSoonPage() {
           </div>
 
         {/* Main Stats Grid - Top Row - Desktop Constrained, Mobile Optimized */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-4 xl:gap-5 max-w-6xl xl:max-w-7xl mx-auto mb-4 lg:mb-6 stats-grid-mobile">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-3 xl:gap-4 max-w-5xl xl:max-w-6xl mx-auto mb-4 lg:mb-6 stats-grid-mobile">
           {/* Supply Sites */}
           <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Supply Sites</h3>
               <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-blue-500 flex-shrink-0" />
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-blue-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={425} duration={2000} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Active locations</p>
@@ -303,7 +303,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Completed Deliveries</h3>
               <div className="w-4 h-4 lg:w-5 lg:h-5 text-green-500 flex-shrink-0">✓</div>
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-green-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-green-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={1219} duration={2200} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Successfully delivered</p>
@@ -315,7 +315,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Food Boxes</h3>
               <div className="w-4 h-4 lg:w-5 lg:h-5 text-orange-500 flex-shrink-0">📦</div>
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-orange-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={101790} duration={2400} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Total distributed</p>
@@ -327,7 +327,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Volunteers</h3>
               <Users className="w-4 h-4 lg:w-5 lg:h-5 text-purple-500 flex-shrink-0" />
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-purple-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-purple-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={69} duration={2600} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Active volunteers</p>
@@ -339,7 +339,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Drivers</h3>
               <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-orange-500 flex-shrink-0" />
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-orange-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={208} duration={2800} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Available drivers</p>
@@ -351,7 +351,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Families Helped</h3>
               <Heart className="w-4 h-4 lg:w-5 lg:h-5 text-cyan-500 flex-shrink-0" />
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-cyan-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-cyan-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={23248} duration={3000} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Site estimates*</p>
@@ -359,14 +359,14 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Secondary Stats Grid - Bottom Row - Desktop Constrained, Mobile Optimized */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-4 xl:gap-5 max-w-5xl mx-auto stats-grid-mobile">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-3 xl:gap-4 max-w-4xl mx-auto stats-grid-mobile">
           {/* Active Sites (60 days) */}
           <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Active Sites (60 days)</h3>
               <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-green-500 flex-shrink-0" />
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-green-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-green-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={240} duration={2000} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Updated inventory recently</p>
@@ -378,7 +378,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Sites with Deliveries</h3>
               <div className="w-4 h-4 lg:w-5 lg:h-5 text-blue-500 flex-shrink-0">🚚</div>
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-blue-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={1295} duration={2200} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Received aid deliveries</p>
@@ -390,7 +390,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Recent Activity</h3>
               <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-red-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-red-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={154} duration={2400} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Active requests or needs</p>
@@ -402,7 +402,7 @@ export default function ComingSoonPage() {
               <h3 className="text-sm lg:text-base font-medium text-gray-600 leading-tight">Aid Partners</h3>
               <Heart className="w-4 h-4 lg:w-5 lg:h-5 text-purple-500 flex-shrink-0" />
             </div>
-            <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-purple-600 mb-1 stats-number">
+            <div className="text-lg lg:text-xl xl:text-2xl font-bold text-purple-600 mb-1 stats-number leading-tight">
               <AnimatedCounter end={49} duration={2600} />
             </div>
             <p className="text-xs lg:text-sm text-gray-500">Partner organizations</p>
