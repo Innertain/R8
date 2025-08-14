@@ -134,25 +134,30 @@
 
   /* Balanced mobile layout */
   @media (max-width: 768px) {
-    /* Optimize heights for mobile - eliminate excess space */
+    /* Hero section - fit content only */
+    .hero-mobile {
+      min-height: 0 !important;
+    }
+    
+    /* Remove fixed heights on mobile */
     .min-h-screen {
-      min-height: auto !important;
+      min-height: 0 !important;
     }
     
     .min-h-\[50vh\] {
-      min-height: auto !important;
+      min-height: 0 !important;
     }
     
     .min-h-\[40vh\],
     .min-h-\[35vh\] {
-      min-height: auto !important;
+      min-height: 0 !important;
     }
     
-    /* Balanced section spacing */
+    /* Tight section spacing */
     section {
-      padding-top: 1.5rem !important;
-      padding-bottom: 1.5rem !important;
-      margin-top: -1.5rem !important;
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+      margin-top: -2rem !important;
       margin-bottom: 0 !important;
     }
     

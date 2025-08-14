@@ -204,7 +204,7 @@ export default function ComingSoonPage() {
                 </div>
               </form>
 
-              <div className="mt-8 pt-6 border-t border-slate-600">
+              <div className="mt-4 pt-4 border-t border-slate-600">
                 <div className="text-center space-y-4">
                   <h4 className="text-lg font-semibold text-white">Don't have access yet?</h4>
                   <p className="text-gray-300 text-sm">
@@ -488,7 +488,7 @@ export default function ComingSoonPage() {
         </div>
       </section>
       {/* Driver Network & Logistics Section */}
-      <section className="py-6 lg:py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90 -mt-6 lg:mt-0">
+      <section className="py-4 lg:py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90 -mt-8 lg:mt-0">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-8 lg:mb-16">
             <h2 className="text-xl md:text-2xl lg:text-4xl font-bold text-white mb-3 lg:mb-6">
