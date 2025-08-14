@@ -100,11 +100,21 @@ export default function ComingSoonPage() {
     <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
       {/* Hero Section with R8 Branding */}
       <div className="relative min-h-screen overflow-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-60" 
-          style={{ backgroundImage: `url(${hawaiiLandscape})` }}
-        />
+        {/* Dynamic Background Images */}
+        <div className="absolute inset-0">
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-60 transition-opacity duration-[8000ms]" 
+            style={{ backgroundImage: `url(${hawaiiLandscape})` }}
+          />
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-[8000ms] animate-pulse" 
+            style={{ 
+              backgroundImage: `url(${appalachianLandscape})`,
+              animationDelay: '4s',
+              animationDuration: '8s'
+            }}
+          />
+        </div>
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-dark/90" />
@@ -244,31 +254,7 @@ export default function ComingSoonPage() {
         </div>
       </section>
 
-      {/* Community Focus Section with Appalachian Background */}
-      <section className="relative py-20 overflow-hidden">
-        {/* Appalachian Background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-50" 
-          style={{ backgroundImage: `url(${appalachianLandscape})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-stormy-dark/90 via-stormy-primary/80 to-stormy-dark/90" />
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <div className="text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">Serving All Communities</h2>
-            <div className="bg-slate-800/70 backdrop-blur-sm rounded-2xl p-12 border border-slate-700/50">
-              <p className="text-2xl text-white font-medium mb-6">
-                From tropical island ecosystems to mountain regions
-              </p>
-              <p className="text-xl text-gray-200 leading-relaxed max-w-4xl mx-auto">
-                R8 connects diverse bioregions and communities across different landscapes, climates, and challenges. 
-                Whether responding to hurricanes in Hawaii or supporting Appalachian communities through environmental transitions, 
-                our platform adapts to local needs while building broader resilience networks.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Platform Impact Statistics */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 mb-20">
