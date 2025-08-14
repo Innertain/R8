@@ -259,7 +259,7 @@ export default function ComingSoonPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-white/90 mb-4">
-                  Track 350+ active weather alerts, wildfire incidents, earthquakes, and disasters across all 50 states using 8 official government data sources.
+                  Track active weather alerts, wildfire incidents, earthquakes, and disasters across all states using official government data sources.
                 </p>
                 <div className="space-y-2 text-sm text-white/80">
                   <div>• FEMA disaster declarations</div>
