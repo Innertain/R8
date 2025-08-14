@@ -868,8 +868,9 @@ export default function ComingSoonPage() {
 
           {/* Bottom Bar */}
           <div className="border-t border-white/20 pt-8 text-center">
-            <div className="text-sm text-white/60">
-              &copy; 2025 R8. Empowering grassroots mutual aid with the best technology tools and network.
+            <div className="text-sm text-white/60 space-y-2">
+              <div>Based in Asheville, NC • Honolulu, HI</div>
+              <div>&copy; 2025 R8. Empowering grassroots mutual aid with the best technology tools and network.</div>
             </div>
           </div>
         </div>
