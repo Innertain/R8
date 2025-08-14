@@ -743,20 +743,87 @@ export default function ComingSoonPage() {
         </div>
       </section>
       {/* Footer */}
-      <footer className="bg-stormy-dark border-t border-stormy-light/30 py-12">
+      <footer className="bg-stormy-dark border-t border-stormy-light/30 py-16">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <img 
-                src={r8LogoWhite}
-                alt="R8 Logo" 
-                className="w-10 h-10 mr-3"
-              />
-              <span className="text-2xl font-bold text-white">R8</span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+            {/* Logo and Mission */}
+            <div className="text-center lg:text-left">
+              <div className="flex items-center justify-center lg:justify-start mb-4">
+                <img 
+                  src={r8LogoWhite}
+                  alt="R8 Logo" 
+                  className="w-10 h-10 mr-3"
+                />
+                <span className="text-2xl font-bold text-white">R8</span>
+              </div>
+              <p className="text-white/80 text-lg mb-4">
+                <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
+              </p>
+              <p className="text-white/60 text-sm">
+                Building resilient communities through data-driven disaster response and bioregional coordination.
+              </p>
             </div>
-            <p className="text-white/80 text-lg mb-6">
-              <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
-            </p>
+
+            {/* Contact Links */}
+            <div className="text-center lg:text-left">
+              <h3 className="text-white font-semibold text-lg mb-4">Contact</h3>
+              <div className="space-y-3">
+                <div>
+                  <a 
+                    href="https://form.jotform.com/250033214947047" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 transition-colors text-sm block"
+                  >
+                    Contact R8 →
+                  </a>
+                </div>
+                <div>
+                  <a 
+                    href="https://form.jotform.com/243608573773062" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm block"
+                  >
+                    Contact Supply Sites →
+                  </a>
+                </div>
+                <div>
+                  <a 
+                    href="https://app.jotform.com/243556240110141/250086799464067" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-emerald-400 hover:text-emerald-300 transition-colors text-sm block"
+                  >
+                    Contact R4 →
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Fiscal Sponsor */}
+            <div className="text-center lg:text-left">
+              <h3 className="text-white font-semibold text-lg mb-4">Fiscal Sponsor</h3>
+              <div className="space-y-2">
+                <p className="text-white/80 text-sm">
+                  Our fiscal sponsor is <span className="font-medium">4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
+                </p>
+                <div>
+                  <a 
+                    href="https://r4reach.org/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-sm"
+                  >
+                    Visit R4 Reach →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-white/20 pt-8 text-center">
             <div className="text-sm text-white/60">
               &copy; 2025 R8. Building resilient communities through data-driven response.
             </div>
