@@ -6,12 +6,27 @@ import { setupVite, serveStatic, log } from "./vite";
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   // Don't exit the process, just log the error
+  // Keep the process running for development
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   // Don't exit the process, just log the error
 });
+
+// Handle SIGTERM and SIGINT gracefully
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT, shutting down gracefully');
+  process.exit(0);
+});
+
+// Prevent exit on warnings
+process.removeAllListeners('warning');
 
 const app = express();
 app.use(express.json());
@@ -79,6 +94,25 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
+  
+  // Add error handling for server listen
+  server.on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${port} is already in use. Trying to recover...`);
+      // Wait a bit and try again
+      setTimeout(() => {
+        server.close();
+        server.listen({
+          port,
+          host: "0.0.0.0",
+          reusePort: true,
+        });
+      }, 1000);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+
   server.listen({
     port,
     host: "0.0.0.0",
