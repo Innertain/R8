@@ -407,7 +407,7 @@ export default function ComingSoonPage() {
             </h2>
             <p className="text-xl text-white/80 max-w-4xl mx-auto">
               Our coordinated driver network enables rapid, efficient distribution of aid from supply sites to communities. 
-              With 208+ active drivers and 1,219+ completed deliveries, we've established a proven logistics system for mutual aid.
+              We've established a proven logistics platform for mutual aid coordination and resource delivery.
             </p>
           </div>
 
@@ -418,23 +418,15 @@ export default function ComingSoonPage() {
                 <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mr-4">
                   <div className="text-2xl">🚚</div>
                 </div>
-                <h3 className="text-2xl font-semibold text-white">Active Driver Network</h3>
+                <h3 className="text-2xl font-semibold text-white">Driver Network Platform</h3>
               </div>
               
               <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-1">
-                      <AnimatedCounter end={208} duration={2000} />
-                    </div>
-                    <div className="text-sm text-gray-300">Active Drivers</div>
-                  </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-1">
-                      <AnimatedCounter end={1219} duration={2200} />
-                    </div>
-                    <div className="text-sm text-gray-300">Completed Deliveries</div>
-                  </div>
+                <div className="bg-slate-700/50 rounded-lg p-6 text-center">
+                  <h4 className="text-lg font-semibold text-white mb-2">Comprehensive Logistics System</h4>
+                  <p className="text-gray-300 text-sm">
+                    Coordinated network for efficient aid distribution from supply sites to communities
+                  </p>
                 </div>
 
                 <div className="space-y-3">
