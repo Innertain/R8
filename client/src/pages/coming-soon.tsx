@@ -331,11 +331,11 @@ export default function ComingSoonPage() {
                 <div>
                   <Input
                     type="tel"
-                    placeholder="Phone number (e.g., 555-DEMO)"
+                    placeholder="Enter demo login: 555-DEMO"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     required
-                    className="text-center text-lg bg-white/10 border-white/30 text-white placeholder-white/60"
+                    className="text-center text-xl py-3 bg-white/10 border-white/30 text-white placeholder-white/70 font-medium tracking-wide"
                   />
                 </div>
                 
