@@ -156,24 +156,25 @@
       margin-bottom: 0 !important;
     }
     
-    /* Hero section mobile - compact size */
+    /* Hero section mobile - ultra compact */
     .hero-mobile {
       min-height: auto !important;
       padding-bottom: 0 !important;
+      padding-top: 0 !important;
     }
     
     .hero-mobile .relative.z-10 {
       min-height: auto !important;
-      padding-top: 1rem !important;
+      padding-top: 0.5rem !important;
       padding-bottom: 0 !important;
     }
     
-    /* Mission section - tight spacing */
+    /* Mission section - overlapping */
     section.relative {
       min-height: auto !important;
       padding-top: 0 !important;
-      padding-bottom: 1rem !important;
-      margin-top: -4rem !important;
+      padding-bottom: 0.5rem !important;
+      margin-top: -6rem !important;
     }
     
     /* Content containers - moderate adjustment */
@@ -214,6 +215,17 @@
     
     .space-y-3 {
       gap: 0.75rem !important;
+    }
+    
+    /* Ultimate gap elimination - force sections together */
+    section:not(:first-child) {
+      margin-top: -8rem !important;
+    }
+    
+    /* Remove all excess vertical space */
+    .min-h-screen, .min-h-\[50vh\], .min-h-\[35vh\] {
+      min-height: auto !important;
+      height: auto !important;
     }
   }
 }
