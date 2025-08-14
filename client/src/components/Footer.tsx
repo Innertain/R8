@@ -31,7 +31,7 @@ export function Footer() {
               Emergency Response • Resilient Communities • Regenerative Solutions
             </p>
             <p className="text-white/50 text-xs mb-2">
-              Serving communities in Asheville, NC • Honolulu, HI
+              Based in Asheville, NC • Honolulu, HI
             </p>
             <p className="text-white/50 text-xs">
               Thank you for helping build resilient communities! 🌱
