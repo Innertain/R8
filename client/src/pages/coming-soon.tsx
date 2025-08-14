@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
 import appalachianLandscape from "@assets/Appalachian _1754183249913.png";
-import { AnimatedCounter } from '../components/ui/animated-counter';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 
 export default function ComingSoonPage() {
@@ -484,7 +484,6 @@ export default function ComingSoonPage() {
               Together, we're building stronger, more resilient communities.
             </p>
           </div>
-        </div>
         </div>
         </div>
       </section>
