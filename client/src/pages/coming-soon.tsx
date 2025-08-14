@@ -230,31 +230,32 @@ export default function ComingSoonPage() {
         </div>
       </div>
       {/* Mission Section */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-20 min-h-screen flex items-center overflow-hidden">
         {/* Parallax Background */}
         <div 
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 w-full h-full"
           style={{
             backgroundImage: `url(${appalachianLandscape})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
+            backgroundRepeat: 'no-repeat',
             transform: `translateY(${scrollY * 0.5}px)`,
-            filter: 'brightness(0.4)',
+            willChange: 'transform',
           }}
         />
         
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-stormy-primary/60 via-stormy-dark/80 to-stormy-dark/95" />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-slate-900/70" />
         
-        <div className="relative z-20 max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
+        {/* Content */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 w-full">
+          <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">Our Mission</h2>
-            <div className="bg-slate-800/70 backdrop-blur-lg rounded-2xl p-12 border border-slate-700/50 shadow-2xl">
+            <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl p-12 border border-slate-700/50 shadow-2xl">
               <h3 className="text-2xl md:text-3xl font-semibold text-emerald-400 mb-8">
                 Empowering mutual aid for regenerative disaster response and recovery.
               </h3>
-              <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-slate-600/50">
+              <div className="bg-slate-700/60 backdrop-blur-sm rounded-xl p-6 mb-8 border border-slate-600/50">
                 <p className="text-xl text-white font-medium text-center">
                   R8 is a resource matching platform for disaster relief, humanitarian aid, and regeneration.
                 </p>
