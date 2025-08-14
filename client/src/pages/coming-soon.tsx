@@ -392,11 +392,8 @@ export default function ComingSoonPage() {
               />
               <span className="text-2xl font-bold text-white">R8</span>
             </div>
-            <p className="text-white/80 text-lg mb-4">
+            <p className="text-white/80 text-lg mb-6">
               <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
-            </p>
-            <p className="text-white/60 text-sm mb-6">
-              Powered by: <span className="text-purple-300">Responsibility</span> • <span className="text-amber-300">Resources</span> • <span className="text-teal-300">Recovery</span> • <span className="text-emerald-300">Restoration</span> • <span className="text-indigo-300">Renewal</span>
             </p>
             <div className="text-sm text-white/60">
               &copy; 2025 Regenerative 8. Building resilient communities through data-driven response.
