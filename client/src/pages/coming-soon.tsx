@@ -239,7 +239,7 @@ export default function ComingSoonPage() {
               Everything You Need for Community Resilience
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Connecting mutual aid networks with disaster supply sites, coordinating 2,340+ volunteers across bioregional regeneration projects. R8 provides the tools communities need to respond, recover, and regenerate.
+              Connecting mutual aid networks with disaster supply sites, coordinating volunteers across bioregional regeneration projects. R8 provides the tools communities need to respond, recover, and regenerate.
             </p>
           </div>
 
