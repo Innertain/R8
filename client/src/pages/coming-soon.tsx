@@ -108,24 +108,16 @@ export default function ComingSoonPage() {
     <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
       {/* Hero Section with R8 Branding */}
       <div className="relative min-h-auto hero-mobile overflow-hidden">
-        {/* Dynamic Background Images */}
+        {/* Single Consistent Background */}
         <div className="absolute inset-0">
           <div 
-            className="absolute inset-0 bg-cover bg-center opacity-60 transition-opacity duration-[8000ms]" 
-            style={{ backgroundImage: `url(${hawaiiLandscape})` }}
-          />
-          <div 
-            className="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-[8000ms] animate-pulse" 
-            style={{ 
-              backgroundImage: `url(${appalachianLandscape})`,
-              animationDelay: '4s',
-              animationDuration: '8s'
-            }}
+            className="absolute inset-0 bg-cover bg-center opacity-70" 
+            style={{ backgroundImage: `url(${appalachianLandscape})` }}
           />
         </div>
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-primary/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/70 via-stormy-dark/60 to-stormy-dark/50" />
 
         {/* Hero Content */}
         <div className="relative z-10 flex items-center justify-center lg:min-h-screen px-4 lg:px-6 py-4 lg:py-12">
@@ -230,11 +222,10 @@ export default function ComingSoonPage() {
         </div>
       </div>
       
-      {/* Smooth Transition Fade */}
-      <div className="relative -mt-2 lg:-mt-4 z-20 h-8 lg:h-16 bg-gradient-to-b from-stormy-primary/30 via-stormy-dark/50 to-transparent"></div>
+
       
       {/* Mission Section */}
-<section className="relative py-6 lg:py-20 min-h-[35vh] lg:min-h-screen flex items-center overflow-hidden -mt-16 lg:-mt-36">
+<section className="relative py-6 lg:py-20 min-h-[35vh] lg:min-h-screen flex items-center overflow-hidden -mt-12 lg:-mt-32">
         {/* Extended Parallax Background */}
         <div 
           className="absolute inset-0 w-full"
@@ -250,8 +241,8 @@ export default function ComingSoonPage() {
           }}
         />
         
-        {/* Enhanced Gradient Overlay for Seamless Transition */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/60 via-stormy-dark/80 to-stormy-primary/40" />
+        {/* Gradient Overlay for Seamless Transition */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/50 via-stormy-dark/70 to-stormy-dark/90" />
         
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-6 w-full">
