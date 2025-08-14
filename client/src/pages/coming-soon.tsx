@@ -396,6 +396,57 @@ export default function ComingSoonPage() {
             Updated in real-time from active mutual aid networks
           </p>
         </div>
+
+        {/* Mutual Aid Partners Attribution */}
+        <div className="mt-12 bg-slate-800/40 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-semibold text-white mb-4">
+              Grateful for Our Mutual Aid Partners
+            </h3>
+            <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+              These numbers represent the collaborative efforts of dedicated organizations working together 
+              to build resilient communities and coordinate disaster response.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+            <div className="text-center">
+              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+                <div className="text-2xl font-bold text-emerald-400 mb-1">Valley Hope Foundation</div>
+                <p className="text-sm text-gray-400">Community resilience partner</p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+                <div className="text-2xl font-bold text-blue-400 mb-1">R4 Reach</div>
+                <p className="text-sm text-gray-400">Resource coordination network</p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+                <div className="text-2xl font-bold text-purple-400 mb-1">Regional Networks</div>
+                <p className="text-sm text-gray-400">Local mutual aid groups</p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+                <div className="text-2xl font-bold text-orange-400 mb-1">Community Partners</div>
+                <p className="text-sm text-gray-400">Grassroots organizations</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8 pt-6 border-t border-slate-600">
+            <p className="text-gray-300">
+              <span className="font-semibold text-white">Thank you</span> to Valley Hope Foundation, R4 Reach, 
+              and the many other mutual aid partners who make this collaborative platform possible. 
+              Together, we're building stronger, more resilient communities.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Driver Network & Logistics Section */}
