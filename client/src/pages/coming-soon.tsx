@@ -629,9 +629,22 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-      {/* Features Preview Section */}
-      <section className="py-20 bg-gradient-to-b from-stormy-dark/95 to-stormy-primary/30">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* Features Preview Section with Hawaii Background */}
+      <section className="py-20 bg-gradient-to-b from-stormy-dark/95 to-stormy-primary/30 relative overflow-hidden">
+        {/* Hawaii Landscape Background */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center opacity-40"
+          style={{
+            backgroundImage: `url(${hawaiiLandscape})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
+        {/* Enhanced Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/85 via-stormy-primary/70 to-stormy-dark/85"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Everything You Need for Community Resilience
