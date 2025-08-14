@@ -398,6 +398,163 @@ export default function ComingSoonPage() {
         </div>
       </div>
 
+      {/* Driver Network & Logistics Section */}
+      <section className="py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Driver Network & Distribution Logistics
+            </h2>
+            <p className="text-xl text-white/80 max-w-4xl mx-auto">
+              Our coordinated driver network enables rapid, efficient distribution of aid from supply sites to communities. 
+              With 208+ active drivers and 1,219+ completed deliveries, we've established a proven logistics system for mutual aid.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            {/* Driver Network Overview */}
+            <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mr-4">
+                  <div className="text-2xl">🚚</div>
+                </div>
+                <h3 className="text-2xl font-semibold text-white">Active Driver Network</h3>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
+                    <div className="text-3xl font-bold text-blue-400 mb-1">
+                      <AnimatedCounter end={208} duration={2000} />
+                    </div>
+                    <div className="text-sm text-gray-300">Active Drivers</div>
+                  </div>
+                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
+                    <div className="text-3xl font-bold text-green-400 mb-1">
+                      <AnimatedCounter end={1219} duration={2200} />
+                    </div>
+                    <div className="text-sm text-gray-300">Completed Deliveries</div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center text-gray-300">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    <span>Real-time driver availability tracking</span>
+                  </div>
+                  <div className="flex items-center text-gray-300">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    <span>Route optimization for efficient deliveries</span>
+                  </div>
+                  <div className="flex items-center text-gray-300">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    <span>Volunteer coordination and scheduling</span>
+                  </div>
+                  <div className="flex items-center text-gray-300">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    <span>Multi-bioregion coverage capabilities</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Distribution Process */}
+            <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mr-4">
+                  <Network className="w-6 h-6 text-purple-400" />
+                </div>
+                <h3 className="text-2xl font-semibold text-white">Distribution Process</h3>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-blue-400 font-semibold text-sm">1</span>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-1">Supply Site Coordination</h4>
+                    <p className="text-gray-400 text-sm">Connect with 425+ supply sites to identify available resources and urgent needs</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-green-400 font-semibold text-sm">2</span>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-1">Driver Assignment</h4>
+                    <p className="text-gray-400 text-sm">Match available drivers with delivery requests based on location and capacity</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-purple-400 font-semibold text-sm">3</span>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-1">Route Optimization</h4>
+                    <p className="text-gray-400 text-sm">Plan efficient routes to maximize deliveries and minimize travel time</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-orange-400 font-semibold text-sm">4</span>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-1">Real-time Tracking</h4>
+                    <p className="text-gray-400 text-sm">Monitor delivery progress and update communities on aid arrival times</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Impact Highlights */}
+          <div className="bg-gradient-to-r from-slate-800/70 to-slate-700/70 backdrop-blur-sm rounded-2xl p-8 border border-slate-600/50">
+            <h3 className="text-2xl font-semibold text-white mb-8 text-center">Logistics Impact</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="text-4xl mb-3">📦</div>
+                <div className="text-3xl font-bold text-orange-400 mb-2">
+                  <AnimatedCounter end={101790} duration={3000} />
+                </div>
+                <div className="text-white font-medium mb-1">Food Boxes Distributed</div>
+                <div className="text-gray-400 text-sm">Delivered to families across multiple bioregions</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-4xl mb-3">🏠</div>
+                <div className="text-3xl font-bold text-cyan-400 mb-2">
+                  <AnimatedCounter end={23248} duration={3200} />
+                </div>
+                <div className="text-white font-medium mb-1">Estimated Families Helped</div>
+                <div className="text-gray-400 text-sm">Based on delivery records and site estimates</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-4xl mb-3">🌍</div>
+                <div className="text-3xl font-bold text-green-400 mb-2">
+                  <AnimatedCounter end={425} duration={2800} />
+                </div>
+                <div className="text-white font-medium mb-1">Connected Supply Sites</div>
+                <div className="text-gray-400 text-sm">Active locations in our distribution network</div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-slate-600">
+              <p className="text-center text-gray-300">
+                <span className="font-semibold text-white">Efficient Coordination:</span> Our driver network reduces response times from days to hours, 
+                ensuring critical aid reaches communities when they need it most. Through bioregional coordination, 
+                we leverage local knowledge and existing community relationships for maximum impact.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Preview Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-dark/95 to-stormy-primary/30">
         <div className="max-w-7xl mx-auto px-6">
@@ -435,10 +592,10 @@ export default function ComingSoonPage() {
             <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:bg-slate-700/50 transition-all duration-300">
               <CardContent className="p-6 text-center space-y-4">
                 <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto">
-                  <Heart className="w-6 h-6 text-blue-400" />
+                  <div className="w-6 h-6 text-blue-400">🚚</div>
                 </div>
-                <h3 className="text-xl font-semibold text-white">Bioregional Projects</h3>
-                <p className="text-gray-400">Coordinate long-term regeneration projects across bioregional boundaries.</p>
+                <h3 className="text-xl font-semibold text-white">Driver Network & Logistics</h3>
+                <p className="text-gray-400">Coordinate our network of 208+ active drivers to efficiently distribute aid from supply sites to communities in need.</p>
               </CardContent>
             </Card>
 
