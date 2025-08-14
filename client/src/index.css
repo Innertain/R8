@@ -134,17 +134,18 @@
 
   /* Balanced mobile layout */
   @media (max-width: 768px) {
-    /* Optimize heights without eliminating them completely */
+    /* Optimize heights for mobile - eliminate excess space */
     .min-h-screen {
-      min-height: 70vh !important;
+      min-height: auto !important;
     }
     
     .min-h-\[50vh\] {
-      min-height: 60vh !important;
+      min-height: auto !important;
     }
     
-    .min-h-\[40vh\] {
-      min-height: 35vh !important;
+    .min-h-\[40vh\],
+    .min-h-\[35vh\] {
+      min-height: auto !important;
     }
     
     /* Balanced section spacing */
@@ -155,24 +156,24 @@
       margin-bottom: 0 !important;
     }
     
-    /* Hero section mobile - balanced size */
+    /* Hero section mobile - compact size */
     .hero-mobile {
-      min-height: 60vh !important;
+      min-height: auto !important;
       padding-bottom: 0 !important;
     }
     
     .hero-mobile .relative.z-10 {
-      min-height: 60vh !important;
-      padding-top: 2rem !important;
-      padding-bottom: 2rem !important;
+      min-height: auto !important;
+      padding-top: 1rem !important;
+      padding-bottom: 0 !important;
     }
     
-    /* Mission section - reasonable spacing */
+    /* Mission section - tight spacing */
     section.relative {
-      min-height: 35vh !important;
-      padding-top: 1rem !important;
-      padding-bottom: 1.5rem !important;
-      margin-top: -3rem !important;
+      min-height: auto !important;
+      padding-top: 0 !important;
+      padding-bottom: 1rem !important;
+      margin-top: -4rem !important;
     }
     
     /* Content containers - moderate adjustment */
