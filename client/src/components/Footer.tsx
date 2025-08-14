@@ -30,6 +30,9 @@ export function Footer() {
             <p className="text-white/60 text-sm mb-2">
               Emergency Response • Resilient Communities • Regenerative Solutions
             </p>
+            <p className="text-white/50 text-xs mb-2">
+              Serving communities in Asheville, NC • Honolulu, HI
+            </p>
             <p className="text-white/50 text-xs">
               Thank you for helping build resilient communities! 🌱
             </p>
