@@ -254,12 +254,12 @@ export default function ComingSoonPage() {
                   <div className="p-3 bg-red-600 rounded-lg">
                     <Shield className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white">Emergency Response</h3>
+                  <h3 className="text-xl font-semibold text-white">Disaster Relief</h3>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-white/90 mb-4">
-                  Track active weather alerts, wildfire incidents, earthquakes, and disasters across all states using official government data sources.
+                  Track active weather alerts, wildfire incidents, earthquakes, and disasters across all states using official government data sources. Providing supply distribution, delivery, and inventory logistics for community-led aid efforts.
                 </p>
                 <div className="space-y-2 text-sm text-white/80">
                   <div>• FEMA disaster declarations</div>
