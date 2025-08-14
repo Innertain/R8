@@ -279,15 +279,15 @@ export default function ComingSoonPage() {
             </div>
           </div>
         </div>
-      </section>
-      {/* Platform Impact Statistics */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 mb-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Real Impact</h2>
-          <p className="text-lg text-gray-300">
-            Real numbers from communities using R8 for mutual aid and disaster response
-          </p>
-        </div>
+
+        {/* Platform Impact Statistics - Still within the mountain background */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 mt-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Real Impact</h2>
+            <p className="text-lg text-gray-300">
+              Real numbers from communities using R8 for mutual aid and disaster response
+            </p>
+          </div>
 
         {/* Main Stats Grid - Top Row */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
@@ -485,7 +485,7 @@ export default function ComingSoonPage() {
             </p>
           </div>
         </div>
-      </div>
+      </section>
       {/* Driver Network & Logistics Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90">
         <div className="max-w-7xl mx-auto px-6">
