@@ -259,13 +259,13 @@ export default function ComingSoonPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-white/90 mb-4">
-                  Track active weather alerts, wildfire incidents, earthquakes, and disasters across all states using official government data sources. Providing supply distribution, delivery, and inventory logistics for community-led aid efforts.
+                  Track active weather alerts, wildfire incidents, earthquakes, and disasters across all states. Providing supply distribution, delivery, and inventory logistics for community-led aid efforts.
                 </p>
                 <div className="space-y-2 text-sm text-white/80">
-                  <div>• FEMA disaster declarations</div>
-                  <div>• National Weather Service alerts</div>
-                  <div>• USGS earthquake monitoring</div>
-                  <div>• NASA satellite imagery</div>
+                  <div>• Emergency response coordination</div>
+                  <div>• Supply chain management</div>
+                  <div>• Resource allocation tracking</div>
+                  <div>• Community network integration</div>
                 </div>
               </CardContent>
             </Card>
