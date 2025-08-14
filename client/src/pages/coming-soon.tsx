@@ -128,7 +128,7 @@ export default function ComingSoonPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stormy-dark/80 via-stormy-primary/70 to-stormy-dark/90" />
 
         {/* Hero Content */}
-        <div className="relative z-10 flex items-center justify-center min-h-[80vh] lg:min-h-screen px-4 lg:px-6 py-8 lg:py-12">
+        <div className="relative z-10 flex items-center justify-center min-h-[70vh] lg:min-h-screen px-4 lg:px-6 py-6 lg:py-12">
           <div className="text-center space-y-12 max-w-5xl mx-auto">
             {/* Prominent R8 Branding */}
             <div className="space-y-6">
@@ -231,7 +231,7 @@ export default function ComingSoonPage() {
       </div>
       
       {/* Mission Section */}
-      <section className="relative py-8 lg:py-20 min-h-[50vh] lg:min-h-screen flex items-center overflow-hidden -mt-8 lg:-mt-32 mobile-section">
+<section className="relative py-4 lg:py-20 min-h-[40vh] lg:min-h-screen flex items-center overflow-hidden -mt-16 lg:-mt-32">
         {/* Extended Parallax Background */}
         <div 
           className="absolute inset-0 w-full"
@@ -253,7 +253,7 @@ export default function ComingSoonPage() {
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-6 w-full">
           <div className="text-center">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 lg:mb-8 pt-4 lg:pt-20">Our Mission</h2>
+            <h2 className="text-2xl md:text-3xl lg:text-5xl font-bold text-white mb-4 lg:mb-8 pt-2 lg:pt-20">Our Mission</h2>
             <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 lg:p-12 border border-slate-700/50 shadow-2xl">
               <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold text-emerald-400 mb-6 lg:mb-8">
                 Empowering mutual aid for regenerative disaster response and recovery.
@@ -281,7 +281,7 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Platform Impact Statistics - Still within the mountain background */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 mt-12 lg:mt-20 stats-section-mobile">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 mt-6 lg:mt-20 stats-section-mobile">
           <div className="text-center mb-8 lg:mb-12">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 lg:mb-4">Real Impact</h2>
             <p className="text-base lg:text-lg text-gray-300 px-4">
@@ -488,7 +488,7 @@ export default function ComingSoonPage() {
         </div>
       </section>
       {/* Driver Network & Logistics Section */}
-      <section className="py-12 lg:py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90">
+      <section className="py-8 lg:py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90 -mt-8 lg:mt-0">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-10 lg:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 lg:mb-6">

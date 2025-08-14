@@ -108,8 +108,8 @@
 
   /* Hero section mobile adjustments */
   .hero-mobile {
-    min-height: 80vh !important;
-    padding-bottom: 1rem !important;
+    min-height: 70vh !important;
+    padding-bottom: 0 !important;
   }
 
   /* Stats section mobile container */
@@ -130,6 +130,31 @@
     padding-left: 16px !important;
     padding-right: 16px !important;
     max-width: 100% !important;
+  }
+
+  /* Complete mobile layout override */
+  @media (max-width: 768px) {
+    .min-h-screen {
+      min-height: 60vh !important;
+    }
+    
+    .min-h-\[40vh\] {
+      min-height: 30vh !important;
+    }
+    
+    section {
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
+      margin-top: -3rem !important;
+    }
+    
+    .hero-mobile {
+      min-height: 60vh !important;
+    }
+    
+    .relative.z-10.max-w-6xl {
+      margin-top: -2rem !important;
+    }
   }
 }
 
