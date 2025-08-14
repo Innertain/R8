@@ -405,7 +405,7 @@ export default function ComingSoonPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-8">
             <div className="text-center">
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
                 <div className="text-2xl font-bold text-emerald-400 mb-1">Valley Hope Foundation</div>
@@ -417,6 +417,13 @@ export default function ComingSoonPage() {
               <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
                 <div className="text-2xl font-bold text-blue-400 mb-1">R4 Reach</div>
                 <p className="text-sm text-gray-400">Resource coordination network</p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+                <div className="text-2xl font-bold text-cyan-400 mb-1">WNC Supply Sites</div>
+                <p className="text-sm text-gray-400">Western NC disaster relief</p>
               </div>
             </div>
             
@@ -438,7 +445,7 @@ export default function ComingSoonPage() {
           <div className="text-center mt-8 pt-6 border-t border-slate-600">
             <p className="text-gray-300">
               <span className="font-semibold text-white">Thank you</span> to Valley Hope Foundation, R4 Reach, 
-              and the many other mutual aid partners who make this collaborative platform possible. 
+              WNC Supply Sites, and the many other mutual aid partners who make this collaborative platform possible. 
               Together, we're building stronger, more resilient communities.
             </p>
           </div>
