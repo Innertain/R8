@@ -14,6 +14,30 @@ export default function ComingSoonPage() {
   const [message, setMessage] = useState('');
   const [accessGranted, setAccessGranted] = useState(false);
 
+  // Allow this landing page to be indexed by search engines
+  React.useEffect(() => {
+    const robotsMeta = document.getElementById('robots-meta');
+    if (robotsMeta) {
+      robotsMeta.setAttribute('content', 'index, follow');
+    }
+    
+    // Set page title and description for SEO
+    document.title = 'R8 - Resilience, Response, Regeneration | Coming Soon';
+    
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'R8 platform connecting mutual aid networks with disaster supply sites, coordinating volunteers across bioregional regeneration projects. Coming soon - request demo access.');
+    }
+
+    // Cleanup function to restore noindex when leaving this page
+    return () => {
+      const robotsMeta = document.getElementById('robots-meta');
+      if (robotsMeta) {
+        robotsMeta.setAttribute('content', 'noindex, nofollow');
+      }
+    };
+  }, []);
+
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -322,7 +346,7 @@ export default function ComingSoonPage() {
                 <div>
                   <Input
                     type="tel"
-                    placeholder="Enter demo login: 555-DEMO"
+                    placeholder="Enter your phone number"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     required

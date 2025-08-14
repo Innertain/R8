@@ -1,0 +1,20 @@
+
+User-agent: *
+Allow: /
+Disallow: /volunteer
+Disallow: /map
+Disallow: /stats
+Disallow: /alerts
+Disallow: /air-quality
+Disallow: /noaa-climate
+Disallow: /disaster-education
+Disallow: /bioregions
+Disallow: /hawaii
+Disallow: /appalachian
+Disallow: /cascadia
+Disallow: /airtable-test
+
+# Allow only the coming soon landing page for now
+Allow: /$
+
+Sitemap: https://your-domain.com/sitemap.xml

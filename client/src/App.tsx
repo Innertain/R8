@@ -40,14 +40,16 @@ function Navigation() {
   return (
     <nav className="bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
       <div className="container mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <img
-            src="/src/assets/r8-logo.png"
-            alt="R8 Logo"
-            className="w-10 h-10"
-          />
-          <h1 className="text-2xl font-bold text-white">R8</h1>
-        </div>
+        <Link href="/">
+          <div className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity">
+            <img
+              src="/src/assets/r8-logo.png"
+              alt="R8 Logo"
+              className="w-10 h-10"
+            />
+            <h1 className="text-2xl font-bold text-white">R8</h1>
+          </div>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-3">
