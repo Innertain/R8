@@ -8,7 +8,7 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 ### UI/UX Decisions
-The platform features a clean, professional design with a focus on readability. It utilizes a soft color scheme with light grey backgrounds and improved contrast. Interactive UI elements incorporate subtle hover effects, such as slight lifting, enhanced shadows, and blue border highlights for clear visual feedback. The design is mobile-optimized with responsive layouts, appropriate touch targets, and simplified animations for a consistent experience across devices. Navigation uses icon-based tabs with responsive layouts (vertical on mobile, horizontal on desktop).
+The platform features a clean, professional design with a focus on readability. It utilizes a soft color scheme with light grey backgrounds and improved contrast. Interactive UI elements incorporate subtle hover effects, such as slight lifting, enhanced shadows, and blue border highlights for clear visual feedback. The design is fully mobile-optimized with comprehensive responsive layouts including: mobile-first grid breakpoints (1 col mobile → 2 col small → 3 col large → 6 col extra-large), aggressive mobile spacing optimizations, section height reductions (70vh hero, 40vh mission on mobile), negative margin overlapping between sections, and complete CSS media query overrides for seamless mobile experience. Navigation uses icon-based tabs with responsive layouts (vertical on mobile, horizontal on desktop).
 
 ### Technical Implementations
 #### Frontend
