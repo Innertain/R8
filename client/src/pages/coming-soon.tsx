@@ -225,6 +225,11 @@ export default function ComingSoonPage() {
               <h3 className="text-2xl md:text-3xl font-semibold text-emerald-400 mb-8">
                 Empowering mutual aid for regenerative disaster response and recovery.
               </h3>
+              <div className="bg-slate-700/40 rounded-xl p-6 mb-8 border border-slate-600/50">
+                <p className="text-xl text-white font-medium text-center">
+                  R8 is a resource matching platform for disaster relief, humanitarian aid, and regeneration.
+                </p>
+              </div>
               <div className="space-y-6 text-left max-w-5xl mx-auto">
                 <p className="text-xl text-gray-200 leading-relaxed">
                   <span className="font-semibold text-white">Real talk:</span> The majority of people recognize that disasters—whether fueled by climate change, systemic failures, or sudden crises—are a growing emergency.
