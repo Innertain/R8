@@ -326,7 +326,7 @@ export default function ComingSoonPage() {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     required
-                    className="text-center text-xl py-3 bg-white/10 border-white/30 text-white placeholder-white/70 font-medium tracking-wide"
+                    className="text-center text-xl py-3 bg-white/90 border-white/50 text-gray-900 placeholder-gray-600 font-medium tracking-wide focus:bg-white focus:border-blue-500"
                   />
                 </div>
 
