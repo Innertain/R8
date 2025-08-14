@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -28,11 +27,11 @@ export default function ComingSoonPage() {
       if (data.success && data.whitelisted) {
         setAccessGranted(true);
         setMessage('Access granted! You can now explore the platform.');
-        
+
         // Store access token in session
         sessionStorage.setItem('platformAccess', 'granted');
         sessionStorage.setItem('accessUser', JSON.stringify(data.user));
-        
+
         // Redirect to main app after a short delay
         setTimeout(() => {
           window.location.href = '/';
@@ -240,8 +239,7 @@ export default function ComingSoonPage() {
               Everything You Need for Community Resilience
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              From real-time emergency monitoring to endangered species conservation, 
-              R8 provides the tools communities need to respond, recover, and regenerate.
+              Connecting mutual aid networks with disaster supply sites, coordinating 2,340+ volunteers across bioregional regeneration projects. R8 provides the tools communities need to respond, recover, and regenerate.
             </p>
           </div>
 
@@ -338,7 +336,7 @@ export default function ComingSoonPage() {
                     className="text-center text-xl py-3 bg-white/10 border-white/30 text-white placeholder-white/70 font-medium tracking-wide"
                   />
                 </div>
-                
+
                 <Button 
                   type="submit" 
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
