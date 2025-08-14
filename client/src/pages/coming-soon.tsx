@@ -485,6 +485,8 @@ export default function ComingSoonPage() {
             </p>
           </div>
         </div>
+        </div>
+        </div>
       </section>
       {/* Driver Network & Logistics Section */}
       <section className="py-20 bg-gradient-to-b from-stormy-primary/20 to-stormy-dark/90">
