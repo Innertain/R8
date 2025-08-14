@@ -283,8 +283,8 @@ export default function ComingSoonPage() {
             </p>
           </div>
 
-        {/* Main Stats Grid - Top Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 mb-4 lg:mb-6 stats-grid-mobile">
+        {/* Main Stats Grid - Top Row - Desktop Constrained, Mobile Optimized */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-4 xl:gap-5 max-w-6xl xl:max-w-7xl mx-auto mb-4 lg:mb-6 stats-grid-mobile">
           {/* Supply Sites */}
           <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
@@ -358,8 +358,8 @@ export default function ComingSoonPage() {
           </div>
         </div>
 
-        {/* Secondary Stats Grid - Bottom Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 stats-grid-mobile">
+        {/* Secondary Stats Grid - Bottom Row - Desktop Constrained, Mobile Optimized */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-4 xl:gap-5 max-w-5xl mx-auto stats-grid-mobile">
           {/* Active Sites (60 days) */}
           <div className="bg-white rounded-xl p-4 lg:p-6 shadow-lg stats-card-mobile">
             <div className="flex items-start justify-between mb-3">
