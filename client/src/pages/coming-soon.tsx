@@ -274,157 +274,157 @@ export default function ComingSoonPage() {
           </div>
         </div>
 
-        {/* Platform Impact Statistics - Redesigned for Better Visual Appeal */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 mt-8 lg:mt-24 stats-section-mobile">
-          <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 lg:mb-6">Real Impact</h2>
-            <p className="text-lg lg:text-xl text-gray-200 max-w-4xl mx-auto leading-relaxed">
+        {/* Platform Impact Statistics - Clean and Professional */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-6 mt-12 lg:mt-20 stats-section-mobile">
+          <div className="text-center mb-8 lg:mb-12">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 lg:mb-4">Real Impact</h2>
+            <p className="text-base lg:text-lg text-gray-300 max-w-3xl mx-auto">
               Real numbers from communities using R8 for mutual aid and disaster response
             </p>
           </div>
 
-        {/* Main Stats Grid - Improved Spacing and Visual Hierarchy */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6 xl:gap-8 mb-8 lg:mb-12">
+        {/* Main Stats Grid - Balanced and Contained */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-5 mb-6 lg:mb-8">
           {/* Supply Sites */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full mb-4 group-hover:bg-blue-500/30 transition-colors">
-                <MapPin className="w-6 h-6 text-blue-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-3">
+                <MapPin className="w-5 h-5 text-blue-600" />
               </div>
-              <div className="text-3xl lg:text-4xl font-bold text-blue-600 mb-2 stats-number">
+              <div className="text-2xl lg:text-3xl font-bold text-blue-600 mb-2 stats-number">
                 <AnimatedCounter end={425} duration={2000} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Supply Sites</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Active locations</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Supply Sites</h3>
+              <p className="text-xs text-gray-600">Active locations</p>
             </div>
           </div>
 
           {/* Completed Deliveries */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-green-500/20 rounded-full mb-4 group-hover:bg-green-500/30 transition-colors">
-                <div className="text-2xl text-green-600">✓</div>
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-green-100 rounded-full mb-3">
+                <div className="text-lg text-green-600 font-bold">✓</div>
               </div>
-              <div className="text-3xl lg:text-4xl font-bold text-green-600 mb-2 stats-number">
+              <div className="text-2xl lg:text-3xl font-bold text-green-600 mb-2 stats-number">
                 <AnimatedCounter end={1219} duration={2200} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Completed Deliveries</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Successfully delivered</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Completed Deliveries</h3>
+              <p className="text-xs text-gray-600">Successfully delivered</p>
             </div>
           </div>
 
           {/* Food Boxes */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-500/20 rounded-full mb-4 group-hover:bg-orange-500/30 transition-colors">
-                <div className="text-2xl">📦</div>
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-orange-100 rounded-full mb-3">
+                <div className="text-lg">📦</div>
               </div>
-              <div className="text-3xl lg:text-4xl font-bold text-orange-600 mb-2 stats-number">
+              <div className="text-2xl lg:text-3xl font-bold text-orange-600 mb-2 stats-number">
                 <AnimatedCounter end={101790} duration={2400} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Food Boxes</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Total distributed</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Food Boxes</h3>
+              <p className="text-xs text-gray-600">Total distributed</p>
             </div>
           </div>
 
           {/* Volunteers */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-full mb-4 group-hover:bg-purple-500/30 transition-colors">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-3">
+                <Users className="w-5 h-5 text-purple-600" />
               </div>
-              <div className="text-3xl lg:text-4xl font-bold text-purple-600 mb-2 stats-number">
+              <div className="text-2xl lg:text-3xl font-bold text-purple-600 mb-2 stats-number">
                 <AnimatedCounter end={69} duration={2600} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Volunteers</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Active volunteers</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Volunteers</h3>
+              <p className="text-xs text-gray-600">Active volunteers</p>
             </div>
           </div>
 
           {/* Drivers */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-500/20 rounded-full mb-4 group-hover:bg-amber-500/30 transition-colors">
-                <TrendingUp className="w-6 h-6 text-amber-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-amber-100 rounded-full mb-3">
+                <TrendingUp className="w-5 h-5 text-amber-600" />
               </div>
-              <div className="text-3xl lg:text-4xl font-bold text-amber-600 mb-2 stats-number">
+              <div className="text-2xl lg:text-3xl font-bold text-amber-600 mb-2 stats-number">
                 <AnimatedCounter end={208} duration={2800} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Drivers</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Available drivers</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Drivers</h3>
+              <p className="text-xs text-gray-600">Available drivers</p>
             </div>
           </div>
 
           {/* Estimated Families Helped */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-cyan-500/20 rounded-full mb-4 group-hover:bg-cyan-500/30 transition-colors">
-                <Heart className="w-6 h-6 text-cyan-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-cyan-100 rounded-full mb-3">
+                <Heart className="w-5 h-5 text-cyan-600" />
               </div>
-              <div className="text-3xl lg:text-4xl font-bold text-cyan-600 mb-2 stats-number">
+              <div className="text-2xl lg:text-3xl font-bold text-cyan-600 mb-2 stats-number">
                 <AnimatedCounter end={23248} duration={3000} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Families Helped</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Site estimates*</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Families Helped</h3>
+              <p className="text-xs text-gray-600">Site estimates*</p>
             </div>
           </div>
         </div>
 
-        {/* Secondary Stats Grid - Enhanced Design */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 xl:gap-8 max-w-6xl mx-auto mb-12 lg:mb-16">
+        {/* Secondary Stats Grid - Contained and Clean */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-8 lg:mb-12">
           {/* Active Sites (60 days) */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-500/20 rounded-full mb-4 group-hover:bg-emerald-500/30 transition-colors">
-                <MapPin className="w-6 h-6 text-emerald-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-3">
+                <MapPin className="w-5 h-5 text-emerald-600" />
               </div>
               <div className="text-2xl lg:text-3xl font-bold text-emerald-600 mb-2 stats-number">
                 <AnimatedCounter end={240} duration={2000} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Active Sites</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Updated recently</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Active Sites</h3>
+              <p className="text-xs text-gray-600">Updated recently</p>
             </div>
           </div>
 
           {/* Sites with Deliveries */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full mb-4 group-hover:bg-blue-500/30 transition-colors">
-                <div className="text-2xl">🚚</div>
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-3">
+                <div className="text-lg">🚚</div>
               </div>
               <div className="text-2xl lg:text-3xl font-bold text-blue-600 mb-2 stats-number">
                 <AnimatedCounter end={1295} duration={2200} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Sites with Deliveries</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Received aid</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Sites with Deliveries</h3>
+              <p className="text-xs text-gray-600">Received aid</p>
             </div>
           </div>
 
           {/* Sites with Recent Activity */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-red-500/20 rounded-full mb-4 group-hover:bg-red-500/30 transition-colors">
-                <Zap className="w-6 h-6 text-red-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-red-100 rounded-full mb-3">
+                <Zap className="w-5 h-5 text-red-600" />
               </div>
               <div className="text-2xl lg:text-3xl font-bold text-red-600 mb-2 stats-number">
                 <AnimatedCounter end={154} duration={2400} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Recent Activity</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Active requests</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Recent Activity</h3>
+              <p className="text-xs text-gray-600">Active requests</p>
             </div>
           </div>
 
           {/* Mutual Aid Partners */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-white/20 hover:bg-white hover:shadow-2xl transition-all duration-300 group">
+          <div className="bg-white rounded-lg p-4 lg:p-5 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-full mb-4 group-hover:bg-purple-500/30 transition-colors">
-                <Heart className="w-6 h-6 text-purple-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-3">
+                <Heart className="w-5 h-5 text-purple-600" />
               </div>
               <div className="text-2xl lg:text-3xl font-bold text-purple-600 mb-2 stats-number">
                 <AnimatedCounter end={49} duration={2600} />
               </div>
-              <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1">Aid Partners</h3>
-              <p className="text-xs lg:text-sm text-gray-600">Organizations</p>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Aid Partners</h3>
+              <p className="text-xs text-gray-600">Organizations</p>
             </div>
           </div>
         </div>
