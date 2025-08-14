@@ -300,7 +300,7 @@ export default function ComingSoonPage() {
                   <div className="p-3 bg-emerald-600 rounded-lg">
                     <Globe className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white">Ecosystem Restoration</h3>
+                  <h3 className="text-xl font-semibold text-white">Bioregional Regeneration</h3>
                 </div>
               </CardHeader>
               <CardContent>
