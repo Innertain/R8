@@ -435,44 +435,44 @@ export default function ComingSoonPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 mt-6 lg:mt-8">
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-lg lg:text-2xl font-bold text-emerald-400 mb-1">Valley Hope Foundation</div>
-                <p className="text-xs lg:text-sm text-gray-400">Community resilience partner</p>
+              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-emerald-400 mb-1 leading-tight">Valley Hope Foundation</div>
+                <p className="text-xs text-gray-400 leading-tight">Community resilience partner</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-lg lg:text-2xl font-bold text-blue-400 mb-1">R4 Reach</div>
-                <p className="text-xs lg:text-sm text-gray-400">Resource coordination network</p>
+              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-blue-400 mb-1 leading-tight">R4 Reach</div>
+                <p className="text-xs text-gray-400 leading-tight">Resource coordination network</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-lg lg:text-2xl font-bold text-cyan-400 mb-1">WNC Supply Sites</div>
-                <p className="text-xs lg:text-sm text-gray-400">Western NC disaster relief</p>
+              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-cyan-400 mb-1 leading-tight">WNC Supply Sites</div>
+                <p className="text-xs text-gray-400 leading-tight">Western NC disaster relief</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-lg lg:text-2xl font-bold text-red-400 mb-1">Aid Arena</div>
-                <p className="text-xs lg:text-sm text-gray-400">Crisis response coordination platform</p>
+              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-red-400 mb-1 leading-tight">Aid Arena</div>
+                <p className="text-xs text-gray-400 leading-tight">Crisis response coordination platform</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-lg lg:text-2xl font-bold text-purple-400 mb-1">Regional Networks</div>
-                <p className="text-xs lg:text-sm text-gray-400">Local mutual aid groups</p>
+              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-purple-400 mb-1 leading-tight">Regional Networks</div>
+                <p className="text-xs text-gray-400 leading-tight">Local mutual aid groups</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-                <div className="text-lg lg:text-2xl font-bold text-orange-400 mb-1">Community Partners</div>
-                <p className="text-xs lg:text-sm text-gray-400">Grassroots organizations</p>
+              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-orange-400 mb-1 leading-tight">Community Partners</div>
+                <p className="text-xs text-gray-400 leading-tight">Grassroots organizations</p>
               </div>
             </div>
           </div>
