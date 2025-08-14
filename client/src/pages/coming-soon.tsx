@@ -16,6 +16,14 @@ export default function ComingSoonPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [accessGranted, setAccessGranted] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
+  // Parallax scroll effect
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Allow this landing page to be indexed by search engines
   React.useEffect(() => {
@@ -222,15 +230,31 @@ export default function ComingSoonPage() {
         </div>
       </div>
       {/* Mission Section */}
-      <section className="py-20 bg-gradient-to-b from-stormy-primary/30 to-stormy-dark/95">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="relative py-20 overflow-hidden">
+        {/* Parallax Background */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url(${appalachianLandscape})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+            transform: `translateY(${scrollY * 0.5}px)`,
+            filter: 'brightness(0.4)',
+          }}
+        />
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-stormy-primary/60 via-stormy-dark/80 to-stormy-dark/95" />
+        
+        <div className="relative z-20 max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">Our Mission</h2>
-            <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-12 border border-slate-700/50">
+            <div className="bg-slate-800/70 backdrop-blur-lg rounded-2xl p-12 border border-slate-700/50 shadow-2xl">
               <h3 className="text-2xl md:text-3xl font-semibold text-emerald-400 mb-8">
                 Empowering mutual aid for regenerative disaster response and recovery.
               </h3>
-              <div className="bg-slate-700/40 rounded-xl p-6 mb-8 border border-slate-600/50">
+              <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-slate-600/50">
                 <p className="text-xl text-white font-medium text-center">
                   R8 is a resource matching platform for disaster relief, humanitarian aid, and regeneration.
                 </p>
