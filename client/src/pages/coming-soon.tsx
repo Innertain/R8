@@ -437,10 +437,15 @@ export default function ComingSoonPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 mt-6 lg:mt-8">
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
-                <div className="text-sm sm:text-base lg:text-xl font-bold text-emerald-400 mb-1 leading-tight">Valley Hope Foundation</div>
+              <a 
+                href="https://www.valleyhopefoundation.org/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+              >
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-emerald-400 mb-1 leading-tight hover:text-emerald-300 transition-colors">Valley Hope Foundation</div>
                 <p className="text-xs text-gray-400 leading-tight">Community resilience partner</p>
-              </div>
+              </a>
             </div>
             
             <div className="text-center">
@@ -458,10 +463,15 @@ export default function ComingSoonPage() {
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
-                <div className="text-sm sm:text-base lg:text-xl font-bold text-red-400 mb-1 leading-tight">Aid Arena</div>
+              <a 
+                href="https://conversacorps.org/aid_arena/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+              >
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-red-400 mb-1 leading-tight hover:text-red-300 transition-colors">Aid Arena</div>
                 <p className="text-xs text-gray-400 leading-tight">Crisis response coordination platform</p>
-              </div>
+              </a>
             </div>
             
             <div className="text-center">
@@ -481,8 +491,11 @@ export default function ComingSoonPage() {
           
           <div className="text-center mt-8 pt-6 border-t border-slate-600">
             <p className="text-gray-300">
-              <span className="font-semibold text-white">Thank you</span> to Valley Hope Foundation, R4 Reach, 
-              WNC Supply Sites, Aid Arena, and the many other mutual aid partners who make this collaborative platform possible. 
+              <span className="font-semibold text-white">Thank you</span> to{' '}
+              <a href="https://www.valleyhopefoundation.org/" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors">Valley Hope Foundation</a>,{' '}
+              <a href="https://r4reach.org/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors">R4 Reach</a>, 
+              WNC Supply Sites,{' '}
+              <a href="https://conversacorps.org/aid_arena/" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 transition-colors">Aid Arena</a>, and the many other mutual aid partners who make this collaborative platform possible. 
               Together, we're building stronger, more resilient communities.
             </p>
           </div>
