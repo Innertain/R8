@@ -449,10 +449,15 @@ export default function ComingSoonPage() {
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
-                <div className="text-sm sm:text-base lg:text-xl font-bold text-blue-400 mb-1 leading-tight">R4 Reach</div>
+              <a 
+                href="https://r4reach.org/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+              >
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-blue-400 mb-1 leading-tight hover:text-blue-300 transition-colors">R4 Reach</div>
                 <p className="text-xs text-gray-400 leading-tight">Resource coordination network</p>
-              </div>
+              </a>
             </div>
             
             <div className="text-center">
