@@ -168,7 +168,7 @@ const PrivacyPolicyPage: React.FC = () => {
             <div>
               <h4 className="font-semibold text-purple-800 mb-2">Google Analytics</h4>
               <p className="text-gray-700 mb-3">
-                We use Google Analytics (Measurement ID: G-VP92MYFGK7) to analyze website usage and improve our services.
+                We use Google Analytics to analyze website usage and improve our services.
                 This service collects anonymized data about your visit patterns and interactions.
               </p>
               <div className="bg-white/70 p-3 rounded border">
