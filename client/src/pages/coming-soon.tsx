@@ -456,10 +456,15 @@ export default function ComingSoonPage() {
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
-                <div className="text-sm sm:text-base lg:text-xl font-bold text-cyan-400 mb-1 leading-tight">WNC Supply Sites</div>
+              <a 
+                href="https://www.wnc-supply-sites.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+              >
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-cyan-400 mb-1 leading-tight hover:text-cyan-300 transition-colors">WNC Supply Sites</div>
                 <p className="text-xs text-gray-400 leading-tight">Western NC disaster relief</p>
-              </div>
+              </a>
             </div>
             
             <div className="text-center">
@@ -493,8 +498,8 @@ export default function ComingSoonPage() {
             <p className="text-gray-300">
               <span className="font-semibold text-white">Thank you</span> to{' '}
               <a href="https://www.valleyhopefoundation.org/" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors">Valley Hope Foundation</a>,{' '}
-              <a href="https://r4reach.org/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors">R4 Reach</a>, 
-              WNC Supply Sites,{' '}
+              <a href="https://r4reach.org/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors">R4 Reach</a>,{' '}
+              <a href="https://www.wnc-supply-sites.com/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 transition-colors">WNC Supply Sites</a>,{' '}
               <a href="https://conversacorps.org/aid_arena/" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 transition-colors">Aid Arena</a>, and the many other mutual aid partners who make this collaborative platform possible. 
               Together, we're building stronger, more resilient communities.
             </p>
