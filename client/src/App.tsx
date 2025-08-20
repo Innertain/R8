@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield, Wind, TreePine, BookOpen, CloudRain } from "lucide-react";
 import { useState, useEffect } from "react";
+import { initGA } from "./lib/analytics";
+import { useAnalytics } from "./hooks/use-analytics";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import VolunteerPortal from "@/pages/volunteer-portal";
@@ -572,6 +574,9 @@ function Navigation() {
 }
 
 function Router() {
+  // Track page views when routes change
+  useAnalytics();
+  
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -635,6 +640,16 @@ function Router() {
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  // Initialize Google Analytics when app loads
+  useEffect(() => {
+    // Verify required environment variable is present
+    if (!import.meta.env.VITE_GA_MEASUREMENT_ID) {
+      console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
+    } else {
+      initGA();
+    }
+  }, []);
 
   // Check for platform access on app load
   useEffect(() => {
