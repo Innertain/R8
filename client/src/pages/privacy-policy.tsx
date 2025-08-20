@@ -103,13 +103,25 @@ const PrivacyPolicyPage: React.FC = () => {
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3">Usage Analytics (Anonymous)</h3>
+              <h3 className="font-semibold text-lg mb-3">Website Analytics & Usage Data</h3>
+              <p className="text-sm text-gray-600 mb-3">
+                We use Google Analytics to understand how visitors use our platform and improve our services.
+              </p>
               <ul className="space-y-2 text-gray-700">
-                <li>• Page views and feature usage (no personal identification)</li>
-                <li>• Error reports for system improvement</li>
-                <li>• Geographic patterns for resource allocation</li>
-                <li>• System performance metrics</li>
+                <li>• <strong>Page Views:</strong> Which pages you visit and how long you spend on them</li>
+                <li>• <strong>Navigation Patterns:</strong> How you move through our website</li>
+                <li>• <strong>Device Information:</strong> Browser type, device type, screen size</li>
+                <li>• <strong>Location Data:</strong> General geographic location (city/region level only)</li>
+                <li>• <strong>User Interactions:</strong> Clicks, downloads, form submissions</li>
+                <li>• <strong>Traffic Sources:</strong> How you found our website (search, direct, referral)</li>
+                <li>• <strong>Performance Metrics:</strong> Page load times and system performance</li>
               </ul>
+              <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> Google Analytics data is anonymized and aggregated. We cannot identify individual users from this data.
+                  You can opt out of analytics tracking using browser settings or ad blockers.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -139,6 +151,52 @@ const PrivacyPolicyPage: React.FC = () => {
               <p className="text-gray-700">
                 Analyze usage patterns to improve features, identify community needs, 
                 and enhance emergency preparedness tools.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Third-Party Services */}
+        <Card className="border-2 border-purple-200 bg-purple-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-purple-600" />
+              Third-Party Analytics & Services
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-purple-800 mb-2">Google Analytics</h4>
+              <p className="text-gray-700 mb-3">
+                We use Google Analytics (Measurement ID: G-VP92MYFGK7) to analyze website usage and improve our services.
+                This service collects anonymized data about your visit patterns and interactions.
+              </p>
+              <div className="bg-white/70 p-3 rounded border">
+                <h5 className="font-medium text-gray-800 mb-2">What Google Analytics Collects:</h5>
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li>• Pages visited and time spent on each page</li>
+                  <li>• Your approximate location (city/region level)</li>
+                  <li>• Device and browser information</li>
+                  <li>• How you arrived at our website</li>
+                  <li>• User interactions and navigation patterns</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-purple-800 mb-2">Your Control Options</h4>
+              <ul className="text-gray-700 space-y-2">
+                <li>• <strong>Browser Settings:</strong> Most browsers allow you to refuse cookies</li>
+                <li>• <strong>Google Analytics Opt-out:</strong> Install Google's browser add-on to opt out</li>
+                <li>• <strong>Ad Blockers:</strong> Many ad blockers automatically block analytics tracking</li>
+                <li>• <strong>Private Browsing:</strong> Use incognito/private mode to limit tracking</li>
+              </ul>
+            </div>
+
+            <div className="bg-white/70 p-3 rounded border">
+              <p className="text-sm text-gray-700">
+                <strong>Data Retention:</strong> Google Analytics data is automatically deleted after 26 months. 
+                We do not share this data with other third parties beyond Google's standard data processing.
               </p>
             </div>
           </CardContent>
