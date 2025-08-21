@@ -93,7 +93,7 @@ const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
+        style: 'mapbox://styles/mapbox/streets-v12',
         center: [-98.5795, 39.8283],
         zoom: 4,
         attributionControl: false // Disable attribution for cleaner look
@@ -124,7 +124,7 @@ const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
         }
       });
 
-      // Force load after 8 seconds if not loaded
+      // Force load after 5 seconds if not loaded
       setTimeout(() => {
         if (loading && map.current) {
           console.log('Force completing map load...');
@@ -132,7 +132,7 @@ const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
           setLoading(false);
           loadWeatherData();
         }
-      }, 8000);
+      }, 5000);
 
     } catch (error) {
       console.error('Failed to initialize map:', error);
