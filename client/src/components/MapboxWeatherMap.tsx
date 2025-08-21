@@ -82,7 +82,7 @@ export default function MapboxWeatherMap() {
   const [weatherLayer, setWeatherLayer] = useState<'none' | 'radar' | 'clouds'>('none');
 
   // Fetch weather alerts
-  const { data: alertsResponse, isLoading } = useQuery({
+  const { data: alertsResponse, isLoading } = useQuery<{alerts: WeatherAlert[]}>({
     queryKey: ['/api/weather-alerts-rss'],
     refetchInterval: 2 * 60 * 1000,
   });
@@ -124,6 +124,8 @@ export default function MapboxWeatherMap() {
 
     try {
       console.log('Initializing Mapbox map...');
+      console.log('Token available:', !!mapboxgl.accessToken);
+      console.log('Container:', !!mapContainer.current);
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -133,13 +135,31 @@ export default function MapboxWeatherMap() {
         attributionControl: true
       });
 
+      console.log('Map instance created:', !!map.current);
+
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+      // Force resize immediately and after delay
+      setTimeout(() => {
+        if (map.current) {
+          map.current.resize();
+          console.log('✓ Force resize applied');
+        }
+      }, 100);
 
       map.current.on('load', () => {
         if (!map.current) return;
         
         console.log('✓ Mapbox loaded successfully');
         setInitialized(true);
+        
+        // Another resize after load
+        setTimeout(() => {
+          if (map.current) {
+            map.current.resize();
+            console.log('✓ Post-load resize applied');
+          }
+        }, 100);
 
         // Add precipitation radar source (initially invisible)
         map.current.addSource('radar-source', {
@@ -180,6 +200,16 @@ export default function MapboxWeatherMap() {
         console.error('Mapbox error:', e);
       });
 
+      map.current.on('styledata', () => {
+        console.log('✓ Map style loaded');
+      });
+
+      map.current.on('sourcedata', (e) => {
+        if (e.isSourceLoaded) {
+          console.log(`✓ Source loaded: ${e.sourceId}`);
+        }
+      });
+
     } catch (error) {
       console.error('Failed to initialize Mapbox:', error);
     }
@@ -205,7 +235,8 @@ export default function MapboxWeatherMap() {
       const stateData = US_STATES[stateCode as keyof typeof US_STATES];
       if (!stateData) return;
 
-      const alertCount = stateAlerts.length;
+      const alertList = stateAlerts as WeatherAlert[];
+      const alertCount = alertList.length;
 
       // Create marker element
       const markerEl = document.createElement('div');
@@ -248,7 +279,7 @@ export default function MapboxWeatherMap() {
             ${alertCount} Active Alert${alertCount !== 1 ? 's' : ''}
           </div>
           <div style="max-height: 200px; overflow-y: auto;">
-            ${stateAlerts.slice(0, 4).map((alert: WeatherAlert) => `
+            ${alertList.slice(0, 4).map((alert: WeatherAlert) => `
               <div style="margin-bottom: 8px; padding: 8px; border-left: 4px solid #ff6b35; background: #f9fafb; border-radius: 0 4px 4px 0;">
                 <div style="font-weight: 600; font-size: 13px; color: #374151; margin-bottom: 2px;">${alert.event}</div>
                 <div style="font-size: 12px; color: #6b7280;">${alert.severity} • ${alert.urgency}</div>
@@ -311,10 +342,12 @@ export default function MapboxWeatherMap() {
       {/* Map Container */}
       <div 
         ref={mapContainer} 
-        className="w-full h-full"
+        className="w-full h-full mapbox-container"
         style={{ 
           minHeight: '500px',
-          position: 'relative'
+          height: '100%',
+          position: 'relative',
+          backgroundColor: '#1e293b'
         }} 
       />
       
