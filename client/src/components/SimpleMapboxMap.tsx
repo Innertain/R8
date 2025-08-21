@@ -1136,25 +1136,24 @@ export default function SimpleMapboxMap() {
         else if (severity > 200) color = '#f97316'; // Orange for medium severity
         else if (severity > 50) color = '#eab308'; // Yellow-orange for low severity
         
-        // Create disaster marker element with enhanced visibility
+        // Create disaster marker using same style as wildfire markers but with different colors
         const el = document.createElement('div');
-        el.className = 'disaster-heat-marker';
-        el.style.width = `${size}px`;
-        el.style.height = `${size}px`;
-        el.style.backgroundColor = color;
-        el.style.borderRadius = '50%';
-        el.style.border = '4px solid white';
-        el.style.cursor = 'pointer';
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        el.style.fontSize = `${size * 0.5}px`;
-        el.style.fontWeight = 'bold';
-        el.style.boxShadow = `0 0 ${size}px ${color}88, 0 0 ${size * 2}px ${color}44`;
-        el.style.position = 'relative';
-        el.style.zIndex = '1000';
-        // Remove problematic animation for now to fix positioning
-        el.style.transition = 'transform 0.2s ease';
+        el.className = `disaster-marker-${disaster.eventType?.toLowerCase()}`;
+        el.style.cssText = `
+          width: ${size}px;
+          height: ${size}px;
+          background-color: ${color};
+          border-radius: 50%;
+          border: 3px solid white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: ${Math.max(12, size * 0.4)}px;
+          font-weight: bold;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          z-index: 100;
+        `;
         
         // Add appropriate emoji based on disaster type (removed skull for sensitivity)
         if (disaster.eventType?.toLowerCase().includes('fire')) {
@@ -1214,13 +1213,17 @@ export default function SimpleMapboxMap() {
             continue;
           }
           
-          // Create marker with explicit coordinate handling - VERIFY POSITIONING
-          console.log(`🎯 POSITIONING CHECK: Creating marker at lng=${lng}, lat=${lat} for ${disaster.eventType} in ${disaster.state}`);
+          // Use the same marker creation approach as wildfires (which work correctly)
+          const marker = new mapboxgl.Marker({
+            element: el,
+            anchor: 'center'
+          })
+            .setLngLat([lng, lat])
+            .setPopup(popup);
           
-          const marker = new mapboxgl.Marker(el)
-            .setLngLat([parseFloat(lng.toString()), parseFloat(lat.toString())])
-            .setPopup(popup)
-            .addTo(map.current!);
+          // Add to map using the same pattern as wildfire markers
+          marker.addTo(map.current!);
+          console.log(`🎯 DISASTER MARKER POSITIONED: ${disaster.eventType} in ${disaster.state} at [${lng}, ${lat}]`);
           
           markersRef.current.push(marker);
           console.log(`✅ DISASTER MARKER ${i+1}: ${disaster.eventType} in ${disaster.state} at [${lng}, ${lat}] - severity: ${severity.toFixed(1)}`);
