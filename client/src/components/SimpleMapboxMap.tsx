@@ -7,6 +7,25 @@ import { MapPin, Layers } from 'lucide-react';
 // Set Mapbox access token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
+// Weather event to icon mapping
+const WEATHER_ICONS = {
+  'hurricane': 'HURICAN_1754119781366.png',
+  'tropical storm': 'HURICAN_1754119781366.png', 
+  'flood': 'FLOOD_1754119781365.png',
+  'flash flood': 'FLOOD_1754119781365.png',
+  'fire': 'Fire_1754119781364.png',
+  'red flag': 'Fire_1754119781364.png',
+  'tornado': 'TORNATOR_1754119781369.png',
+  'severe thunderstorm': 'STORM_1754119781368.png',
+  'winter storm': 'ICE _ WINTER STORM_1754119781367.png',
+  'blizzard': 'ICE _ WINTER STORM_1754119781367.png',
+  'ice storm': 'ICE _ WINTER STORM_1754119781367.png',
+  'wind': 'WIND_1754119781370.png',
+  'high wind': 'WIND_1754119781370.png',
+  'heat': 'Heatwave_1754119781366.png',
+  'excessive heat': 'Heatwave_1754119781366.png'
+} as const;
+
 // State icon mapping
 const STATE_ICONS = {
   'AL': 'Alabama_1754172085109.png',
@@ -146,6 +165,17 @@ export default function SimpleMapboxMap() {
     alert.event?.toLowerCase().includes('warning') || 
     alert.event?.toLowerCase().includes('watch')
   );
+
+  // Helper function to get weather icon for event type
+  const getWeatherIcon = (eventType: string): string => {
+    const event = eventType.toLowerCase();
+    for (const [key, icon] of Object.entries(WEATHER_ICONS)) {
+      if (event.includes(key)) {
+        return icon;
+      }
+    }
+    return 'STORM_1754119781368.png'; // Default to storm icon
+  };
 
   // Group alerts by state
   const statesWithAlerts = filteredAlerts.reduce((acc: Record<string, WeatherAlert[]>, alert) => {
@@ -300,8 +330,15 @@ export default function SimpleMapboxMap() {
           <!-- Enhanced Header with State Info -->
           <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 48px; height: 48px; background: rgba(255, 107, 53, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3);">
-                <div style="color: #ff6b35; font-size: 18px; font-weight: bold; text-align: center;">${stateCode}</div>
+              <div style="width: 56px; height: 56px; background: rgba(255, 107, 53, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3); padding: 4px; position: relative; overflow: hidden;">
+                <img 
+                  src="/attached_assets/${STATE_ICONS[stateCode as keyof typeof STATE_ICONS] || 'California_1754172085112.png'}" 
+                  alt="${stateData.name}" 
+                  style="width: 40px; height: 40px; object-fit: contain; filter: invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%); opacity: 0.9;"
+                  onload="this.style.opacity='1'"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+                />
+                <div style="display: none; color: #ff6b35; font-size: 16px; font-weight: bold; text-align: center; width: 100%; height: 100%; align-items: center; justify-content: center;">${stateCode}</div>
               </div>
               <div>
                 <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">${stateData.name}</h3>
@@ -315,23 +352,30 @@ export default function SimpleMapboxMap() {
           </div>
 
           <!-- Alert Cards Container -->
-          <div style="max-height: 320px; overflow-y: auto; padding: 0 4px;">
-            ${alerts.slice(0, 6).map((alert, index) => `
+          <div style="max-height: 360px; overflow-y: auto; padding: 0 6px; scrollbar-width: thin;">
+            ${alerts.slice(0, 8).map((alert, index) => `
               <div style="
-                margin-bottom: 12px; 
-                padding: 16px; 
-                background: linear-gradient(135deg, #f8fafc, #f1f5f9); 
-                border-radius: 12px; 
+                margin-bottom: 14px; 
+                padding: 18px; 
+                background: linear-gradient(135deg, #ffffff, #f8fafc); 
+                border-radius: 16px; 
                 border: 1px solid #e2e8f0; 
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-                transition: all 0.2s ease;
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+                transition: all 0.3s ease;
                 position: relative;
                 overflow: hidden;
-              " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.06)'">
+                border-left: 4px solid ${alert.severity === 'Severe' ? '#dc2626' : alert.severity === 'Moderate' ? '#ea580c' : '#0891b2'};
+              " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.12)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(0, 0, 0, 0.08)'">
                 
-                <!-- Alert Type Icon -->
-                <div style="position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: rgba(255, 107, 53, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                  <div style="width: 8px; height: 8px; background: #ff6b35; border-radius: 50%;"></div>
+                <!-- Weather Event Icon -->
+                <div style="position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; background: rgba(255, 107, 53, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                  <img 
+                    src="/attached_assets/${getWeatherIcon(alert.event)}" 
+                    alt="${alert.event}" 
+                    style="width: 24px; height: 24px; object-fit: contain; filter: invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
+                  />
+                  <div style="display: none; width: 8px; height: 8px; background: #ff6b35; border-radius: 50%;"></div>
                 </div>
 
                 <!-- Alert Title -->
@@ -395,19 +439,24 @@ export default function SimpleMapboxMap() {
               </div>
             `).join('')}
 
-            ${alertCount > 6 ? `
+            ${alertCount > 8 ? `
               <div style="
                 text-align: center; 
                 color: #64748b; 
                 font-size: 14px; 
-                padding: 16px; 
+                padding: 18px; 
                 background: linear-gradient(135deg, #f1f5f9, #e2e8f0); 
-                border-radius: 12px; 
+                border-radius: 16px; 
                 border: 1px dashed #cbd5e1;
-                margin-top: 8px;
+                margin-top: 12px;
                 font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
               ">
-                📊 ${alertCount - 6} additional alert${alertCount - 6 !== 1 ? 's' : ''} active
+                <div style="width: 6px; height: 6px; background: #64748b; border-radius: 50%;"></div>
+                ${alertCount - 8} additional alert${alertCount - 8 !== 1 ? 's' : ''} active
               </div>
             ` : ''}
           </div>
