@@ -967,7 +967,7 @@ export default function SimpleMapboxMap() {
     console.log(`🔍 FORCING disaster check: showDisasterCounties=${showDisasterCounties}, length=${disasterCounties.length}, map=${!!map.current}`);
     console.log(`🔍 DEBUG useEffect dependencies:`, {showDisasterCounties, disasterCountiesLength: disasterCounties.length, mapExists: !!map.current});
     
-    if (showDisasterCounties && disasterCounties.length > 0) {
+    if (showDisasterCounties && disasterCounties.length > 0 && map.current) {
       console.log(`🚨 CREATING ${disasterCounties.length} disaster county indicators NOW!`);
       
       // Show up to 25 events as requested (more than 15)
@@ -1078,7 +1078,7 @@ export default function SimpleMapboxMap() {
       
       console.log(`✅ Added ${eventsToShow} disaster county markers with real coordinates`);
     }
-  }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties, showWeatherAlerts, showWildfires]);
+  }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties, showWeatherAlerts, showWildfires, map.current]);
 
   // Debug: Log disaster data availability
   React.useEffect(() => {
