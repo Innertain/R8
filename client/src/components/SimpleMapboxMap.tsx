@@ -756,12 +756,14 @@ export default function SimpleMapboxMap() {
         ">🔥</div>
         `;
 
-      // Enhanced hover effects for wildfire markers
+      // Enhanced hover effects for wildfire markers with hot shadow
       el.addEventListener('mouseenter', () => {
         const markerDiv = el.firstElementChild as HTMLElement;
         if (markerDiv) {
-          markerDiv.style.transform = 'scale(1.15)';
-          markerDiv.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.6), 0 4px 12px rgba(0,0,0,0.4)';
+          markerDiv.style.transform = 'scale(1.2)';
+          markerDiv.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.8), 0 6px 16px rgba(251, 191, 36, 0.6), 0 4px 12px rgba(0,0,0,0.5)';
+          markerDiv.style.transition = 'all 0.2s ease-out';
+          markerDiv.style.zIndex = '1000';
         }
       });
 
@@ -769,7 +771,9 @@ export default function SimpleMapboxMap() {
         const markerDiv = el.firstElementChild as HTMLElement;
         if (markerDiv) {
           markerDiv.style.transform = 'scale(1)';
-          markerDiv.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4), 0 3px 10px rgba(0,0,0,0.2)';
+          markerDiv.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.5), 0 3px 10px rgba(251, 191, 36, 0.3), 0 2px 6px rgba(0,0,0,0.3)';
+          markerDiv.style.transition = 'all 0.2s ease-in';
+          markerDiv.style.zIndex = '100';
         }
       });
 
