@@ -1136,59 +1136,181 @@ export default function SimpleMapboxMap() {
         else if (severity > 200) color = '#f97316'; // Orange for medium severity
         else if (severity > 50) color = '#eab308'; // Yellow-orange for low severity
         
-        // Create disaster marker using same style as wildfire markers but with different colors
+        // Create enhanced heat map marker with unique visual effects
         const el = document.createElement('div');
-        el.className = `disaster-marker-${disaster.eventType?.toLowerCase()}`;
+        el.className = `disaster-heatmap-marker severity-${severity > 1000 ? 'extreme' : severity > 500 ? 'high' : severity > 200 ? 'medium' : 'low'}`;
+        
+        // Create multi-layer heat map effect
+        const innerGlow = document.createElement('div');
+        const outerRing = document.createElement('div');
+        const centerDot = document.createElement('div');
+        
+        // Outer heat glow effect
         el.style.cssText = `
+          width: ${size * 1.8}px;
+          height: ${size * 1.8}px;
+          position: relative;
+          cursor: pointer;
+          z-index: 100;
+          animation: heat-pulse 3s ease-in-out infinite;
+        `;
+        
+        // Inner glow layer
+        innerGlow.style.cssText = `
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: radial-gradient(circle, ${color}40 0%, ${color}20 50%, transparent 70%);
+          position: absolute;
+          top: 0;
+          left: 0;
+          animation: heat-glow 2s ease-in-out infinite alternate;
+        `;
+        
+        // Outer ring
+        outerRing.style.cssText = `
           width: ${size}px;
           height: ${size}px;
-          background-color: ${color};
           border-radius: 50%;
-          border: 3px solid white;
+          border: 3px solid ${color};
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: ${color}30;
+          animation: heat-ring 2.5s linear infinite;
+        `;
+        
+        // Center marker dot
+        centerDot.style.cssText = `
+          width: ${size * 0.6}px;
+          height: ${size * 0.6}px;
+          border-radius: 50%;
+          background: ${color};
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: ${Math.max(12, size * 0.4)}px;
+          font-size: ${Math.max(10, size * 0.3)}px;
+          color: white;
           font-weight: bold;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-          z-index: 100;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+          border: 2px solid white;
+          box-shadow: 0 0 8px ${color}80;
         `;
         
-        // Add appropriate emoji based on disaster type (removed skull for sensitivity)
-        if (disaster.eventType?.toLowerCase().includes('fire')) {
-          el.textContent = '🔥'; // Fire events
-        } else if (disaster.eventType?.toLowerCase().includes('flood')) {
-          el.textContent = '💧'; // Flood events  
-        } else if (disaster.eventType?.toLowerCase().includes('hurricane')) {
-          el.textContent = '🌀'; // Hurricane events
-        } else if (disaster.eventType?.toLowerCase().includes('tornado')) {
-          el.textContent = '🌪️'; // Tornado events
-        } else if (disaster.eventType?.toLowerCase().includes('earthquake')) {
-          el.textContent = '🌋'; // Earthquake events
-        } else {
-          el.textContent = '⚠️'; // Other disasters
+        // Add CSS animations only if not already present  
+        if (typeof document !== 'undefined' && !document.querySelector('#heat-map-styles')) {
+          const style = document.createElement('style');
+          style.id = 'heat-map-styles';
+          style.textContent = `
+            @keyframes heat-pulse {
+              0%, 100% { transform: scale(1); opacity: 0.8; }
+              50% { transform: scale(1.1); opacity: 1; }
+            }
+            @keyframes heat-glow {
+              0% { opacity: 0.6; }
+              100% { opacity: 0.9; }
+            }
+            @keyframes heat-ring {
+              0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+              100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+            }
+            .disaster-heatmap-marker:hover {
+              z-index: 1000 !important;
+            }
+            .disaster-heatmap-marker:hover .center-dot {
+              transform: translate(-50%, -50%) scale(1.2) !important;
+            }
+          `;
+          document.head && document.head.appendChild(style);
         }
         
-        // Create popup with disaster details
+        // Add emoji to center dot
+        if (disaster.eventType?.toLowerCase().includes('fire')) {
+          centerDot.textContent = '🔥';
+        } else if (disaster.eventType?.toLowerCase().includes('flood')) {
+          centerDot.textContent = '💧';
+        } else if (disaster.eventType?.toLowerCase().includes('hurricane')) {
+          centerDot.textContent = '🌀';
+        } else if (disaster.eventType?.toLowerCase().includes('tornado')) {
+          centerDot.textContent = '🌪️';
+        } else if (disaster.eventType?.toLowerCase().includes('earthquake')) {
+          centerDot.textContent = '🌋';
+        } else {
+          centerDot.textContent = '⚠️';
+        }
+        
+        // Assemble the multi-layer heat map marker
+        el.appendChild(innerGlow);
+        el.appendChild(outerRing);
+        el.appendChild(centerDot);
+        centerDot.className = 'center-dot';
+        
+        // Emoji will be added to centerDot in the heat map creation section
+        
+        // Create enhanced popup with comprehensive disaster information
         const popup = new mapboxgl.Popup({
           closeButton: true,
           closeOnClick: true,
-          maxWidth: '300px'
+          maxWidth: '400px',
+          className: 'disaster-popup'
         }).setHTML(`
-          <div style="font-family: system-ui, sans-serif;">
-            <div style="background: ${color}; color: white; padding: 12px; margin: -10px -10px 12px -10px; border-radius: 6px 6px 0 0;">
-              <h3 style="margin: 0; font-size: 16px;">${disaster.eventType} in ${disaster.state}</h3>
-              <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">
-                ${disaster.beginDate ? new Date(disaster.beginDate).toLocaleDateString() : 'Date TBD'}
+          <div style="font-family: system-ui, sans-serif; line-height: 1.4;">
+            <div style="background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 8px 8px 0 0; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+              <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">${disaster.eventType?.toLowerCase().includes('fire') ? '🔥' : disaster.eventType?.toLowerCase().includes('flood') ? '💧' : disaster.eventType?.toLowerCase().includes('hurricane') ? '🌀' : disaster.eventType?.toLowerCase().includes('tornado') ? '🌪️' : '⚠️'}</span>
+                ${disaster.stormSummary || `${disaster.eventType} Event`}
+              </h3>
+              <div style="font-size: 14px; opacity: 0.95;">
+                <strong>${disaster.state}</strong>${disaster.county ? ` • ${disaster.county}` : ''}
+              </div>
+              <div style="font-size: 12px; opacity: 0.8; margin-top: 6px;">
+                ${disaster.beginDate ? new Date(disaster.beginDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date Unknown'}
+                ${disaster.endDate ? ` - ${new Date(disaster.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
               </div>
             </div>
-            <div style="padding: 4px;">
-              ${deaths > 0 ? `<div style="margin-bottom: 6px;"><strong>Deaths:</strong> ${deaths}</div>` : ''}
-              ${disaster.injuries > 0 ? `<div style="margin-bottom: 6px;"><strong>Injuries:</strong> ${disaster.injuries}</div>` : ''}
-              ${damage > 0 ? `<div style="margin-bottom: 6px;"><strong>Damage:</strong> $${(damage / 1000000000).toFixed(1)}B</div>` : ''}
-              <div style="font-size: 11px; color: #666; margin-top: 8px;">
-                Severity Score: ${severity.toFixed(1)}
+            
+            <div style="padding: 0 4px 8px 4px;">
+              ${deaths > 0 || disaster.injuries > 0 ? `
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+                  <div style="font-weight: bold; color: #dc2626; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <span>📊</span> Human Impact
+                  </div>
+                  ${deaths > 0 ? `<div style="margin-bottom: 4px; color: #991b1b;"><strong>Fatalities:</strong> ${deaths.toLocaleString()}</div>` : ''}
+                  ${disaster.injuries > 0 ? `<div style="color: #dc2626;"><strong>Injuries:</strong> ${disaster.injuries.toLocaleString()}</div>` : ''}
+                </div>
+              ` : ''}
+              
+              ${damage > 0 || disaster.damageCrops > 0 ? `
+                <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+                  <div style="font-weight: bold; color: #d97706; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <span>💰</span> Economic Impact
+                  </div>
+                  ${damage > 0 ? `<div style="margin-bottom: 4px; color: #92400e;"><strong>Property:</strong> $${(damage / 1000000000).toFixed(2)}B</div>` : ''}
+                  ${disaster.damageCrops > 0 ? `<div style="color: #d97706;"><strong>Crops:</strong> $${(disaster.damageCrops / 1000000).toFixed(0)}M</div>` : ''}
+                </div>
+              ` : ''}
+              
+              ${disaster.episodeNarrative ? `
+                <div style="background: #f0f9ff; border: 1px solid #93c5fd; border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+                  <div style="font-weight: bold; color: #1d4ed8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <span>📝</span> Event Summary
+                  </div>
+                  <div style="font-size: 13px; color: #1e40af; line-height: 1.5;">
+                    ${disaster.episodeNarrative.substring(0, 200)}${disaster.episodeNarrative.length > 200 ? '...' : ''}
+                  </div>
+                </div>
+              ` : ''}
+              
+              <div style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #6b7280;">
+                  <span>Severity Score: <strong style="color: ${color};">${severity.toFixed(1)}</strong></span>
+                  <span style="opacity: 0.7;">ID: ${disaster.id}</span>
+                </div>
               </div>
             </div>
           </div>
