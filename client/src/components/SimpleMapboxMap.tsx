@@ -954,58 +954,116 @@ export default function SimpleMapboxMap() {
       addWildfireMarkers();
     }
     
-    // Add disaster county highlighting markers (TEST - Simple Orange Circles)
+    // Add disaster county highlighting markers using actual county coordinates
     if (showDisasterCounties && disasterCounties.length > 0) {
       console.log(`✓ Adding ${disasterCounties.length} disaster county indicators`);
       
-      // Test with just the first 5 counties to see if they appear
-      disasterCounties.slice(0, 5).forEach((county, index) => {
-        const stateData = US_STATES[county.state as keyof typeof US_STATES];
-        if (!stateData) return;
+      // Show up to 25 events as requested (more than 15)
+      disasterCounties.slice(0, 25).forEach((event, index) => {
+        // Use actual coordinates from the event if available, otherwise fallback to state center
+        let lng, lat;
         
-        // Create very simple, bright orange marker
+        if ((event as any).coordinates && (event as any).coordinates.longitude && (event as any).coordinates.latitude) {
+          lng = (event as any).coordinates.longitude;
+          lat = (event as any).coordinates.latitude;
+          console.log(`📍 Using event coordinates [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
+        } else {
+          const stateData = US_STATES[event.state as keyof typeof US_STATES];
+          if (!stateData) return;
+          
+          // Add small offset from state center
+          const offset = 0.2 + (index * 0.1); // Varying offset based on index
+          const angle = (index * 25) * (Math.PI / 180); // 25-degree spacing
+          lng = stateData.coords[0] + (offset * Math.cos(angle));
+          lat = stateData.coords[1] + (offset * Math.sin(angle));
+          console.log(`📍 Using offset state coords [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
+        }
+        
+        // Create county disaster area marker
         const countyEl = document.createElement('div');
         countyEl.style.cssText = `
-          width: 40px;
-          height: 40px;
-          background: orange;
-          border: 3px solid yellow;
+          width: 28px;
+          height: 28px;
+          background: radial-gradient(circle, #dc2626, #b91c1c);
+          border: 3px solid #fbbf24;
           border-radius: 50%;
           cursor: pointer;
           position: relative;
-          z-index: 999;
-          box-shadow: 0 0 20px orange;
+          z-index: 250;
+          box-shadow: 0 4px 16px rgba(220, 38, 38, 0.7), 0 0 0 8px rgba(251, 191, 36, 0.3);
+          animation: disaster-glow 2s infinite;
         `;
         
-        // Large offset to ensure they're visible far from other markers
-        const countyOffset = 1.5; // Very large offset
-        const countyAngle = (index * 72) * (Math.PI / 180); // 72-degree spacing
-        const countyLng = stateData.coords[0] + (countyOffset * Math.cos(countyAngle));
-        const countyLat = stateData.coords[1] + (countyOffset * Math.sin(countyAngle));
+        // Add CSS animation for disaster areas
+        if (!document.querySelector('#disaster-glow-style')) {
+          const style = document.createElement('style');
+          style.id = 'disaster-glow-style';
+          style.textContent = `
+            @keyframes disaster-glow {
+              0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(220, 38, 38, 0.7), 0 0 0 8px rgba(251, 191, 36, 0.3);
+              }
+              50% { 
+                transform: scale(1.2);
+                box-shadow: 0 6px 24px rgba(220, 38, 38, 0.9), 0 0 0 12px rgba(251, 191, 36, 0.5);
+              }
+            }
+          `;
+          document.head.appendChild(style);
+        }
         
-        console.log(`📍 TEST County marker ${index + 1} at [${countyLng}, ${countyLat}] for ${county.state} - ${county.eventType}`);
-        console.log(`   State center: [${stateData.coords[0]}, ${stateData.coords[1]}]`);
+        // Parse county names for display
+        const countyNames = typeof (event as any).county === 'string' 
+          ? (event as any).county.split(',').map((c: any) => c.trim()).slice(0, 5)
+          : event.counties?.slice(0, 5) || ['County data unavailable'];
         
-        // Create simple popup
+        // Create detailed popup
         const countyPopup = new mapboxgl.Popup({
           closeButton: true,
-          closeOnClick: true
+          closeOnClick: true,
+          maxWidth: '320px'
         }).setHTML(`
-          <div style="padding: 10px; font-family: Arial;">
-            <h3>${county.eventType} Event</h3>
-            <p>${county.state} • ${new Date(county.eventDate).getFullYear()}</p>
-            <p>Counties: ${county.counties.slice(0, 3).join(', ')}</p>
+          <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 280px;">
+            <div style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 14px; margin: -10px -10px 14px -10px; border-radius: 8px 8px 0 0;">
+              <h3 style="margin: 0; font-size: 17px; font-weight: 700;">🚨 ${event.eventType}</h3>
+              <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; margin-top: 4px;">
+                ${event.state} • ${new Date((event as any).beginDate || event.eventDate).getFullYear()}
+              </div>
+            </div>
+            <div style="color: #374151; padding: 2px;">
+              <div style="margin-bottom: 12px;">
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #dc2626;">📍 Affected Counties</div>
+                <div style="background: #fef3c7; color: #92400e; padding: 8px; border-radius: 6px; font-size: 13px; line-height: 1.4;">
+                  ${countyNames.join(', ')}${countyNames.length >= 5 ? '+' : ''}
+                </div>
+              </div>
+              ${(event as any).deaths > 0 ? `
+                <div style="margin-bottom: 10px;">
+                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💀 Fatalities: ${(event as any).deaths}</div>
+                </div>
+              ` : ''}
+              ${(event as any).damageProperty > 0 ? `
+                <div style="margin-bottom: 10px;">
+                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💰 Property Damage: $${((event as any).damageProperty / 1000000).toFixed(1)}M</div>
+                </div>
+              ` : ''}
+              <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280;">
+                NOAA Disaster Impact Database • ${(event as any).beginDate ? new Date((event as any).beginDate).toLocaleDateString() : 'Date TBD'}
+              </div>
+            </div>
           </div>
         `);
         
         const countyMarker = new mapboxgl.Marker(countyEl)
-          .setLngLat([countyLng, countyLat])
+          .setLngLat([lng, lat])
           .setPopup(countyPopup)
           .addTo(map.current!);
         
         markersRef.current.push(countyMarker);
-        console.log(`✓ County marker added to map successfully`);
       });
+      
+      console.log(`✓ Added ${Math.min(disasterCounties.length, 25)} disaster county markers with real coordinates`);
     }
   }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties, showWeatherAlerts, showWildfires]);
 
