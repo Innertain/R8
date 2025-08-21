@@ -84,6 +84,17 @@ function Navigation() {
             </button>
           </Link>
 
+          <Link href="/disaster-map">
+            <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              location === "/disaster-map"
+                ? "bg-purple-500 text-white shadow-md"
+                : "text-white hover:bg-purple-500/20 hover:text-white"
+            }`}>
+              <MapPin className="h-4 w-4" />
+              Disaster Map
+            </button>
+          </Link>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
