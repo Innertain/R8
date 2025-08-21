@@ -377,6 +377,7 @@ export default function SimpleMapboxMap() {
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
+          z-index: 500;
         ">
           <div style="
             position: absolute;
@@ -453,12 +454,13 @@ export default function SimpleMapboxMap() {
         </style>
       `;
 
-      // Enhanced hover effects
+      // Enhanced hover effects - ensure weather alerts stay on top
       el.addEventListener('mouseenter', () => {
         const markerDiv = el.firstElementChild as HTMLElement;
         if (markerDiv) {
           markerDiv.style.transform = 'scale(1.15)';
           markerDiv.style.boxShadow = '0 6px 20px rgba(255, 107, 53, 0.6), 0 4px 12px rgba(0,0,0,0.4)';
+          markerDiv.style.zIndex = '1000'; // Ensure weather alerts stay above wildfire markers
         }
       });
 
@@ -467,6 +469,7 @@ export default function SimpleMapboxMap() {
         if (markerDiv) {
           markerDiv.style.transform = 'scale(1)';
           markerDiv.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.4), 0 2px 6px rgba(0,0,0,0.3)';
+          markerDiv.style.zIndex = '500'; // Still higher than wildfire base z-index
         }
       });
 
@@ -711,6 +714,7 @@ export default function SimpleMapboxMap() {
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
+          z-index: 100;
         ">
           <div style="
             position: absolute;
@@ -773,7 +777,7 @@ export default function SimpleMapboxMap() {
           markerDiv.style.transform = 'scale(1)';
           markerDiv.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.5), 0 3px 10px rgba(251, 191, 36, 0.3), 0 2px 6px rgba(0,0,0,0.3)';
           markerDiv.style.transition = 'all 0.2s ease-in';
-          markerDiv.style.zIndex = '100';
+          markerDiv.style.zIndex = '200'; // Lower than weather alerts but visible when hovered
         }
       });
 
