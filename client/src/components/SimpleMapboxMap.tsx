@@ -607,7 +607,7 @@ export default function SimpleMapboxMap() {
 
     // Add wildfire incident markers
     wildfires.forEach((incident) => {
-      const stateData = STATE_COORDINATES[incident.state as keyof typeof STATE_COORDINATES];
+      const stateData = US_STATES[incident.state as keyof typeof US_STATES];
       if (!stateData) return;
 
       const [lng, lat] = stateData.coords;
