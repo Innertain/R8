@@ -1152,15 +1152,7 @@ export default function SimpleMapboxMap() {
         el.style.boxShadow = `0 0 10px ${color}88, 0 2px 4px rgba(0,0,0,0.3)`;
         el.style.transition = 'transform 0.2s ease';
         
-        // Add hover effect
-        el.addEventListener('mouseenter', () => {
-          el.style.transform = 'scale(1.2)';
-          el.style.zIndex = '1000';
-        });
-        el.addEventListener('mouseleave', () => {
-          el.style.transform = 'scale(1)';
-          el.style.zIndex = '100';
-        });
+        // Remove hover effects that break positioning - they interfere with Mapbox coordinates
         
         // Add appropriate emoji
         if (disaster.eventType?.toLowerCase().includes('fire')) {
@@ -1262,16 +1254,12 @@ export default function SimpleMapboxMap() {
             continue;
           }
           
-          // Use the same marker creation approach as wildfires (which work correctly)
-          const marker = new mapboxgl.Marker({
-            element: el,
-            anchor: 'center'
-          })
+          // Use EXACT same pattern as wildfire markers - no complex object, just simple constructor
+          const marker = new mapboxgl.Marker(el)
             .setLngLat([lng, lat])
-            .setPopup(popup);
+            .setPopup(popup)
+            .addTo(map.current!);
           
-          // Add to map using the same pattern as wildfire markers
-          marker.addTo(map.current!);
           console.log(`🎯 DISASTER MARKER POSITIONED: ${disaster.eventType} in ${disaster.state} at [${lng}, ${lat}]`);
           
           markersRef.current.push(marker);
