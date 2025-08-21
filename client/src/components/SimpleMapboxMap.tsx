@@ -280,13 +280,6 @@ export default function SimpleMapboxMap() {
       
       // Create enhanced marker element with weather icon
       const el = document.createElement('div');
-      el.style.position = 'relative';
-      el.style.width = '70px';
-      el.style.height = '70px';
-      el.style.display = 'flex';
-      el.style.alignItems = 'center';
-      el.style.justifyContent = 'center';
-      
       el.innerHTML = `
         <div style="
           background: linear-gradient(135deg, #ffffff, #f8fafc);
@@ -323,49 +316,48 @@ export default function SimpleMapboxMap() {
             />
           </div>
           <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; width: 100%; height: 100%; align-items: center; justify-content: center;">${alertCount}</div>
+          
         </div>
         
         <!-- Alert count badge - positioned outside the main circle -->
         <div style="
           position: absolute;
-          bottom: -2px;
-          right: -2px;
+          bottom: -4px;
+          right: -4px;
           background: #ff6b35;
           color: white;
           border-radius: 50%;
-          width: 26px;
-          height: 26px;
+          width: 20px;
+          height: 20px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 14px;
+          font-size: 12px;
           font-weight: bold;
           border: 2px solid white;
-          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-          z-index: 30;
-          pointer-events: none;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          z-index: 20;
         ">${alertCount}</div>
           
         <!-- Multiple weather types indicator -->
         ${hasMultipleTypes ? `
         <div style="
           position: absolute;
-          top: -2px;
-          left: -2px;
+          top: -4px;
+          left: -4px;
           background: #ea580c;
           color: white;
           border-radius: 50%;
-          width: 22px;
-          height: 22px;
+          width: 18px;
+          height: 18px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 11px;
+          font-size: 10px;
           font-weight: bold;
           border: 2px solid white;
-          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-          z-index: 30;
-          pointer-events: none;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          z-index: 20;
         ">+${uniqueWeatherTypes.length - 1}</div>
         ` : ''}
         </div>
