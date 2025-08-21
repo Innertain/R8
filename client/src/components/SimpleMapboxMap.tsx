@@ -92,26 +92,31 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
     if (!map.current || !initialized) return;
 
     try {
-      const response = await fetch('/api/weather-alerts');
+      console.log('🌐 Fetching weather alerts from RSS feeds...');
+      const response = await fetch('/api/weather-alerts-rss');
       const data = await response.json();
+      
+      console.log('📊 Weather alerts received:', data.alerts?.length || 0, 'alerts');
+      console.log('📋 Sample alert:', data.alerts?.[0]);
 
-      if (data.success && data.alerts) {
-        console.log('Adding', data.alerts.length, 'weather alerts');
+      if (data.success && data.alerts && data.alerts.length > 0) {
+        console.log('✅ Processing', data.alerts.length, 'weather alerts');
         setAlertCount(data.alerts.length);
 
-        // Create GeoJSON for weather alerts
-        console.log('Processing', data.alerts.length, 'alerts for map display');
+        // Create features from NWS alerts - match the InteractiveWeatherMap structure
         const features = data.alerts.slice(0, 100).map((alert: any, index: number) => ({
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: getCoordinatesForAlert(alert.areaDesc)
+            coordinates: getCoordinatesForAlert(alert.title || alert.event || alert.areaDesc)
           },
           properties: {
-            title: alert.event || 'Weather Alert',
-            description: alert.description || '',
-            severity: alert.severity || 'Unknown',
-            area: alert.areaDesc || ''
+            title: alert.title || alert.event || 'Weather Alert',
+            description: alert.description || alert.summary || '',
+            severity: alert.severity || 'Moderate',
+            area: alert.location || alert.areaDesc || '',
+            event: alert.event || 'Weather Alert',
+            urgency: alert.urgency || 'Unknown'
           }
         }));
 
