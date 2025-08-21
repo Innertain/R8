@@ -1,5 +1,5 @@
 import React from 'react';
-import DisasterMapWithUI from '@/components/DisasterMapWithUI';
+import SimpleDisasterMap from '@/components/SimpleDisasterMap';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -78,7 +78,7 @@ const DisasterMapPage: React.FC = () => {
 
       {/* Map Section */}
       <div className="flex-1 h-[calc(100vh-200px)]">
-        <DisasterMapWithUI />
+        <SimpleDisasterMap />
       </div>
 
       {/* Footer Info */}

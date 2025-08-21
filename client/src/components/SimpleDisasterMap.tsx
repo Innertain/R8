@@ -1,464 +1,280 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { 
-  Layers, 
-  AlertTriangle, 
-  MapPin, 
-  Zap, 
-  Flame, 
-  CloudRain,
-  TreePine,
-  Home,
-  Activity,
-  X,
-  Search,
-  Filter,
-  Download
-} from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { AlertTriangle, MapPin } from 'lucide-react';
 
-interface DisasterData {
+// Set Mapbox access token
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+
+// US States coordinates (same as your working version)
+const US_STATES = {
+  'AL': { name: 'Alabama', coords: [-86.79113, 32.377716] },
+  'AK': { name: 'Alaska', coords: [-152.404419, 61.370716] },
+  'AZ': { name: 'Arizona', coords: [-111.431221, 33.729759] },
+  'AR': { name: 'Arkansas', coords: [-92.373123, 34.969704] },
+  'CA': { name: 'California', coords: [-119.681564, 36.116203] },
+  'CO': { name: 'Colorado', coords: [-105.311104, 39.059811] },
+  'CT': { name: 'Connecticut', coords: [-72.755371, 41.767] },
+  'DE': { name: 'Delaware', coords: [-75.507141, 39.318523] },
+  'DC': { name: 'District of Columbia', coords: [-77.026817, 38.907192] },
+  'FL': { name: 'Florida', coords: [-82.057549, 27.766279] },
+  'GA': { name: 'Georgia', coords: [-83.643074, 33.76] },
+  'HI': { name: 'Hawaii', coords: [-155.665857, 19.741755] },
+  'ID': { name: 'Idaho', coords: [-114.478828, 44.240459] },
+  'IL': { name: 'Illinois', coords: [-88.986137, 40.349457] },
+  'IN': { name: 'Indiana', coords: [-86.147685, 40.790443] },
+  'IA': { name: 'Iowa', coords: [-93.620866, 42.590794] },
+  'KS': { name: 'Kansas', coords: [-96.726486, 38.572954] },
+  'KY': { name: 'Kentucky', coords: [-84.670067, 37.839333] },
+  'LA': { name: 'Louisiana', coords: [-91.467086, 30.391830] },
+  'ME': { name: 'Maine', coords: [-69.765261, 44.323535] },
+  'MD': { name: 'Maryland', coords: [-76.501157, 39.045755] },
+  'MA': { name: 'Massachusetts', coords: [-71.530106, 42.230171] },
+  'MI': { name: 'Michigan', coords: [-84.536095, 44.314844] },
+  'MN': { name: 'Minnesota', coords: [-93.094636, 45.919827] },
+  'MS': { name: 'Mississippi', coords: [-89.207229, 32.320] },
+  'MO': { name: 'Missouri', coords: [-92.189283, 38.572954] },
+  'MT': { name: 'Montana', coords: [-110.454353, 47.052767] },
+  'NE': { name: 'Nebraska', coords: [-99.901813, 41.12537] },
+  'NV': { name: 'Nevada', coords: [-117.055374, 38.313515] },
+  'NH': { name: 'New Hampshire', coords: [-71.563896, 43.452492] },
+  'NJ': { name: 'New Jersey', coords: [-74.756138, 40.221741] },
+  'NM': { name: 'New Mexico', coords: [-106.248482, 34.307144] },
+  'NY': { name: 'New York', coords: [-74.948051, 42.165726] },
+  'NC': { name: 'North Carolina', coords: [-79.806419, 35.759573] },
+  'ND': { name: 'North Dakota', coords: [-99.784012, 47.528912] },
+  'OH': { name: 'Ohio', coords: [-82.764915, 40.269789] },
+  'OK': { name: 'Oklahoma', coords: [-96.921387, 35.482309] },
+  'OR': { name: 'Oregon', coords: [-122.070938, 43.804133] },
+  'PA': { name: 'Pennsylvania', coords: [-77.209755, 40.269789] },
+  'RI': { name: 'Rhode Island', coords: [-71.51178, 41.82355] },
+  'SC': { name: 'South Carolina', coords: [-80.945007, 33.836082] },
+  'SD': { name: 'South Dakota', coords: [-99.901813, 44.299782] },
+  'TN': { name: 'Tennessee', coords: [-86.784, 35.860119] },
+  'TX': { name: 'Texas', coords: [-97.563461, 31.054487] },
+  'UT': { name: 'Utah', coords: [-111.892622, 39.419220] },
+  'VT': { name: 'Vermont', coords: [-72.580536, 44.26639] },
+  'VA': { name: 'Virginia', coords: [-78.169968, 37.54] },
+  'WA': { name: 'Washington', coords: [-121.490494, 47.042418] },
+  'WV': { name: 'West Virginia', coords: [-80.954570, 38.349497] },
+  'WI': { name: 'Wisconsin', coords: [-89.616508, 44.268543] },
+  'WY': { name: 'Wyoming', coords: [-107.30249, 43.075968] }
+} as const;
+
+interface WeatherAlert {
   id: string;
   title: string;
-  type: 'weather-alert' | 'fema-disaster' | 'supply-site' | 'wildfire' | 'earthquake';
   description: string;
   location: string;
-  severity?: string;
-  coordinates: [number, number];
-  date?: string;
-  status?: string;
-  requests?: number;
-  resources?: number;
+  severity: string;
+  event: string;
+  urgency: string;
+  sent: string;
+  expires: string;
+  senderName: string;
+  category: string;
 }
 
-interface LayerConfig {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  visible: boolean;
-  color: string;
-  description: string;
-}
+export function SimpleDisasterMap() {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-const SimpleDisasterMap: React.FC = () => {
-  const [selectedEvent, setSelectedEvent] = useState<DisasterData | null>(null);
-  const [layers, setLayers] = useState<LayerConfig[]>([
-    {
-      id: 'weather-alerts',
-      name: 'Weather Alerts',
-      icon: <CloudRain className="w-4 h-4" />,
-      visible: true,
-      color: '#f59e0b',
-      description: 'Active weather warnings and watches'
-    },
-    {
-      id: 'fema-disasters',
-      name: 'FEMA Disasters',
-      icon: <AlertTriangle className="w-4 h-4" />,
-      visible: true,
-      color: '#dc2626',
-      description: 'Federal disaster declarations'
-    },
-    {
-      id: 'supply-sites',
-      name: 'Supply Sites',
-      icon: <Home className="w-4 h-4" />,
-      visible: true,
-      color: '#059669',
-      description: 'Active supply distribution sites'
-    },
-    {
-      id: 'wildfires',
-      name: 'Wildfire Incidents',
-      icon: <Flame className="w-4 h-4" />,
-      visible: true,
-      color: '#ea580c',
-      description: 'Active wildfire incidents'
-    },
-    {
-      id: 'earthquakes',
-      name: 'Recent Earthquakes',
-      icon: <Zap className="w-4 h-4" />,
-      visible: true,
-      color: '#7c3aed',
-      description: 'Earthquakes in last 30 days'
+  // Get weather alerts using the same endpoint as your working disaster center
+  const { data: response, isLoading, error } = useQuery({
+    queryKey: ['/api/weather-alerts-rss'],
+    refetchInterval: 2 * 60 * 60 * 1000,
+  });
+
+  const rawAlerts = (response as any)?.alerts || [];
+  
+  // Filter to only show warnings and watches (exact logic from working version)
+  const alerts = rawAlerts.filter((alert: WeatherAlert) => {
+    const title = alert.title?.toLowerCase() || '';
+    const event = alert.event?.toLowerCase() || '';
+    const combined = `${title} ${event}`;
+    
+    // Filter out advisories - only show warnings and watches
+    if (combined.includes('advisory')) return false;
+    if (combined.includes('statement')) return false;
+    if (combined.includes('outlook')) return false;
+    
+    // Keep warnings and watches
+    return combined.includes('warning') || combined.includes('watch');
+  });
+
+  // Group alerts by state (exact logic from your working version)
+  const statesWithAlerts = alerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
+    const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
+    const titleStateMatch = alert.title?.match(/\b([A-Z]{2})\b/);
+    const descriptionStateMatch = alert.description?.match(/\b([A-Z]{2})\b/);
+    
+    let state = stateMatch ? stateMatch[1] : null;
+    if (!state && titleStateMatch) state = titleStateMatch[1];
+    if (!state && descriptionStateMatch) state = descriptionStateMatch[1];
+
+    if (state && US_STATES[state as keyof typeof US_STATES]) {
+      if (!acc[state]) acc[state] = [];
+      acc[state].push(alert);
     }
-  ]);
+    return acc;
+  }, {});
 
-  const [disasterData, setDisasterData] = useState<DisasterData[]>([]);
-  const [loading, setLoading] = useState(true);
-
+  // Initialize map
   useEffect(() => {
-    loadDisasterData();
+    if (!mapContainer.current || map.current) return;
+
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: [-95.7129, 37.0902],
+      zoom: 4
+    });
+
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    map.current.on('load', () => {
+      setInitialized(true);
+      console.log('✓ Simple map loaded successfully');
+    });
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
   }, []);
 
-  const loadDisasterData = async () => {
-    setLoading(true);
-    try {
-      const [weatherAlerts, femaDisasters, supplySites, wildfires, earthquakes] = await Promise.all([
-        fetch('/api/weather-alerts').then(r => r.json()).catch(() => ({ alerts: [] })),
-        fetch('/api/fema/disasters').then(r => r.json()).catch(() => ({ disasters: [] })),
-        fetch('/api/supply-sites').then(r => r.json()).catch(() => ({ sites: [] })),
-        fetch('/api/wildfires').then(r => r.json()).catch(() => ({ incidents: [] })),
-        fetch('/api/earthquakes').then(r => r.json()).catch(() => ({ earthquakes: [] }))
-      ]);
+  // Add markers when map is ready and we have data
+  useEffect(() => {
+    if (!map.current || !initialized || Object.keys(statesWithAlerts).length === 0) return;
 
-      const allData: DisasterData[] = [];
+    // Clear existing markers
+    const existingMarkers = document.querySelectorAll('.mapboxgl-marker');
+    existingMarkers.forEach(marker => marker.remove());
 
-      // Process weather alerts
-      if (weatherAlerts.alerts?.length) {
-        weatherAlerts.alerts.slice(0, 50).forEach((alert: any, index: number) => {
-          allData.push({
-            id: `weather-${index}`,
-            title: alert.title || 'Weather Alert',
-            type: 'weather-alert',
-            description: alert.description || 'Weather warning issued',
-            location: alert.areaDesc || 'Unknown area',
-            severity: alert.severity || 'moderate',
-            coordinates: [-120 + (Math.random() * 60), 25 + (Math.random() * 25)],
-            date: alert.date || new Date().toISOString()
-          });
-        });
-      }
+    // Add state markers
+    Object.entries(statesWithAlerts).forEach(([stateCode, stateAlerts]) => {
+      const stateData = US_STATES[stateCode as keyof typeof US_STATES];
+      if (!stateData) return;
 
-      // Process FEMA disasters
-      if (femaDisasters.disasters?.length) {
-        femaDisasters.disasters.slice(0, 25).forEach((disaster: any, index: number) => {
-          allData.push({
-            id: `fema-${index}`,
-            title: disaster.title || disaster.incidentType || 'FEMA Disaster',
-            type: 'fema-disaster',
-            description: disaster.declarationTitle || 'Federal disaster declaration',
-            location: disaster.state || 'Unknown state',
-            coordinates: [-120 + (Math.random() * 60), 25 + (Math.random() * 25)],
-            date: disaster.incidentBeginDate || disaster.declarationDate,
-            status: 'Active'
-          });
-        });
-      }
+      const alertCount = (stateAlerts as WeatherAlert[]).length;
+      
+      // Create marker element
+      const markerElement = document.createElement('div');
+      markerElement.className = 'state-alert-marker';
+      markerElement.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        border: 3px solid #fff;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      `;
+      markerElement.textContent = alertCount.toString();
+      
+      markerElement.addEventListener('mouseenter', () => {
+        markerElement.style.transform = 'scale(1.2)';
+      });
+      
+      markerElement.addEventListener('mouseleave', () => {
+        markerElement.style.transform = 'scale(1)';
+      });
 
-      // Process supply sites
-      if (supplySites.sites?.length) {
-        supplySites.sites.slice(0, 100).forEach((site: any, index: number) => {
-          allData.push({
-            id: `supply-${index}`,
-            title: site.name || `Supply Site ${index + 1}`,
-            type: 'supply-site',
-            description: site.description || 'Active supply distribution site',
-            location: site.location || 'Unknown location',
-            coordinates: [-120 + (Math.random() * 60), 25 + (Math.random() * 25)],
-            requests: Math.floor(Math.random() * 50),
-            resources: Math.floor(Math.random() * 100),
-            status: site.status || 'Active'
-          });
-        });
-      }
+      // Create popup
+      const popup = new mapboxgl.Popup({ 
+        offset: 25,
+        closeButton: true,
+        closeOnClick: false
+      }).setHTML(`
+        <div style="font-family: system-ui; max-width: 300px;">
+          <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #1f2937;">
+            ${stateData.name} (${stateCode})
+          </div>
+          <div style="margin-bottom: 8px; padding: 4px 8px; background: #ff6b35; color: white; border-radius: 4px; text-align: center;">
+            ${alertCount} Active Alert${alertCount !== 1 ? 's' : ''}
+          </div>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${(stateAlerts as WeatherAlert[]).slice(0, 3).map((alert: WeatherAlert) => `
+              <div style="margin-bottom: 8px; padding: 8px; border-left: 4px solid #ff6b35; background: #f9fafb;">
+                <div style="font-weight: bold; font-size: 13px; color: #374151;">${alert.event}</div>
+                <div style="font-size: 12px; color: #6b7280;">${alert.severity} • ${alert.urgency}</div>
+              </div>
+            `).join('')}
+            ${alertCount > 3 ? `<div style="text-align: center; color: #6b7280; font-size: 12px;">... and ${alertCount - 3} more</div>` : ''}
+          </div>
+        </div>
+      `);
 
-      // Process wildfires
-      if (wildfires.incidents?.length) {
-        wildfires.incidents.slice(0, 30).forEach((incident: any, index: number) => {
-          allData.push({
-            id: `wildfire-${index}`,
-            title: incident.name || `Wildfire ${index + 1}`,
-            type: 'wildfire',
-            description: `Active wildfire incident - ${Math.floor(Math.random() * 10000)} acres`,
-            location: incident.state || 'Unknown state',
-            coordinates: [-120 + (Math.random() * 60), 25 + (Math.random() * 25)]
-          });
-        });
-      }
-
-      // Process earthquakes
-      if (earthquakes.earthquakes?.length) {
-        earthquakes.earthquakes.slice(0, 50).forEach((eq: any, index: number) => {
-          const magnitude = (Math.random() * 5 + 2).toFixed(1);
-          allData.push({
-            id: `earthquake-${index}`,
-            title: `M${magnitude} Earthquake`,
-            type: 'earthquake',
-            description: `Magnitude ${magnitude}, depth ${Math.floor(Math.random() * 100)}km`,
-            location: eq.place || 'Unknown location',
-            coordinates: [-120 + (Math.random() * 60), 25 + (Math.random() * 25)],
-            date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
-          });
-        });
-      }
-
-      setDisasterData(allData);
-    } catch (error) {
-      console.error('Error loading disaster data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleLayer = (layerId: string, visible: boolean) => {
-    setLayers(prev => prev.map(layer => 
-      layer.id === layerId ? { ...layer, visible } : layer
-    ));
-  };
-
-  const getFilteredData = () => {
-    return disasterData.filter(event => {
-      const layer = layers.find(l => l.id === `${event.type}s` || l.id === event.type.replace('-', '-'));
-      return layer?.visible !== false;
+      // Add marker to map
+      new mapboxgl.Marker(markerElement)
+        .setLngLat([stateData.coords[0], stateData.coords[1]])
+        .setPopup(popup)
+        .addTo(map.current!);
     });
-  };
 
-  const getEventIcon = (type: string) => {
-    switch (type) {
-      case 'weather-alert': return <CloudRain className="w-4 h-4" />;
-      case 'fema-disaster': return <AlertTriangle className="w-4 h-4" />;
-      case 'supply-site': return <Home className="w-4 h-4" />;
-      case 'wildfire': return <Flame className="w-4 h-4" />;
-      case 'earthquake': return <Zap className="w-4 h-4" />;
-      default: return <MapPin className="w-4 h-4" />;
-    }
-  };
+    console.log(`✓ Added ${Object.keys(statesWithAlerts).length} state markers (warnings/watches only)`);
+  }, [initialized, statesWithAlerts]);
 
-  const getEventColor = (type: string) => {
-    const layer = layers.find(l => l.id === `${type}s` || l.id === type.replace('-', '-'));
-    return layer?.color || '#6b7280';
-  };
-
-  const getSeverityBadge = (severity?: string) => {
-    const colors = {
-      'severe': 'bg-red-500',
-      'moderate': 'bg-yellow-500', 
-      'minor': 'bg-blue-500'
-    };
-    
-    if (!severity) return null;
-    
+  if (isLoading) {
     return (
-      <Badge className={`${colors[severity as keyof typeof colors] || 'bg-gray-500'} text-white text-xs`}>
-        {severity}
-      </Badge>
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-900">
+      <div className="w-full h-full bg-gray-900 flex items-center justify-center">
         <div className="text-center text-white">
-          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading disaster data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p>Loading weather alerts...</p>
         </div>
       </div>
     );
   }
 
-  const filteredData = getFilteredData();
+  if (error) {
+    return (
+      <div className="w-full h-full bg-gray-900 flex items-center justify-center">
+        <div className="text-center p-8">
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-red-500 mb-2">Error Loading Map</h3>
+          <p className="text-gray-300">{error?.toString() || 'Unknown error'}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative w-full h-full bg-gray-900">
-      {/* Main Content Area */}
-      <div className="flex h-full">
-        {/* Map Alternative - Data List */}
-        <div className="flex-1 p-4 overflow-y-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Disaster Response Data</h2>
-            <p className="text-gray-300">
-              Interactive disaster map is temporarily unavailable. Showing tabular data from all sources.
-            </p>
-            <div className="flex items-center gap-4 mt-4">
-              <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-400/30">
-                <Activity className="w-4 h-4 mr-1" />
-                Live Data
-              </Badge>
-              <span className="text-sm text-gray-400">
-                {filteredData.length} events displayed
-              </span>
+    <div className="relative w-full h-full">
+      {/* Map Container */}
+      <div ref={mapContainer} className="w-full h-full" />
+      
+      {/* Alert Badge */}
+      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white z-10">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-orange-500" />
+          <div>
+            <div className="font-bold text-sm">
+              {Object.keys(statesWithAlerts).length} States with Alerts
+            </div>
+            <div className="text-xs opacity-90">
+              Warnings & Watches Only
             </div>
           </div>
-
-          {/* Data Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredData.map((event) => (
-              <Card 
-                key={event.id} 
-                className="bg-gray-800 border-gray-700 hover:bg-gray-750 cursor-pointer transition-colors"
-                onClick={() => setSelectedEvent(event)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: getEventColor(event.type) }}
-                    >
-                      {getEventIcon(event.type)}
-                    </div>
-                    {getSeverityBadge(event.severity)}
-                  </div>
-                  
-                  <h3 className="text-white font-semibold text-sm mb-1 truncate">
-                    {event.title}
-                  </h3>
-                  
-                  <p className="text-gray-300 text-xs mb-2 line-clamp-2">
-                    {event.description}
-                  </p>
-                  
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <MapPin className="w-3 h-3" />
-                    <span className="truncate">{event.location}</span>
-                  </div>
-
-                  {(event.requests !== undefined || event.resources !== undefined) && (
-                    <div className="grid grid-cols-2 gap-2 mt-3 pt-2 border-t border-gray-700">
-                      {event.requests !== undefined && (
-                        <div className="text-center">
-                          <div className="text-orange-400 font-bold text-sm">{event.requests}</div>
-                          <div className="text-gray-500 text-xs">Requests</div>
-                        </div>
-                      )}
-                      {event.resources !== undefined && (
-                        <div className="text-center">
-                          <div className="text-green-400 font-bold text-sm">{event.resources}</div>
-                          <div className="text-gray-500 text-xs">Resources</div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Side Panel - Controls */}
-        <div className="w-80 bg-gray-800 border-l border-gray-700 p-4">
-          {/* Layer Controls */}
-          <Card className="bg-gray-750 border-gray-600 mb-4">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg text-white">
-                <Layers className="w-5 h-5" />
-                Data Layers
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {layers.map((layer) => (
-                <div key={layer.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 flex-1">
-                    <div className="p-1 rounded" style={{ color: layer.color }}>
-                      {layer.icon}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-sm text-white">{layer.name}</div>
-                      <div className="text-xs text-gray-400">{layer.description}</div>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={layer.visible}
-                    onCheckedChange={(checked) => toggleLayer(layer.id, checked)}
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="bg-gray-750 border-gray-600">
-            <CardContent className="pt-4">
-              <div className="space-y-2">
-                <Button size="sm" variant="outline" className="w-full justify-start">
-                  <Search className="w-4 h-4 mr-2" />
-                  Search Events
-                </Button>
-                <Button size="sm" variant="outline" className="w-full justify-start">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Advanced Filters
-                </Button>
-                <Button size="sm" variant="outline" className="w-full justify-start">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Data
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
 
-      {/* Event Detail Modal */}
-      {selectedEvent && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-96 bg-gray-800 border-gray-600 shadow-2xl">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-lg text-white">{selectedEvent.title}</CardTitle>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-gray-300 border-gray-500">
-                      {selectedEvent.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </Badge>
-                    {getSeverityBadge(selectedEvent.severity)}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedEvent(null)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <div className="text-sm font-medium text-gray-300">Description</div>
-                <div className="text-sm text-gray-100">{selectedEvent.description}</div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <div className="font-medium text-gray-300">Location</div>
-                  <div className="text-gray-100">{selectedEvent.location}</div>
-                </div>
-                {selectedEvent.date && (
-                  <div>
-                    <div className="font-medium text-gray-300">Date</div>
-                    <div className="text-gray-100">
-                      {new Date(selectedEvent.date).toLocaleDateString()}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {(selectedEvent.requests !== undefined || selectedEvent.resources !== undefined) && (
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-700">
-                  {selectedEvent.requests !== undefined && (
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-400">{selectedEvent.requests}</div>
-                      <div className="text-sm text-gray-400">Active Requests</div>
-                    </div>
-                  )}
-                  {selectedEvent.resources !== undefined && (
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-400">{selectedEvent.resources}</div>
-                      <div className="text-sm text-gray-400">Resources</div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-2">
-                <Button size="sm" variant="outline" className="flex-1">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  View Location
-                </Button>
-                <Button size="sm" className="flex-1">
-                  View Details
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Instructions */}
+      <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white text-sm z-10">
+        Click markers for alert details • {alerts.length} total alerts filtered
+      </div>
     </div>
   );
-};
+}
 
 export default SimpleDisasterMap;
