@@ -193,40 +193,45 @@ const DisasterMapWithUI: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
-    
-    // Check for Mapbox token
-    if (!import.meta.env.VITE_MAPBOX_TOKEN) {
-      console.warn('VITE_MAPBOX_TOKEN not found');
-      return;
-    }
+    let timeoutId: NodeJS.Timeout;
 
-    try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/satellite-streets-v12', // Better looking style
-        center: [-95.7129, 37.0902],
-        zoom: 4
-      });
+    const initializeMap = () => {
+      if (!mapContainer.current || map.current || !import.meta.env.VITE_MAPBOX_TOKEN) {
+        return;
+      }
 
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      try {
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/satellite-streets-v12',
+          center: [-95.7129, 37.0902],
+          zoom: 4
+        });
 
-      map.current.on('load', () => {
-        console.log('✓ Mapbox map loaded successfully');
-        setInitialized(true);
-      });
+        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      map.current.on('error', (e) => {
-        console.error('Mapbox error:', e.error);
-      });
+        map.current.on('load', () => {
+          console.log('✓ Mapbox map loaded successfully');
+          setInitialized(true);
+        });
 
-    } catch (error) {
-      console.error('Map initialization error:', error);
-    }
+        map.current.on('error', (e) => {
+          console.error('Mapbox error:', e.error);
+        });
+
+      } catch (error) {
+        console.error('Map initialization error:', error);
+      }
+    };
+
+    // Small delay to ensure DOM is ready
+    timeoutId = setTimeout(initializeMap, 100);
 
     return () => {
+      clearTimeout(timeoutId);
       if (map.current) {
         map.current.remove();
+        map.current = null;
       }
     };
   }, []);
@@ -372,6 +377,35 @@ const DisasterMapWithUI: React.FC = () => {
           <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-red-500 mb-2">Mapbox Token Required</h3>
           <p className="text-gray-300">Please add VITE_MAPBOX_TOKEN to your environment variables.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-full bg-gray-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p>Loading weather alerts...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-900">
+        <div className="text-center p-8">
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-red-500 mb-2">Error Loading Alerts</h3>
+          <p className="text-gray-300 mb-4">Unable to load weather alert data</p>
+          <button 
+            onClick={() => refetch()} 
+            className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
