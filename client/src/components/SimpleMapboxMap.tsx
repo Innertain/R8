@@ -1136,121 +1136,48 @@ export default function SimpleMapboxMap() {
         else if (severity > 200) color = '#f97316'; // Orange for medium severity
         else if (severity > 50) color = '#eab308'; // Yellow-orange for low severity
         
-        // Create enhanced heat map marker with unique visual effects
+        // Create simple, working disaster marker (revert from complex styling that broke positioning)
         const el = document.createElement('div');
-        el.className = `disaster-heatmap-marker severity-${severity > 1000 ? 'extreme' : severity > 500 ? 'high' : severity > 200 ? 'medium' : 'low'}`;
+        el.className = 'disaster-marker';
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+        el.style.backgroundColor = color;
+        el.style.borderRadius = '50%';
+        el.style.border = '3px solid white';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.fontSize = `${Math.max(12, size * 0.5)}px`;
+        el.style.cursor = 'pointer';
+        el.style.boxShadow = `0 0 10px ${color}88, 0 2px 4px rgba(0,0,0,0.3)`;
+        el.style.transition = 'transform 0.2s ease';
         
-        // Create multi-layer heat map effect
-        const innerGlow = document.createElement('div');
-        const outerRing = document.createElement('div');
-        const centerDot = document.createElement('div');
+        // Add hover effect
+        el.addEventListener('mouseenter', () => {
+          el.style.transform = 'scale(1.2)';
+          el.style.zIndex = '1000';
+        });
+        el.addEventListener('mouseleave', () => {
+          el.style.transform = 'scale(1)';
+          el.style.zIndex = '100';
+        });
         
-        // Outer heat glow effect
-        el.style.cssText = `
-          width: ${size * 1.8}px;
-          height: ${size * 1.8}px;
-          position: relative;
-          cursor: pointer;
-          z-index: 100;
-          animation: heat-pulse 3s ease-in-out infinite;
-        `;
-        
-        // Inner glow layer
-        innerGlow.style.cssText = `
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          background: radial-gradient(circle, ${color}40 0%, ${color}20 50%, transparent 70%);
-          position: absolute;
-          top: 0;
-          left: 0;
-          animation: heat-glow 2s ease-in-out infinite alternate;
-        `;
-        
-        // Outer ring
-        outerRing.style.cssText = `
-          width: ${size}px;
-          height: ${size}px;
-          border-radius: 50%;
-          border: 3px solid ${color};
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: ${color}30;
-          animation: heat-ring 2.5s linear infinite;
-        `;
-        
-        // Center marker dot
-        centerDot.style.cssText = `
-          width: ${size * 0.6}px;
-          height: ${size * 0.6}px;
-          border-radius: 50%;
-          background: ${color};
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: ${Math.max(10, size * 0.3)}px;
-          color: white;
-          font-weight: bold;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-          border: 2px solid white;
-          box-shadow: 0 0 8px ${color}80;
-        `;
-        
-        // Add CSS animations only if not already present  
-        if (typeof document !== 'undefined' && !document.querySelector('#heat-map-styles')) {
-          const style = document.createElement('style');
-          style.id = 'heat-map-styles';
-          style.textContent = `
-            @keyframes heat-pulse {
-              0%, 100% { transform: scale(1); opacity: 0.8; }
-              50% { transform: scale(1.1); opacity: 1; }
-            }
-            @keyframes heat-glow {
-              0% { opacity: 0.6; }
-              100% { opacity: 0.9; }
-            }
-            @keyframes heat-ring {
-              0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-              100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
-            }
-            .disaster-heatmap-marker:hover {
-              z-index: 1000 !important;
-            }
-            .disaster-heatmap-marker:hover .center-dot {
-              transform: translate(-50%, -50%) scale(1.2) !important;
-            }
-          `;
-          document.head && document.head.appendChild(style);
-        }
-        
-        // Add emoji to center dot
+        // Add appropriate emoji
         if (disaster.eventType?.toLowerCase().includes('fire')) {
-          centerDot.textContent = '🔥';
+          el.textContent = '🔥';
         } else if (disaster.eventType?.toLowerCase().includes('flood')) {
-          centerDot.textContent = '💧';
+          el.textContent = '💧';
         } else if (disaster.eventType?.toLowerCase().includes('hurricane')) {
-          centerDot.textContent = '🌀';
+          el.textContent = '🌀';
         } else if (disaster.eventType?.toLowerCase().includes('tornado')) {
-          centerDot.textContent = '🌪️';
+          el.textContent = '🌪️';
         } else if (disaster.eventType?.toLowerCase().includes('earthquake')) {
-          centerDot.textContent = '🌋';
+          el.textContent = '🌋';
         } else {
-          centerDot.textContent = '⚠️';
+          el.textContent = '⚠️';
         }
         
-        // Assemble the multi-layer heat map marker
-        el.appendChild(innerGlow);
-        el.appendChild(outerRing);
-        el.appendChild(centerDot);
-        centerDot.className = 'center-dot';
-        
-        // Emoji will be added to centerDot in the heat map creation section
+        // Emoji added directly to marker element above
         
         // Create enhanced popup with comprehensive disaster information
         const popup = new mapboxgl.Popup({
