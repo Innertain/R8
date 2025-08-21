@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -83,6 +83,14 @@ const STATE_ICONS = {
   'WY': 'Wyoming_1754172607638.png'
 } as const;
 
+interface DisasterCounty {
+  state: string;
+  counties: string[];
+  eventType: string;
+  eventDate: string;
+  id: string;
+}
+
 // Complete US States coordinates for markers
 const US_STATES = {
   'AL': { name: 'Alabama', coords: [-86.79113, 32.377716] },
@@ -164,6 +172,7 @@ export default function SimpleMapboxMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const [showDisasterCounties, setShowDisasterCounties] = useState(true);
 
   // Fetch weather alerts with error handling
   const { data: alertsResponse, error, isLoading } = useQuery<{alerts: WeatherAlert[]}>({
@@ -181,6 +190,14 @@ export default function SimpleMapboxMap() {
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Fetch extreme weather events for county highlighting
+  const { data: extremeWeatherResponse } = useQuery<{events: any[]}>({
+    queryKey: ['/api/extreme-weather-events'],
+    refetchInterval: 2 * 60 * 60 * 1000, // 2 hours
+    retry: 3,
+    staleTime: 60 * 60 * 1000, // 1 hour
   });
 
   // Helper function to extract and geocode location from wildfire titles
@@ -246,10 +263,32 @@ export default function SimpleMapboxMap() {
 
   const alerts = alertsResponse?.alerts || [];
   const wildfires = wildfireResponse?.incidents || [];
+  const extremeWeatherEvents = extremeWeatherResponse?.events || [];
   const filteredAlerts = alerts.filter(alert => 
     alert.event?.toLowerCase().includes('warning') || 
     alert.event?.toLowerCase().includes('watch')
   );
+
+  // Process extreme weather events for county highlighting
+  const processCountyData = (): DisasterCounty[] => {
+    if (!extremeWeatherEvents?.length) return [];
+    
+    return extremeWeatherEvents.slice(0, 15).map(event => {
+      // Parse county information from the event
+      const countyInfo = event.county || event.location || '';
+      const counties = countyInfo.split(',').map((c: string) => c.trim().replace(/\s+County$/, ''));
+      
+      return {
+        state: event.state || 'Unknown',
+        counties: counties.filter((c: string) => c.length > 0),
+        eventType: event.eventType || 'Disaster',
+        eventDate: event.beginDate || event.date || new Date().toISOString(),
+        id: event.id || `disaster-${Math.random()}`
+      };
+    }).filter(county => county.counties.length > 0);
+  };
+
+  const disasterCounties = processCountyData();
 
   // Helper function to get weather icon for event type
   const getWeatherIcon = (eventType: string): string => {
@@ -911,7 +950,81 @@ export default function SimpleMapboxMap() {
     if (wildfires.length > 0) {
       addWildfireMarkers();
     }
-  }, [statesWithAlerts, wildfires]);
+    
+    // Add disaster county highlighting markers
+    if (showDisasterCounties && disasterCounties.length > 0) {
+      console.log(`✓ Adding ${disasterCounties.length} disaster county indicators`);
+      disasterCounties.forEach((county, index) => {
+        const stateData = US_STATES[county.state as keyof typeof US_STATES];
+        if (!stateData) return;
+        
+        // Create subtle county disaster indicator
+        const countyEl = document.createElement('div');
+        countyEl.innerHTML = `
+          <div style="
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.8), rgba(251, 191, 36, 0.6));
+            border: 2px solid rgba(251, 146, 60, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(251, 146, 60, 0.4), 0 0 0 4px rgba(251, 146, 60, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 200;
+            animation: pulse-glow 3s infinite;
+          ">
+            <div style="width: 8px; height: 8px; background: white; border-radius: 50%; opacity: 0.9;"></div>
+          </div>
+          <style>
+            @keyframes pulse-glow {
+              0%, 100% { transform: scale(1); box-shadow: 0 2px 8px rgba(251, 146, 60, 0.4), 0 0 0 4px rgba(251, 146, 60, 0.1); }
+              50% { transform: scale(1.1); box-shadow: 0 4px 16px rgba(251, 146, 60, 0.6), 0 0 0 8px rgba(251, 146, 60, 0.2); }
+            }
+          </style>
+        `;
+        
+        // Create popup with county disaster info
+        const countyPopup = new mapboxgl.Popup({
+          closeButton: true,
+          closeOnClick: true,
+          maxWidth: '300px'
+        }).setHTML(`
+          <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 260px;">
+            <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px; margin: -10px -10px 12px -10px; border-radius: 8px 8px 0 0;">
+              <h3 style="margin: 0; font-size: 16px; font-weight: 700;">${county.eventType} Event</h3>
+              <div style="color: rgba(255, 255, 255, 0.9); font-size: 12px; margin-top: 4px;">${county.state} • ${new Date(county.eventDate).getFullYear()}</div>
+            </div>
+            <div style="color: #374151;">
+              <div style="font-weight: 600; font-size: 14px; margin-bottom: 8px;">Affected Counties:</div>
+              <div style="background: #f3f4f6; padding: 8px; border-radius: 6px; font-size: 13px; line-height: 1.4;">
+                ${county.counties.slice(0, 5).join(', ')}${county.counties.length > 5 ? `, +${county.counties.length - 5} more` : ''}
+              </div>
+              <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280;">
+                Major Disaster Event • NOAA Database
+              </div>
+            </div>
+          </div>
+        `);
+        
+        // Offset position to avoid overlap with weather/wildfire markers
+        const countyOffset = 0.3;
+        const countyAngle = (index * 30) * (Math.PI / 180); // 30-degree spacing
+        const countyLng = stateData.coords[0] + (countyOffset * Math.cos(countyAngle));
+        const countyLat = stateData.coords[1] + (countyOffset * Math.sin(countyAngle));
+        
+        const countyMarker = new mapboxgl.Marker(countyEl)
+          .setLngLat([countyLng, countyLat])
+          .setPopup(countyPopup)
+          .addTo(map.current!);
+        
+        markersRef.current.push(countyMarker);
+      });
+    }
+  }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties]);
 
   return (
     <div className="w-full h-full relative">
@@ -936,6 +1049,9 @@ export default function SimpleMapboxMap() {
             </div>
             <div className="text-sm text-slate-300">
               {filteredAlerts.length} Weather • {wildfires.length} Wildfires
+              {showDisasterCounties && disasterCounties.length > 0 && (
+                <span className="ml-2 text-orange-300">• {disasterCounties.length} Counties</span>
+              )}
               {isLoading && <span className="ml-2 text-yellow-400 animate-pulse">●</span>}
               {error && <span className="ml-2 text-red-400 animate-bounce">⚠</span>}
             </div>
@@ -944,12 +1060,34 @@ export default function SimpleMapboxMap() {
         </div>
       </div>
 
-      {/* Weather Data Info */}
+      {/* Weather Data Info & Disaster Counties Toggle */}
       <div className="absolute top-4 right-4 bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-sm rounded-xl p-2 text-white shadow-2xl border border-slate-700/50">
         <div className="flex items-center gap-2 px-4 py-3 text-sm font-medium">
           <Layers className="w-4 h-4 text-blue-400" />
           <span>Live Data</span>
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        </div>
+        
+        {/* Disaster Counties Toggle */}
+        <div className="border-t border-slate-700/50 pt-2 pb-1 px-4">
+          <label className="flex items-center gap-3 text-xs cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showDisasterCounties}
+              onChange={(e) => setShowDisasterCounties(e.target.checked)}
+              className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-orange-500 focus:ring-orange-500 focus:ring-2"
+            />
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-sm ${showDisasterCounties ? 'bg-orange-400' : 'bg-slate-600'}`}></div>
+              <span className="text-slate-300">Major Disasters</span>
+              {disasterCounties.length > 0 && (
+                <span className="bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded text-xs">
+                  {disasterCounties.length}
+                </span>
+              )}
+            </div>
+          </label>
+          <div className="text-xs text-slate-400 mt-1 pl-7">NOAA 2021-2025 Events</div>
         </div>
       </div>
 
