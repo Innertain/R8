@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -196,8 +196,14 @@ export default function SimpleMapboxMap() {
         console.error('Mapbox error:', e);
       });
 
-      map.current.on('style.load', () => {
+      map.current.on('styledata', () => {
         console.log('✓ Map style loaded');
+      });
+
+      map.current.on('sourcedata', (e) => {
+        if (e.isSourceLoaded) {
+          console.log(`✓ Source loaded: ${e.sourceId}`);
+        }
       });
 
     } catch (error) {
@@ -283,7 +289,7 @@ export default function SimpleMapboxMap() {
         }
       });
 
-      // Create enhanced popup with better styling and close behavior
+      // Create enhanced popup with state icons
       const popup = new mapboxgl.Popup({
         closeButton: true,
         closeOnClick: true,
@@ -444,13 +450,6 @@ export default function SimpleMapboxMap() {
 
     console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
   }, [statesWithAlerts]);
-
-
-
-  // Log successful data fetch
-  if (alertsResponse?.alerts) {
-    console.log(`✓ Weather data loaded: ${alerts.length} total alerts, ${filteredAlerts.length} warnings/watches`);
-  }
 
   return (
     <div className="w-full h-full relative">
