@@ -171,11 +171,20 @@ export default function SimpleMapboxMap() {
   // Helper function to get weather icon for event type
   const getWeatherIcon = (eventType: string): string => {
     const event = eventType.toLowerCase();
-    for (const [key, icon] of Object.entries(WEATHER_ICONS)) {
-      if (event.includes(key)) {
-        return icon;
-      }
-    }
+    console.log('Looking for weather icon for:', event);
+    
+    // Direct mappings for common weather events
+    if (event.includes('tropical storm') || event.includes('hurricane')) return 'HURICAN_1754119781366.png';
+    if (event.includes('flood')) return 'FLOOD_1754119781365.png';
+    if (event.includes('fire') || event.includes('red flag')) return 'Fire_1754119781364.png';
+    if (event.includes('tornado')) return 'TORNATOR_1754119781369.png';
+    if (event.includes('thunderstorm') || event.includes('severe')) return 'STORM_1754119781368.png';
+    if (event.includes('winter') || event.includes('blizzard') || event.includes('ice')) return 'ICE _ WINTER STORM_1754119781367.png';
+    if (event.includes('wind') || event.includes('gale')) return 'WIND_1754119781370.png';
+    if (event.includes('heat')) return 'Heatwave_1754119781366.png';
+    if (event.includes('earthquake')) return 'Earth Quake_1754119781363.png';
+    
+    console.log('Using default storm icon for:', event);
     return 'STORM_1754119781368.png'; // Default to storm icon
   };
 
@@ -286,10 +295,10 @@ export default function SimpleMapboxMap() {
           position: relative;
         ">
           <img 
-            src="/attached_assets/${weatherIcon}" 
+            src="/attached_assets/${encodeURIComponent(weatherIcon)}" 
             alt="${primaryAlert.event}"
-            style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) saturate(100%) invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
+            style="width: 32px; height: 32px; object-fit: contain;"
+            onerror="console.log('Weather marker icon failed:', '${weatherIcon}', 'encoded:', encodeURIComponent('${weatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='block'"
           />
           <div style="display: none; color: #ff6b35; font-size: 16px; font-weight: bold;">${alertCount}</div>
           <div style="
@@ -349,11 +358,11 @@ export default function SimpleMapboxMap() {
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
               <div style="width: 64px; height: 64px; background: rgba(255, 255, 255, 0.95); border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255, 107, 53, 0.6); padding: 8px; box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3); position: relative;">
                 <img 
-                  src="/attached_assets/${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}" 
+                  src="/attached_assets/${encodeURIComponent(STATE_ICONS[stateCode as keyof typeof STATE_ICONS])}" 
                   alt="${stateData.name} State Silhouette" 
                   style="width: 48px; height: 48px; object-fit: contain; opacity: 1;"
-                  onload="console.log('State icon loaded for ${stateCode}');"
-                  onerror="console.log('Failed to load state icon for ${stateCode}'); this.style.display='none'; this.nextElementSibling.style.display='flex'"
+                  onload="console.log('State icon loaded for ${stateCode}:', '${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}');"
+                  onerror="console.log('Failed to load state icon for ${stateCode}:', '${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}', 'encoded:', encodeURIComponent('${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
                 />
                 <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; text-align: center; width: 100%; height: 100%; align-items: center; justify-content: center;">${stateCode}</div>
                 <div style="position: absolute; top: -8px; right: -8px; background: #ff6b35; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${alertCount}</div>
@@ -388,11 +397,11 @@ export default function SimpleMapboxMap() {
                 <!-- Weather Event Icon -->
                 <div style="position: absolute; top: 16px; right: 16px; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3); border: 2px solid rgba(255, 107, 53, 0.2);">
                   <img 
-                    src="/attached_assets/${getWeatherIcon(alert.event)}" 
+                    src="/attached_assets/${encodeURIComponent(getWeatherIcon(alert.event))}" 
                     alt="${alert.event} Weather Icon" 
                     style="width: 32px; height: 32px; object-fit: contain; opacity: 1;"
-                    onload="console.log('Weather icon loaded for ${alert.event}');"
-                    onerror="console.log('Failed to load weather icon for ${alert.event}'); this.style.display='none'; this.nextElementSibling.style.display='block'"
+                    onload="console.log('Weather alert icon loaded for ${alert.event}:', '${getWeatherIcon(alert.event)}');"
+                    onerror="console.log('Failed to load weather alert icon for ${alert.event}:', '${getWeatherIcon(alert.event)}', 'encoded:', encodeURIComponent('${getWeatherIcon(alert.event)}')); this.style.display='none'; this.nextElementSibling.style.display='block'"
                   />
                   <div style="display: none; width: 12px; height: 12px; background: #ff6b35; border-radius: 50%;"></div>
                 </div>
