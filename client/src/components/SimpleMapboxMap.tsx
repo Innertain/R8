@@ -1116,8 +1116,30 @@ export default function SimpleMapboxMap() {
       
       console.log(`🚨 ADDING DISASTER MARKERS DIRECTLY: ${disasterCounties.length} disasters`);
       
-      for (let i = 0; i < Math.min(disasterCounties.length, 20); i++) {
-        const disaster = disasterCounties[i];
+      // Sort disasters by severity to ensure Lahaina fire (highest severity) is included
+      const sortedDisasters = [...disasterCounties].sort((a, b) => {
+        const severityA = (a.deaths || 0) * 10 + (a.damageProperty || 0) / 1000000000 * 5;
+        const severityB = (b.deaths || 0) * 10 + (b.damageProperty || 0) / 1000000000 * 5;
+        return severityB - severityA;
+      });
+      
+      console.log(`🔥 Top 5 disasters by severity:`, sortedDisasters.slice(0, 5).map(d => ({
+        summary: d.stormSummary, 
+        state: d.state,
+        severity: (d.deaths || 0) * 10 + (d.damageProperty || 0) / 1000000000 * 5
+      })));
+      
+      // Check for Hawaii fires specifically
+      const hawaiiFires = sortedDisasters.filter(d => d.state === 'Hawaii');
+      console.log(`🌺 Hawaii fires found: ${hawaiiFires.length}`, hawaiiFires.map(h => ({
+        summary: h.stormSummary,
+        severity: (h.deaths || 0) * 10 + (h.damageProperty || 0) / 1000000000 * 5,
+        coords: [h.coordinates?.longitude, h.coordinates?.latitude]
+      })));
+      
+      // Display top 35 disasters to ensure Hawaii fires are included
+      for (let i = 0; i < Math.min(sortedDisasters.length, 35); i++) {
+        const disaster = sortedDisasters[i];
         if (!disaster.coordinates?.longitude || !disaster.coordinates?.latitude) {
           console.log(`❌ Skipping disaster ${i+1}: ${disaster.eventType} - no coordinates`);
           continue;
@@ -1135,6 +1157,12 @@ export default function SimpleMapboxMap() {
         else if (severity > 500) color = '#dc2626'; // Red for high severity 
         else if (severity > 200) color = '#f97316'; // Orange for medium severity
         else if (severity > 50) color = '#eab308'; // Yellow-orange for low severity
+        
+        // Special highlighting for Hawaii fires (highest severity)
+        if (disaster.state === 'Hawaii') {
+          color = '#4c1d95'; // Deep purple for Hawaii fires to make them stand out
+          console.log(`🌺 HAWAII FIRE MARKER: ${disaster.stormSummary} at [${lng}, ${lat}] - severity: ${severity} - DEEP PURPLE COLOR`);
+        }
         
         // Create simple, working disaster marker (revert from complex styling that broke positioning)
         const el = document.createElement('div');
@@ -1265,16 +1293,16 @@ export default function SimpleMapboxMap() {
           markersRef.current.push(marker);
           console.log(`✅ DISASTER MARKER ${i+1}: ${disaster.eventType} in ${disaster.state} at [${lng}, ${lat}] - severity: ${severity.toFixed(1)}`);
           
-          // Pan to Lahaina fire for verification (highest severity in database)
-          if (disaster.stormSummary?.includes('Lahaina') && disaster.state === 'Hawaii') {
+          // Pan to Hawaii fires for verification (highest severity in database)
+          if (disaster.state === 'Hawaii' && i < 3) { // Any of the top Hawaii disasters
             setTimeout(() => {
               map.current!.flyTo({
                 center: [lng, lat],
-                zoom: 9,
-                duration: 3000
+                zoom: 8,
+                duration: 4000
               });
-              console.log(`🔥 Flying to Lahaina fire at [${lng}, ${lat}] - deadliest US wildfire in 100+ years`);
-            }, 1000);
+              console.log(`🔥 Flying to Hawaii fire at [${lng}, ${lat}] - ${disaster.stormSummary || 'Hawaii Wildfire'}`);
+            }, 2000);
           }
           
           // Small delay to prevent browser freeze
@@ -1284,7 +1312,7 @@ export default function SimpleMapboxMap() {
         }
       }
       
-      console.log(`✅ DISASTER MARKERS COMPLETE: Added ${Math.min(disasterCounties.length, 20)} disaster markers`);
+      console.log(`✅ DISASTER MARKERS COMPLETE: Added ${Math.min(sortedDisasters.length, 35)} disaster markers`);
     };
     
     // Execute disaster marker addition if enabled
