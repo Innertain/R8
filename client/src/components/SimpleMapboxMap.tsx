@@ -290,57 +290,7 @@ export default function SimpleMapboxMap() {
   // Add debug log for heat map trigger
   console.log(`🌡️ Heat map trigger check: showDisasterCounties=${showDisasterCounties}, disasterCount=${disasterCounties.length}, mapReady=${!!map.current}`);
   
-  // FORCE disaster markers to appear - completely bypass React rendering issues
-  React.useEffect(() => {
-    console.log(`🚨 FORCE EFFECT TRIGGERED: map=${!!map.current}, show=${showDisasterCounties}, disasters=${disasterCounties.length}`);
-    
-    if (!map.current) {
-      console.log(`❌ FORCE EFFECT: Map not ready yet`);
-      return;
-    }
-    
-    console.log(`🚨 FORCING DISASTER MARKERS NOW: ${disasterCounties.length} disasters available`);
-    
-    if (showDisasterCounties && disasterCounties.length > 0) {
-      // Clear existing disaster markers first
-      markersRef.current.forEach(marker => {
-        if (marker.getElement().style.backgroundColor?.includes('#')) {
-          marker.remove();
-        }
-      });
-      
-      for (let i = 0; i < Math.min(disasterCounties.length, 20); i++) {
-        const disaster = disasterCounties[i];
-        if (!disaster.coordinates?.longitude || !disaster.coordinates?.latitude) continue;
-        
-        const severity = (disaster.deaths || 0) * 10 + (disaster.damageProperty || 0) / 1000000000 * 5;
-        const size = Math.max(15, Math.min(35, severity / 10));
-        const color = severity > 500 ? '#7f1d1d' : severity > 200 ? '#dc2626' : severity > 50 ? '#f97316' : '#fbbf24';
-        
-        const el = document.createElement('div');
-        el.style.width = size + 'px';
-        el.style.height = size + 'px';
-        el.style.backgroundColor = color;
-        el.style.borderRadius = '50%';
-        el.style.border = '2px solid white';
-        el.style.position = 'absolute';
-        el.style.cursor = 'pointer';
-        el.textContent = severity > 300 ? '💀' : '🔥';
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        
-        const marker = new mapboxgl.Marker(el)
-          .setLngLat([disaster.coordinates.longitude, disaster.coordinates.latitude])
-          .addTo(map.current!);
-          
-        markersRef.current.push(marker);
-        console.log(`🔥 FORCED marker ${i+1}: ${disaster.eventType} at [${disaster.coordinates.longitude}, ${disaster.coordinates.latitude}]`);
-      }
-      
-      console.log(`🔥 FORCED ${Math.min(disasterCounties.length, 20)} disaster markers onto map`);
-    }
-  }, [showDisasterCounties, disasterCounties.length, map.current]);
+  // REMOVED OLD CONFLICTING FORCE EFFECT - Using direct creation in main useEffect instead
   
   // Create heat map visualization for major disasters based on severity
   React.useEffect(() => {
@@ -1203,36 +1153,20 @@ export default function SimpleMapboxMap() {
         el.style.boxShadow = `0 0 ${size}px ${color}88, 0 0 ${size * 2}px ${color}44`;
         el.style.position = 'relative';
         el.style.zIndex = '1000';
-        el.style.animation = `pulse-disaster 2s infinite`;
+        // Remove problematic animation for now to fix positioning
+        el.style.transition = 'transform 0.2s ease';
         
-        // Add CSS animation for pulsing effect
-        if (!document.querySelector('#disaster-marker-styles')) {
-          const style = document.createElement('style');
-          style.id = 'disaster-marker-styles';
-          style.textContent = `
-            @keyframes pulse-disaster {
-              0% { transform: scale(1); opacity: 1; }
-              50% { transform: scale(1.1); opacity: 0.8; }
-              100% { transform: scale(1); opacity: 1; }
-            }
-            .disaster-heat-marker:hover {
-              transform: scale(1.2) !important;
-              z-index: 1001 !important;
-              transition: transform 0.2s ease !important;
-            }
-          `;
-          document.head.appendChild(style);
-        }
-        
-        // Add emoji based on severity and type
-        if (severity > 500) {
-          el.textContent = '💀'; // High casualty disasters
-        } else if (disaster.eventType?.toLowerCase().includes('fire')) {
+        // Add appropriate emoji based on disaster type (removed skull for sensitivity)
+        if (disaster.eventType?.toLowerCase().includes('fire')) {
           el.textContent = '🔥'; // Fire events
         } else if (disaster.eventType?.toLowerCase().includes('flood')) {
           el.textContent = '💧'; // Flood events  
         } else if (disaster.eventType?.toLowerCase().includes('hurricane')) {
           el.textContent = '🌀'; // Hurricane events
+        } else if (disaster.eventType?.toLowerCase().includes('tornado')) {
+          el.textContent = '🌪️'; // Tornado events
+        } else if (disaster.eventType?.toLowerCase().includes('earthquake')) {
+          el.textContent = '🌋'; // Earthquake events
         } else {
           el.textContent = '⚠️'; // Other disasters
         }
@@ -1271,22 +1205,36 @@ export default function SimpleMapboxMap() {
             continue;
           }
           
+          // CRITICAL FIX: Ensure proper coordinate order and validation
+          console.log(`🔧 Creating marker for ${disaster.eventType} in ${disaster.state} at coordinates [${lng}, ${lat}]`);
+          
+          // Double-check coordinate validity and order (longitude first, latitude second)
+          if (Math.abs(lng) > 180 || Math.abs(lat) > 90) {
+            console.error(`❌ Invalid coordinates detected: lng=${lng}, lat=${lat}`);
+            continue;
+          }
+          
+          // Create marker with explicit coordinate handling - VERIFY POSITIONING
+          console.log(`🎯 POSITIONING CHECK: Creating marker at lng=${lng}, lat=${lat} for ${disaster.eventType} in ${disaster.state}`);
+          
           const marker = new mapboxgl.Marker(el)
-            .setLngLat([lng, lat])
+            .setLngLat([parseFloat(lng.toString()), parseFloat(lat.toString())])
             .setPopup(popup)
             .addTo(map.current!);
           
           markersRef.current.push(marker);
           console.log(`✅ DISASTER MARKER ${i+1}: ${disaster.eventType} in ${disaster.state} at [${lng}, ${lat}] - severity: ${severity.toFixed(1)}`);
           
-          // Pan map to show first few high-severity markers
-          if (i === 0 && severity > 500) {
-            map.current!.flyTo({
-              center: [lng, lat],
-              zoom: 6,
-              duration: 2000
-            });
-            console.log(`🎯 Flying to highest severity disaster: ${disaster.eventType} in ${disaster.state}`);
+          // Pan to Texas Hill Country flood for verification (highest casualties)
+          if (disaster.eventType === 'Flood' && disaster.state === 'Texas' && disaster.deaths === 135) {
+            setTimeout(() => {
+              map.current!.flyTo({
+                center: [lng, lat],
+                zoom: 8,
+                duration: 3000
+              });
+              console.log(`🎯 Flying to Texas Hill Country flood at [${lng}, ${lat}] for positioning verification`);
+            }, 1000);
           }
           
           // Small delay to prevent browser freeze
