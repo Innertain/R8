@@ -1265,15 +1265,15 @@ export default function SimpleMapboxMap() {
           markersRef.current.push(marker);
           console.log(`✅ DISASTER MARKER ${i+1}: ${disaster.eventType} in ${disaster.state} at [${lng}, ${lat}] - severity: ${severity.toFixed(1)}`);
           
-          // Pan to Texas Hill Country flood for verification (highest casualties)
-          if (disaster.eventType === 'Flood' && disaster.state === 'Texas' && disaster.deaths === 135) {
+          // Pan to Lahaina fire for verification (highest severity in database)
+          if (disaster.stormSummary?.includes('Lahaina') && disaster.state === 'Hawaii') {
             setTimeout(() => {
               map.current!.flyTo({
                 center: [lng, lat],
-                zoom: 8,
+                zoom: 9,
                 duration: 3000
               });
-              console.log(`🎯 Flying to Texas Hill Country flood at [${lng}, ${lat}] for positioning verification`);
+              console.log(`🔥 Flying to Lahaina fire at [${lng}, ${lat}] - deadliest US wildfire in 100+ years`);
             }, 1000);
           }
           
