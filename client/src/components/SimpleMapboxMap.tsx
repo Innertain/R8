@@ -249,43 +249,152 @@ export default function SimpleMapboxMap() {
         }
       });
 
-      // Create enhanced popup with better styling
+      // Create enhanced popup with better styling and close behavior
       const popup = new mapboxgl.Popup({
         closeButton: true,
-        closeOnClick: false,
-        maxWidth: '320px'
+        closeOnClick: true,
+        closeOnMove: false,
+        maxWidth: '380px'
       }).setHTML(`
-        <div style="font-family: system-ui, -apple-system, sans-serif;">
-          <div style="background: linear-gradient(135deg, #1f2937, #374151); color: white; padding: 12px; margin: -10px -10px 12px -10px; border-radius: 8px 8px 0 0;">
-            <h3 style="margin: 0; font-size: 18px; font-weight: 600;">${stateData.name}</h3>
-            <div style="background: #ff6b35; color: white; padding: 4px 12px; border-radius: 12px; margin-top: 8px; text-align: center; font-size: 14px; font-weight: 600; display: inline-block;">
+        <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 320px;">
+          <!-- Enhanced Header with State Info -->
+          <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="width: 48px; height: 48px; background: rgba(255, 107, 53, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3);">
+                <svg style="width: 24px; height: 24px; fill: #ff6b35;" viewBox="0 0 24 24">
+                  <path d="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22S19,14.25 19,9C19,5.13 15.87,2 12,2M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5Z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">${stateData.name}</h3>
+                <div style="color: #94a3b8; font-size: 14px; margin-top: 2px;">${stateCode} • United States</div>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #ff6b35, #e85d22); color: white; padding: 8px 16px; border-radius: 20px; text-align: center; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);">
+              <div style="width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 2s infinite;"></div>
               ${alertCount} Active Alert${alertCount !== 1 ? 's' : ''}
             </div>
           </div>
-          <div style="max-height: 240px; overflow-y: auto;">
-            ${alerts.slice(0, 5).map((alert, index) => `
-              <div style="margin-bottom: 10px; padding: 10px; border-left: 4px solid #ff6b35; background: #f9fafb; border-radius: 0 6px 6px 0; position: relative;">
-                <div style="font-weight: 600; font-size: 14px; color: #1f2937; margin-bottom: 4px; line-height: 1.3;">
+
+          <!-- Alert Cards Container -->
+          <div style="max-height: 320px; overflow-y: auto; padding: 0 4px;">
+            ${alerts.slice(0, 6).map((alert, index) => `
+              <div style="
+                margin-bottom: 12px; 
+                padding: 16px; 
+                background: linear-gradient(135deg, #f8fafc, #f1f5f9); 
+                border-radius: 12px; 
+                border: 1px solid #e2e8f0; 
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                transition: all 0.2s ease;
+                position: relative;
+                overflow: hidden;
+              " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.06)'">
+                
+                <!-- Alert Type Icon -->
+                <div style="position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: rgba(255, 107, 53, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <div style="width: 8px; height: 8px; background: #ff6b35; border-radius: 50%;"></div>
+                </div>
+
+                <!-- Alert Title -->
+                <div style="font-weight: 700; font-size: 16px; color: #1e293b; margin-bottom: 8px; line-height: 1.3; padding-right: 40px;">
                   ${alert.event}
                 </div>
-                <div style="display: flex; gap: 8px; margin-bottom: 4px;">
-                  <span style="background: ${alert.severity === 'Severe' ? '#dc2626' : alert.severity === 'Moderate' ? '#ea580c' : '#0891b2'}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 500;">
-                    ${alert.severity}
-                  </span>
-                  <span style="background: ${alert.urgency === 'Immediate' ? '#dc2626' : alert.urgency === 'Expected' ? '#ea580c' : '#64748b'}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 500;">
-                    ${alert.urgency}
-                  </span>
+
+                <!-- Severity & Urgency Badges -->
+                <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                  <div style="
+                    background: ${alert.severity === 'Severe' ? 'linear-gradient(135deg, #dc2626, #b91c1c)' : alert.severity === 'Moderate' ? 'linear-gradient(135deg, #ea580c, #c2410c)' : 'linear-gradient(135deg, #0891b2, #0e7490)'}; 
+                    color: white; 
+                    padding: 4px 12px; 
+                    border-radius: 20px; 
+                    font-size: 12px; 
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                  ">
+                    <div style="width: 6px; height: 6px; background: white; border-radius: 50%;"></div>
+                    ${alert.severity || 'Unknown'}
+                  </div>
+                  <div style="
+                    background: ${alert.urgency === 'Immediate' ? 'linear-gradient(135deg, #dc2626, #b91c1c)' : alert.urgency === 'Expected' ? 'linear-gradient(135deg, #ea580c, #c2410c)' : 'linear-gradient(135deg, #64748b, #475569)'}; 
+                    color: white; 
+                    padding: 4px 12px; 
+                    border-radius: 20px; 
+                    font-size: 12px; 
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                  ">
+                    <div style="width: 6px; height: 6px; background: white; border-radius: 50%;"></div>
+                    ${alert.urgency || 'Unknown'}
+                  </div>
                 </div>
-                ${alert.location ? `<div style="font-size: 12px; color: #6b7280; margin-top: 4px;">📍 ${alert.location}</div>` : ''}
+
+                <!-- Location Info -->
+                ${alert.location ? `
+                  <div style="
+                    background: rgba(59, 130, 246, 0.1); 
+                    color: #1e40af; 
+                    padding: 8px 12px; 
+                    border-radius: 8px; 
+                    font-size: 13px; 
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                  ">
+                    <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24">
+                      <path d="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22S19,14.25 19,9C19,5.13 15.87,2 12,2M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5Z"/>
+                    </svg>
+                    ${alert.location}
+                  </div>
+                ` : ''}
               </div>
             `).join('')}
-            ${alertCount > 5 ? `
-              <div style="text-align: center; color: #6b7280; font-size: 13px; padding: 8px; background: #f3f4f6; border-radius: 6px; margin-top: 8px;">
-                ... and ${alertCount - 5} more alert${alertCount - 5 !== 1 ? 's' : ''}
+
+            ${alertCount > 6 ? `
+              <div style="
+                text-align: center; 
+                color: #64748b; 
+                font-size: 14px; 
+                padding: 16px; 
+                background: linear-gradient(135deg, #f1f5f9, #e2e8f0); 
+                border-radius: 12px; 
+                border: 1px dashed #cbd5e1;
+                margin-top: 8px;
+                font-weight: 600;
+              ">
+                📊 ${alertCount - 6} additional alert${alertCount - 6 !== 1 ? 's' : ''} active
               </div>
             ` : ''}
           </div>
+
+          <!-- Footer Action -->
+          <div style="
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9); 
+            padding: 12px 16px; 
+            margin: 16px -10px -10px -10px; 
+            border-radius: 0 0 12px 12px; 
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+          ">
+            <div style="color: #64748b; font-size: 12px; font-weight: 500;">
+              Click outside or press ESC to close • Data refreshes every 2 minutes
+            </div>
+          </div>
         </div>
+        
+        <style>
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+        </style>
       `);
 
       // Add marker to map
