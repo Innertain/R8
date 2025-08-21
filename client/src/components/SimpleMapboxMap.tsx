@@ -148,6 +148,18 @@ interface WeatherAlert {
   description?: string;
 }
 
+interface WildfireIncident {
+  id: string;
+  title: string;
+  description: string;
+  state: string;
+  link: string;
+  pubDate: string;
+  incidentType: string;
+  severity: string;
+  coordinates?: [number, number];
+}
+
 export default function SimpleMapboxMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -162,7 +174,17 @@ export default function SimpleMapboxMap() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  // Fetch wildfire incidents
+  const { data: wildfireResponse } = useQuery<{success: boolean, incidents: WildfireIncident[]}>({
+    queryKey: ['/api/wildfire-incidents'],
+    refetchInterval: 2 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   const alerts = alertsResponse?.alerts || [];
+  const wildfires = wildfireResponse?.incidents || [];
   const filteredAlerts = alerts.filter(alert => 
     alert.event?.toLowerCase().includes('warning') || 
     alert.event?.toLowerCase().includes('watch')
@@ -582,7 +604,204 @@ export default function SimpleMapboxMap() {
     });
 
     console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
-  }, [statesWithAlerts]);
+
+    // Add wildfire incident markers
+    wildfires.forEach((incident) => {
+      const stateData = STATE_COORDINATES[incident.state as keyof typeof STATE_COORDINATES];
+      if (!stateData) return;
+
+      const [lng, lat] = stateData.coords;
+      
+      // Create wildfire marker element
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <div style="
+          background: linear-gradient(135deg, #dc2626, #b91c1c);
+          border: 3px solid #fbbf24;
+          border-radius: 50%;
+          width: 52px;
+          height: 52px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4), 0 3px 10px rgba(0,0,0,0.2);
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+        ">
+          <div style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+            <img 
+              src="/attached_assets/Fire_1754119781364.png" 
+              alt="Wildfire incident"
+              style="width: 40px; height: 40px; object-fit: contain;"
+              onerror="console.log('Wildfire marker icon failed'); this.style.display='none'; this.nextElementSibling.style.display='flex'"
+            />
+          </div>
+          <div style="display: none; color: #fbbf24; font-size: 16px; font-weight: bold; width: 100%; height: 100%; align-items: center; justify-content: center;">🔥</div>
+        </div>
+        
+        <!-- Wildfire indicator badge -->
+        <div style="
+          position: absolute;
+          bottom: -4px;
+          right: -4px;
+          background: #fbbf24;
+          color: #7c2d12;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          font-weight: bold;
+          border: 2px solid white;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          z-index: 20;
+        ">🔥</div>
+        `;
+
+      // Enhanced hover effects for wildfire markers
+      el.addEventListener('mouseenter', () => {
+        const markerDiv = el.firstElementChild as HTMLElement;
+        if (markerDiv) {
+          markerDiv.style.transform = 'scale(1.15)';
+          markerDiv.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.6), 0 4px 12px rgba(0,0,0,0.4)';
+        }
+      });
+
+      el.addEventListener('mouseleave', () => {
+        const markerDiv = el.firstElementChild as HTMLElement;
+        if (markerDiv) {
+          markerDiv.style.transform = 'scale(1)';
+          markerDiv.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4), 0 3px 10px rgba(0,0,0,0.2)';
+        }
+      });
+
+      // Create wildfire popup with comprehensive incident details
+      const popup = new mapboxgl.Popup({
+        closeButton: true,
+        closeOnClick: true,
+        closeOnMove: false,
+        maxWidth: '380px'
+      }).setHTML(`
+        <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 320px;">
+          <!-- Wildfire Header -->
+          <div style="background: linear-gradient(135deg, #7c2d12, #dc2626); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="width: 72px; height: 72px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(251, 191, 36, 0.6); padding: 4px; box-shadow: 0 6px 16px rgba(251, 191, 36, 0.3); position: relative;">
+                <img 
+                  src="/attached_assets/${encodeURIComponent(STATE_ICONS[incident.state as keyof typeof STATE_ICONS])}" 
+                  alt="${stateData.name} State Silhouette" 
+                  style="width: 64px; height: 64px; object-fit: contain; opacity: 1; border-radius: 12px;"
+                />
+                <div style="position: absolute; top: -8px; right: -8px; background: #fbbf24; color: #7c2d12; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 30;">🔥</div>
+              </div>
+              <div>
+                <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">${stateData.name}</h3>
+                <div style="color: #fbbf24; font-size: 14px; margin-top: 2px;">${incident.state} • Wildfire Incident</div>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #7c2d12; padding: 8px 16px; border-radius: 20px; text-align: center; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);">
+              <div style="width: 8px; height: 8px; background: #dc2626; border-radius: 50%; animation: pulse 2s infinite;"></div>
+              Active Wildfire
+            </div>
+          </div>
+
+          <!-- Incident Details Container -->
+          <div style="max-height: 300px; overflow-y: auto; padding: 0 6px; scrollbar-width: thin;">
+            <div style="
+              margin-bottom: 14px; 
+              padding: 18px; 
+              background: linear-gradient(135deg, #ffffff, #fef7cd); 
+              border-radius: 16px; 
+              border: 1px solid #fbbf24; 
+              box-shadow: 0 3px 12px rgba(251, 191, 36, 0.08);
+              border-left: 4px solid #dc2626;
+              position: relative;
+            ">
+              <!-- Wildfire Icon -->
+              <div style="position: absolute; top: 16px; right: 16px; width: 56px; height: 56px; background: rgba(255, 255, 255, 0.95); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); border: 2px solid rgba(220, 38, 38, 0.2);">
+                <img 
+                  src="/attached_assets/Fire_1754119781364.png" 
+                  alt="Wildfire Icon" 
+                  style="width: 48px; height: 48px; object-fit: contain; opacity: 1; border-radius: 8px;"
+                />
+              </div>
+
+              <!-- Incident Title -->
+              <div style="font-weight: 700; font-size: 16px; color: #7c2d12; margin-bottom: 8px; line-height: 1.3; padding-right: 60px;">
+                ${incident.title}
+              </div>
+
+              <!-- Incident Type & Severity Badges -->
+              <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                <div style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                  ${incident.incidentType}
+                </div>
+                <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #7c2d12; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                  ${incident.severity}
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div style="color: #374151; font-size: 14px; line-height: 1.4; margin-bottom: 12px;">
+                ${incident.description.length > 150 ? incident.description.substring(0, 150) + '...' : incident.description}
+              </div>
+
+              <!-- Published Date -->
+              <div style="color: #6b7280; font-size: 12px; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+                <span style="color: #dc2626;">📅</span>
+                Published: ${new Date(incident.pubDate).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+
+              <!-- View Details Link -->
+              <div style="padding-top: 12px; border-top: 1px solid #fbbf24;">
+                <a href="${incident.link}" target="_blank" style="color: #dc2626; font-weight: 600; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s ease;">
+                  View Full Details 🔗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <style>
+          @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+          }
+        </style>
+      `);
+
+      // Create and add wildfire marker
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([lng, lat])
+        .setPopup(popup)
+        .addTo(map.current!);
+
+      markersRef.current.push(marker);
+    });
+
+    console.log(`✓ Added ${wildfires.length} wildfire incident markers`);
+  }, [statesWithAlerts, wildfires]);
 
   return (
     <div className="w-full h-full relative">
@@ -606,11 +825,11 @@ export default function SimpleMapboxMap() {
               <span className="text-orange-400 ml-1">States</span>
             </div>
             <div className="text-sm text-slate-300">
-              {filteredAlerts.length} Active Alerts
+              {filteredAlerts.length} Weather Alerts • {wildfires.length} Wildfires
               {isLoading && <span className="ml-2 text-yellow-400 animate-pulse">●</span>}
               {error && <span className="ml-2 text-red-400 animate-bounce">⚠</span>}
             </div>
-            <div className="text-xs text-slate-400 mt-1">Warnings & Watches</div>
+            <div className="text-xs text-slate-400 mt-1">Live Emergency Data</div>
           </div>
         </div>
       </div>
