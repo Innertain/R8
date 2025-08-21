@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { geocodeLocation } from "./geocoding";
 import { db } from "./db";
 import { alertRules, alertDeliveries, userNotificationSettings, insertAlertRuleSchema, insertNotificationSettingsSchema } from "@shared/schema";
 import { eq, desc, and, gte } from "drizzle-orm";
@@ -4005,6 +4006,56 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
   // Include Wikipedia routes
   const wikipediaRoutes = (await import('./routes/wikipedia')).default;
   app.use('/api', wikipediaRoutes);
+
+  // Add geocoded weather alerts endpoint
+  app.get("/api/weather-alerts-geocoded", async (req, res) => {
+    try {
+      // Get regular weather alerts first
+      const alertsResponse = await fetch(`${req.protocol}://${req.get('host')}/api/weather-alerts-rss`);
+      const alertsData = await alertsResponse.json();
+      
+      if (!alertsData.success || !alertsData.alerts) {
+        return res.json({ success: false, error: 'Failed to fetch weather alerts' });
+      }
+
+      // Add geocoded coordinates to each alert
+      const geocodedAlerts = await Promise.all(
+        alertsData.alerts.slice(0, 50).map(async (alert: any) => {
+          try {
+            const coords = await geocodeLocation(alert.location || alert.title || '');
+            return {
+              ...alert,
+              coordinates: coords,
+              geocoded: true
+            };
+          } catch (error) {
+            console.error(`Failed to geocode alert: ${alert.id}`, error);
+            return {
+              ...alert,
+              coordinates: [-95.7129, 37.0902], // Fallback
+              geocoded: false
+            };
+          }
+        })
+      );
+
+      res.json({
+        success: true,
+        alerts: geocodedAlerts,
+        totalAlerts: alertsData.alerts.length,
+        geocodedCount: geocodedAlerts.filter(a => a.geocoded).length,
+        lastUpdated: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Geocoded alerts error:', error);
+      res.json({
+        success: false,
+        error: 'Failed to geocode weather alerts',
+        alerts: []
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

@@ -95,9 +95,9 @@ const DisasterMapWithUI: React.FC = () => {
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const weatherMarkersRef = useRef<mapboxgl.Marker[]>([]);
 
-  // Use the same query as your working disaster center
+  // Use the new geocoded alerts endpoint
   const { data: response, isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/weather-alerts-rss'],
+    queryKey: ['/api/weather-alerts-geocoded'],
     refetchInterval: 2 * 60 * 60 * 1000, // 2 hours
   });
 
@@ -246,43 +246,14 @@ const DisasterMapWithUI: React.FC = () => {
     console.log(`✓ Added ${weatherMarkersRef.current.length} weather alert markers to map`);
   };
 
-  const getCoordinatesForAlert = (alert: WeatherAlert): [number, number] => {
-    const location = alert.location?.toLowerCase() || '';
+  const getCoordinatesForAlert = (alert: any): [number, number] => {
+    // Use geocoded coordinates from the API if available
+    if (alert.coordinates && Array.isArray(alert.coordinates)) {
+      return [alert.coordinates[0], alert.coordinates[1]];
+    }
     
-    // Specific coastal areas - critical for accuracy
-    const coastalAreas: Record<string, [number, number]> = {
-      'outer banks': [-75.5296, 35.2193],
-      'hatteras island': [-75.7004, 35.2193],
-      'ocracoke island': [-75.9876, 35.1154],
-      'cape hatteras': [-75.6504, 35.2315],
-      'east carteret': [-76.5833, 34.7333],
-      'cape cod bay': [-70.2962, 41.6688],
-      'nantucket sound': [-70.2962, 41.3579],
-      'delaware bay': [-75.0941, 39.0458],
-      'chesapeake bay': [-76.1327, 38.5767],
-      'pamlico sound': [-76.0327, 35.4193]
-    };
-
-    // Check coastal areas first
-    for (const [area, coords] of Object.entries(coastalAreas)) {
-      if (location.includes(area)) {
-        return [coords[0], coords[1]];
-      }
-    }
-
-    // Match to states using your existing logic
-    for (const [stateCode, stateData] of Object.entries(US_STATES)) {
-      const stateName = stateData.name.toLowerCase();
-      if (location.includes(stateCode.toLowerCase()) || location.includes(stateName)) {
-        // Add small random offset to prevent overlapping
-        return [
-          stateData.coords[0] + (Math.random() - 0.5) * 1.0,
-          stateData.coords[1] + (Math.random() - 0.5) * 0.6
-        ];
-      }
-    }
-
-    // Default fallback
+    // Fallback to center US if no coordinates
+    console.warn(`No coordinates available for alert: ${alert.id}`);
     return [-95.7129, 37.0902];
   };
 
@@ -357,11 +328,15 @@ const DisasterMapWithUI: React.FC = () => {
               <Badge variant="secondary" className="bg-yellow-600 text-white">
                 {alerts.length} Active Alerts
               </Badge>
+              {response && 'geocodedCount' in response && (
+                <Badge variant="outline" className="text-green-400 border-green-400 text-xs">
+                  {response.geocodedCount}/{response.totalAlerts} Located
+                </Badge>
+              )}
               <div className="flex items-center gap-1">
                 <Switch 
                   checked={showAlerts} 
                   onCheckedChange={setShowAlerts}
-                  size="sm"
                 />
                 <span className="text-xs text-gray-300">Show markers</span>
               </div>
