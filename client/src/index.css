@@ -28,6 +28,22 @@
   top: 0;
 }
 
+/* Fix for Leaflet map rendering */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #1e293b;
+}
+
+.leaflet-tile-pane {
+  filter: brightness(0.8) contrast(1.2);
+}
+
+.custom-alert-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
 .mapboxgl-ctrl-group:not(:empty) {
   box-shadow: 0 0 2px 2px rgba(0,0,0,.1);
 }

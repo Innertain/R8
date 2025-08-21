@@ -122,19 +122,40 @@ export function LeafletWeatherMap() {
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
 
-    // Create map
-    const map = L.map(mapContainer.current).setView([39.0902, -95.7129], 4);
+    try {
+      console.log('Initializing Leaflet map...');
+      
+      // Create map with options
+      const map = L.map(mapContainer.current, {
+        center: [39.0902, -95.7129],
+        zoom: 4,
+        zoomControl: true,
+        preferCanvas: false
+      });
 
-    // Add dark tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(map);
+      // Add dark tile layer
+      const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+        tileSize: 256
+      });
 
-    mapRef.current = map;
-    
-    console.log('✓ Leaflet map initialized successfully');
+      tileLayer.addTo(map);
+      
+      // Force map to resize and render
+      setTimeout(() => {
+        map.invalidateSize();
+        console.log('✓ Map resize triggered');
+      }, 100);
+
+      mapRef.current = map;
+      
+      console.log('✓ Leaflet map initialized successfully');
+
+    } catch (error) {
+      console.error('Failed to initialize map:', error);
+    }
 
     return () => {
       if (mapRef.current) {
@@ -295,7 +316,16 @@ export function LeafletWeatherMap() {
   return (
     <div className="relative w-full h-full">
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full" style={{ minHeight: '500px' }} />
+      <div 
+        ref={mapContainer} 
+        className="w-full h-full" 
+        style={{ 
+          minHeight: '500px',
+          height: '100%',
+          position: 'relative',
+          backgroundColor: '#1e293b'
+        }} 
+      />
       
       {/* Alert Counter */}
       <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white z-[1000]">
