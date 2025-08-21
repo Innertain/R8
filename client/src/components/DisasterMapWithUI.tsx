@@ -95,13 +95,28 @@ const DisasterMapWithUI: React.FC = () => {
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const weatherMarkersRef = useRef<mapboxgl.Marker[]>([]);
 
-  // Use the new geocoded alerts endpoint
+  // Use the same RSS endpoint as your working disaster center
   const { data: response, isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/weather-alerts-geocoded'],
+    queryKey: ['/api/weather-alerts-rss'],
     refetchInterval: 2 * 60 * 60 * 1000, // 2 hours
   });
 
-  const alerts = (response as any)?.alerts || [];
+  const rawAlerts = (response as any)?.alerts || [];
+  
+  // Filter to only show warnings and watches (exact logic from your working version)
+  const alerts = rawAlerts.filter((alert: WeatherAlert) => {
+    const title = alert.title?.toLowerCase() || '';
+    const event = alert.event?.toLowerCase() || '';
+    const combined = `${title} ${event}`;
+    
+    // Filter out advisories - only show warnings and watches
+    if (combined.includes('advisory')) return false;
+    if (combined.includes('statement')) return false;
+    if (combined.includes('outlook')) return false;
+    
+    // Keep warnings and watches
+    return combined.includes('warning') || combined.includes('watch');
+  });
 
   // Use your exact working state grouping logic from InteractiveWeatherMap
   const getAlertsForState = (stateCode: string): WeatherAlert[] => {
@@ -143,14 +158,23 @@ const DisasterMapWithUI: React.FC = () => {
     });
   };
 
-  // Get states with active alerts (like your working version)
-  const statesWithAlerts = Object.keys(US_STATES).reduce((acc, stateCode) => {
-    const stateAlerts = getAlertsForState(stateCode);
-    if (stateAlerts.length > 0) {
-      acc[stateCode] = stateAlerts;
+  // Group alerts by state using exact logic from your working InteractiveWeatherMap
+  const statesWithAlerts = alerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
+    // Extract state from location or title/description using robust approach
+    const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
+    const titleStateMatch = alert.title?.match(/\b([A-Z]{2})\b/);
+    const descriptionStateMatch = alert.description?.match(/\b([A-Z]{2})\b/);
+    
+    let state = stateMatch ? stateMatch[1] : null;
+    if (!state && titleStateMatch) state = titleStateMatch[1];
+    if (!state && descriptionStateMatch) state = descriptionStateMatch[1];
+
+    if (state && US_STATES[state as keyof typeof US_STATES]) {
+      if (!acc[state]) acc[state] = [];
+      acc[state].push(alert);
     }
     return acc;
-  }, {} as Record<string, WeatherAlert[]>);
+  }, {});
 
   // Filter alerts based on selected state and severity (your existing logic)
   const filteredAlerts = alerts.filter((alert: WeatherAlert) => {
@@ -174,7 +198,7 @@ const DisasterMapWithUI: React.FC = () => {
     try {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/dark-v11', // Dark theme for your brand
+        style: 'mapbox://styles/mapbox/satellite-streets-v12', // Better looking style
         center: [-95.7129, 37.0902],
         zoom: 4
       });
@@ -220,25 +244,25 @@ const DisasterMapWithUI: React.FC = () => {
       const alertCount = stateAlerts.length;
       const coords: [number, number] = [stateData.coords[0], stateData.coords[1]];
       
-      // Color based on alert count (matching your state overview colors)
+      // Brand colors with glow effect matching your design
       const getStateAlertColor = (count: number): string => {
-        if (count >= 15) return '#B91C1C'; // Red - many alerts
-        if (count >= 10) return '#DC2626'; // Dark red
-        if (count >= 5) return '#EA580C';  // Orange-red
-        if (count >= 2) return '#F97316';  // Orange
-        return '#F59E0B'; // Yellow - few alerts
+        if (count >= 15) return '#DC2626'; // Bright red for severe
+        if (count >= 10) return '#EA580C'; // Red-orange  
+        if (count >= 5) return '#F97316';  // Orange
+        if (count >= 2) return '#F59E0B';  // Amber
+        return '#EAB308'; // Yellow for few alerts
       };
 
       const color = getStateAlertColor(alertCount);
 
-      // Create state marker showing alert count
+      // Create glowing state marker matching your brand
       const el = document.createElement('div');
       el.className = 'state-alert-marker';
-      el.style.width = '50px';
-      el.style.height = '50px';
+      el.style.width = '60px';
+      el.style.height = '48px';
       el.style.borderRadius = '8px';
       el.style.backgroundColor = color;
-      el.style.border = '3px solid white';
+      el.style.border = '2px solid rgba(255,255,255,0.9)';
       el.style.display = 'flex';
       el.style.alignItems = 'center';
       el.style.justifyContent = 'center';
@@ -247,11 +271,13 @@ const DisasterMapWithUI: React.FC = () => {
       el.style.fontWeight = 'bold';
       el.style.color = 'white';
       el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.7)';
+      el.style.textShadow = '0 1px 2px rgba(0,0,0,0.8)';
+      el.style.boxShadow = `0 0 20px ${color}80, 0 4px 12px rgba(0,0,0,0.5)`;
+      el.style.filter = 'brightness(1.1)';
       el.innerHTML = `
-        <div style="font-size: 10px; line-height: 1;">${stateCode}</div>
-        <div style="font-size: 12px; line-height: 1;">${alertCount}</div>
-        <div style="font-size: 8px; line-height: 1;">alerts</div>
+        <div style="font-size: 11px; line-height: 1; font-weight: 900;">${stateCode}</div>
+        <div style="font-size: 14px; line-height: 1; font-weight: 900;">${alertCount}</div>
+        <div style="font-size: 9px; line-height: 1; opacity: 0.9;">alerts</div>
       `;
 
       // Create popup showing state details
@@ -366,11 +392,14 @@ const DisasterMapWithUI: React.FC = () => {
           
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="bg-yellow-600 text-white">
-                {alerts.length} Active Alerts
+              <Badge variant="secondary" className="bg-red-600 text-white">
+                {alerts.length} Warnings/Watches
               </Badge>
-              <Badge variant="outline" className="text-blue-400 border-blue-400 text-xs">
-                {Object.keys(statesWithAlerts).length} States Affected
+              <Badge variant="outline" className="text-orange-400 border-orange-400 text-xs">
+                {Object.keys(statesWithAlerts).length} States
+              </Badge>
+              <Badge variant="outline" className="text-gray-400 border-gray-400 text-xs">
+                {rawAlerts.length - alerts.length} Advisories Filtered
               </Badge>
               <div className="flex items-center gap-1">
                 <Switch 
