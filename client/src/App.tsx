@@ -27,6 +27,7 @@ import CascadiaRegenerationPage from "@/pages/cascadia-regeneration";
 import AirQualityPage from "@/pages/air-quality";
 import NoaaClimatePage from "@/pages/noaa-climate";
 import DisasterEducationPage from "@/pages/disaster-education";
+import DisasterMapPage from "@/pages/disaster-map";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
@@ -86,7 +87,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                ['/map', '/stats', '/alerts', '/air-quality', '/noaa-climate', '/disaster-education'].includes(location)
+                ['/map', '/stats', '/alerts', '/disaster-map', '/air-quality', '/noaa-climate', '/disaster-education'].includes(location)
                   ? "bg-red-500 text-white shadow-md"
                   : "text-white hover:bg-red-500/20 hover:text-white"
               }`}>
@@ -150,6 +151,17 @@ function Navigation() {
                     <div className="transition-colors duration-200">
                       <div className="font-medium text-gray-900 group-hover:text-cyan-700 transition-colors duration-200">NOAA Climate Reports</div>
                       <div className="text-sm text-gray-600 group-hover:text-cyan-600 transition-colors duration-200">Monthly climate monitoring</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/disaster-map" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-purple-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-purple-600 group-hover:shadow-md group-hover:scale-110">
+                      <MapPin className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-purple-700 transition-colors duration-200">Disaster Response Map</div>
+                      <div className="text-sm text-gray-600 group-hover:text-purple-600 transition-colors duration-200">Interactive mapping platform</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -618,6 +630,7 @@ function Router() {
             <Route path="/map" component={InteractiveMap} />
             <Route path="/stats" component={StatsDashboard} />
             <Route path="/alerts" component={AlertsPage} />
+            <Route path="/disaster-map" component={DisasterMapPage} />
             <Route path="/air-quality" component={AirQualityPage} />
             <Route path="/noaa-climate" component={NoaaClimatePage} />
             <Route path="/disaster-education" component={DisasterEducationPage} />
