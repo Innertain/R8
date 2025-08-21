@@ -280,6 +280,13 @@ export default function SimpleMapboxMap() {
       
       // Create enhanced marker element with weather icon
       const el = document.createElement('div');
+      el.style.position = 'relative';
+      el.style.width = '70px';
+      el.style.height = '70px';
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.justifyContent = 'center';
+      
       el.innerHTML = `
         <div style="
           background: linear-gradient(135deg, #ffffff, #f8fafc);
@@ -316,14 +323,13 @@ export default function SimpleMapboxMap() {
             />
           </div>
           <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; width: 100%; height: 100%; align-items: center; justify-content: center;">${alertCount}</div>
-          
         </div>
         
         <!-- Alert count badge - positioned outside the main circle -->
         <div style="
           position: absolute;
-          bottom: -6px;
-          right: -6px;
+          bottom: -2px;
+          right: -2px;
           background: #ff6b35;
           color: white;
           border-radius: 50%;
@@ -336,15 +342,16 @@ export default function SimpleMapboxMap() {
           font-weight: bold;
           border: 2px solid white;
           box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-          z-index: 20;
+          z-index: 30;
+          pointer-events: none;
         ">${alertCount}</div>
           
         <!-- Multiple weather types indicator -->
         ${hasMultipleTypes ? `
         <div style="
           position: absolute;
-          top: -6px;
-          left: -6px;
+          top: -2px;
+          left: -2px;
           background: #ea580c;
           color: white;
           border-radius: 50%;
@@ -357,7 +364,8 @@ export default function SimpleMapboxMap() {
           font-weight: bold;
           border: 2px solid white;
           box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-          z-index: 20;
+          z-index: 30;
+          pointer-events: none;
         ">+${uniqueWeatherTypes.length - 1}</div>
         ` : ''}
         </div>
