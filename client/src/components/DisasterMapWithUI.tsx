@@ -87,7 +87,7 @@ interface WeatherAlert {
 }
 
 const DisasterMapWithUI: React.FC = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [initialized, setInitialized] = useState(false);
   const [showAlerts, setShowAlerts] = useState(true);
@@ -193,7 +193,13 @@ const DisasterMapWithUI: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!mapContainer.current || map.current || !import.meta.env.VITE_MAPBOX_TOKEN) return;
+    if (!mapContainer.current || map.current) return;
+    
+    // Check for Mapbox token
+    if (!import.meta.env.VITE_MAPBOX_TOKEN) {
+      console.warn('VITE_MAPBOX_TOKEN not found');
+      return;
+    }
 
     try {
       map.current = new mapboxgl.Map({
@@ -206,7 +212,12 @@ const DisasterMapWithUI: React.FC = () => {
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       map.current.on('load', () => {
+        console.log('✓ Mapbox map loaded successfully');
         setInitialized(true);
+      });
+
+      map.current.on('error', (e) => {
+        console.error('Mapbox error:', e.error);
       });
 
     } catch (error) {
@@ -241,7 +252,7 @@ const DisasterMapWithUI: React.FC = () => {
       const stateData = US_STATES[stateCode as keyof typeof US_STATES];
       if (!stateData) return null;
 
-      const alertCount = stateAlerts.length;
+      const alertCount = (stateAlerts as WeatherAlert[]).length;
       const coords: [number, number] = [stateData.coords[0], stateData.coords[1]];
       
       // Brand colors with glow effect matching your design
@@ -290,13 +301,13 @@ const DisasterMapWithUI: React.FC = () => {
             ${alertCount} Active Alerts
           </div>
           <div style="max-height: 200px; overflow-y: auto;">
-            ${stateAlerts.slice(0, 5).map(alert => `
+            ${(stateAlerts as WeatherAlert[]).slice(0, 5).map((alert: WeatherAlert) => `
               <div style="margin-bottom: 6px; padding: 6px; border-left: 3px solid ${getSeverityColor(alert.severity)}; background: #f9fafb;">
                 <div style="font-weight: bold; font-size: 12px; color: #374151;">${alert.event}</div>
                 <div style="font-size: 11px; color: #6b7280;">${alert.severity} • ${alert.urgency}</div>
               </div>
             `).join('')}
-            ${stateAlerts.length > 5 ? `<div style="text-align: center; color: #6b7280; font-size: 11px; margin-top: 6px;">... and ${stateAlerts.length - 5} more alerts</div>` : ''}
+            ${(stateAlerts as WeatherAlert[]).length > 5 ? `<div style="text-align: center; color: #6b7280; font-size: 11px; margin-top: 6px;">... and ${(stateAlerts as WeatherAlert[]).length - 5} more alerts</div>` : ''}
           </div>
         </div>
       `;
@@ -313,15 +324,9 @@ const DisasterMapWithUI: React.FC = () => {
     console.log(`✓ Added ${stateMarkers.length} state alert markers to map (matching your state overview)`);
   };
 
-  const getCoordinatesForAlert = (alert: any): [number, number] => {
-    // Use geocoded coordinates from the API if available
-    if (alert.coordinates && Array.isArray(alert.coordinates)) {
-      return [alert.coordinates[0], alert.coordinates[1]];
-    }
-    
-    // Fallback to center US if no coordinates
-    console.warn(`No coordinates available for alert: ${alert.id}`);
-    return [-95.7129, 37.0902];
+  const getCoordinatesForAlert = (alert: WeatherAlert): [number, number] => {
+    // For state-based markers, use state center coordinates
+    return [-95.7129, 37.0902]; // Center US fallback
   };
 
   const getWeatherIcon = (eventType: string): string => {
