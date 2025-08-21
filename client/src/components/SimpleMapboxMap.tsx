@@ -1094,10 +1094,7 @@ export default function SimpleMapboxMap() {
           markersRef.current.push(marker);
         }
         
-        // Small delay between batches to prevent browser freeze
-        if (i + batchSize < wildfires.length) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
+        // Removed batch delay for faster loading
       }
       console.log(`✓ Added ${wildfires.length} wildfire incident markers with enhanced geocoding`);
     };
@@ -1305,8 +1302,7 @@ export default function SimpleMapboxMap() {
             }, 2000);
           }
           
-          // Small delay to prevent browser freeze
-          await new Promise(resolve => setTimeout(resolve, 50));
+          // Removed delay for faster loading
         } catch (error) {
           console.error(`❌ Failed to create disaster marker ${i+1}:`, error);
         }
