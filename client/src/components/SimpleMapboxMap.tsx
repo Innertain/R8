@@ -294,57 +294,72 @@ export default function SimpleMapboxMap() {
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
-          overflow: hidden;
         ">
-          <img 
-            src="/attached_assets/${encodeURIComponent(primaryWeatherIcon)}" 
-            alt="Primary weather event"
-            style="width: 44px; height: 44px; object-fit: contain; border-radius: 50%; clip-path: circle(50% at center);"
-            onerror="console.log('Weather marker icon failed:', '${primaryWeatherIcon}', 'encoded:', encodeURIComponent('${primaryWeatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
-          />
+          <div style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+            <img 
+              src="/attached_assets/${encodeURIComponent(primaryWeatherIcon)}" 
+              alt="Primary weather event"
+              style="width: 44px; height: 44px; object-fit: contain;"
+              onerror="console.log('Weather marker icon failed:', '${primaryWeatherIcon}', 'encoded:', encodeURIComponent('${primaryWeatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
+            />
+          </div>
           <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; width: 100%; height: 100%; align-items: center; justify-content: center;">${alertCount}</div>
           
-          <!-- Alert count badge - positioned outside the clipped area -->
-          <div style="
-            position: absolute;
-            bottom: -4px;
-            right: -4px;
-            background: #ff6b35;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            z-index: 10;
-          ">${alertCount}</div>
+        </div>
+        
+        <!-- Alert count badge - positioned outside the main circle -->
+        <div style="
+          position: absolute;
+          bottom: -4px;
+          right: -4px;
+          background: #ff6b35;
+          color: white;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: bold;
+          border: 2px solid white;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          z-index: 20;
+        ">${alertCount}</div>
           
-          <!-- Multiple weather types indicator -->
-          ${hasMultipleTypes ? `
-          <div style="
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            background: #ea580c;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            z-index: 10;
-          ">+${uniqueWeatherTypes.length - 1}</div>
-          ` : ''}
+        <!-- Multiple weather types indicator -->
+        ${hasMultipleTypes ? `
+        <div style="
+          position: absolute;
+          top: -4px;
+          left: -4px;
+          background: #ea580c;
+          color: white;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          font-weight: bold;
+          border: 2px solid white;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          z-index: 20;
+        ">+${uniqueWeatherTypes.length - 1}</div>
+        ` : ''}
         </div>
         <style>
           @keyframes pulse {
