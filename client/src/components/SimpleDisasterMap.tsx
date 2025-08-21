@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { AlertTriangle, MapPin } from 'lucide-react';
 
 // Set Mapbox access token
@@ -134,7 +133,8 @@ export function SimpleDisasterMap() {
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/dark-v11',
         center: [-95.7129, 37.0902],
-        zoom: 4
+        zoom: 4,
+        attributionControl: false
       });
 
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -269,7 +269,11 @@ export function SimpleDisasterMap() {
   return (
     <div className="relative w-full h-full">
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full" />
+      <div 
+        ref={mapContainer} 
+        className="w-full h-full"
+        style={{ minHeight: '500px' }}
+      />
       
       {/* Alert Badge */}
       <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white z-10">

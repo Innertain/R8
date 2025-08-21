@@ -5,6 +5,101 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mapbox GL styles */
+.mapboxgl-map {
+  width: 100%;
+  height: 100%;
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.mapboxgl-ctrl-group:not(:empty) {
+  box-shadow: 0 0 2px 2px rgba(0,0,0,.1);
+}
+
+.mapboxgl-ctrl {
+  clear: both;
+  pointer-events: auto;
+  transform: translate(0,0);
+}
+
+.mapboxgl-ctrl-top-right {
+  top: 0;
+  right: 0;
+}
+
+.mapboxgl-ctrl-group {
+  border-radius: 4px;
+  background: #fff;
+}
+
+.mapboxgl-ctrl-group > button {
+  width: 29px;
+  height: 29px;
+  display: block;
+  padding: 0;
+  outline: none;
+  border: 0;
+  box-sizing: border-box;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e  %3cpath style='fill:%23333333;' d='m 7%2c9 c 0%2c0.554 0.446%2c1 1%2c1 l 1%2c0 l 0%2c1 c 0%2c0.554 0.446%2c1 1%2c1 0.554%2c0 1%2c-0.446 1%2c-1 l 0%2c-1 1%2c0 c 0.554%2c0 1%2c-0.446 1%2c-1 0%2c-0.554 -0.446%2c-1 -1%2c-1 l -1%2c0 0%2c-1 c 0%2c-0.554 -0.446%2c-1 -1%2c-1 -0.554%2c0 -1%2c0.446 -1%2c1 l 0%2c1 -1%2c0 c -0.554%2c0 -1%2c0.446 -1%2c1 z'/%3e%3c/svg%3e");
+}
+
+.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e %3cpath style='fill:%23333333;' d='m 7%2c9 c 0%2c0.554 0.446%2c1 1%2c1 l 4%2c0 c 0.554%2c0 1%2c-0.446 1%2c-1 0%2c-0.554 -0.446%2c-1 -1%2c-1 l -4%2c0 c -0.554%2c0 -1%2c0.446 -1%2c1 z'/%3e%3c/svg%3e");
+}
+
+.mapboxgl-ctrl-icon {
+  width: 20px;
+  height: 20px;
+  margin: 0 auto;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 20px 20px;
+}
+
+.mapboxgl-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mapboxgl-popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: -webkit-flex;
+  display: flex;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: #fff;
+}
+
+.mapboxgl-popup-content {
+  position: relative;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.3);
+  padding: 10px 10px 15px;
+  pointer-events: auto;
+}
+
+.mapboxgl-popup-close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 0;
+  border-radius: 0 3px 0 0;
+  cursor: pointer;
+  background-color: transparent;
+}
+
 /* Enhanced hover effects with contrasting borders */
 .hover-border-effect {
   transition: all 0.3s ease-in-out;
