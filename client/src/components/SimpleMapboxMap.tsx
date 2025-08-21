@@ -580,8 +580,12 @@ export default function SimpleMapboxMap() {
         </style>
       `);
 
-      // Add marker to map
-      const marker = new mapboxgl.Marker(el)
+      // Add marker to map with proper anchoring
+      const marker = new mapboxgl.Marker({
+        element: el,
+        anchor: 'center',
+        offset: [0, 0]
+      })
         .setLngLat([stateData.coords[0], stateData.coords[1]])
         .setPopup(popup)
         .addTo(map.current!);
