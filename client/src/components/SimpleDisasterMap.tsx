@@ -124,20 +124,37 @@ export function SimpleDisasterMap() {
   // Initialize map
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
+    
+    console.log('Initializing Mapbox map...');
+    console.log('Token available:', !!import.meta.env.VITE_MAPBOX_TOKEN);
+    console.log('Container ready:', !!mapContainer.current);
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: [-95.7129, 37.0902],
-      zoom: 4
-    });
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: [-95.7129, 37.0902],
+        zoom: 4
+      });
 
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-    map.current.on('load', () => {
-      setInitialized(true);
-      console.log('✓ Simple map loaded successfully');
-    });
+      map.current.on('load', () => {
+        setInitialized(true);
+        console.log('✓ Simple map loaded successfully');
+      });
+      
+      map.current.on('error', (e) => {
+        console.error('Mapbox error:', e);
+      });
+      
+      map.current.on('style.load', () => {
+        console.log('✓ Map style loaded');
+      });
+
+    } catch (error) {
+      console.error('Map initialization failed:', error);
+    }
 
     return () => {
       if (map.current) {
