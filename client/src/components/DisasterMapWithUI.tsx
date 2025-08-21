@@ -103,7 +103,7 @@ const DisasterMapWithUI: React.FC = () => {
 
   const alerts = (response as any)?.alerts || [];
 
-  // Use your existing state grouping logic
+  // Use your exact working state grouping logic from InteractiveWeatherMap
   const getAlertsForState = (stateCode: string): WeatherAlert[] => {
     const stateNames: Record<string, string> = Object.fromEntries(
       Object.entries(US_STATES).map(([code, data]) => [code, data.name])
@@ -113,21 +113,33 @@ const DisasterMapWithUI: React.FC = () => {
       const location = alert.location?.toLowerCase() || '';
       const title = alert.title?.toLowerCase() || '';
       const description = alert.description?.toLowerCase() || '';
+      const combined = `${location} ${title} ${description}`;
 
-      // Check for state code in location
-      if (location.includes(stateCode.toLowerCase()) || 
-          title.includes(stateCode.toLowerCase()) || 
-          description.includes(stateCode.toLowerCase())) {
-        return true;
-      }
-
-      // Check for full state name
+      // Enhanced state matching - same logic as your working version
+      const stateCode2 = stateCode.toLowerCase();
       const stateName = stateNames[stateCode]?.toLowerCase() || '';
-      if (stateName && (location.includes(stateName) || title.includes(stateName) || description.includes(stateName))) {
-        return true;
-      }
 
-      return false;
+      // Direct state code match
+      if (combined.includes(stateCode2)) return true;
+      if (combined.includes(` ${stateCode2} `) || combined.includes(` ${stateCode2},`)) return true;
+
+      // Full state name match
+      if (stateName && combined.includes(stateName)) return true;
+
+      // Specific state pattern matching (like your working version)
+      const statePatterns: Record<string, string[]> = {
+        'NC': ['north carolina', 'outer banks', 'cape hatteras', 'dare county', 'currituck'],
+        'VA': ['virginia', 'chesapeake bay', 'virginia beach'],
+        'CA': ['california', 'los angeles', 'san diego', 'san francisco', 'coachella valley'],
+        'NY': ['new york', 'long island', 'suffolk', 'nassau'],
+        'FL': ['florida', 'miami', 'tampa', 'orlando', 'keys'],
+        'TX': ['texas', 'houston', 'dallas', 'austin', 'san antonio'],
+        'WA': ['washington', 'seattle', 'spokane', 'tacoma'],
+        'OR': ['oregon', 'portland', 'eugene']
+      };
+
+      const patterns = statePatterns[stateCode] || [];
+      return patterns.some(pattern => combined.includes(pattern));
     });
   };
 
@@ -200,50 +212,79 @@ const DisasterMapWithUI: React.FC = () => {
 
     if (!showAlerts) return;
 
-    filteredAlerts.slice(0, 100).forEach((alert: WeatherAlert) => {
-      const coords = getCoordinatesForAlert(alert);
-      const icon = getWeatherIcon(alert.event || alert.title);
-      const color = getSeverityColor(alert.severity);
+    // Show state-level markers like your working overview
+    const stateMarkers = Object.entries(statesWithAlerts).map(([stateCode, stateAlerts]) => {
+      const stateData = US_STATES[stateCode as keyof typeof US_STATES];
+      if (!stateData) return null;
 
-      // Create stable, visible marker
+      const alertCount = stateAlerts.length;
+      const coords: [number, number] = [stateData.coords[0], stateData.coords[1]];
+      
+      // Color based on alert count (matching your state overview colors)
+      const getStateAlertColor = (count: number): string => {
+        if (count >= 15) return '#B91C1C'; // Red - many alerts
+        if (count >= 10) return '#DC2626'; // Dark red
+        if (count >= 5) return '#EA580C';  // Orange-red
+        if (count >= 2) return '#F97316';  // Orange
+        return '#F59E0B'; // Yellow - few alerts
+      };
+
+      const color = getStateAlertColor(alertCount);
+
+      // Create state marker showing alert count
       const el = document.createElement('div');
-      el.className = 'weather-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
-      el.style.borderRadius = '50%';
+      el.className = 'state-alert-marker';
+      el.style.width = '50px';
+      el.style.height = '50px';
+      el.style.borderRadius = '8px';
       el.style.backgroundColor = color;
-      el.style.border = '2px solid white';
+      el.style.border = '3px solid white';
       el.style.display = 'flex';
       el.style.alignItems = 'center';
       el.style.justifyContent = 'center';
-      el.style.fontSize = '16px';
+      el.style.flexDirection = 'column';
+      el.style.fontSize = '11px';
+      el.style.fontWeight = 'bold';
+      el.style.color = 'white';
       el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.6)';
-      el.innerHTML = icon;
+      el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.7)';
+      el.innerHTML = `
+        <div style="font-size: 10px; line-height: 1;">${stateCode}</div>
+        <div style="font-size: 12px; line-height: 1;">${alertCount}</div>
+        <div style="font-size: 8px; line-height: 1;">alerts</div>
+      `;
+
+      // Create popup showing state details
+      const statePopupContent = `
+        <div style="padding: 12px; max-width: 300px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <strong style="color: #1f2937; font-size: 16px;">${stateData.name} (${stateCode})</strong>
+          </div>
+          <div style="margin-bottom: 8px; padding: 4px 8px; background: ${color}; color: white; border-radius: 4px; font-size: 14px; text-align: center;">
+            ${alertCount} Active Alerts
+          </div>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${stateAlerts.slice(0, 5).map(alert => `
+              <div style="margin-bottom: 6px; padding: 6px; border-left: 3px solid ${getSeverityColor(alert.severity)}; background: #f9fafb;">
+                <div style="font-weight: bold; font-size: 12px; color: #374151;">${alert.event}</div>
+                <div style="font-size: 11px; color: #6b7280;">${alert.severity} • ${alert.urgency}</div>
+              </div>
+            `).join('')}
+            ${stateAlerts.length > 5 ? `<div style="text-align: center; color: #6b7280; font-size: 11px; margin-top: 6px;">... and ${stateAlerts.length - 5} more alerts</div>` : ''}
+          </div>
+        </div>
+      `;
 
       const marker = new mapboxgl.Marker(el)
         .setLngLat(coords)
-        .setPopup(new mapboxgl.Popup().setHTML(`
-          <div style="padding: 12px; max-width: 280px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              <span style="font-size: 18px;">${icon}</span>
-              <strong style="color: #1f2937;">${alert.event}</strong>
-            </div>
-            <div style="margin-bottom: 6px; color: #6b7280; font-size: 12px;">${alert.location}</div>
-            <div style="padding: 2px 6px; background: ${color}; color: white; border-radius: 4px; font-size: 11px; display: inline-block; margin-bottom: 8px;">
-              ${alert.severity} • ${alert.urgency}
-            </div>
-            <div style="color: #374151; font-size: 13px; line-height: 1.4;">
-              ${alert.description.substring(0, 200)}${alert.description.length > 200 ? '...' : ''}
-            </div>
-          </div>
-        `))
+        .setPopup(new mapboxgl.Popup({ maxWidth: '320px' }).setHTML(statePopupContent))
         .addTo(map.current!);
 
-      weatherMarkersRef.current.push(marker);
-    });
+      return marker;
+    }).filter(Boolean) as mapboxgl.Marker[];
 
-    console.log(`✓ Added ${weatherMarkersRef.current.length} weather alert markers to map`);
+    weatherMarkersRef.current = stateMarkers;
+    console.log(`✓ Added ${stateMarkers.length} state alert markers to map (matching your state overview)`);
   };
 
   const getCoordinatesForAlert = (alert: any): [number, number] => {
@@ -328,11 +369,9 @@ const DisasterMapWithUI: React.FC = () => {
               <Badge variant="secondary" className="bg-yellow-600 text-white">
                 {alerts.length} Active Alerts
               </Badge>
-              {response && 'geocodedCount' in response && (
-                <Badge variant="outline" className="text-green-400 border-green-400 text-xs">
-                  {response.geocodedCount}/{response.totalAlerts} Located
-                </Badge>
-              )}
+              <Badge variant="outline" className="text-blue-400 border-blue-400 text-xs">
+                {Object.keys(statesWithAlerts).length} States Affected
+              </Badge>
               <div className="flex items-center gap-1">
                 <Switch 
                   checked={showAlerts} 
