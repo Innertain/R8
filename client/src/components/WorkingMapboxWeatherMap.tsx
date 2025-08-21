@@ -150,6 +150,19 @@ const WorkingMapboxWeatherMap: React.FC = () => {
   };
 
   const getCoordinatesFromLocation = (location: string): [number, number] => {
+    // Specific geographic features and coastal/marine areas
+    const marineCoords: Record<string, [number, number]> = {
+      'Delaware Bay': [-75.0941, 39.0458], 'Chesapeake Bay': [-76.1327, 38.5767], 'Cape Cod Bay': [-70.2962, 41.6688],
+      'Buzzards Bay': [-70.7461, 41.5579], 'Nantucket Sound': [-70.2962, 41.3579], 'Block Island Sound': [-71.5561, 41.1579],
+      'Long Island Sound': [-72.6851, 41.2579], 'Fire Island': [-73.1851, 40.6426], 'Montauk Point': [-71.8565, 41.0707],
+      'Outer Banks': [-75.5296, 35.2193], 'Hatteras Island': [-75.7004, 35.2193], 'Ocracoke Island': [-75.9876, 35.1154],
+      'Cape Hatteras': [-75.6504, 35.2315], 'Cape Fear': [-78.0661, 33.8376], 'Pamlico Sound': [-76.0327, 35.4193],
+      'Albemarle Sound': [-75.9327, 36.1193], 'Currituck Sound': [-75.8327, 36.3193], 'Bogue Sound': [-77.0327, 34.6193],
+      'Core Sound': [-76.3327, 34.8193], 'Roanoke Sound': [-75.6327, 35.8193], 'Croatan Sound': [-75.7327, 35.9193],
+      'East Carteret': [-76.5833, 34.7333], 'West Carteret': [-77.0833, 34.7333], 'Carteret County': [-76.6833, 34.7333],
+      'Dare County': [-75.6333, 35.5333], 'Hyde County': [-76.1333, 35.4333], 'Tyrrell County': [-76.1833, 35.8333]
+    };
+
     // Enhanced county and city coordinates for more precise placement
     const locationCoords: Record<string, [number, number]> = {
       // Major cities and counties with precise coordinates
@@ -163,7 +176,7 @@ const WorkingMapboxWeatherMap: React.FC = () => {
       'Tucson': [-110.9265, 32.2226], 'Fresno': [-119.7871, 36.7378], 'Sacramento': [-121.4684, 38.5816],
       'Kansas City': [-94.5786, 39.0997], 'Mesa': [-111.8315, 33.4152], 'Virginia Beach': [-75.9780, 36.8529],
       'Colorado Springs': [-104.8214, 38.8339], 'Omaha': [-95.9345, 41.2524], 'Raleigh': [-78.6382, 35.7796],
-      'Long Beach': [-118.1937, 33.7701], 'Miami Gardens': [-80.2456, 25.9420], 'Virginia Beach': [-75.9780, 36.8529],
+      'Long Beach': [-118.1937, 33.7701], 'Miami Gardens': [-80.2456, 25.9420],
       'Oakland': [-122.2711, 37.8044], 'Minneapolis': [-93.2650, 44.9778], 'Tampa': [-82.4572, 27.9506],
       'Tulsa': [-95.9928, 36.1540], 'Arlington': [-97.1081, 32.7357], 'Wichita': [-97.3301, 37.6872],
       'Bakersfield': [-119.0187, 35.3733], 'New Orleans': [-90.0715, 29.9511], 'Honolulu': [-157.8583, 21.3099],
@@ -205,7 +218,7 @@ const WorkingMapboxWeatherMap: React.FC = () => {
       'Kansas City Metro': [-94.5786, 39.0997], 'St. Louis Metro': [-90.1994, 38.6270], 'Southwest Missouri': [-93.2923, 37.2153],
       'Billings': [-108.5007, 45.7833], 'Great Falls': [-111.2833, 47.4941], 'Missoula': [-113.9940, 46.8059],
       'Omaha Metro': [-95.9345, 41.2524], 'North Platte': [-100.7665, 41.1240], 'Lincoln': [-96.6917, 40.8136],
-      'Las Vegas Metro': [-115.1398, 36.1699], 'Reno': [-119.7674, 39.5296], 'Northern Nevada': [-116.4194, 40.5000]
+      'Las Vegas Metro': [-115.1398, 36.1699], 'Northern Nevada': [-116.4194, 40.5000]
     };
 
     // State coordinates as fallback
@@ -229,9 +242,32 @@ const WorkingMapboxWeatherMap: React.FC = () => {
       'Wisconsin': [-89.616508, 44.268543], 'Wyoming': [-107.30249, 43.075968]
     };
 
-    // First try to match specific locations
+    // Enhanced parsing for NWS location formats
+    const cleanLocation = location.toLowerCase().trim();
+    
+    // First check marine/coastal areas
+    for (const [loc, coords] of Object.entries(marineCoords)) {
+      if (cleanLocation.includes(loc.toLowerCase())) {
+        return [coords[0], coords[1]];
+      }
+    }
+    
+    // Parse county names - NWS format: "CountyName, ST" or "CountyName County, ST"
+    const countyPattern = /([a-zA-Z\s]+)(?:\s+County)?,\s*([A-Z]{2})/g;
+    let match;
+    while ((match = countyPattern.exec(location)) !== null) {
+      const countyName = match[1].trim();
+      const state = match[2];
+      const countyKey = `${countyName} County, ${state}`;
+      
+      if (locationCoords[countyKey]) {
+        return locationCoords[countyKey];
+      }
+    }
+
+    // Try to match specific cities and locations
     for (const [loc, coords] of Object.entries(locationCoords)) {
-      if (location.toLowerCase().includes(loc.toLowerCase())) {
+      if (cleanLocation.includes(loc.toLowerCase())) {
         return [coords[0], coords[1]];
       }
     }
