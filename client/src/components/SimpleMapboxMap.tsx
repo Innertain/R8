@@ -173,6 +173,8 @@ export default function SimpleMapboxMap() {
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [showDisasterCounties, setShowDisasterCounties] = useState(true);
+  const [showWeatherAlerts, setShowWeatherAlerts] = useState(true);
+  const [showWildfires, setShowWildfires] = useState(true);
 
   // Fetch weather alerts with error handling
   const { data: alertsResponse, error, isLoading } = useQuery<{alerts: WeatherAlert[]}>({
@@ -388,8 +390,9 @@ export default function SimpleMapboxMap() {
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    // Add new markers with offset positioning to avoid wildfire overlap
-    Object.entries(statesWithAlerts).forEach(([stateCode, alerts], stateIndex) => {
+    // Add weather alert markers only if enabled
+    if (showWeatherAlerts) {
+      Object.entries(statesWithAlerts).forEach(([stateCode, alerts], stateIndex) => {
       const stateData = US_STATES[stateCode as keyof typeof US_STATES];
       if (!stateData) return;
 
@@ -712,10 +715,10 @@ export default function SimpleMapboxMap() {
         .setPopup(popup)
         .addTo(map.current!);
 
-      markersRef.current.push(marker);
-    });
-
-    console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
+        markersRef.current.push(marker);
+      });
+      console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
+    }
 
     // Add wildfire incident markers with enhanced geocoding
     const addWildfireMarkers = async () => {
@@ -946,8 +949,8 @@ export default function SimpleMapboxMap() {
       console.log(`✓ Added ${wildfires.length} wildfire incident markers with enhanced geocoding`);
     };
 
-    // Execute the async wildfire marker addition
-    if (wildfires.length > 0) {
+    // Execute the async wildfire marker addition only if enabled
+    if (showWildfires && wildfires.length > 0) {
       addWildfireMarkers();
     }
     
@@ -958,31 +961,37 @@ export default function SimpleMapboxMap() {
         const stateData = US_STATES[county.state as keyof typeof US_STATES];
         if (!stateData) return;
         
-        // Create subtle county disaster indicator
+        // Create prominent county disaster indicator
         const countyEl = document.createElement('div');
         countyEl.innerHTML = `
           <div style="
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, rgba(251, 146, 60, 0.8), rgba(251, 191, 36, 0.6));
-            border: 2px solid rgba(251, 146, 60, 0.9);
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #f59e0b, #d97706);
+            border: 3px solid #fbbf24;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(251, 146, 60, 0.4), 0 0 0 4px rgba(251, 146, 60, 0.1);
+            box-shadow: 0 4px 16px rgba(251, 146, 60, 0.7), 0 0 0 6px rgba(251, 146, 60, 0.3);
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
-            z-index: 200;
-            animation: pulse-glow 3s infinite;
+            position: absolute;
+            z-index: 400 !important;
+            animation: disaster-pulse 2s infinite;
           ">
-            <div style="width: 8px; height: 8px; background: white; border-radius: 50%; opacity: 0.9;"></div>
+            <div style="width: 12px; height: 12px; background: white; border-radius: 50%; opacity: 1; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
           </div>
           <style>
-            @keyframes pulse-glow {
-              0%, 100% { transform: scale(1); box-shadow: 0 2px 8px rgba(251, 146, 60, 0.4), 0 0 0 4px rgba(251, 146, 60, 0.1); }
-              50% { transform: scale(1.1); box-shadow: 0 4px 16px rgba(251, 146, 60, 0.6), 0 0 0 8px rgba(251, 146, 60, 0.2); }
+            @keyframes disaster-pulse {
+              0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 4px 16px rgba(251, 146, 60, 0.7), 0 0 0 6px rgba(251, 146, 60, 0.3);
+              }
+              50% { 
+                transform: scale(1.15); 
+                box-shadow: 0 6px 24px rgba(251, 146, 60, 0.9), 0 0 0 12px rgba(251, 146, 60, 0.5);
+              }
             }
           </style>
         `;
@@ -1024,7 +1033,7 @@ export default function SimpleMapboxMap() {
         markersRef.current.push(countyMarker);
       });
     }
-  }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties]);
+  }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties, showWeatherAlerts, showWildfires]);
 
   return (
     <div className="w-full h-full relative">
@@ -1048,7 +1057,9 @@ export default function SimpleMapboxMap() {
               <span className="text-orange-400 ml-1">States</span>
             </div>
             <div className="text-sm text-slate-300">
-              {filteredAlerts.length} Weather • {wildfires.length} Wildfires
+              {showWeatherAlerts ? `${filteredAlerts.length} Weather` : 'Weather Hidden'}
+              {(showWeatherAlerts || showWildfires || showDisasterCounties) && ' • '}
+              {showWildfires ? `${wildfires.length} Wildfires` : showWeatherAlerts ? 'Wildfires Hidden' : ''}
               {showDisasterCounties && disasterCounties.length > 0 && (
                 <span className="ml-2 text-orange-300">• {disasterCounties.length} Counties</span>
               )}
@@ -1060,16 +1071,56 @@ export default function SimpleMapboxMap() {
         </div>
       </div>
 
-      {/* Weather Data Info & Disaster Counties Toggle */}
+      {/* Layer Controls Panel */}
       <div className="absolute top-4 right-4 bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-sm rounded-xl p-2 text-white shadow-2xl border border-slate-700/50">
         <div className="flex items-center gap-2 px-4 py-3 text-sm font-medium">
           <Layers className="w-4 h-4 text-blue-400" />
-          <span>Live Data</span>
+          <span>Map Layers</span>
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         </div>
         
-        {/* Disaster Counties Toggle */}
-        <div className="border-t border-slate-700/50 pt-2 pb-1 px-4">
+        {/* Layer Toggle Controls */}
+        <div className="border-t border-slate-700/50 pt-2 pb-1 px-4 space-y-2">
+          
+          {/* Weather Alerts Toggle */}
+          <label className="flex items-center gap-3 text-xs cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showWeatherAlerts}
+              onChange={(e) => setShowWeatherAlerts(e.target.checked)}
+              className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-2"
+            />
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${showWeatherAlerts ? 'bg-blue-400' : 'bg-slate-600'}`}></div>
+              <span className="text-slate-300">Weather Alerts</span>
+              {showWeatherAlerts && (
+                <span className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded text-xs">
+                  {filteredAlerts.length}
+                </span>
+              )}
+            </div>
+          </label>
+          
+          {/* Wildfires Toggle */}
+          <label className="flex items-center gap-3 text-xs cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showWildfires}
+              onChange={(e) => setShowWildfires(e.target.checked)}
+              className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-red-500 focus:ring-red-500 focus:ring-2"
+            />
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${showWildfires ? 'bg-red-400' : 'bg-slate-600'}`}></div>
+              <span className="text-slate-300">Wildfires</span>
+              {showWildfires && (
+                <span className="bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded text-xs">
+                  {wildfires.length}
+                </span>
+              )}
+            </div>
+          </label>
+          
+          {/* Disaster Counties Toggle */}
           <label className="flex items-center gap-3 text-xs cursor-pointer">
             <input
               type="checkbox"
@@ -1080,15 +1131,16 @@ export default function SimpleMapboxMap() {
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-sm ${showDisasterCounties ? 'bg-orange-400' : 'bg-slate-600'}`}></div>
               <span className="text-slate-300">Major Disasters</span>
-              {disasterCounties.length > 0 && (
+              {showDisasterCounties && disasterCounties.length > 0 && (
                 <span className="bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded text-xs">
                   {disasterCounties.length}
                 </span>
               )}
             </div>
           </label>
-          <div className="text-xs text-slate-400 mt-1 pl-7">NOAA 2021-2025 Events</div>
+          
         </div>
+        <div className="text-xs text-slate-400 px-4 pb-2">Toggle layers on/off</div>
       </div>
 
       {/* Enhanced Status Bar */}
