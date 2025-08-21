@@ -300,12 +300,8 @@ export default function SimpleMapboxMap() {
           <!-- Enhanced Header with State Info -->
           <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 48px; height: 48px; background: rgba(255, 107, 53, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3); padding: 8px;">
-                <img 
-                  src="/attached_assets/${STATE_ICONS[stateCode as keyof typeof STATE_ICONS] || 'California_1754172085112.png'}" 
-                  alt="${stateData.name}" 
-                  style="width: 100%; height: 100%; object-fit: contain; filter: invert(1) sepia(1) saturate(5) hue-rotate(25deg) brightness(1.2);"
-                />
+              <div style="width: 48px; height: 48px; background: rgba(255, 107, 53, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3);">
+                <div style="color: #ff6b35; font-size: 18px; font-weight: bold; text-align: center;">${stateCode}</div>
               </div>
               <div>
                 <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">${stateData.name}</h3>
