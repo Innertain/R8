@@ -287,58 +287,139 @@ export default function SimpleMapboxMap() {
   const disasterCounties = extremeWeatherEvents.slice(0, 25);
   console.log(`🔍 Processed disasterCounties: ${disasterCounties.length} events available`);
   
-  // Force immediate disaster marker creation when data is available
+  // Create heat map visualization for major disasters based on severity
   React.useEffect(() => {
-    console.log(`🔥 IMMEDIATE DISASTER CHECK: ${disasterCounties.length} disasters, showDisasterCounties: ${showDisasterCounties}, mapExists: ${!!map.current}`);
-    
-    if (showDisasterCounties && disasterCounties.length > 0 && map.current) {
-      console.log(`🚨 IMMEDIATE DISASTER CREATION: Processing ${disasterCounties.length} disasters NOW!`);
-      
-      disasterCounties.slice(0, 10).forEach((event, index) => {
-        if (!event.coordinates || !event.coordinates.longitude || !event.coordinates.latitude) {
-          console.log(`❌ Skipping disaster ${index + 1}: ${event.eventType} in ${event.state} - no valid coordinates`);
-          return;
-        }
-        
-        const lng = event.coordinates.longitude;
-        const lat = event.coordinates.latitude;
-        console.log(`🎯 DISASTER ${index + 1}: ${event.eventType} in ${event.state} using EXACT coordinates [${lng}, ${lat}]`);
-        
-        const el = document.createElement('div');
-        el.className = 'disaster-marker-authentic';
-        el.style.cssText = `
-          width: 28px;
-          height: 28px;
-          background: radial-gradient(circle, #dc2626, #991b1b);
-          border: 3px solid #fbbf24;
-          border-radius: 50%;
-          cursor: pointer;
-          z-index: 999;
-          box-shadow: 0 4px 16px rgba(220, 38, 38, 0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 14px;
-        `;
-        el.innerHTML = '🚨';
-        
-        try {
-          const marker = new mapboxgl.Marker(el)
-            .setLngLat([lng, lat])
-            .addTo(map.current!);
-            
-          console.log(`✅ IMMEDIATE DISASTER ${index + 1}: ${event.eventType} in ${event.state} added at [${lng}, ${lat}]`);
-          
-          // Store marker reference for cleanup
-          markersRef.current.push(marker);
-        } catch (error) {
-          console.error(`❌ Failed immediate disaster ${index + 1}:`, error);
-        }
-      });
-      
-      console.log(`✅ Created ${Math.min(disasterCounties.length, 10)} disaster markers at exact coordinates`);
+    if (!showDisasterCounties || !map.current || disasterCounties.length === 0) {
+      console.log(`🌡️ Heat map check: showDisasterCounties=${showDisasterCounties}, map=${!!map.current}, disasters=${disasterCounties.length}`);
+      return;
     }
-  }, [disasterCounties.length, showDisasterCounties, map.current]);
+
+    console.log(`🌡️ CREATING DISASTER HEAT MAP: Processing ${disasterCounties.length} disasters for severity visualization`);
+
+    // Calculate severity scores for heat map visualization
+    const calculateSeverityScore = (event: any): number => {
+      let score = 0;
+      if (event.deaths) score += event.deaths * 10; // Deaths weighted heavily
+      if (event.injuries) score += event.injuries * 2; // Injuries moderate weight
+      if (event.damageProperty) score += (event.damageProperty / 1000000000) * 5; // Billions in damage
+      if (event.damageCrops) score += (event.damageCrops / 1000000000) * 2; // Crop damage
+      return Math.max(score, 10); // Minimum score of 10
+    };
+
+    // Get severity levels for color/size mapping
+    const severityLevels = disasterCounties.map(event => ({
+      ...event,
+      severityScore: calculateSeverityScore(event)
+    }));
+    
+    const maxSeverity = Math.max(...severityLevels.map(e => e.severityScore));
+    const minSeverity = Math.min(...severityLevels.map(e => e.severityScore));
+    
+    console.log(`🌡️ Severity range: ${minSeverity} to ${maxSeverity}`);
+
+    severityLevels.slice(0, 15).forEach((event, index) => {
+      if (!event.coordinates?.longitude || !event.coordinates?.latitude) {
+        console.log(`❌ Skipping disaster ${index + 1}: ${event.eventType} - no coordinates`);
+        return;
+      }
+
+      const lng = event.coordinates.longitude;
+      const lat = event.coordinates.latitude;
+      
+      // Calculate heat map properties based on severity
+      const severityRatio = (event.severityScore - minSeverity) / (maxSeverity - minSeverity);
+      const size = 15 + (severityRatio * 25); // 15px to 40px
+      const opacity = 0.4 + (severityRatio * 0.6); // 40% to 100% opacity
+      
+      // Color gradient: yellow → orange → red → dark red based on severity
+      let color, borderColor;
+      if (severityRatio < 0.25) {
+        color = '#fbbf24'; // Yellow for lowest severity
+        borderColor = '#f59e0b';
+      } else if (severityRatio < 0.5) {
+        color = '#f97316'; // Orange for low-medium severity
+        borderColor = '#ea580c';
+      } else if (severityRatio < 0.75) {
+        color = '#dc2626'; // Red for high severity
+        borderColor = '#b91c1c';
+      } else {
+        color = '#991b1b'; // Dark red for highest severity
+        borderColor = '#7f1d1d';
+      }
+
+      console.log(`🌡️ DISASTER ${index + 1}: ${event.eventType} in ${event.state} - Score: ${event.severityScore.toFixed(1)} (${(severityRatio * 100).toFixed(1)}%) at [${lng}, ${lat}]`);
+
+      // Create heat map marker
+      const el = document.createElement('div');
+      el.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        background: radial-gradient(circle, ${color}, ${borderColor});
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        opacity: ${opacity};
+        z-index: ${500 + Math.floor(severityRatio * 100)};
+        box-shadow: 0 0 ${size * 0.5}px ${color}40;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: ${Math.max(10, size * 0.4)}px;
+        color: white;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        transition: all 0.3s ease;
+      `;
+      
+      // Add severity indicator emoji
+      if (severityRatio >= 0.75) el.innerHTML = '💀'; // Highest severity
+      else if (severityRatio >= 0.5) el.innerHTML = '🚨'; // High severity  
+      else if (severityRatio >= 0.25) el.innerHTML = '⚠️'; // Medium severity
+      else el.innerHTML = '🟡'; // Low severity
+
+      // Create detailed popup with severity information
+      const popup = new mapboxgl.Popup({
+        closeButton: true,
+        closeOnClick: true,
+        maxWidth: '350px'
+      }).setHTML(`
+        <div style="font-family: system-ui, sans-serif; min-width: 300px;">
+          <div style="background: linear-gradient(135deg, ${color}, ${borderColor}); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 8px 8px 0 0;">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${event.eventType}</h3>
+            <div style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin-top: 4px;">
+              ${event.state} • ${event.beginDate ? new Date(event.beginDate).toLocaleDateString() : 'Date TBD'}
+            </div>
+            <div style="margin-top: 8px; padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 4px; font-size: 13px; font-weight: 600;">
+              Severity Score: ${event.severityScore.toFixed(1)} / ${maxSeverity.toFixed(1)}
+            </div>
+          </div>
+          <div style="padding: 4px;">
+            ${event.deaths > 0 ? `<div style="margin-bottom: 8px;"><strong style="color: #dc2626;">💀 Deaths:</strong> ${event.deaths}</div>` : ''}
+            ${event.injuries > 0 ? `<div style="margin-bottom: 8px;"><strong style="color: #f97316;">🏥 Injuries:</strong> ${event.injuries}</div>` : ''}
+            ${event.damageProperty > 0 ? `<div style="margin-bottom: 8px;"><strong style="color: #059669;">💰 Property Damage:</strong> $${(event.damageProperty / 1000000000).toFixed(1)}B</div>` : ''}
+            ${event.damageCrops > 0 ? `<div style="margin-bottom: 8px;"><strong style="color: #059669;">🌾 Crop Damage:</strong> $${(event.damageCrops / 1000000).toFixed(1)}M</div>` : ''}
+            <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
+              <div style="font-size: 12px; color: #6b7280;">NOAA Major Disaster Database</div>
+            </div>
+          </div>
+        </div>
+      `);
+
+      try {
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([lng, lat])
+          .setPopup(popup)
+          .addTo(map.current!);
+          
+        markersRef.current.push(marker);
+        console.log(`✅ HEAT MAP ${index + 1}: ${event.eventType} added with severity ${event.severityScore.toFixed(1)} at [${lng}, ${lat}]`);
+      } catch (error) {
+        console.error(`❌ Failed to add heat map marker ${index + 1}:`, error);
+      }
+    });
+    
+    console.log(`✅ Created disaster heat map with ${Math.min(severityLevels.length, 15)} markers based on severity`);
+  }, [showDisasterCounties, disasterCounties, map.current]);
 
   // Helper function to get weather icon for event type
   const getWeatherIcon = (eventType: string): string => {
