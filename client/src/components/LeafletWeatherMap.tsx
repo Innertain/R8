@@ -123,42 +123,77 @@ export function LeafletWeatherMap() {
     if (!mapContainer.current || mapRef.current) return;
 
     try {
-      console.log('Initializing Leaflet map...');
+      console.log('Initializing Leaflet map with container:', mapContainer.current);
       
-      // Create map with options
+      // Create map with explicit options
       const map = L.map(mapContainer.current, {
         center: [39.0902, -95.7129],
         zoom: 4,
         zoomControl: true,
-        preferCanvas: false
+        attributionControl: true
       });
 
-      // Add dark tile layer
+      console.log('Map instance created:', map);
+
+      // Add dark tile layer with error handling
       const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
-        maxZoom: 19,
-        tileSize: 256
+        maxZoom: 19
+      });
+
+      tileLayer.on('loading', () => {
+        console.log('✓ Tiles loading...');
+      });
+
+      tileLayer.on('load', () => {
+        console.log('✓ Tiles loaded successfully');
+      });
+
+      tileLayer.on('tileerror', (e) => {
+        console.warn('Tile load error:', e);
       });
 
       tileLayer.addTo(map);
       
-      // Force map to resize and render
+      // Add precipitation radar overlay (initially hidden)
+      const radarLayer = L.tileLayer('https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png', {
+        attribution: 'RainViewer',
+        opacity: 0,
+        zIndex: 200
+      });
+      
+      radarLayer.addTo(map);
+      
+      // Store layer reference for toggling
+      (map as any).radarLayer = radarLayer;
+      
+      // Multiple resize attempts to ensure proper rendering
       setTimeout(() => {
-        map.invalidateSize();
-        console.log('✓ Map resize triggered');
-      }, 100);
+        if (map) {
+          map.invalidateSize(true);
+          console.log('✓ First map resize triggered');
+        }
+      }, 50);
+      
+      setTimeout(() => {
+        if (map) {
+          map.invalidateSize(true);
+          console.log('✓ Second map resize triggered');
+        }
+      }, 200);
 
       mapRef.current = map;
       
-      console.log('✓ Leaflet map initialized successfully');
+      console.log('✓ Leaflet map initialized and configured successfully');
 
     } catch (error) {
-      console.error('Failed to initialize map:', error);
+      console.error('Failed to initialize Leaflet map:', error);
     }
 
     return () => {
       if (mapRef.current) {
+        console.log('Cleaning up Leaflet map...');
         mapRef.current.remove();
         mapRef.current = null;
       }
@@ -318,12 +353,13 @@ export function LeafletWeatherMap() {
       {/* Map Container */}
       <div 
         ref={mapContainer} 
-        className="w-full h-full" 
+        className="w-full h-full leaflet-map-container" 
         style={{ 
           minHeight: '500px',
           height: '100%',
           position: 'relative',
-          backgroundColor: '#1e293b'
+          backgroundColor: '#1e293b',
+          zIndex: 0
         }} 
       />
       
