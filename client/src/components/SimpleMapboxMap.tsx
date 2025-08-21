@@ -1161,7 +1161,7 @@ export default function SimpleMapboxMap() {
         // Special highlighting for Hawaii fires (highest severity)
         if (disaster.state === 'Hawaii') {
           color = '#4c1d95'; // Deep purple for Hawaii fires to make them stand out
-          console.log(`🌺 HAWAII FIRE MARKER: ${disaster.stormSummary} at [${lng}, ${lat}] - severity: ${severity} - DEEP PURPLE COLOR`);
+          console.log(`🌺 HAWAII FIRE MARKER: ${disaster.stormSummary} at [${disaster.coordinates.longitude}, ${disaster.coordinates.latitude}] - severity: ${severity} - DEEP PURPLE COLOR`);
         }
         
         // Create simple, working disaster marker (revert from complex styling that broke positioning)
