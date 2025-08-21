@@ -322,20 +322,20 @@ export default function SimpleMapboxMap() {
         <!-- Alert count badge - positioned outside the main circle -->
         <div style="
           position: absolute;
-          bottom: -4px;
-          right: -4px;
+          bottom: -6px;
+          right: -6px;
           background: #ff6b35;
           color: white;
           border-radius: 50%;
-          width: 20px;
-          height: 20px;
+          width: 26px;
+          height: 26px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 12px;
+          font-size: 14px;
           font-weight: bold;
           border: 2px solid white;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
           z-index: 20;
         ">${alertCount}</div>
           
@@ -343,20 +343,20 @@ export default function SimpleMapboxMap() {
         ${hasMultipleTypes ? `
         <div style="
           position: absolute;
-          top: -4px;
-          left: -4px;
+          top: -6px;
+          left: -6px;
           background: #ea580c;
           color: white;
           border-radius: 50%;
-          width: 18px;
-          height: 18px;
+          width: 22px;
+          height: 22px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 10px;
+          font-size: 11px;
           font-weight: bold;
           border: 2px solid white;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
           z-index: 20;
         ">+${uniqueWeatherTypes.length - 1}</div>
         ` : ''}
