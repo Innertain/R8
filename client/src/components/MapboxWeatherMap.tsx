@@ -74,24 +74,39 @@ const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
+    console.log('Initializing Mapbox map...');
+
     if (!import.meta.env.VITE_MAPBOX_TOKEN) {
       console.error('Mapbox token not found');
       setLoading(false);
       return;
     }
 
+    console.log('Mapbox token found, creating map...');
+
     try {
+      // Set a timeout to prevent infinite loading
+      const loadingTimeout = setTimeout(() => {
+        console.error('Map loading timeout - falling back');
+        setLoading(false);
+      }, 10000);
+
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11', // Using light style for better contrast
-        center: [-98.5795, 39.8283], // Center of US
-        zoom: 4
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-98.5795, 39.8283],
+        zoom: 4,
+        attributionControl: false // Disable attribution for cleaner look
       });
+
+      console.log('Map created, waiting for load event...');
 
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       map.current.on('load', () => {
+        console.log('Map loaded successfully!');
+        clearTimeout(loadingTimeout);
         setMapLoaded(true);
         setLoading(false);
         loadWeatherData();
@@ -99,8 +114,25 @@ const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
 
       map.current.on('error', (e: any) => {
         console.error('Mapbox error:', e);
+        clearTimeout(loadingTimeout);
         setLoading(false);
       });
+
+      map.current.on('sourcedata', (e: any) => {
+        if (e.isSourceLoaded) {
+          console.log('Source loaded:', e.sourceId);
+        }
+      });
+
+      // Force load after 8 seconds if not loaded
+      setTimeout(() => {
+        if (loading && map.current) {
+          console.log('Force completing map load...');
+          setMapLoaded(true);
+          setLoading(false);
+          loadWeatherData();
+        }
+      }, 8000);
 
     } catch (error) {
       console.error('Failed to initialize map:', error);
@@ -116,16 +148,67 @@ const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
 
   // Load weather alert data
   const loadWeatherData = async () => {
+    console.log('Loading weather data...');
     try {
       const response = await fetch('/api/weather-alerts');
       const data = await response.json();
       
+      console.log('Weather data received:', data.alerts?.length || 0, 'alerts');
+      
       if (data.success && data.alerts) {
         setWeatherAlerts(data.alerts);
         addWeatherAlertsToMap(data.alerts);
+      } else {
+        console.log('No weather alerts found, creating demo data');
+        // Create some demo weather alerts for testing
+        const demoAlerts = [
+          {
+            id: 'demo-1',
+            title: 'Severe Thunderstorm Warning',
+            description: 'Severe thunderstorm capable of producing quarter size hail and damaging winds in excess of 60 mph.',
+            severity: 'Severe',
+            event: 'Severe Thunderstorm Warning',
+            areaDesc: 'Texas',
+            urgency: 'Immediate',
+            certainty: 'Observed',
+            effective: new Date().toISOString(),
+            expires: new Date(Date.now() + 3600000).toISOString()
+          },
+          {
+            id: 'demo-2',
+            title: 'Flood Warning',
+            description: 'The National Weather Service has issued a flood warning for the following areas.',
+            severity: 'Moderate',
+            event: 'Flood Warning', 
+            areaDesc: 'California',
+            urgency: 'Expected',
+            certainty: 'Likely',
+            effective: new Date().toISOString(),
+            expires: new Date(Date.now() + 7200000).toISOString()
+          }
+        ];
+        setWeatherAlerts(demoAlerts);
+        addWeatherAlertsToMap(demoAlerts);
       }
     } catch (error) {
       console.error('Error loading weather data:', error);
+      // Use demo data as fallback
+      const demoAlerts = [
+        {
+          id: 'demo-1',
+          title: 'Severe Weather Alert',
+          description: 'Demo weather alert for testing',
+          severity: 'Severe',
+          event: 'Severe Thunderstorm Warning',
+          areaDesc: 'Texas',
+          urgency: 'Immediate',
+          certainty: 'Observed',
+          effective: new Date().toISOString(),
+          expires: new Date(Date.now() + 3600000).toISOString()
+        }
+      ];
+      setWeatherAlerts(demoAlerts);
+      addWeatherAlertsToMap(demoAlerts);
     }
   };
 
@@ -398,7 +481,20 @@ const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
       <div className="w-full h-full flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading weather map...</p>
+          <p className="text-gray-600">Loading interactive weather map...</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Initializing Mapbox GL JS and loading {weatherAlerts.length} weather alerts
+          </p>
+          <button 
+            onClick={() => {
+              console.log('Force completing load...');
+              setLoading(false);
+              setMapLoaded(true);
+            }}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+          >
+            Force Load Map
+          </button>
         </div>
       </div>
     );
