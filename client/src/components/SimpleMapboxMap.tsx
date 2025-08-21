@@ -264,41 +264,56 @@ export default function SimpleMapboxMap() {
 
       const alertCount = alerts.length;
 
-      // Create enhanced marker element with animation
+      // Get the primary weather event for this state to show on marker
+      const primaryAlert = alerts[0];
+      const weatherIcon = getWeatherIcon(primaryAlert.event);
+      
+      // Create enhanced marker element with weather icon
       const el = document.createElement('div');
       el.innerHTML = `
         <div style="
-          background: linear-gradient(135deg, #ff6b35, #e85d22);
-          border: 3px solid #fff;
+          background: linear-gradient(135deg, #ffffff, #f8fafc);
+          border: 3px solid #ff6b35;
           border-radius: 50%;
-          width: 44px;
-          height: 44px;
+          width: 56px;
+          height: 56px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
-          font-weight: bold;
-          font-size: 15px;
-          box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4), 0 2px 6px rgba(0,0,0,0.3);
+          box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4), 0 3px 10px rgba(0,0,0,0.2);
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
-        ">${alertCount}
+        ">
+          <img 
+            src="/attached_assets/${weatherIcon}" 
+            alt="${primaryAlert.event}"
+            style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) saturate(100%) invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
+          />
+          <div style="display: none; color: #ff6b35; font-size: 16px; font-weight: bold;">${alertCount}</div>
           <div style="
             position: absolute;
-            top: -2px;
-            right: -2px;
-            background: #dc2626;
+            bottom: -4px;
+            right: -4px;
+            background: #ff6b35;
+            color: white;
             border-radius: 50%;
-            width: 12px;
-            height: 12px;
-            animation: pulse 2s infinite;
-          "></div>
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          ">${alertCount}</div>
         </div>
         <style>
           @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
           }
         </style>
@@ -332,14 +347,16 @@ export default function SimpleMapboxMap() {
           <!-- Enhanced Header with State Info -->
           <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 56px; height: 56px; background: rgba(255, 107, 53, 0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.4); padding: 6px; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);">
+              <div style="width: 64px; height: 64px; background: rgba(255, 255, 255, 0.95); border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255, 107, 53, 0.6); padding: 8px; box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3); position: relative;">
                 <img 
-                  src="/attached_assets/${STATE_ICONS[stateCode as keyof typeof STATE_ICONS] || 'California_1754172085112.png'}" 
-                  alt="${stateData.name}" 
-                  style="width: 44px; height: 44px; object-fit: contain; filter: brightness(0) saturate(100%) invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+                  src="/attached_assets/${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}" 
+                  alt="${stateData.name} State Silhouette" 
+                  style="width: 48px; height: 48px; object-fit: contain; opacity: 1;"
+                  onload="console.log('State icon loaded for ${stateCode}');"
+                  onerror="console.log('Failed to load state icon for ${stateCode}'); this.style.display='none'; this.nextElementSibling.style.display='flex'"
                 />
-                <div style="display: none; color: #ff6b35; font-size: 16px; font-weight: bold; text-align: center; width: 100%; height: 100%; align-items: center; justify-content: center;">${stateCode}</div>
+                <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; text-align: center; width: 100%; height: 100%; align-items: center; justify-content: center;">${stateCode}</div>
+                <div style="position: absolute; top: -8px; right: -8px; background: #ff6b35; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${alertCount}</div>
               </div>
               <div>
                 <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">${stateData.name}</h3>
@@ -369,14 +386,15 @@ export default function SimpleMapboxMap() {
               " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.12)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(0, 0, 0, 0.08)'">
                 
                 <!-- Weather Event Icon -->
-                <div style="position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; background: rgba(255, 107, 53, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);">
+                <div style="position: absolute; top: 16px; right: 16px; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3); border: 2px solid rgba(255, 107, 53, 0.2);">
                   <img 
                     src="/attached_assets/${getWeatherIcon(alert.event)}" 
-                    alt="${alert.event}" 
-                    style="width: 28px; height: 28px; object-fit: contain; filter: brightness(0) saturate(100%) invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
+                    alt="${alert.event} Weather Icon" 
+                    style="width: 32px; height: 32px; object-fit: contain; opacity: 1;"
+                    onload="console.log('Weather icon loaded for ${alert.event}');"
+                    onerror="console.log('Failed to load weather icon for ${alert.event}'); this.style.display='none'; this.nextElementSibling.style.display='block'"
                   />
-                  <div style="display: none; width: 10px; height: 10px; background: #ff6b35; border-radius: 50%;"></div>
+                  <div style="display: none; width: 12px; height: 12px; background: #ff6b35; border-radius: 50%;"></div>
                 </div>
 
                 <!-- Alert Title -->
