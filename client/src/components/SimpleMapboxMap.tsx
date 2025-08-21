@@ -283,9 +283,12 @@ export default function SimpleMapboxMap() {
     alert.event?.toLowerCase().includes('watch')
   );
 
-  // Use extreme weather events directly for disaster markers (show up to 25, not 15!)
-  const disasterCounties = extremeWeatherEvents.slice(0, 25);
-  console.log(`🔍 Processed disasterCounties: ${disasterCounties.length} events available`);
+  // Use extreme weather events directly for disaster markers (show ALL disasters, not just 15!)
+  const disasterCounties = extremeWeatherEvents; // Show all 45 disasters
+  console.log(`🔍 Processed disasterCounties: ${disasterCounties.length} events available out of ${extremeWeatherEvents.length} total disasters`);
+  
+  // Add debug log for heat map trigger
+  console.log(`🌡️ Heat map trigger check: showDisasterCounties=${showDisasterCounties}, disasterCount=${disasterCounties.length}, mapReady=${!!map.current}`);
   
   // Create heat map visualization for major disasters based on severity
   React.useEffect(() => {
@@ -293,6 +296,14 @@ export default function SimpleMapboxMap() {
       console.log(`🌡️ Heat map check: showDisasterCounties=${showDisasterCounties}, map=${!!map.current}, disasters=${disasterCounties.length}`);
       return;
     }
+    
+    // Clean up existing disaster markers first
+    const existingDisasterMarkers = markersRef.current.filter(marker => 
+      marker.getElement().className?.includes('disaster-marker') || 
+      marker.getElement().style.backgroundColor?.includes('#')
+    );
+    existingDisasterMarkers.forEach(marker => marker.remove());
+    markersRef.current = markersRef.current.filter(marker => !existingDisasterMarkers.includes(marker));
 
     console.log(`🌡️ CREATING DISASTER HEAT MAP: Processing ${disasterCounties.length} disasters for severity visualization`);
 
@@ -317,7 +328,7 @@ export default function SimpleMapboxMap() {
     
     console.log(`🌡️ Severity range: ${minSeverity} to ${maxSeverity}`);
 
-    severityLevels.slice(0, 15).forEach((event, index) => {
+    severityLevels.slice(0, 30).forEach((event, index) => {
       if (!event.coordinates?.longitude || !event.coordinates?.latitude) {
         console.log(`❌ Skipping disaster ${index + 1}: ${event.eventType} - no coordinates`);
         return;
@@ -349,27 +360,24 @@ export default function SimpleMapboxMap() {
 
       console.log(`🌡️ DISASTER ${index + 1}: ${event.eventType} in ${event.state} - Score: ${event.severityScore.toFixed(1)} (${(severityRatio * 100).toFixed(1)}%) at [${lng}, ${lat}]`);
 
-      // Create heat map marker
+      // Create simplified heat map marker without complex CSS to avoid React errors
       const el = document.createElement('div');
-      el.style.cssText = `
-        width: ${size}px;
-        height: ${size}px;
-        background: radial-gradient(circle, ${color}, ${borderColor});
-        border: 2px solid white;
-        border-radius: 50%;
-        cursor: pointer;
-        opacity: ${opacity};
-        z-index: ${500 + Math.floor(severityRatio * 100)};
-        box-shadow: 0 0 ${size * 0.5}px ${color}40;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: ${Math.max(10, size * 0.4)}px;
-        color: white;
-        font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        transition: all 0.3s ease;
-      `;
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
+      el.style.backgroundColor = color;
+      el.style.border = '2px solid white';
+      el.style.borderRadius = '50%';
+      el.style.cursor = 'pointer';
+      el.style.opacity = `${opacity}`;
+      el.style.zIndex = `${500 + Math.floor(severityRatio * 100)}`;
+      el.style.boxShadow = `0 0 ${size * 0.5}px ${color}40`;
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.justifyContent = 'center';
+      el.style.fontSize = `${Math.max(10, size * 0.4)}px`;
+      el.style.color = 'white';
+      el.style.fontWeight = 'bold';
+      el.style.textShadow = '1px 1px 2px rgba(0,0,0,0.8)';
       
       // Add severity indicator emoji
       if (severityRatio >= 0.75) el.innerHTML = '💀'; // Highest severity
@@ -418,7 +426,7 @@ export default function SimpleMapboxMap() {
       }
     });
     
-    console.log(`✅ Created disaster heat map with ${Math.min(severityLevels.length, 15)} markers based on severity`);
+    console.log(`✅ Created disaster heat map with ${Math.min(severityLevels.length, 30)} markers based on severity`);
   }, [showDisasterCounties, disasterCounties, map.current]);
 
   // Helper function to get weather icon for event type
