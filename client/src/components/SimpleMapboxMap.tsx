@@ -37,10 +37,13 @@ export default function SimpleMapboxMap() {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [radarVisible, setRadarVisible] = useState(false);
 
-  // Fetch weather alerts
-  const { data: alertsResponse } = useQuery<{alerts: WeatherAlert[]}>({
+  // Fetch weather alerts with error handling
+  const { data: alertsResponse, error, isLoading } = useQuery<{alerts: WeatherAlert[]}>({
     queryKey: ['/api/weather-alerts-rss'],
     refetchInterval: 2 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const alerts = alertsResponse?.alerts || [];
@@ -206,6 +209,11 @@ export default function SimpleMapboxMap() {
     console.log(`✓ Radar ${radarVisible ? 'hidden' : 'shown'}`);
   };
 
+  // Log successful data fetch
+  if (alertsResponse?.alerts) {
+    console.log(`✓ Weather data loaded: ${alerts.length} total alerts, ${filteredAlerts.length} warnings/watches`);
+  }
+
   return (
     <div className="w-full h-full relative">
       <div 
@@ -221,7 +229,11 @@ export default function SimpleMapboxMap() {
         <div className="flex items-center gap-2">
           <MapPin className="w-5 h-5 text-orange-500" />
           <div>
-            <div className="font-bold text-sm">{Object.keys(statesWithAlerts).length} States with Alerts</div>
+            <div className="font-bold text-sm">
+              {Object.keys(statesWithAlerts).length} States with Alerts
+              {isLoading && <span className="ml-2 text-xs text-yellow-400">(Loading...)</span>}
+              {error && <span className="ml-2 text-xs text-red-400">(Retrying...)</span>}
+            </div>
             <div className="text-xs text-gray-300">Warnings & Watches Only</div>
           </div>
         </div>
