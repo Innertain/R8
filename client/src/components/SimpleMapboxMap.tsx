@@ -123,78 +123,55 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
         console.log('Sample feature coordinates:', features[0]?.geometry.coordinates);
         console.log('Sample feature properties:', features[0]?.properties);
 
-        // Add source
-        console.log('Adding weather alerts source with', features.length, 'features');
-        map.current.addSource('weather-alerts', {
-          type: 'geojson',
-          data: geojson
-        });
-
-        // Add circles layer
-        console.log('Adding weather alerts circle layer');
-        map.current.addLayer({
-          id: 'weather-alerts-circles',
-          type: 'circle',
-          source: 'weather-alerts',
-          paint: {
-            'circle-radius': 10,
-            'circle-color': [
-              'case',
-              ['==', ['get', 'severity'], 'Extreme'], '#8B0000',
-              ['==', ['get', 'severity'], 'Severe'], '#DC2626',
-              ['==', ['get', 'severity'], 'Moderate'], '#F59E0B',
-              '#3B82F6'
-            ],
-            'circle-opacity': 0.9,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#ffffff'
-          }
-        });
+        // Add weather markers with proper icons
+        console.log('Creating weather markers with event-specific icons');
         
-        console.log('Weather alerts layer added successfully');
-
-        // Add popups on click
-        map.current.on('click', 'weather-alerts-circles', (e) => {
-          const coordinates = (e.features![0].geometry as any).coordinates.slice();
-          const properties = e.features![0].properties!;
-
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-          }
-
-          new mapboxgl.Popup()
-            .setLngLat(coordinates)
-            .setHTML(`
-              <div style="padding: 8px; max-width: 200px;">
-                <h3 style="margin: 0 0 4px 0; font-weight: bold; font-size: 14px;">${properties.title}</h3>
-                <p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">${properties.area}</p>
-                <div style="padding: 2px 6px; background: ${getSeverityColor(properties.severity)}; color: white; border-radius: 3px; font-size: 11px; display: inline-block;">
-                  ${properties.severity}
+        features.forEach((feature: any, index: number) => {
+          const coords = feature.geometry.coordinates;
+          const props = feature.properties;
+          
+          // Get weather icon and color
+          const icon = getWeatherIcon(props.title);
+          const color = getSeverityColor(props.severity);
+          
+          // Create custom HTML marker
+          const el = document.createElement('div');
+          el.style.width = '30px';
+          el.style.height = '30px';
+          el.style.borderRadius = '50%';
+          el.style.backgroundColor = color;
+          el.style.border = '2px solid white';
+          el.style.display = 'flex';
+          el.style.alignItems = 'center';
+          el.style.justifyContent = 'center';
+          el.style.fontSize = '16px';
+          el.style.cursor = 'pointer';
+          el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+          el.innerHTML = icon;
+          el.title = `${props.title} - ${props.severity}`;
+          
+          // Create marker with popup
+          const marker = new mapboxgl.Marker(el)
+            .setLngLat([coords[0], coords[1]])
+            .setPopup(new mapboxgl.Popup().setHTML(`
+              <div style="padding: 10px; max-width: 250px;">
+                <h3 style="margin: 0 0 8px 0; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 20px;">${icon}</span>
+                  ${props.title}
+                </h3>
+                <p style="margin: 0 0 6px 0; color: #666; font-size: 12px;">${props.area}</p>
+                <div style="padding: 4px 8px; background: ${color}; color: white; border-radius: 4px; font-size: 12px; display: inline-block; margin-bottom: 8px;">
+                  ${props.severity}
                 </div>
+                <p style="margin: 0; font-size: 13px; line-height: 1.4;">
+                  ${props.description.substring(0, 150)}...
+                </p>
               </div>
-            `)
+            `))
             .addTo(map.current!);
         });
-
-        // Change cursor on hover
-        map.current.on('mouseenter', 'weather-alerts-circles', () => {
-          map.current!.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.current.on('mouseleave', 'weather-alerts-circles', () => {
-          map.current!.getCanvas().style.cursor = '';
-        });
-
-        console.log('Weather alerts added to map - should be visible now');
         
-        // Verify layer was added
-        setTimeout(() => {
-          if (map.current?.getLayer('weather-alerts-circles')) {
-            console.log('✓ Weather alerts layer confirmed on map');
-          } else {
-            console.error('✗ Weather alerts layer not found on map');
-          }
-        }, 500);
+        console.log('✓', features.length, 'weather alert markers with icons added to map');
       }
     } catch (error) {
       console.error('Error loading weather alerts:', error);
