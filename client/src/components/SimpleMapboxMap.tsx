@@ -7,7 +7,7 @@ import { MapPin, Layers } from 'lucide-react';
 // Set Mapbox access token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-// Weather event to icon mapping
+// Weather event to icon mapping using your disaster watch center icons
 const WEATHER_ICONS = {
   'hurricane': 'HURICAN_1754119781366.png',
   'tropical storm': 'HURICAN_1754119781366.png', 
@@ -17,16 +17,18 @@ const WEATHER_ICONS = {
   'red flag': 'Fire_1754119781364.png',
   'tornado': 'TORNATOR_1754119781369.png',
   'severe thunderstorm': 'STORM_1754119781368.png',
+  'thunderstorm': 'STORM_1754119781368.png',
   'winter storm': 'ICE _ WINTER STORM_1754119781367.png',
   'blizzard': 'ICE _ WINTER STORM_1754119781367.png',
   'ice storm': 'ICE _ WINTER STORM_1754119781367.png',
   'wind': 'WIND_1754119781370.png',
   'high wind': 'WIND_1754119781370.png',
   'heat': 'Heatwave_1754119781366.png',
-  'excessive heat': 'Heatwave_1754119781366.png'
+  'excessive heat': 'Heatwave_1754119781366.png',
+  'earthquake': 'Earth Quake_1754119781363.png'
 } as const;
 
-// State icon mapping
+// State silhouette mapping using your exact state icon files
 const STATE_ICONS = {
   'AL': 'Alabama_1754172085109.png',
   'AK': 'Alaska_1754172085109.png', 
@@ -330,12 +332,11 @@ export default function SimpleMapboxMap() {
           <!-- Enhanced Header with State Info -->
           <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 56px; height: 56px; background: rgba(255, 107, 53, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3); padding: 4px; position: relative; overflow: hidden;">
+              <div style="width: 56px; height: 56px; background: rgba(255, 107, 53, 0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.4); padding: 6px; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);">
                 <img 
                   src="/attached_assets/${STATE_ICONS[stateCode as keyof typeof STATE_ICONS] || 'California_1754172085112.png'}" 
                   alt="${stateData.name}" 
-                  style="width: 40px; height: 40px; object-fit: contain; filter: invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%); opacity: 0.9;"
-                  onload="this.style.opacity='1'"
+                  style="width: 44px; height: 44px; object-fit: contain; filter: brightness(0) saturate(100%) invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
                 />
                 <div style="display: none; color: #ff6b35; font-size: 16px; font-weight: bold; text-align: center; width: 100%; height: 100%; align-items: center; justify-content: center;">${stateCode}</div>
@@ -368,14 +369,14 @@ export default function SimpleMapboxMap() {
               " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.12)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(0, 0, 0, 0.08)'">
                 
                 <!-- Weather Event Icon -->
-                <div style="position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; background: rgba(255, 107, 53, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                <div style="position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; background: rgba(255, 107, 53, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);">
                   <img 
                     src="/attached_assets/${getWeatherIcon(alert.event)}" 
                     alt="${alert.event}" 
-                    style="width: 24px; height: 24px; object-fit: contain; filter: invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
+                    style="width: 28px; height: 28px; object-fit: contain; filter: brightness(0) saturate(100%) invert(47%) sepia(69%) saturate(959%) hue-rotate(15deg) brightness(98%) contrast(89%);"
                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
                   />
-                  <div style="display: none; width: 8px; height: 8px; background: #ff6b35; border-radius: 50%;"></div>
+                  <div style="display: none; width: 10px; height: 10px; background: #ff6b35; border-radius: 50%;"></div>
                 </div>
 
                 <!-- Alert Title -->
