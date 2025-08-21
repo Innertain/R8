@@ -720,43 +720,51 @@ export default function SimpleMapboxMap() {
       console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
     }
 
-    // Add wildfire incident markers with enhanced geocoding
+    // Add wildfire incident markers with enhanced geocoding (cached & batched)
     const addWildfireMarkers = async () => {
-      for (const [index, incident] of wildfires.entries()) {
-        const stateData = US_STATES[incident.state as keyof typeof US_STATES];
-        if (!stateData) continue;
-
-        let lng, lat;
-        
-        // Try to extract and geocode specific location from title
-        const extractedLocation = extractLocationFromTitle(incident.title);
-        let coordinates: [number, number] | null = null;
-        
-        if (extractedLocation) {
-          coordinates = await geocodeLocationCached(extractedLocation, incident.state);
-        }
-        
-        if (coordinates) {
-          [lng, lat] = coordinates;
-          // Add small offset even for geocoded locations to avoid exact overlap
-          const microOffset = 0.02; // Small offset to prevent exact overlap
-          const microAngle = (index * 45) * (Math.PI / 180);
-          lng += microOffset * Math.cos(microAngle);
-          lat += microOffset * Math.sin(microAngle);
-          console.log(`📍 Wildfire "${incident.title}" geocoded to ${extractedLocation}: [${lng}, ${lat}]`);
-        } else {
-          // Enhanced fallback with larger offset positioning to avoid overlapping weather markers
-          const baseCoords = stateData.coords;
-          const offsetDistance = 0.5; // Increased from 0.3 to 0.5 degrees for better separation
-          const angle = (index * 72) * (Math.PI / 180); // Changed to 72 degrees (360/5) for better distribution
-          lng = baseCoords[0] + (offsetDistance * Math.cos(angle));
-          lat = baseCoords[1] + (offsetDistance * Math.sin(angle));
-          console.log(`📍 Wildfire "${incident.title}" using offset coords: [${lng}, ${lat}]`);
-        }
+      console.log(`🔥 Processing ${wildfires.length} wildfire incidents for map display`);
       
-        // Create wildfire marker element
-        const el = document.createElement('div');
-      el.innerHTML = `
+      // Process in batches of 10 to improve performance
+      const batchSize = 10;
+      for (let i = 0; i < wildfires.length; i += batchSize) {
+        const batch = wildfires.slice(i, i + batchSize);
+        
+        for (const [batchIndex, incident] of batch.entries()) {
+          const index = i + batchIndex;
+          const stateData = US_STATES[incident.state as keyof typeof US_STATES];
+          if (!stateData) continue;
+
+          let lng, lat;
+          
+          // Try to extract and geocode specific location from title
+          const extractedLocation = extractLocationFromTitle(incident.title);
+          let coordinates: [number, number] | null = null;
+          
+          if (extractedLocation) {
+            coordinates = await geocodeLocationCached(extractedLocation, incident.state);
+          }
+          
+          if (coordinates) {
+            [lng, lat] = coordinates;
+            // Add small offset even for geocoded locations to avoid exact overlap
+            const microOffset = 0.02; // Small offset to prevent exact overlap
+            const microAngle = (index * 45) * (Math.PI / 180);
+            lng += microOffset * Math.cos(microAngle);
+            lat += microOffset * Math.sin(microAngle);
+            console.log(`📍 Wildfire "${incident.title}" geocoded to ${extractedLocation}: [${lng}, ${lat}]`);
+          } else {
+            // Enhanced fallback with larger offset positioning to avoid overlapping weather markers
+            const baseCoords = stateData.coords;
+            const offsetDistance = 0.5; // Increased from 0.3 to 0.5 degrees for better separation
+            const angle = (index * 72) * (Math.PI / 180); // Changed to 72 degrees (360/5) for better distribution
+            lng = baseCoords[0] + (offsetDistance * Math.cos(angle));
+            lat = baseCoords[1] + (offsetDistance * Math.sin(angle));
+            console.log(`📍 Wildfire "${incident.title}" using offset coords: [${lng}, ${lat}]`);
+          }
+        
+          // Create wildfire marker element
+          const el = document.createElement('div');
+          el.innerHTML = `
         <div style="
           background: linear-gradient(135deg, #dc2626, #b91c1c);
           border: 3px solid #fbbf24;
@@ -944,7 +952,13 @@ export default function SimpleMapboxMap() {
         .setPopup(popup)
         .addTo(map.current!);
 
-        markersRef.current.push(marker);
+          markersRef.current.push(marker);
+        }
+        
+        // Small delay between batches to prevent browser freeze
+        if (i + batchSize < wildfires.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
       }
       console.log(`✓ Added ${wildfires.length} wildfire incident markers with enhanced geocoding`);
     };
@@ -956,27 +970,33 @@ export default function SimpleMapboxMap() {
     
     // Add disaster county highlighting markers using actual county coordinates
     if (showDisasterCounties && disasterCounties.length > 0) {
-      console.log(`✓ Adding ${disasterCounties.length} disaster county indicators`);
+      console.log(`🚨 Adding ${disasterCounties.length} disaster county indicators`);
       
       // Show up to 25 events as requested (more than 15)
-      disasterCounties.slice(0, 25).forEach((event, index) => {
+      const eventsToShow = Math.min(disasterCounties.length, 25);
+      console.log(`🚨 Processing ${eventsToShow} disaster events for map display`);
+      
+      disasterCounties.slice(0, eventsToShow).forEach((event, index) => {
         // Use actual coordinates from the event if available, otherwise fallback to state center
         let lng, lat;
         
         if ((event as any).coordinates && (event as any).coordinates.longitude && (event as any).coordinates.latitude) {
           lng = (event as any).coordinates.longitude;
           lat = (event as any).coordinates.latitude;
-          console.log(`📍 Using event coordinates [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
+          console.log(`🚨 DISASTER ${index + 1}: Using event coordinates [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
         } else {
           const stateData = US_STATES[event.state as keyof typeof US_STATES];
-          if (!stateData) return;
+          if (!stateData) {
+            console.log(`❌ No state data for ${event.state}, skipping event ${index + 1}`);
+            return;
+          }
           
           // Add small offset from state center
-          const offset = 0.2 + (index * 0.1); // Varying offset based on index
-          const angle = (index * 25) * (Math.PI / 180); // 25-degree spacing
+          const offset = 0.3 + (index * 0.05); // Smaller, more controlled offset
+          const angle = (index * 15) * (Math.PI / 180); // 15-degree spacing for better distribution
           lng = stateData.coords[0] + (offset * Math.cos(angle));
           lat = stateData.coords[1] + (offset * Math.sin(angle));
-          console.log(`📍 Using offset state coords [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
+          console.log(`🚨 DISASTER ${index + 1}: Using state offset coords [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
         }
         
         // Create county disaster area marker
@@ -1055,17 +1075,32 @@ export default function SimpleMapboxMap() {
           </div>
         `);
         
-        const countyMarker = new mapboxgl.Marker(countyEl)
-          .setLngLat([lng, lat])
-          .setPopup(countyPopup)
-          .addTo(map.current!);
-        
-        markersRef.current.push(countyMarker);
+        try {
+          const countyMarker = new mapboxgl.Marker(countyEl)
+            .setLngLat([lng, lat])
+            .setPopup(countyPopup)
+            .addTo(map.current!);
+          
+          markersRef.current.push(countyMarker);
+          console.log(`✅ DISASTER ${index + 1} added successfully to map at [${lng}, ${lat}]`);
+        } catch (error) {
+          console.error(`❌ Failed to add disaster marker ${index + 1}:`, error);
+        }
       });
       
-      console.log(`✓ Added ${Math.min(disasterCounties.length, 25)} disaster county markers with real coordinates`);
+      console.log(`✅ Added ${eventsToShow} disaster county markers with real coordinates`);
     }
   }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties, showWeatherAlerts, showWildfires]);
+
+  // Debug: Log disaster data availability
+  React.useEffect(() => {
+    console.log(`🔍 DEBUG: disasterCounties length: ${disasterCounties.length}`);
+    console.log(`🔍 DEBUG: showDisasterCounties: ${showDisasterCounties}`);
+    if (disasterCounties.length > 0) {
+      console.log(`🔍 DEBUG: First disaster county:`, disasterCounties[0]);
+      console.log(`🔍 DEBUG: States available in US_STATES:`, Object.keys(US_STATES).slice(0, 5));
+    }
+  }, [disasterCounties, showDisasterCounties]);
 
   return (
     <div className="w-full h-full relative">
@@ -1093,7 +1128,7 @@ export default function SimpleMapboxMap() {
               {(showWeatherAlerts || showWildfires || showDisasterCounties) && ' • '}
               {showWildfires ? `${wildfires.length} Wildfires` : showWeatherAlerts ? 'Wildfires Hidden' : ''}
               {showDisasterCounties && disasterCounties.length > 0 && (
-                <span className="ml-2 text-orange-300">• {disasterCounties.length} Counties</span>
+                <span className="ml-2 text-red-300">• {Math.min(disasterCounties.length, 25)} Disasters</span>
               )}
               {isLoading && <span className="ml-2 text-yellow-400 animate-pulse">●</span>}
               {error && <span className="ml-2 text-red-400 animate-bounce">⚠</span>}
