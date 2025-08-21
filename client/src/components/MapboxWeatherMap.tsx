@@ -1,682 +1,359 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import mapboxgl from 'mapbox-gl';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { 
-  CloudRain, 
-  Zap, 
-  Wind, 
-  Snowflake, 
-  Sun, 
-  AlertTriangle,
-  Layers,
-  X,
-  MapPin,
-  Activity
-} from 'lucide-react';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { AlertTriangle, MapPin, Layers, Cloud } from 'lucide-react';
 
 // Initialize Mapbox
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
+// US States coordinates
+const US_STATES = {
+  'AL': { name: 'Alabama', coords: [-86.79113, 32.377716] },
+  'AK': { name: 'Alaska', coords: [-152.404419, 61.370716] },
+  'AZ': { name: 'Arizona', coords: [-111.431221, 33.729759] },
+  'AR': { name: 'Arkansas', coords: [-92.373123, 34.969704] },
+  'CA': { name: 'California', coords: [-119.681564, 36.116203] },
+  'CO': { name: 'Colorado', coords: [-105.311104, 39.059811] },
+  'CT': { name: 'Connecticut', coords: [-72.755371, 41.767] },
+  'DE': { name: 'Delaware', coords: [-75.507141, 39.318523] },
+  'DC': { name: 'District of Columbia', coords: [-77.026817, 38.897438] },
+  'FL': { name: 'Florida', coords: [-82.057549, 27.766279] },
+  'GA': { name: 'Georgia', coords: [-83.643074, 33.76] },
+  'HI': { name: 'Hawaii', coords: [-157.826182, 21.30895] },
+  'ID': { name: 'Idaho', coords: [-114.478828, 44.240459] },
+  'IL': { name: 'Illinois', coords: [-88.986137, 40.349457] },
+  'IN': { name: 'Indiana', coords: [-86.147685, 40.790443] },
+  'IA': { name: 'Iowa', coords: [-93.620866, 42.590794] },
+  'KS': { name: 'Kansas', coords: [-98.484246, 39.04] },
+  'KY': { name: 'Kentucky', coords: [-84.86311, 37.669789] },
+  'LA': { name: 'Louisiana', coords: [-91.867805, 31.106] },
+  'ME': { name: 'Maine', coords: [-69.765261, 44.323535] },
+  'MD': { name: 'Maryland', coords: [-76.501157, 39.045755] },
+  'MA': { name: 'Massachusetts', coords: [-71.530106, 42.407211] },
+  'MI': { name: 'Michigan', coords: [-84.5467, 44.182205] },
+  'MN': { name: 'Minnesota', coords: [-94.6859, 46.729553] },
+  'MS': { name: 'Mississippi', coords: [-89.678696, 32.741646] },
+  'MO': { name: 'Missouri', coords: [-91.831833, 38.572954] },
+  'MT': { name: 'Montana', coords: [-110.454353, 46.965260] },
+  'NE': { name: 'Nebraska', coords: [-99.901813, 41.492537] },
+  'NV': { name: 'Nevada', coords: [-117.055374, 38.313515] },
+  'NH': { name: 'New Hampshire', coords: [-71.549896, 43.452492] },
+  'NJ': { name: 'New Jersey', coords: [-74.756138, 40.221741] },
+  'NM': { name: 'New Mexico', coords: [-106.248482, 34.307144] },
+  'NY': { name: 'New York', coords: [-74.948051, 42.165726] },
+  'NC': { name: 'North Carolina', coords: [-79.806419, 35.630066] },
+  'ND': { name: 'North Dakota', coords: [-101.002012, 47.528912] },
+  'OH': { name: 'Ohio', coords: [-82.764915, 40.269789] },
+  'OK': { name: 'Oklahoma', coords: [-96.921387, 35.482309] },
+  'OR': { name: 'Oregon', coords: [-122.070938, 44.931109] },
+  'PA': { name: 'Pennsylvania', coords: [-77.209755, 40.269789] },
+  'RI': { name: 'Rhode Island', coords: [-71.422132, 41.82355] },
+  'SC': { name: 'South Carolina', coords: [-81.035, 33.836082] },
+  'SD': { name: 'South Dakota', coords: [-99.438828, 44.299782] },
+  'TN': { name: 'Tennessee', coords: [-86.518842, 35.747845] },
+  'TX': { name: 'Texas', coords: [-97.563461, 31.106] },
+  'UT': { name: 'Utah', coords: [-111.892622, 39.419220] },
+  'VT': { name: 'Vermont', coords: [-72.710686, 44.0] },
+  'VA': { name: 'Virginia', coords: [-78.169968, 37.769337] },
+  'WA': { name: 'Washington', coords: [-121.220637, 47.042418] },
+  'WV': { name: 'West Virginia', coords: [-80.954570, 38.349497] },
+  'WI': { name: 'Wisconsin', coords: [-89.616508, 44.268543] },
+  'WY': { name: 'Wyoming', coords: [-107.518505, 43.075968] }
+} as const;
+
 interface WeatherAlert {
   id: string;
   title: string;
-  description: string;
-  severity: string;
   event: string;
-  areaDesc: string;
+  severity: string;
   urgency: string;
-  certainty: string;
-  effective: string;
-  expires: string;
+  location?: string;
+  description?: string;
+  effective?: string;
+  expires?: string;
 }
 
-interface MapboxWeatherMapProps {
-  className?: string;
-}
-
-const MapboxWeatherMap: React.FC<MapboxWeatherMapProps> = ({ className }) => {
+export default function MapboxWeatherMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const popup = useRef<mapboxgl.Popup | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const [initialized, setInitialized] = useState(false);
+  const [weatherLayer, setWeatherLayer] = useState<'none' | 'radar' | 'clouds'>('none');
+
+  // Fetch weather alerts
+  const { data: alertsResponse, isLoading } = useQuery({
+    queryKey: ['/api/weather-alerts-rss'],
+    refetchInterval: 2 * 60 * 1000,
+  });
+
+  // Extract alerts array from response
+  const alerts = alertsResponse?.alerts || [];
   
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [weatherAlerts, setWeatherAlerts] = useState<WeatherAlert[]>([]);
-  const [selectedAlert, setSelectedAlert] = useState<WeatherAlert | null>(null);
-  const [showWeatherLayer, setShowWeatherLayer] = useState(true);
-  const [loading, setLoading] = useState(true);
+  // Filter for warnings and watches only
+  const filteredAlerts = Array.isArray(alerts) ? alerts.filter((alert: WeatherAlert) => 
+    alert.event?.toLowerCase().includes('warning') || 
+    alert.event?.toLowerCase().includes('watch')
+  ) : [];
 
-  // Weather event type mapping to icons and colors
-  const getWeatherIcon = (eventType: string) => {
-    const type = eventType.toLowerCase();
-    if (type.includes('tornado')) return <Zap className="w-4 h-4" />;
-    if (type.includes('severe thunderstorm') || type.includes('storm')) return <CloudRain className="w-4 h-4" />;
-    if (type.includes('flood') || type.includes('flash flood')) return <CloudRain className="w-4 h-4" />;
-    if (type.includes('winter') || type.includes('snow') || type.includes('ice')) return <Snowflake className="w-4 h-4" />;
-    if (type.includes('wind') || type.includes('gale')) return <Wind className="w-4 h-4" />;
-    if (type.includes('heat') || type.includes('fire')) return <Sun className="w-4 h-4" />;
-    return <AlertTriangle className="w-4 h-4" />;
-  };
+  // Group alerts by state
+  const statesWithAlerts = filteredAlerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
+    const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
+    const titleStateMatch = alert.title?.match(/\b([A-Z]{2})\b/);
+    const descriptionStateMatch = alert.description?.match(/\b([A-Z]{2})\b/);
+    
+    let state = stateMatch ? stateMatch[1] : null;
+    if (!state && titleStateMatch) state = titleStateMatch[1];
+    if (!state && descriptionStateMatch) state = descriptionStateMatch[1];
 
-  const getWeatherColor = (eventType: string, severity: string) => {
-    const sev = severity.toLowerCase();
-    if (sev.includes('extreme')) return '#8B0000'; // Dark red
-    if (sev.includes('severe')) return '#DC2626'; // Red
-    if (sev.includes('moderate')) return '#F59E0B'; // Amber
-    if (sev.includes('minor')) return '#3B82F6'; // Blue
-    return '#6B7280'; // Gray
-  };
+    if (state && US_STATES[state as keyof typeof US_STATES]) {
+      if (!acc[state]) acc[state] = [];
+      acc[state].push(alert);
+    }
+    return acc;
+  }, {});
 
   // Initialize map
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    console.log('Initializing Mapbox map...');
-
-    if (!import.meta.env.VITE_MAPBOX_TOKEN) {
-      console.error('Mapbox token not found');
-      setLoading(false);
+    if (!mapboxgl.accessToken) {
+      console.error('Mapbox token not available');
       return;
     }
 
-    console.log('Mapbox token found, creating map...');
-
     try {
-      // Set a timeout to prevent infinite loading
-      const loadingTimeout = setTimeout(() => {
-        console.error('Map loading timeout - falling back');
-        setLoading(false);
-      }, 10000);
-
+      console.log('Initializing Mapbox map...');
+      
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [-98.5795, 39.8283],
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: [-95.7129, 37.0902],
         zoom: 4,
-        attributionControl: false // Disable attribution for cleaner look
+        attributionControl: true
       });
 
-      console.log('Map created, waiting for load event...');
-
-      // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       map.current.on('load', () => {
-        console.log('Map loaded successfully!');
-        clearTimeout(loadingTimeout);
-        setMapLoaded(true);
-        setLoading(false);
-        loadWeatherData();
+        if (!map.current) return;
+        
+        console.log('✓ Mapbox loaded successfully');
+        setInitialized(true);
+
+        // Add precipitation radar source (initially invisible)
+        map.current.addSource('radar-source', {
+          type: 'raster',
+          tiles: ['https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png'],
+          tileSize: 256
+        });
+
+        map.current.addLayer({
+          id: 'radar-layer',
+          type: 'raster',
+          source: 'radar-source',
+          paint: {
+            'raster-opacity': 0
+          }
+        });
+
+        // Add cloud cover source (initially invisible)  
+        map.current.addSource('clouds-source', {
+          type: 'raster',
+          tiles: ['https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png'],
+          tileSize: 256
+        });
+
+        map.current.addLayer({
+          id: 'clouds-layer', 
+          type: 'raster',
+          source: 'clouds-source',
+          paint: {
+            'raster-opacity': 0
+          }
+        });
+
+        console.log('✓ Weather layers added');
       });
 
-      map.current.on('error', (e: any) => {
+      map.current.on('error', (e) => {
         console.error('Mapbox error:', e);
-        clearTimeout(loadingTimeout);
-        setLoading(false);
       });
-
-      map.current.on('sourcedata', (e: any) => {
-        if (e.isSourceLoaded) {
-          console.log('Source loaded:', e.sourceId);
-        }
-      });
-
-      // Force load after 5 seconds if not loaded
-      setTimeout(() => {
-        if (loading && map.current) {
-          console.log('Force completing map load...');
-          setMapLoaded(true);
-          setLoading(false);
-          loadWeatherData();
-        }
-      }, 5000);
 
     } catch (error) {
-      console.error('Failed to initialize map:', error);
-      setLoading(false);
+      console.error('Failed to initialize Mapbox:', error);
     }
 
     return () => {
       if (map.current) {
         map.current.remove();
+        map.current = null;
       }
     };
   }, []);
 
-  // Load weather alert data
-  const loadWeatherData = async () => {
-    console.log('Loading weather data...');
-    try {
-      const response = await fetch('/api/weather-alerts');
-      const data = await response.json();
-      
-      console.log('Weather data received:', data.alerts?.length || 0, 'alerts');
-      
-      if (data.success && data.alerts) {
-        setWeatherAlerts(data.alerts);
-        addWeatherAlertsToMap(data.alerts);
-      } else {
-        console.log('No weather alerts found, creating demo data');
-        // Create some demo weather alerts for testing
-        const demoAlerts = [
-          {
-            id: 'demo-1',
-            title: 'Severe Thunderstorm Warning',
-            description: 'Severe thunderstorm capable of producing quarter size hail and damaging winds in excess of 60 mph.',
-            severity: 'Severe',
-            event: 'Severe Thunderstorm Warning',
-            areaDesc: 'Texas',
-            urgency: 'Immediate',
-            certainty: 'Observed',
-            effective: new Date().toISOString(),
-            expires: new Date(Date.now() + 3600000).toISOString()
-          },
-          {
-            id: 'demo-2',
-            title: 'Flood Warning',
-            description: 'The National Weather Service has issued a flood warning for the following areas.',
-            severity: 'Moderate',
-            event: 'Flood Warning', 
-            areaDesc: 'California',
-            urgency: 'Expected',
-            certainty: 'Likely',
-            effective: new Date().toISOString(),
-            expires: new Date(Date.now() + 7200000).toISOString()
-          }
-        ];
-        setWeatherAlerts(demoAlerts);
-        addWeatherAlertsToMap(demoAlerts);
-      }
-    } catch (error) {
-      console.error('Error loading weather data:', error);
-      // Use demo data as fallback
-      const demoAlerts = [
-        {
-          id: 'demo-1',
-          title: 'Severe Weather Alert',
-          description: 'Demo weather alert for testing',
-          severity: 'Severe',
-          event: 'Severe Thunderstorm Warning',
-          areaDesc: 'Texas',
-          urgency: 'Immediate',
-          certainty: 'Observed',
-          effective: new Date().toISOString(),
-          expires: new Date(Date.now() + 3600000).toISOString()
-        }
-      ];
-      setWeatherAlerts(demoAlerts);
-      addWeatherAlertsToMap(demoAlerts);
-    }
-  };
-
-  // Add weather alerts to map
-  const addWeatherAlertsToMap = (alerts: WeatherAlert[]) => {
-    if (!map.current) return;
-
-    // Create GeoJSON data for alerts
-    const alertsGeoJSON = {
-      type: 'FeatureCollection' as const,
-      features: alerts.slice(0, 200).map((alert, index) => {
-        // Generate realistic US coordinates based on alert area
-        const coords = generateCoordinatesFromArea(alert.areaDesc);
-        
-        return {
-          type: 'Feature' as const,
-          geometry: {
-            type: 'Point' as const,
-            coordinates: coords
-          },
-          properties: {
-            id: alert.id,
-            title: alert.title,
-            event: alert.event,
-            severity: alert.severity,
-            description: alert.description,
-            areaDesc: alert.areaDesc,
-            urgency: alert.urgency,
-            effective: alert.effective,
-            expires: alert.expires
-          }
-        };
-      })
-    };
-
-    // Add source
-    if (map.current.getSource('weather-alerts')) {
-      (map.current.getSource('weather-alerts') as mapboxgl.GeoJSONSource).setData(alertsGeoJSON);
-    } else {
-      map.current.addSource('weather-alerts', {
-        type: 'geojson',
-        data: alertsGeoJSON,
-        cluster: true,
-        clusterMaxZoom: 8,
-        clusterRadius: 50
-      });
-    }
-
-    // Add cluster layer
-    if (!map.current.getLayer('weather-alerts-clusters')) {
-      map.current.addLayer({
-        id: 'weather-alerts-clusters',
-        type: 'circle',
-        source: 'weather-alerts',
-        filter: ['has', 'point_count'],
-        paint: {
-          'circle-color': [
-            'step',
-            ['get', 'point_count'],
-            '#F59E0B', 20,
-            '#DC2626', 100,
-            '#8B0000'
-          ],
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            20, 100, 30, 750, 40
-          ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff'
-        }
-      });
-
-      // Add cluster count labels
-      map.current.addLayer({
-        id: 'weather-alerts-cluster-count',
-        type: 'symbol',
-        source: 'weather-alerts',
-        filter: ['has', 'point_count'],
-        layout: {
-          'text-field': '{point_count_abbreviated}',
-          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-          'text-size': 12
-        },
-        paint: {
-          'text-color': '#ffffff'
-        }
-      });
-    }
-
-    // Add individual alert points
-    if (!map.current.getLayer('weather-alerts-points')) {
-      map.current.addLayer({
-        id: 'weather-alerts-points',
-        type: 'circle',
-        source: 'weather-alerts',
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-color': [
-            'case',
-            ['==', ['get', 'severity'], 'Extreme'], '#8B0000',
-            ['==', ['get', 'severity'], 'Severe'], '#DC2626',
-            ['==', ['get', 'severity'], 'Moderate'], '#F59E0B',
-            ['==', ['get', 'severity'], 'Minor'], '#3B82F6',
-            '#6B7280'
-          ],
-          'circle-radius': [
-            'case',
-            ['==', ['get', 'severity'], 'Extreme'], 12,
-            ['==', ['get', 'severity'], 'Severe'], 10,
-            8
-          ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff',
-          'circle-opacity': 0.8
-        }
-      });
-    }
-
-    // Add click handlers
-    map.current.on('click', 'weather-alerts-clusters', (e: any) => {
-      const features = map.current!.queryRenderedFeatures(e.point, {
-        layers: ['weather-alerts-clusters']
-      });
-
-      const clusterId = features[0].properties!.cluster_id;
-      (map.current!.getSource('weather-alerts') as mapboxgl.GeoJSONSource).getClusterExpansionZoom(
-        clusterId,
-        (err: any, zoom: any) => {
-          if (err) return;
-
-          map.current!.easeTo({
-            center: (features[0].geometry as any).coordinates,
-            zoom: zoom
-          });
-        }
-      );
-    });
-
-    map.current.on('click', 'weather-alerts-points', (e: any) => {
-      if (e.features && e.features[0]) {
-        const feature = e.features[0];
-        const properties = feature.properties!;
-        const coordinates = (feature.geometry as any).coordinates.slice();
-
-        // Find the full alert data
-        const alert = alerts.find(a => a.id === properties.id);
-        if (alert) {
-          setSelectedAlert(alert);
-          
-          // Show popup
-          if (popup.current) {
-            popup.current.remove();
-          }
-
-          popup.current = new mapboxgl.Popup({ closeOnClick: false })
-            .setLngLat(coordinates)
-            .setHTML(`
-              <div class="p-3">
-                <div class="font-bold text-sm mb-1">${alert.event}</div>
-                <div class="text-xs text-gray-600 mb-2">${alert.areaDesc}</div>
-                <div class="text-xs">
-                  <span class="inline-block px-2 py-1 bg-${getWeatherColor(alert.event, alert.severity).replace('#', '')}-100 text-${getWeatherColor(alert.event, alert.severity).replace('#', '')}-800 rounded">
-                    ${alert.severity}
-                  </span>
-                </div>
-              </div>
-            `)
-            .addTo(map.current!);
-        }
-      }
-    });
-
-    // Change cursor on hover
-    map.current.on('mouseenter', 'weather-alerts-clusters', () => {
-      map.current!.getCanvas().style.cursor = 'pointer';
-    });
-
-    map.current.on('mouseenter', 'weather-alerts-points', () => {
-      map.current!.getCanvas().style.cursor = 'pointer';
-    });
-
-    map.current.on('mouseleave', 'weather-alerts-clusters', () => {
-      map.current!.getCanvas().style.cursor = '';
-    });
-
-    map.current.on('mouseleave', 'weather-alerts-points', () => {
-      map.current!.getCanvas().style.cursor = '';
-    });
-  };
-
-  // Generate realistic coordinates from area description
-  const generateCoordinatesFromArea = (areaDesc: string): [number, number] => {
-    // Simple mapping of common areas to approximate coordinates
-    const areaCoords: Record<string, [number, number]> = {
-      'California': [-119.4179, 36.7783],
-      'Texas': [-99.9018, 31.9686],
-      'Florida': [-81.5158, 27.6648],
-      'New York': [-74.0060, 40.7128],
-      'Illinois': [-89.3985, 40.6331],
-      'Pennsylvania': [-77.1945, 40.2732],
-      'Ohio': [-82.7649, 40.3888],
-      'Georgia': [-83.2572, 32.1656],
-      'North Carolina': [-78.6569, 35.7596],
-      'Michigan': [-84.5555, 44.3467],
-      'New Jersey': [-74.7429, 40.0583],
-      'Virginia': [-78.6569, 37.4316],
-      'Washington': [-120.7401, 47.7511],
-      'Arizona': [-111.0937, 34.0489],
-      'Massachusetts': [-71.0942, 42.2373],
-      'Tennessee': [-86.7816, 35.7796],
-      'Indiana': [-86.1349, 40.2732],
-      'Maryland': [-76.5019, 39.0458],
-      'Missouri': [-91.8318, 38.5767],
-      'Wisconsin': [-89.6165, 43.7844]
-    };
-
-    // Check if area description contains a known state
-    for (const [state, coords] of Object.entries(areaCoords)) {
-      if (areaDesc.includes(state)) {
-        // Add some random offset for variety
-        return [
-          coords[0] + (Math.random() - 0.5) * 4,
-          coords[1] + (Math.random() - 0.5) * 2
-        ];
-      }
-    }
-
-    // Default to random US coordinates
-    return [
-      -125 + Math.random() * 50, // US longitude range
-      25 + Math.random() * 25    // US latitude range
-    ];
-  };
-
-  // Toggle weather layer visibility
+  // Add markers when alerts change
   useEffect(() => {
-    if (!map.current || !mapLoaded) return;
+    if (!map.current || !initialized || isLoading) return;
 
-    const visibility = showWeatherLayer ? 'visible' : 'none';
-    
-    if (map.current.getLayer('weather-alerts-clusters')) {
-      map.current.setLayoutProperty('weather-alerts-clusters', 'visibility', visibility);
-    }
-    if (map.current.getLayer('weather-alerts-cluster-count')) {
-      map.current.setLayoutProperty('weather-alerts-cluster-count', 'visibility', visibility);
-    }
-    if (map.current.getLayer('weather-alerts-points')) {
-      map.current.setLayoutProperty('weather-alerts-points', 'visibility', visibility);
-    }
-  }, [showWeatherLayer, mapLoaded]);
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
 
-  const getSeverityBadge = (severity: string) => {
-    const colors = {
-      'Extreme': 'bg-red-800 text-white',
-      'Severe': 'bg-red-600 text-white',
-      'Moderate': 'bg-yellow-500 text-white',
-      'Minor': 'bg-blue-500 text-white'
-    };
-    
-    return (
-      <Badge className={`${colors[severity as keyof typeof colors] || 'bg-gray-500 text-white'} text-xs`}>
-        {severity}
-      </Badge>
-    );
+    // Add state markers
+    Object.entries(statesWithAlerts).forEach(([stateCode, stateAlerts]) => {
+      const stateData = US_STATES[stateCode as keyof typeof US_STATES];
+      if (!stateData) return;
+
+      const alertCount = stateAlerts.length;
+
+      // Create marker element
+      const markerEl = document.createElement('div');
+      markerEl.className = 'alert-marker';
+      markerEl.innerHTML = `
+        <div style="
+          background: #ff6b35;
+          border: 3px solid #fff;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        ">${alertCount}</div>
+      `;
+
+      // Add hover effects
+      markerEl.addEventListener('mouseenter', () => {
+        markerEl.style.transform = 'scale(1.1)';
+      });
+
+      markerEl.addEventListener('mouseleave', () => {
+        markerEl.style.transform = 'scale(1)';
+      });
+
+      // Create popup content
+      const popupContent = `
+        <div style="max-width: 300px; font-family: system-ui;">
+          <h4 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937; font-size: 16px;">
+            ${stateData.name} (${stateCode})
+          </h4>
+          <div style="margin-bottom: 12px; padding: 6px 12px; background: #ff6b35; color: white; border-radius: 4px; text-align: center; font-size: 14px; font-weight: 600;">
+            ${alertCount} Active Alert${alertCount !== 1 ? 's' : ''}
+          </div>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${stateAlerts.slice(0, 4).map((alert: WeatherAlert) => `
+              <div style="margin-bottom: 8px; padding: 8px; border-left: 4px solid #ff6b35; background: #f9fafb; border-radius: 0 4px 4px 0;">
+                <div style="font-weight: 600; font-size: 13px; color: #374151; margin-bottom: 2px;">${alert.event}</div>
+                <div style="font-size: 12px; color: #6b7280;">${alert.severity} • ${alert.urgency}</div>
+              </div>
+            `).join('')}
+            ${alertCount > 4 ? `
+              <div style="text-align: center; color: #6b7280; font-size: 12px; padding: 4px;">
+                ... and ${alertCount - 4} more alerts
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      // Create marker with popup
+      const marker = new mapboxgl.Marker(markerEl)
+        .setLngLat([stateData.coords[0], stateData.coords[1]])
+        .setPopup(new mapboxgl.Popup().setHTML(popupContent))
+        .addTo(map.current!);
+
+      markersRef.current.push(marker);
+    });
+
+    console.log(`✓ Added ${Object.keys(statesWithAlerts).length} weather alert markers`);
+  }, [statesWithAlerts, initialized, isLoading]);
+
+  // Toggle weather layers
+  const toggleWeatherLayer = (layerType: 'radar' | 'clouds') => {
+    if (!map.current || !initialized) return;
+
+    // Reset all layers to invisible
+    map.current.setPaintProperty('radar-layer', 'raster-opacity', 0);
+    map.current.setPaintProperty('clouds-layer', 'raster-opacity', 0);
+
+    if (weatherLayer === layerType) {
+      // Toggle off if same layer
+      setWeatherLayer('none');
+    } else {
+      // Show selected layer
+      const opacity = layerType === 'radar' ? 0.7 : 0.6;
+      map.current.setPaintProperty(`${layerType}-layer`, 'raster-opacity', opacity);
+      setWeatherLayer(layerType);
+      console.log(`✓ ${layerType} layer activated`);
+    }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+      <div className="w-full h-full bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading interactive weather map...</p>
-          <p className="text-sm text-gray-500 mt-2">
-            Initializing Mapbox GL JS and loading {weatherAlerts.length} weather alerts
-          </p>
-          <button 
-            onClick={() => {
-              console.log('Force completing load...');
-              setLoading(false);
-              setMapLoaded(true);
-            }}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-          >
-            Force Load Map
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!import.meta.env.VITE_MAPBOX_TOKEN) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-        <div className="text-center text-gray-600">
-          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h3 className="text-xl font-bold mb-2">Mapbox Token Required</h3>
-          <p className="max-w-md">
-            Please add your VITE_MAPBOX_TOKEN to the environment variables to display the interactive weather map.
-          </p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading weather data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`relative w-full h-full ${className}`}>
+    <div className="relative w-full h-full">
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full" />
+      <div 
+        ref={mapContainer} 
+        className="w-full h-full"
+        style={{ 
+          minHeight: '500px',
+          position: 'relative'
+        }} 
+      />
       
-      {/* Layer Controls */}
-      <Card className="absolute top-4 left-4 w-72 bg-white/95 backdrop-blur-sm shadow-lg z-10">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Layers className="w-5 h-5" />
-            Weather Layers
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CloudRain className="w-4 h-4 text-blue-600" />
-              <div>
-                <div className="font-medium text-sm">Weather Alerts</div>
-                <div className="text-xs text-gray-500">
-                  {weatherAlerts.length} active alerts
-                </div>
-              </div>
-            </div>
-            <Switch
-              checked={showWeatherLayer}
-              onCheckedChange={setShowWeatherLayer}
-            />
+      {/* Alert Counter */}
+      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white z-10">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-orange-500" />
+          <div>
+            <div className="font-bold text-sm">{Object.keys(statesWithAlerts).length} States with Alerts</div>
+            <div className="text-xs text-gray-300">Warnings & Watches Only</div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Stats Panel */}
-      <Card className="absolute top-4 right-4 w-64 bg-white/95 backdrop-blur-sm shadow-lg z-10">
-        <CardContent className="pt-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Activity className="w-5 h-5 text-green-500" />
-            <span className="font-semibold">Live Weather Data</span>
-          </div>
-          
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Total Alerts:</span>
-              <span className="font-medium">{weatherAlerts.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Extreme:</span>
-              <span className="font-medium text-red-600">
-                {weatherAlerts.filter(a => a.severity === 'Extreme').length}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Severe:</span>
-              <span className="font-medium text-red-500">
-                {weatherAlerts.filter(a => a.severity === 'Severe').length}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Moderate:</span>
-              <span className="font-medium text-yellow-600">
-                {weatherAlerts.filter(a => a.severity === 'Moderate').length}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Legend */}
-      <Card className="absolute bottom-4 right-4 w-56 bg-white/95 backdrop-blur-sm shadow-lg z-10">
-        <CardContent className="pt-4">
-          <div className="text-sm font-semibold mb-3">Alert Severity</div>
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-800 rounded-full"></div>
-              <span>Extreme Risk</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-600 rounded-full"></div>
-              <span>Severe Risk</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span>Moderate Risk</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span>Minor Risk</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Alert Detail Modal */}
-      {selectedAlert && (
-        <Card className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 bg-white shadow-2xl z-50 max-h-[80vh] overflow-y-auto">
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  {getWeatherIcon(selectedAlert.event)}
-                  {selectedAlert.event}
-                </CardTitle>
-                <div className="flex items-center gap-2 mt-2">
-                  {getSeverityBadge(selectedAlert.severity)}
-                  <Badge variant="outline" className="text-xs">
-                    {selectedAlert.urgency}
-                  </Badge>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSelectedAlert(null);
-                  popup.current?.remove();
-                }}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-1">Area</div>
-              <div className="text-sm text-gray-900">{selectedAlert.areaDesc}</div>
-            </div>
-            
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-1">Description</div>
-              <div className="text-sm text-gray-900 leading-relaxed">
-                {selectedAlert.description}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <div className="font-medium text-gray-700">Effective</div>
-                <div className="text-gray-900">
-                  {new Date(selectedAlert.effective).toLocaleString()}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium text-gray-700">Expires</div>
-                <div className="text-gray-900">
-                  {new Date(selectedAlert.expires).toLocaleString()}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button size="sm" variant="outline" className="flex-1">
-                <MapPin className="w-4 h-4 mr-1" />
-                View on Map
-              </Button>
-              <Button size="sm" className="flex-1">
-                Get Updates
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Weather Layer Controls */}
+      <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 text-white z-10">
+        <div className="flex gap-1">
+          <button
+            onClick={() => toggleWeatherLayer('radar')}
+            className={`flex items-center gap-2 px-3 py-2 hover:bg-white/20 rounded transition-colors text-sm ${
+              weatherLayer === 'radar' ? 'bg-white/20' : ''
+            }`}
+            title="Toggle precipitation radar"
+          >
+            <Layers className="w-4 h-4" />
+            Radar
+          </button>
+          <button
+            onClick={() => toggleWeatherLayer('clouds')}
+            className={`flex items-center gap-2 px-3 py-2 hover:bg-white/20 rounded transition-colors text-sm ${
+              weatherLayer === 'clouds' ? 'bg-white/20' : ''
+            }`}
+            title="Toggle cloud cover"
+          >
+            <Cloud className="w-4 h-4" />
+            Clouds  
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default MapboxWeatherMap;
+}
