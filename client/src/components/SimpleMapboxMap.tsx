@@ -398,7 +398,7 @@ export default function SimpleMapboxMap() {
           <!-- Enhanced Header with State Info -->
           <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 72px; height: 72px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255, 107, 53, 0.6); padding: 4px; box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3); position: relative; overflow: hidden;">
+              <div style="width: 72px; height: 72px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255, 107, 53, 0.6); padding: 4px; box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3); position: relative;">
                 <img 
                   src="/attached_assets/${encodeURIComponent(STATE_ICONS[stateCode as keyof typeof STATE_ICONS])}" 
                   alt="${stateData.name} State Silhouette" 
@@ -407,7 +407,7 @@ export default function SimpleMapboxMap() {
                   onerror="console.log('Failed to load state icon for ${stateCode}:', '${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}', 'encoded:', encodeURIComponent('${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
                 />
                 <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; text-align: center; width: 100%; height: 100%; align-items: center; justify-content: center;">${stateCode}</div>
-                <div style="position: absolute; top: -8px; right: -8px; background: #ff6b35; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${alertCount}</div>
+                <div style="position: absolute; top: -8px; right: -8px; background: #ff6b35; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 30;">${alertCount}</div>
               </div>
               <div>
                 <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">${stateData.name}</h3>
