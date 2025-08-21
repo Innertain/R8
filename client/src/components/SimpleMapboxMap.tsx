@@ -309,8 +309,9 @@ export default function SimpleMapboxMap() {
         }
       });
       
-      disasterCounties.slice(0, 20).forEach((disaster, i) => {
-        if (!disaster.coordinates?.longitude || !disaster.coordinates?.latitude) return;
+      for (let i = 0; i < Math.min(disasterCounties.length, 20); i++) {
+        const disaster = disasterCounties[i];
+        if (!disaster.coordinates?.longitude || !disaster.coordinates?.latitude) continue;
         
         const severity = (disaster.deaths || 0) * 10 + (disaster.damageProperty || 0) / 1000000000 * 5;
         const size = Math.max(15, Math.min(35, severity / 10));
@@ -335,7 +336,7 @@ export default function SimpleMapboxMap() {
           
         markersRef.current.push(marker);
         console.log(`🔥 FORCED marker ${i+1}: ${disaster.eventType} at [${disaster.coordinates.longitude}, ${disaster.coordinates.latitude}]`);
-      });
+      }
       
       console.log(`🔥 FORCED ${Math.min(disasterCounties.length, 20)} disaster markers onto map`);
     }
@@ -1154,6 +1155,112 @@ export default function SimpleMapboxMap() {
     // Execute the async wildfire marker addition only if enabled
     if (showWildfires && wildfires.length > 0) {
       addWildfireMarkers();
+    }
+    
+    // DIRECT DISASTER MARKER CREATION - INTEGRATED WITH WILDFIRE SYSTEM
+    const addDisasterMarkers = async () => {
+      if (!showDisasterCounties || disasterCounties.length === 0 || !map.current) {
+        console.log(`❌ Disaster markers skipped: show=${showDisasterCounties}, count=${disasterCounties.length}, map=${!!map.current}`);
+        return;
+      }
+      
+      console.log(`🚨 ADDING DISASTER MARKERS DIRECTLY: ${disasterCounties.length} disasters`);
+      
+      for (let i = 0; i < Math.min(disasterCounties.length, 20); i++) {
+        const disaster = disasterCounties[i];
+        if (!disaster.coordinates?.longitude || !disaster.coordinates?.latitude) {
+          console.log(`❌ Skipping disaster ${i+1}: ${disaster.eventType} - no coordinates`);
+          continue;
+        }
+        
+        // Calculate severity and visual properties
+        const deaths = disaster.deaths || 0;
+        const damage = disaster.damageProperty || 0;
+        const severity = deaths * 10 + (damage / 1000000000) * 5;
+        const size = Math.max(20, Math.min(45, severity / 15 + 20));
+        
+        // Severity-based colors
+        let color = '#fbbf24'; // Default yellow
+        if (severity > 1000) color = '#7f1d1d'; // Dark red for highest severity
+        else if (severity > 500) color = '#dc2626'; // Red for high severity 
+        else if (severity > 200) color = '#f97316'; // Orange for medium severity
+        else if (severity > 50) color = '#eab308'; // Yellow-orange for low severity
+        
+        // Create disaster marker element
+        const el = document.createElement('div');
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+        el.style.backgroundColor = color;
+        el.style.borderRadius = '50%';
+        el.style.border = '3px solid white';
+        el.style.cursor = 'pointer';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.fontSize = `${size * 0.4}px`;
+        el.style.boxShadow = `0 0 ${size * 0.8}px ${color}66`;
+        el.style.position = 'relative';
+        el.style.zIndex = '600';
+        
+        // Add emoji based on severity and type
+        if (severity > 500) {
+          el.textContent = '💀'; // High casualty disasters
+        } else if (disaster.eventType?.toLowerCase().includes('fire')) {
+          el.textContent = '🔥'; // Fire events
+        } else if (disaster.eventType?.toLowerCase().includes('flood')) {
+          el.textContent = '💧'; // Flood events  
+        } else if (disaster.eventType?.toLowerCase().includes('hurricane')) {
+          el.textContent = '🌀'; // Hurricane events
+        } else {
+          el.textContent = '⚠️'; // Other disasters
+        }
+        
+        // Create popup with disaster details
+        const popup = new mapboxgl.Popup({
+          closeButton: true,
+          closeOnClick: true,
+          maxWidth: '300px'
+        }).setHTML(`
+          <div style="font-family: system-ui, sans-serif;">
+            <div style="background: ${color}; color: white; padding: 12px; margin: -10px -10px 12px -10px; border-radius: 6px 6px 0 0;">
+              <h3 style="margin: 0; font-size: 16px;">${disaster.eventType} in ${disaster.state}</h3>
+              <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">
+                ${disaster.beginDate ? new Date(disaster.beginDate).toLocaleDateString() : 'Date TBD'}
+              </div>
+            </div>
+            <div style="padding: 4px;">
+              ${deaths > 0 ? `<div style="margin-bottom: 6px;"><strong>Deaths:</strong> ${deaths}</div>` : ''}
+              ${disaster.injuries > 0 ? `<div style="margin-bottom: 6px;"><strong>Injuries:</strong> ${disaster.injuries}</div>` : ''}
+              ${damage > 0 ? `<div style="margin-bottom: 6px;"><strong>Damage:</strong> $${(damage / 1000000000).toFixed(1)}B</div>` : ''}
+              <div style="font-size: 11px; color: #666; margin-top: 8px;">
+                Severity Score: ${severity.toFixed(1)}
+              </div>
+            </div>
+          </div>
+        `);
+        
+        try {
+          const marker = new mapboxgl.Marker(el)
+            .setLngLat([disaster.coordinates.longitude, disaster.coordinates.latitude])
+            .setPopup(popup)
+            .addTo(map.current!);
+          
+          markersRef.current.push(marker);
+          console.log(`✅ DISASTER MARKER ${i+1}: ${disaster.eventType} in ${disaster.state} at [${disaster.coordinates.longitude}, ${disaster.coordinates.latitude}] - severity: ${severity.toFixed(1)}`);
+          
+          // Small delay to prevent browser freeze
+          await new Promise(resolve => setTimeout(resolve, 50));
+        } catch (error) {
+          console.error(`❌ Failed to create disaster marker ${i+1}:`, error);
+        }
+      }
+      
+      console.log(`✅ DISASTER MARKERS COMPLETE: Added ${Math.min(disasterCounties.length, 20)} disaster markers`);
+    };
+    
+    // Execute disaster marker addition if enabled
+    if (showDisasterCounties && disasterCounties.length > 0) {
+      addDisasterMarkers();
     }
     
     // FORCE disaster county highlighting markers using actual county coordinates
