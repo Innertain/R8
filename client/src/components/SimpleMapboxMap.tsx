@@ -205,7 +205,7 @@ export default function SimpleMapboxMap() {
   console.log('🔍 Extreme Weather Response:', extremeWeatherResponse);
   
   // Extract first few events for debugging
-  if (extremeWeatherResponse?.events?.length > 0) {
+  if (extremeWeatherResponse?.events && extremeWeatherResponse.events.length > 0) {
     console.log('🔍 First 3 disasters:', extremeWeatherResponse.events.slice(0, 3).map(e => ({
       id: e.id,
       eventType: e.eventType,
@@ -905,19 +905,25 @@ export default function SimpleMapboxMap() {
         const batch = wildfires.slice(i, i + batchSize);
         
         for (const [batchIndex, incident] of batch.entries()) {
-          const index = i + batchIndex;
-          const stateData = US_STATES[incident.state as keyof typeof US_STATES];
-          if (!stateData) continue;
+          try {
+            const index = i + batchIndex;
+            const stateData = US_STATES[incident.state as keyof typeof US_STATES];
+            if (!stateData) continue;
 
-          let lng, lat;
-          
-          // Try to extract and geocode specific location from title
-          const extractedLocation = extractLocationFromTitle(incident.title);
-          let coordinates: [number, number] | null = null;
-          
-          if (extractedLocation) {
-            coordinates = await geocodeLocationCached(extractedLocation, incident.state);
-          }
+            let lng, lat;
+            
+            // Try to extract and geocode specific location from title
+            const extractedLocation = extractLocationFromTitle(incident.title);
+            let coordinates: [number, number] | null = null;
+            
+            if (extractedLocation) {
+              try {
+                coordinates = await geocodeLocationCached(extractedLocation, incident.state);
+              } catch (error) {
+                console.log(`❌ Geocoding error for ${extractedLocation}: ${error}`);
+                coordinates = null;
+              }
+            }
           
           if (coordinates) {
             [lng, lat] = coordinates;
@@ -1121,13 +1127,16 @@ export default function SimpleMapboxMap() {
         </style>
       `);
 
-      // Create and add wildfire marker
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([lng, lat])
-        .setPopup(popup)
-        .addTo(map.current!);
+            // Create and add wildfire marker
+            const marker = new mapboxgl.Marker(el)
+              .setLngLat([lng, lat])
+              .setPopup(popup)
+              .addTo(map.current!);
 
-          markersRef.current.push(marker);
+            markersRef.current.push(marker);
+          } catch (error) {
+            console.log(`❌ Failed to create wildfire marker: ${error}`);
+          }
         }
         
         // Removed batch delay for faster loading
