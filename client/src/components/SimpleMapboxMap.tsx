@@ -605,12 +605,17 @@ export default function SimpleMapboxMap() {
 
     console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
 
-    // Add wildfire incident markers
-    wildfires.forEach((incident) => {
+    // Add wildfire incident markers with offset positioning to avoid overlapping weather markers
+    wildfires.forEach((incident, index) => {
       const stateData = US_STATES[incident.state as keyof typeof US_STATES];
       if (!stateData) return;
 
-      const [lng, lat] = stateData.coords;
+      // Offset wildfire markers to avoid overlapping with weather markers
+      const baseCoords = stateData.coords;
+      const offsetDistance = 0.3; // degrees
+      const angle = (index * 60) * (Math.PI / 180); // Spread multiple wildfires in circle
+      const lng = baseCoords[0] + (offsetDistance * Math.cos(angle));
+      const lat = baseCoords[1] + (offsetDistance * Math.sin(angle));
       
       // Create wildfire marker element
       const el = document.createElement('div');
@@ -825,7 +830,7 @@ export default function SimpleMapboxMap() {
               <span className="text-orange-400 ml-1">States</span>
             </div>
             <div className="text-sm text-slate-300">
-              {filteredAlerts.length} Weather Alerts • {wildfires.length} Wildfires
+              {filteredAlerts.length} Weather • {wildfires.length} Wildfires
               {isLoading && <span className="ml-2 text-yellow-400 animate-pulse">●</span>}
               {error && <span className="ml-2 text-red-400 animate-bounce">⚠</span>}
             </div>
