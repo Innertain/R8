@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import mapboxgl from 'mapbox-gl';
 import { AlertTriangle, MapPin, Layers } from 'lucide-react';
 
-// Initialize Mapbox
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+// Initialize Mapbox - token should be available
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 // US States coordinates
 const US_STATES = {
@@ -124,9 +124,9 @@ export function RealMapboxWeatherMap() {
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    // Check if we have a valid Mapbox token
-    if (!import.meta.env.VITE_MAPBOX_TOKEN) {
-      console.error('Mapbox token not found');
+    // Verify Mapbox token is available
+    if (!mapboxgl.accessToken) {
+      console.error('Mapbox token not properly set');
       return;
     }
 
@@ -147,14 +147,16 @@ export function RealMapboxWeatherMap() {
       map.current.on('load', () => {
         if (!map.current) return;
 
-        // Add free precipitation radar from RainViewer 
+        // Add weather overlays
         try {
+          // RainViewer precipitation radar
           map.current.addSource('rainviewer-radar', {
             type: 'raster',
             tiles: [
               'https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png'
             ],
-            tileSize: 256
+            tileSize: 256,
+            attribution: 'RainViewer'
           });
 
           map.current.addLayer({
@@ -162,13 +164,32 @@ export function RealMapboxWeatherMap() {
             type: 'raster',
             source: 'rainviewer-radar',
             paint: {
-              'raster-opacity': 0.7
+              'raster-opacity': 0.0  // Start hidden
+            }
+          });
+
+          // Add clouds overlay as temperature alternative (no API key needed)
+          map.current.addSource('clouds-tiles', {
+            type: 'raster',
+            tiles: [
+              'https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png'
+            ],
+            tileSize: 256,
+            attribution: 'OpenWeatherMap'
+          });
+
+          map.current.addLayer({
+            id: 'clouds-layer',
+            type: 'raster',
+            source: 'clouds-tiles',
+            paint: {
+              'raster-opacity': 0.0  // Start hidden
             }
           });
           
-          console.log('✓ Added precipitation radar layer');
+          console.log('✓ Added weather overlay layers');
         } catch (error) {
-          console.warn('Could not add radar layer:', error);
+          console.warn('Could not add weather layers:', error);
         }
 
         setInitialized(true);
@@ -286,16 +307,17 @@ export function RealMapboxWeatherMap() {
       const currentOpacity = map.current.getPaintProperty('radar-layer', 'raster-opacity');
       const newOpacity = currentOpacity > 0 ? 0 : 0.7;
       map.current.setPaintProperty('radar-layer', 'raster-opacity', newOpacity);
-      map.current.setPaintProperty('temperature-layer', 'raster-opacity', 0);
-    } else if (layerType === 'temperature') {
-      // Toggle temperature layer  
-      const currentOpacity = map.current.getPaintProperty('temperature-layer', 'raster-opacity');
+      map.current.setPaintProperty('clouds-layer', 'raster-opacity', 0);
+    } else if (layerType === 'clouds') {
+      // Toggle clouds layer  
+      const currentOpacity = map.current.getPaintProperty('clouds-layer', 'raster-opacity');
       const newOpacity = currentOpacity > 0 ? 0 : 0.6;
-      map.current.setPaintProperty('temperature-layer', 'raster-opacity', newOpacity);
+      map.current.setPaintProperty('clouds-layer', 'raster-opacity', newOpacity);
       map.current.setPaintProperty('radar-layer', 'raster-opacity', 0);
     }
     
     setWeatherLayer(layerType);
+    console.log(`✓ Toggled ${layerType} overlay`);
   };
 
   if (isLoading) {
@@ -321,17 +343,7 @@ export function RealMapboxWeatherMap() {
     );
   }
 
-  if (!import.meta.env.VITE_MAPBOX_TOKEN) {
-    return (
-      <div className="w-full h-full bg-slate-900 flex items-center justify-center">
-        <div className="text-center p-8">
-          <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-yellow-500 mb-2">Mapbox Token Required</h3>
-          <p className="text-gray-300">Please configure your Mapbox access token to view the interactive weather map.</p>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="relative w-full h-full">
@@ -367,14 +379,14 @@ export function RealMapboxWeatherMap() {
             Radar
           </button>
           <button
-            onClick={() => toggleWeatherLayer('temperature')}
+            onClick={() => toggleWeatherLayer('clouds')}
             className={`flex items-center gap-2 px-3 py-2 hover:bg-white/20 rounded transition-colors text-sm ${
-              weatherLayer === 'temperature' ? 'bg-white/20' : ''
+              weatherLayer === 'clouds' ? 'bg-white/20' : ''
             }`}
-            title="Toggle temperature overlay"
+            title="Toggle cloud cover overlay"
           >
-            <div className="w-4 h-4 bg-gradient-to-r from-blue-400 to-red-400 rounded" />
-            Temp
+            <div className="w-4 h-4 bg-gradient-to-r from-gray-400 to-white rounded" />
+            Clouds
           </button>
         </div>
       </div>
