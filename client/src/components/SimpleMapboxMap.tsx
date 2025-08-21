@@ -521,16 +521,17 @@ export default function SimpleMapboxMap() {
     };
   }, []);
 
-  // Add weather alert markers
+  // Add weather alert markers and manage all marker types
   useEffect(() => {
-    if (!map.current || !Object.keys(statesWithAlerts).length) return;
+    if (!map.current) return;
 
-    // Clear existing markers
+    // Clear ALL existing markers when any toggle state changes
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
+    console.log('🧹 Cleared all markers due to toggle change');
 
-    // Add weather alert markers only if enabled
-    if (showWeatherAlerts) {
+    // Add weather alert markers only if enabled and have data
+    if (showWeatherAlerts && Object.keys(statesWithAlerts).length > 0) {
       Object.entries(statesWithAlerts).forEach(([stateCode, alerts], stateIndex) => {
       const stateData = US_STATES[stateCode as keyof typeof US_STATES];
       if (!stateData) return;
@@ -1101,7 +1102,10 @@ export default function SimpleMapboxMap() {
 
     // Execute the async wildfire marker addition only if enabled
     if (showWildfires && wildfires.length > 0) {
+      console.log('🔥 Adding wildfire markers - toggle ON');
       addWildfireMarkers();
+    } else {
+      console.log('🔥 Skipping wildfire markers - toggle OFF or no data');
     }
     
     // DIRECT DISASTER MARKER CREATION - INTEGRATED WITH WILDFIRE SYSTEM
