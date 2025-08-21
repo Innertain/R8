@@ -285,16 +285,21 @@ export default function SimpleMapboxMap() {
 
   // Use extreme weather events directly for disaster markers (show ALL disasters, not just 15!)
   const disasterCounties = extremeWeatherEvents; // Show all 45 disasters
-  console.log(`🔍 Processed disasterCounties: ${disasterCounties.length} events available out of ${extremeWeatherEvents.length} total disasters`);
+  console.log(`🔍 Processed disasterCounties: ${disasterCounties.length} events available out of ${extremeWeatherEvents?.length || 0} total disasters`);
   
   // Add debug log for heat map trigger
   console.log(`🌡️ Heat map trigger check: showDisasterCounties=${showDisasterCounties}, disasterCount=${disasterCounties.length}, mapReady=${!!map.current}`);
   
-  // FORCE disaster markers to appear - bypass all React issues
+  // FORCE disaster markers to appear - completely bypass React rendering issues
   React.useEffect(() => {
-    if (!map.current) return;
+    console.log(`🚨 FORCE EFFECT TRIGGERED: map=${!!map.current}, show=${showDisasterCounties}, disasters=${disasterCounties.length}`);
     
-    console.log(`🚨 FORCING DISASTER MARKERS: ${disasterCounties.length} disasters available`);
+    if (!map.current) {
+      console.log(`❌ FORCE EFFECT: Map not ready yet`);
+      return;
+    }
+    
+    console.log(`🚨 FORCING DISASTER MARKERS NOW: ${disasterCounties.length} disasters available`);
     
     if (showDisasterCounties && disasterCounties.length > 0) {
       // Clear existing disaster markers first
@@ -326,7 +331,7 @@ export default function SimpleMapboxMap() {
         
         const marker = new mapboxgl.Marker(el)
           .setLngLat([disaster.coordinates.longitude, disaster.coordinates.latitude])
-          .addTo(map.current);
+          .addTo(map.current!);
           
         markersRef.current.push(marker);
         console.log(`🔥 FORCED marker ${i+1}: ${disaster.eventType} at [${disaster.coordinates.longitude}, ${disaster.coordinates.latitude}]`);
