@@ -236,13 +236,27 @@ export default function SimpleMapboxMap() {
     return null;
   };
 
-  // Enhanced geocoding with caching and fallback
+  // Enhanced geocoding with caching and fallback - with robust error handling
   const geocodeLocationCached = async (locationString: string, state: string): Promise<[number, number] | null> => {
     const cacheKey = `${locationString}, ${state}`;
     
     try {
-      // Try with full location first
-      let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cacheKey)}&countrycodes=us&limit=1`);
+      // Try with full location first with timeout and proper error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cacheKey)}&countrycodes=us&limit=1`, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Disaster-Map-Application/1.0'
+        }
+      });
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
       let data = await response.json();
       
       if (data && data.length > 0) {
@@ -254,9 +268,23 @@ export default function SimpleMapboxMap() {
         }
       }
       
-      // Fallback: Try just the location name + state
+      // Fallback: Try just the location name + state with timeout
       const fallbackQuery = `${locationString} ${state}`;
-      response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}&countrycodes=us&limit=1`);
+      const controller2 = new AbortController();
+      const timeoutId2 = setTimeout(() => controller2.abort(), 5000);
+      
+      response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}&countrycodes=us&limit=1`, {
+        signal: controller2.signal,
+        headers: {
+          'User-Agent': 'Disaster-Map-Application/1.0'
+        }
+      });
+      clearTimeout(timeoutId2);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
       data = await response.json();
       
       if (data && data.length > 0) {
@@ -269,8 +297,15 @@ export default function SimpleMapboxMap() {
       }
       
       return null;
-    } catch (error) {
-      console.log('Geocoding failed for:', cacheKey);
+    } catch (error: any) {
+      // More detailed error logging but don't throw - gracefully fallback
+      if (error.name === 'AbortError') {
+        console.log(`⏱️ Geocoding timeout for: ${cacheKey}`);
+      } else if (error.message?.includes('Failed to fetch')) {
+        console.log(`🌐 Network error geocoding: ${cacheKey}`);
+      } else {
+        console.log(`❌ Geocoding failed for: ${cacheKey} - ${error.message || error}`);
+      }
       return null;
     }
   };
