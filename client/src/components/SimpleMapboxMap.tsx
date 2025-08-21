@@ -40,12 +40,8 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
         console.log('Mapbox map loaded successfully');
         setInitialized(true);
         
-        // Add test markers first
-        addTestMarkers();
-        
-        setTimeout(() => {
-          addWeatherAlerts();
-        }, 1000);
+        // Load weather alerts immediately
+        addWeatherAlerts();
       });
 
       map.current.on('error', (e) => {
@@ -63,30 +59,8 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
     };
   }, []);
 
-  // Add test markers to verify map is working
-  const addTestMarkers = () => {
-    if (!map.current) return;
-    
-    console.log('Adding test markers to verify map functionality');
-    
-    // Add test markers
-    const testMarker1 = new mapboxgl.Marker({ color: 'red' })
-      .setLngLat([-74.006, 40.7128]) // New York
-      .setPopup(new mapboxgl.Popup().setHTML('<h3>Test Marker 1</h3><p>New York City</p>'))
-      .addTo(map.current);
-      
-    const testMarker2 = new mapboxgl.Marker({ color: 'blue' })
-      .setLngLat([-118.2437, 34.0522]) // Los Angeles
-      .setPopup(new mapboxgl.Popup().setHTML('<h3>Test Marker 2</h3><p>Los Angeles</p>'))
-      .addTo(map.current);
-      
-    const testMarker3 = new mapboxgl.Marker({ color: 'green' })
-      .setLngLat([-87.6298, 41.8781]) // Chicago
-      .setPopup(new mapboxgl.Popup().setHTML('<h3>Test Marker 3</h3><p>Chicago</p>'))
-      .addTo(map.current);
-      
-    console.log('✓ 3 test markers added to map');
-  };
+  // Store weather markers for toggling
+  const weatherMarkersRef = useRef<mapboxgl.Marker[]>([]);
 
   const addWeatherAlerts = async () => {
     if (!map.current || !initialized) return;
@@ -131,56 +105,81 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
         // Add weather markers with proper icons
         console.log('Creating weather markers with event-specific icons');
         
+        // Clear existing markers
+        weatherMarkersRef.current.forEach(marker => marker.remove());
+        weatherMarkersRef.current = [];
+
         features.forEach((feature: any, index: number) => {
           const coords = feature.geometry.coordinates;
           const props = feature.properties;
           
           // Get weather icon and color
-          const icon = getWeatherIcon(props.title);
+          const icon = getWeatherIcon(props.event || props.title);
           const color = getSeverityColor(props.severity);
           
           // Create custom HTML marker
           const el = document.createElement('div');
-          el.style.width = '30px';
-          el.style.height = '30px';
+          el.style.width = '32px';
+          el.style.height = '32px';
           el.style.borderRadius = '50%';
           el.style.backgroundColor = color;
-          el.style.border = '2px solid white';
+          el.style.border = '3px solid white';
           el.style.display = 'flex';
           el.style.alignItems = 'center';
           el.style.justifyContent = 'center';
-          el.style.fontSize = '16px';
+          el.style.fontSize = '14px';
           el.style.cursor = 'pointer';
-          el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+          el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.4)';
           el.innerHTML = icon;
-          el.title = `${props.title} - ${props.severity}`;
+          el.title = `${props.event || props.title} - ${props.severity}`;
           
           // Create marker with popup
           const marker = new mapboxgl.Marker(el)
             .setLngLat([coords[0], coords[1]])
             .setPopup(new mapboxgl.Popup().setHTML(`
-              <div style="padding: 10px; max-width: 250px;">
+              <div style="padding: 12px; max-width: 280px;">
                 <h3 style="margin: 0 0 8px 0; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 20px;">${icon}</span>
-                  ${props.title}
+                  <span style="font-size: 18px;">${icon}</span>
+                  ${props.event || props.title}
                 </h3>
                 <p style="margin: 0 0 6px 0; color: #666; font-size: 12px;">${props.area}</p>
                 <div style="padding: 4px 8px; background: ${color}; color: white; border-radius: 4px; font-size: 12px; display: inline-block; margin-bottom: 8px;">
-                  ${props.severity}
+                  ${props.severity} • ${props.urgency}
                 </div>
                 <p style="margin: 0; font-size: 13px; line-height: 1.4;">
-                  ${props.description.substring(0, 150)}...
+                  ${props.description.substring(0, 200)}${props.description.length > 200 ? '...' : ''}
                 </p>
               </div>
             `))
             .addTo(map.current!);
+            
+          weatherMarkersRef.current.push(marker);
         });
         
         console.log('✓', features.length, 'weather alert markers with icons added to map');
+      } else {
+        console.error('❌ No weather alerts found or API call failed');
+        setAlertCount(0);
       }
     } catch (error) {
-      console.error('Error loading weather alerts:', error);
+      console.error('❌ Error loading weather alerts:', error);
+      setAlertCount(0);
     }
+  };
+
+  const getWeatherIcon = (eventType: string) => {
+    const type = eventType.toLowerCase();
+    if (type.includes('tornado')) return '🌪️';
+    if (type.includes('severe thunderstorm') || type.includes('thunderstorm')) return '⛈️';
+    if (type.includes('flood') || type.includes('flash flood')) return '🌊';
+    if (type.includes('winter') || type.includes('snow') || type.includes('ice') || type.includes('blizzard')) return '❄️';
+    if (type.includes('wind') || type.includes('gale')) return '💨';
+    if (type.includes('heat') || type.includes('fire') || type.includes('excessive heat')) return '🔥';
+    if (type.includes('hurricane') || type.includes('tropical storm')) return '🌀';
+    if (type.includes('dense fog') || type.includes('fog')) return '🌫️';
+    if (type.includes('dust storm') || type.includes('dust')) return '🌪️';
+    if (type.includes('coastal flood') || type.includes('storm surge')) return '🌊';
+    return '⚠️';
   };
 
   const getSeverityColor = (severity: string) => {
@@ -263,12 +262,15 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
   };
 
   const toggleAlerts = (show: boolean) => {
-    if (!map.current) return;
+    if (!weatherMarkersRef.current) return;
     
-    const visibility = show ? 'visible' : 'none';
-    if (map.current.getLayer('weather-alerts-circles')) {
-      map.current.setLayoutProperty('weather-alerts-circles', 'visibility', visibility);
-    }
+    weatherMarkersRef.current.forEach(marker => {
+      if (show) {
+        marker.addTo(map.current!);
+      } else {
+        marker.remove();
+      }
+    });
     setShowAlerts(show);
   };
 
