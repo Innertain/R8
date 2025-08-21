@@ -39,7 +39,13 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
       map.current.on('load', () => {
         console.log('Mapbox map loaded successfully');
         setInitialized(true);
-        addWeatherAlerts();
+        
+        // Add test markers first
+        addTestMarkers();
+        
+        setTimeout(() => {
+          addWeatherAlerts();
+        }, 1000);
       });
 
       map.current.on('error', (e) => {
@@ -57,6 +63,31 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
     };
   }, []);
 
+  // Add test markers to verify map is working
+  const addTestMarkers = () => {
+    if (!map.current) return;
+    
+    console.log('Adding test markers to verify map functionality');
+    
+    // Add test markers
+    const testMarker1 = new mapboxgl.Marker({ color: 'red' })
+      .setLngLat([-74.006, 40.7128]) // New York
+      .setPopup(new mapboxgl.Popup().setHTML('<h3>Test Marker 1</h3><p>New York City</p>'))
+      .addTo(map.current);
+      
+    const testMarker2 = new mapboxgl.Marker({ color: 'blue' })
+      .setLngLat([-118.2437, 34.0522]) // Los Angeles
+      .setPopup(new mapboxgl.Popup().setHTML('<h3>Test Marker 2</h3><p>Los Angeles</p>'))
+      .addTo(map.current);
+      
+    const testMarker3 = new mapboxgl.Marker({ color: 'green' })
+      .setLngLat([-87.6298, 41.8781]) // Chicago
+      .setPopup(new mapboxgl.Popup().setHTML('<h3>Test Marker 3</h3><p>Chicago</p>'))
+      .addTo(map.current);
+      
+    console.log('✓ 3 test markers added to map');
+  };
+
   const addWeatherAlerts = async () => {
     if (!map.current || !initialized) return;
 
@@ -69,7 +100,8 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
         setAlertCount(data.alerts.length);
 
         // Create GeoJSON for weather alerts
-        const features = data.alerts.slice(0, 50).map((alert: any, index: number) => ({
+        console.log('Processing', data.alerts.length, 'alerts for map display');
+        const features = data.alerts.slice(0, 100).map((alert: any, index: number) => ({
           type: 'Feature',
           geometry: {
             type: 'Point',
@@ -88,24 +120,24 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
           features
         };
 
+        console.log('Sample feature coordinates:', features[0]?.geometry.coordinates);
+        console.log('Sample feature properties:', features[0]?.properties);
+
         // Add source
+        console.log('Adding weather alerts source with', features.length, 'features');
         map.current.addSource('weather-alerts', {
           type: 'geojson',
           data: geojson
         });
 
         // Add circles layer
+        console.log('Adding weather alerts circle layer');
         map.current.addLayer({
           id: 'weather-alerts-circles',
           type: 'circle',
           source: 'weather-alerts',
           paint: {
-            'circle-radius': [
-              'case',
-              ['==', ['get', 'severity'], 'Extreme'], 12,
-              ['==', ['get', 'severity'], 'Severe'], 10,
-              8
-            ],
+            'circle-radius': 10,
             'circle-color': [
               'case',
               ['==', ['get', 'severity'], 'Extreme'], '#8B0000',
@@ -113,11 +145,13 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
               ['==', ['get', 'severity'], 'Moderate'], '#F59E0B',
               '#3B82F6'
             ],
-            'circle-opacity': 0.8,
+            'circle-opacity': 0.9,
             'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff'
           }
         });
+        
+        console.log('Weather alerts layer added successfully');
 
         // Add popups on click
         map.current.on('click', 'weather-alerts-circles', (e) => {
@@ -151,7 +185,16 @@ const SimpleMapboxMap: React.FC<SimpleMapboxMapProps> = ({ className }) => {
           map.current!.getCanvas().style.cursor = '';
         });
 
-        console.log('Weather alerts added to map');
+        console.log('Weather alerts added to map - should be visible now');
+        
+        // Verify layer was added
+        setTimeout(() => {
+          if (map.current?.getLayer('weather-alerts-circles')) {
+            console.log('✓ Weather alerts layer confirmed on map');
+          } else {
+            console.error('✗ Weather alerts layer not found on map');
+          }
+        }, 500);
       }
     } catch (error) {
       console.error('Error loading weather alerts:', error);
