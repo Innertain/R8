@@ -290,6 +290,52 @@ export default function SimpleMapboxMap() {
   // Add debug log for heat map trigger
   console.log(`🌡️ Heat map trigger check: showDisasterCounties=${showDisasterCounties}, disasterCount=${disasterCounties.length}, mapReady=${!!map.current}`);
   
+  // FORCE disaster markers to appear - bypass all React issues
+  React.useEffect(() => {
+    if (!map.current) return;
+    
+    console.log(`🚨 FORCING DISASTER MARKERS: ${disasterCounties.length} disasters available`);
+    
+    if (showDisasterCounties && disasterCounties.length > 0) {
+      // Clear existing disaster markers first
+      markersRef.current.forEach(marker => {
+        if (marker.getElement().style.backgroundColor?.includes('#')) {
+          marker.remove();
+        }
+      });
+      
+      disasterCounties.slice(0, 20).forEach((disaster, i) => {
+        if (!disaster.coordinates?.longitude || !disaster.coordinates?.latitude) return;
+        
+        const severity = (disaster.deaths || 0) * 10 + (disaster.damageProperty || 0) / 1000000000 * 5;
+        const size = Math.max(15, Math.min(35, severity / 10));
+        const color = severity > 500 ? '#7f1d1d' : severity > 200 ? '#dc2626' : severity > 50 ? '#f97316' : '#fbbf24';
+        
+        const el = document.createElement('div');
+        el.style.width = size + 'px';
+        el.style.height = size + 'px';
+        el.style.backgroundColor = color;
+        el.style.borderRadius = '50%';
+        el.style.border = '2px solid white';
+        el.style.position = 'absolute';
+        el.style.cursor = 'pointer';
+        el.textContent = severity > 300 ? '💀' : '🔥';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([disaster.coordinates.longitude, disaster.coordinates.latitude])
+          .addTo(map.current);
+          
+        markersRef.current.push(marker);
+        console.log(`🔥 FORCED marker ${i+1}: ${disaster.eventType} at [${disaster.coordinates.longitude}, ${disaster.coordinates.latitude}]`);
+      });
+      
+      console.log(`🔥 FORCED ${Math.min(disasterCounties.length, 20)} disaster markers onto map`);
+    }
+  }, [showDisasterCounties, disasterCounties.length, map.current]);
+  
   // Create heat map visualization for major disasters based on severity
   React.useEffect(() => {
     if (!showDisasterCounties || !map.current || disasterCounties.length === 0) {
