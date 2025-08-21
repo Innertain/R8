@@ -298,9 +298,9 @@ export default function SimpleMapboxMap() {
             src="/attached_assets/${encodeURIComponent(weatherIcon)}" 
             alt="${primaryAlert.event}"
             style="width: 32px; height: 32px; object-fit: contain;"
-            onerror="console.log('Weather marker icon failed:', '${weatherIcon}', 'encoded:', encodeURIComponent('${weatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='block'"
+            onerror="console.log('Weather marker icon failed:', '${weatherIcon}', 'encoded:', encodeURIComponent('${weatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
           />
-          <div style="display: none; color: #ff6b35; font-size: 16px; font-weight: bold;">${alertCount}</div>
+          <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; width: 100%; height: 100%; align-items: center; justify-content: center;">${alertCount}</div>
           <div style="
             position: absolute;
             bottom: -4px;
