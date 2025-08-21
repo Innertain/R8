@@ -202,6 +202,8 @@ export default function SimpleMapboxMap() {
     staleTime: 60 * 60 * 1000, // 1 hour
   });
 
+  console.log('🔍 Extreme Weather Response:', extremeWeatherResponse);
+
   // Helper function to extract and geocode location from wildfire titles
   const extractLocationFromTitle = (title: string): string | null => {
     // Common patterns in wildfire incident titles
@@ -271,26 +273,9 @@ export default function SimpleMapboxMap() {
     alert.event?.toLowerCase().includes('watch')
   );
 
-  // Process extreme weather events for county highlighting
-  const processCountyData = (): DisasterCounty[] => {
-    if (!extremeWeatherEvents?.length) return [];
-    
-    return extremeWeatherEvents.slice(0, 15).map(event => {
-      // Parse county information from the event
-      const countyInfo = event.county || event.location || '';
-      const counties = countyInfo.split(',').map((c: string) => c.trim().replace(/\s+County$/, ''));
-      
-      return {
-        state: event.state || 'Unknown',
-        counties: counties.filter((c: string) => c.length > 0),
-        eventType: event.eventType || 'Disaster',
-        eventDate: event.beginDate || event.date || new Date().toISOString(),
-        id: event.id || `disaster-${Math.random()}`
-      };
-    }).filter(county => county.counties.length > 0);
-  };
-
-  const disasterCounties = processCountyData();
+  // Use extreme weather events directly for disaster markers (show up to 25, not 15!)
+  const disasterCounties = extremeWeatherEvents.slice(0, 25);
+  console.log(`🔍 Processed disasterCounties: ${disasterCounties.length} events available`);
 
   // Helper function to get weather icon for event type
   const getWeatherIcon = (eventType: string): string => {
@@ -980,9 +965,9 @@ export default function SimpleMapboxMap() {
         // Use actual coordinates from the event if available, otherwise fallback to state center
         let lng, lat;
         
-        if ((event as any).coordinates && (event as any).coordinates.longitude && (event as any).coordinates.latitude) {
-          lng = (event as any).coordinates.longitude;
-          lat = (event as any).coordinates.latitude;
+        if (event.coordinates && event.coordinates.longitude && event.coordinates.latitude) {
+          lng = event.coordinates.longitude;
+          lat = event.coordinates.latitude;
           console.log(`🚨 DISASTER ${index + 1}: Using event coordinates [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
         } else {
           const stateData = US_STATES[event.state as keyof typeof US_STATES];
@@ -1034,9 +1019,9 @@ export default function SimpleMapboxMap() {
         }
         
         // Parse county names for display
-        const countyNames = typeof (event as any).county === 'string' 
-          ? (event as any).county.split(',').map((c: any) => c.trim()).slice(0, 5)
-          : event.counties?.slice(0, 5) || ['County data unavailable'];
+        const countyNames = typeof event.county === 'string' 
+          ? event.county.split(',').map((c: any) => c.trim()).slice(0, 5)
+          : ['County data unavailable'];
         
         // Create detailed popup
         const countyPopup = new mapboxgl.Popup({
@@ -1048,7 +1033,7 @@ export default function SimpleMapboxMap() {
             <div style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 14px; margin: -10px -10px 14px -10px; border-radius: 8px 8px 0 0;">
               <h3 style="margin: 0; font-size: 17px; font-weight: 700;">🚨 ${event.eventType}</h3>
               <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; margin-top: 4px;">
-                ${event.state} • ${new Date((event as any).beginDate || event.eventDate).getFullYear()}
+                ${event.state} • ${new Date(event.beginDate || new Date()).getFullYear()}
               </div>
             </div>
             <div style="color: #374151; padding: 2px;">
@@ -1058,18 +1043,18 @@ export default function SimpleMapboxMap() {
                   ${countyNames.join(', ')}${countyNames.length >= 5 ? '+' : ''}
                 </div>
               </div>
-              ${(event as any).deaths > 0 ? `
+              ${event.deaths > 0 ? `
                 <div style="margin-bottom: 10px;">
-                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💀 Fatalities: ${(event as any).deaths}</div>
+                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💀 Fatalities: ${event.deaths}</div>
                 </div>
               ` : ''}
-              ${(event as any).damageProperty > 0 ? `
+              ${event.damageProperty > 0 ? `
                 <div style="margin-bottom: 10px;">
-                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💰 Property Damage: $${((event as any).damageProperty / 1000000).toFixed(1)}M</div>
+                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💰 Property Damage: $${(event.damageProperty / 1000000).toFixed(1)}M</div>
                 </div>
               ` : ''}
               <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280;">
-                NOAA Disaster Impact Database • ${(event as any).beginDate ? new Date((event as any).beginDate).toLocaleDateString() : 'Date TBD'}
+                NOAA Disaster Impact Database • ${event.beginDate ? new Date(event.beginDate).toLocaleDateString() : 'Date TBD'}
               </div>
             </div>
           </div>
