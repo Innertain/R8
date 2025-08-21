@@ -294,20 +294,33 @@ export default function SimpleMapboxMap() {
     if (showDisasterCounties && disasterCounties.length > 0 && map.current) {
       console.log(`🚨 IMMEDIATE DISASTER CREATION: Processing ${disasterCounties.length} disasters NOW!`);
       
-      disasterCounties.slice(0, 5).forEach((event, index) => {
-        const lng = event.coordinates?.longitude || -99;
-        const lat = event.coordinates?.latitude || 30;
+      disasterCounties.slice(0, 10).forEach((event, index) => {
+        if (!event.coordinates || !event.coordinates.longitude || !event.coordinates.latitude) {
+          console.log(`❌ Skipping disaster ${index + 1}: ${event.eventType} in ${event.state} - no valid coordinates`);
+          return;
+        }
+        
+        const lng = event.coordinates.longitude;
+        const lat = event.coordinates.latitude;
+        console.log(`🎯 DISASTER ${index + 1}: ${event.eventType} in ${event.state} using EXACT coordinates [${lng}, ${lat}]`);
         
         const el = document.createElement('div');
+        el.className = 'disaster-marker-authentic';
         el.style.cssText = `
-          width: 24px;
-          height: 24px;
-          background: #dc2626;
-          border: 2px solid #ffffff;
+          width: 28px;
+          height: 28px;
+          background: radial-gradient(circle, #dc2626, #991b1b);
+          border: 3px solid #fbbf24;
           border-radius: 50%;
           cursor: pointer;
           z-index: 999;
+          box-shadow: 0 4px 16px rgba(220, 38, 38, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
         `;
+        el.innerHTML = '🚨';
         
         try {
           const marker = new mapboxgl.Marker(el)
@@ -315,10 +328,15 @@ export default function SimpleMapboxMap() {
             .addTo(map.current!);
             
           console.log(`✅ IMMEDIATE DISASTER ${index + 1}: ${event.eventType} in ${event.state} added at [${lng}, ${lat}]`);
+          
+          // Store marker reference for cleanup
+          markersRef.current.push(marker);
         } catch (error) {
           console.error(`❌ Failed immediate disaster ${index + 1}:`, error);
         }
       });
+      
+      console.log(`✅ Created ${Math.min(disasterCounties.length, 10)} disaster markers at exact coordinates`);
     }
   }, [disasterCounties.length, showDisasterCounties, map.current]);
 
@@ -1007,117 +1025,7 @@ export default function SimpleMapboxMap() {
       console.log(`🔍 FORCE DEBUG: First disaster data:`, disasterCounties[0]);
     }
     
-    if (showDisasterCounties && disasterCounties.length > 0 && map.current) {
-      console.log(`🚨 CREATING ${disasterCounties.length} disaster county indicators NOW!`);
-      
-      // Show up to 25 events as requested (more than 15)
-      const eventsToShow = Math.min(disasterCounties.length, 25);
-      console.log(`🚨 PROCESSING ${eventsToShow} disaster events for map display - STARTING LOOP`);
-      
-      disasterCounties.slice(0, eventsToShow).forEach((event, index) => {
-        console.log(`🚨 STARTING disaster ${index + 1}: ${event.eventType} in ${event.state}`);
-        
-        // Use actual coordinates from the event if available, otherwise fallback to state center
-        let lng, lat;
-        
-        if (event.coordinates && event.coordinates.longitude && event.coordinates.latitude) {
-          lng = event.coordinates.longitude;
-          lat = event.coordinates.latitude;
-          console.log(`🚨 DISASTER ${index + 1}: Using event coordinates [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
-        } else {
-          const stateData = US_STATES[event.state as keyof typeof US_STATES];
-          if (!stateData) {
-            console.log(`❌ No state data for ${event.state}, skipping event ${index + 1}`);
-            return;
-          }
-          
-          // Add small offset from state center
-          const offset = 0.3 + (index * 0.05); // Smaller, more controlled offset
-          const angle = (index * 15) * (Math.PI / 180); // 15-degree spacing for better distribution
-          lng = stateData.coords[0] + (offset * Math.cos(angle));
-          lat = stateData.coords[1] + (offset * Math.sin(angle));
-          console.log(`🚨 DISASTER ${index + 1}: Using state offset coords [${lng}, ${lat}] for ${event.eventType} in ${event.state}`);
-        }
-        
-        // Create county disaster area marker
-        const countyEl = document.createElement('div');
-        countyEl.style.cssText = `
-          width: 28px;
-          height: 28px;
-          background: radial-gradient(circle, #dc2626, #b91c1c);
-          border: 3px solid #fbbf24;
-          border-radius: 50%;
-          cursor: pointer;
-          position: relative;
-          z-index: 250;
-          box-shadow: 0 4px 16px rgba(220, 38, 38, 0.7), 0 0 0 8px rgba(251, 191, 36, 0.3);
-          animation: none;
-        `;
-        
-        // Skip CSS injection completely to avoid React errors
-        // Use inline styles instead
-        
-        // Parse county names for display
-        const countyNames = typeof event.county === 'string' 
-          ? event.county.split(',').map((c: any) => c.trim()).slice(0, 5)
-          : ['County data unavailable'];
-        
-        // Create detailed popup
-        const countyPopup = new mapboxgl.Popup({
-          closeButton: true,
-          closeOnClick: true,
-          maxWidth: '320px'
-        }).setHTML(`
-          <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 280px;">
-            <div style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 14px; margin: -10px -10px 14px -10px; border-radius: 8px 8px 0 0;">
-              <h3 style="margin: 0; font-size: 17px; font-weight: 700;">🚨 ${event.eventType}</h3>
-              <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; margin-top: 4px;">
-                ${event.state} • ${new Date(event.beginDate || new Date()).getFullYear()}
-              </div>
-            </div>
-            <div style="color: #374151; padding: 2px;">
-              <div style="margin-bottom: 12px;">
-                <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #dc2626;">📍 Affected Counties</div>
-                <div style="background: #fef3c7; color: #92400e; padding: 8px; border-radius: 6px; font-size: 13px; line-height: 1.4;">
-                  ${countyNames.join(', ')}${countyNames.length >= 5 ? '+' : ''}
-                </div>
-              </div>
-              ${event.deaths > 0 ? `
-                <div style="margin-bottom: 10px;">
-                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💀 Fatalities: ${event.deaths}</div>
-                </div>
-              ` : ''}
-              ${event.damageProperty > 0 ? `
-                <div style="margin-bottom: 10px;">
-                  <div style="font-weight: 600; font-size: 13px; color: #dc2626;">💰 Property Damage: $${(event.damageProperty / 1000000).toFixed(1)}M</div>
-                </div>
-              ` : ''}
-              <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280;">
-                NOAA Disaster Impact Database • ${event.beginDate ? new Date(event.beginDate).toLocaleDateString() : 'Date TBD'}
-              </div>
-            </div>
-          </div>
-        `);
-        
-        try {
-          if (map.current) {
-            const countyMarker = new mapboxgl.Marker(countyEl)
-              .setLngLat([lng, lat])
-              .setPopup(countyPopup)
-              .addTo(map.current);
-            
-            markersRef.current.push(countyMarker);
-            console.log(`✅ DISASTER ${index + 1}: ${event.eventType} in ${event.state} added at [${lng}, ${lat}]`);
-          } else {
-            console.log(`❌ Map not ready for disaster ${index + 1}`);
-          }
-        } catch (error) {
-          console.error(`❌ Failed to add disaster marker ${index + 1}:`, error);
-        }
-      });
-      
-      console.log(`✅ Added ${eventsToShow} disaster county markers with real coordinates`);
-    }
+    // REMOVED OLD PROBLEMATIC DISASTER MARKER CODE - Using immediate creation instead
   }, [statesWithAlerts, wildfires, showDisasterCounties, disasterCounties, showWeatherAlerts, showWildfires, map.current]);
 
   // Debug: Log disaster data availability
