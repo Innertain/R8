@@ -365,27 +365,29 @@ export default function SimpleMapboxMap() {
       const el = document.createElement('div');
       el.innerHTML = `
         <div style="
-          background: linear-gradient(135deg, #ffffff, #f8fafc);
-          border: 3px solid #ff6b35;
+          background: linear-gradient(135deg, #ffffff, #f0f9ff);
+          border: 4px solid #0ea5e9;
           border-radius: 50%;
-          width: 56px;
-          height: 56px;
+          width: 60px;
+          height: 60px;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4), 0 3px 10px rgba(0,0,0,0.2);
+          box-shadow: 0 8px 30px rgba(14, 165, 233, 0.6), 0 4px 15px rgba(59, 130, 246, 0.4), 0 2px 8px rgba(0,0,0,0.3);
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
           z-index: 500;
+          outline: 2px solid rgba(255, 255, 255, 0.8);
+          outline-offset: 2px;
         ">
           <div style="
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             overflow: hidden;
             display: flex;
@@ -395,7 +397,7 @@ export default function SimpleMapboxMap() {
             <img 
               src="/attached_assets/${encodeURIComponent(primaryWeatherIcon)}" 
               alt="Primary weather event"
-              style="width: 44px; height: 44px; object-fit: contain;"
+              style="width: 48px; height: 48px; object-fit: contain;"
               onerror="console.log('Weather marker icon failed:', '${primaryWeatherIcon}', 'encoded:', encodeURIComponent('${primaryWeatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
             />
           </div>
@@ -408,7 +410,7 @@ export default function SimpleMapboxMap() {
           position: absolute;
           bottom: -4px;
           right: -4px;
-          background: #ff6b35;
+          background: linear-gradient(135deg, #0ea5e9, #1d4ed8);
           color: white;
           border-radius: 50%;
           width: 20px;
@@ -459,8 +461,9 @@ export default function SimpleMapboxMap() {
         const markerDiv = el.firstElementChild as HTMLElement;
         if (markerDiv) {
           markerDiv.style.transform = 'scale(1.15)';
-          markerDiv.style.boxShadow = '0 6px 20px rgba(255, 107, 53, 0.6), 0 4px 12px rgba(0,0,0,0.4)';
-          markerDiv.style.zIndex = '1000'; // Ensure weather alerts stay above wildfire markers
+          markerDiv.style.boxShadow = '0 12px 40px rgba(14, 165, 233, 0.8), 0 8px 25px rgba(59, 130, 246, 0.6), 0 4px 15px rgba(0,0,0,0.5)';
+          markerDiv.style.zIndex = '1500'; // Much higher to ensure weather alerts always stay on top
+          markerDiv.style.transform = 'scale(1.25)';
         }
       });
 
@@ -468,8 +471,8 @@ export default function SimpleMapboxMap() {
         const markerDiv = el.firstElementChild as HTMLElement;
         if (markerDiv) {
           markerDiv.style.transform = 'scale(1)';
-          markerDiv.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.4), 0 2px 6px rgba(0,0,0,0.3)';
-          markerDiv.style.zIndex = '500'; // Still higher than wildfire base z-index
+          markerDiv.style.boxShadow = '0 8px 30px rgba(14, 165, 233, 0.6), 0 4px 15px rgba(59, 130, 246, 0.4), 0 2px 8px rgba(0,0,0,0.3)';
+          markerDiv.style.zIndex = '800'; // Much higher base level than wildfire markers
         }
       });
 
