@@ -7,6 +7,61 @@ import { MapPin, Layers } from 'lucide-react';
 // Set Mapbox access token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
+// State icon mapping
+const STATE_ICONS = {
+  'AL': 'Alabama_1754172085109.png',
+  'AK': 'Alaska_1754172085109.png', 
+  'AZ': 'Arizona_1754172085110.png',
+  'AR': 'Arkansas_1754172085111.png',
+  'CA': 'California_1754172085112.png',
+  'CO': 'Colorado_1754172085113.png',
+  'CT': 'Connecticut Map Silhouette_1754172085114.png',
+  'DE': 'Delaware_1754172085115.png',
+  'DC': 'District of Columbia_1754172085116.png',
+  'FL': 'Florida_1754172085117.png',
+  'GA': 'Georgia_1754172085118.png',
+  'HI': 'Hawaii_1754172085119.png',
+  'ID': 'Idaho_1754172085120.png',
+  'IL': 'Illinois_1754172085121.png',
+  'IN': 'Indiana_1754172085108.png',
+  'IA': 'Iowa_1754172090688.png',
+  'KS': 'Kansas_1754172090689.png',
+  'KY': 'Kentucky_1754172090690.png',
+  'LA': 'Lousiana_1754172090691.png',
+  'ME': 'Maine_1754172090691.png',
+  'MD': 'Maryland_1754172090693.png',
+  'MA': 'Massachusetts_1754172090694.png',
+  'MI': 'Michigan_1754172090695.png',
+  'MN': 'Minnesota_1754172090696.png',
+  'MS': 'Mississippi_1754172090697.png',
+  'MO': 'Missouri_1754172090698.png',
+  'MT': 'Montana_1754172090698.png',
+  'NE': 'Nebraska_1754172090686.png',
+  'NV': 'Nevada_1754172552866.png',
+  'NH': 'New Hampshire_1754172552868.png',
+  'NJ': 'New Jersey_1754172552869.png',
+  'NM': 'New Mexico_1754172552870.png',
+  'NY': 'New York State_1754172552871.png',
+  'NC': 'North Carolina_1754172552872.png',
+  'ND': 'North Dakota_1754172552872.png',
+  'OH': 'Ohio_1754172552873.png',
+  'OK': 'Oklahoma_1754172552874.png',
+  'OR': 'Oregon_1754172552875.png',
+  'PA': 'Pennsylvania_1754172552875.png',
+  'RI': 'Rhode Island_1754172552876.png',
+  'SC': 'South Carolina_1754172552865.png',
+  'SD': 'South Dakota_1754172607630.png',
+  'TN': 'Tennessee_1754172607631.png',
+  'TX': 'TEXAS_1754172607632.png',
+  'UT': 'Utah_1754172607633.png',
+  'VT': 'Vermont State map sign_1754172607634.png',
+  'VA': 'Virginia_1754172607636.png',
+  'WA': 'Washington_1754172607637.png',
+  'WV': 'West Virginia_1754172607637.png',
+  'WI': 'Wisconsin_1754172607638.png',
+  'WY': 'Wyoming_1754172607638.png'
+} as const;
+
 // Complete US States coordinates for markers
 const US_STATES = {
   'AL': { name: 'Alabama', coords: [-86.79113, 32.377716] },
@@ -76,7 +131,6 @@ export default function SimpleMapboxMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [radarVisible, setRadarVisible] = useState(false);
 
   // Fetch weather alerts with error handling
   const { data: alertsResponse, error, isLoading } = useQuery<{alerts: WeatherAlert[]}>({
@@ -136,26 +190,6 @@ export default function SimpleMapboxMap() {
 
       map.current.on('load', () => {
         console.log('✓ Mapbox map loaded successfully!');
-        
-        // Add radar layer (initially hidden)
-        if (map.current) {
-          map.current.addSource('radar-source', {
-            type: 'raster',
-            tiles: ['https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png'],
-            tileSize: 256
-          });
-
-          map.current.addLayer({
-            id: 'radar-layer',
-            type: 'raster',
-            source: 'radar-source',
-            paint: {
-              'raster-opacity': 0
-            }
-          });
-
-          console.log('✓ Weather radar layer added');
-        }
       });
 
       map.current.on('error', (e) => {
@@ -260,10 +294,12 @@ export default function SimpleMapboxMap() {
           <!-- Enhanced Header with State Info -->
           <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 48px; height: 48px; background: rgba(255, 107, 53, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3);">
-                <svg style="width: 24px; height: 24px; fill: #ff6b35;" viewBox="0 0 24 24">
-                  <path d="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22S19,14.25 19,9C19,5.13 15.87,2 12,2M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5Z"/>
-                </svg>
+              <div style="width: 48px; height: 48px; background: rgba(255, 107, 53, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 107, 53, 0.3); padding: 8px;">
+                <img 
+                  src="/attached_assets/${STATE_ICONS[stateCode as keyof typeof STATE_ICONS] || 'California_1754172085112.png'}" 
+                  alt="${stateData.name}" 
+                  style="width: 100%; height: 100%; object-fit: contain; filter: invert(1) sepia(1) saturate(5) hue-rotate(25deg) brightness(1.2);"
+                />
               </div>
               <div>
                 <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">${stateData.name}</h3>
@@ -409,15 +445,7 @@ export default function SimpleMapboxMap() {
     console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
   }, [statesWithAlerts]);
 
-  // Toggle radar overlay
-  const toggleRadar = () => {
-    if (!map.current) return;
-    
-    const newOpacity = radarVisible ? 0 : 0.7;
-    map.current.setPaintProperty('radar-layer', 'raster-opacity', newOpacity);
-    setRadarVisible(!radarVisible);
-    console.log(`✓ Radar ${radarVisible ? 'hidden' : 'shown'}`);
-  };
+
 
   // Log successful data fetch
   if (alertsResponse?.alerts) {
@@ -455,35 +483,27 @@ export default function SimpleMapboxMap() {
         </div>
       </div>
 
-      {/* Enhanced Radar Toggle */}
+      {/* Weather Data Info */}
       <div className="absolute top-4 right-4 bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-sm rounded-xl p-2 text-white shadow-2xl border border-slate-700/50">
-        <button
-          onClick={toggleRadar}
-          className={`flex items-center gap-2 px-4 py-3 hover:bg-white/10 rounded-lg transition-all duration-300 text-sm font-medium ${
-            radarVisible ? 'bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/20' : 'hover:shadow-lg'
-          }`}
-          title="Toggle precipitation radar overlay"
-        >
-          <Layers className={`w-4 h-4 transition-transform ${radarVisible ? 'rotate-180' : ''}`} />
-          <span>Radar</span>
-          {radarVisible && (
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-          )}
-        </button>
+        <div className="flex items-center gap-2 px-4 py-3 text-sm font-medium">
+          <Layers className="w-4 h-4 text-blue-400" />
+          <span>Live Data</span>
+          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        </div>
       </div>
 
       {/* Enhanced Status Bar */}
       <div className="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-slate-900/90 to-slate-800/90 backdrop-blur-sm rounded-lg px-4 py-2 text-white shadow-xl border border-slate-700/30">
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-4">
-            <span className="text-slate-300">Live Weather Data</span>
+            <span className="text-slate-300">National Weather Service • Real-time Alerts</span>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-green-300">Connected</span>
             </div>
           </div>
           <div className="text-slate-400">
-            Updated every 2 minutes • Click markers for details
+            Updated every 2 minutes • Click markers for detailed alerts
           </div>
         </div>
       </div>
