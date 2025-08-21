@@ -286,6 +286,41 @@ export default function SimpleMapboxMap() {
   // Use extreme weather events directly for disaster markers (show up to 25, not 15!)
   const disasterCounties = extremeWeatherEvents.slice(0, 25);
   console.log(`🔍 Processed disasterCounties: ${disasterCounties.length} events available`);
+  
+  // Force immediate disaster marker creation when data is available
+  React.useEffect(() => {
+    console.log(`🔥 IMMEDIATE DISASTER CHECK: ${disasterCounties.length} disasters, showDisasterCounties: ${showDisasterCounties}, mapExists: ${!!map.current}`);
+    
+    if (showDisasterCounties && disasterCounties.length > 0 && map.current) {
+      console.log(`🚨 IMMEDIATE DISASTER CREATION: Processing ${disasterCounties.length} disasters NOW!`);
+      
+      disasterCounties.slice(0, 5).forEach((event, index) => {
+        const lng = event.coordinates?.longitude || -99;
+        const lat = event.coordinates?.latitude || 30;
+        
+        const el = document.createElement('div');
+        el.style.cssText = `
+          width: 24px;
+          height: 24px;
+          background: #dc2626;
+          border: 2px solid #ffffff;
+          border-radius: 50%;
+          cursor: pointer;
+          z-index: 999;
+        `;
+        
+        try {
+          const marker = new mapboxgl.Marker(el)
+            .setLngLat([lng, lat])
+            .addTo(map.current!);
+            
+          console.log(`✅ IMMEDIATE DISASTER ${index + 1}: ${event.eventType} in ${event.state} added at [${lng}, ${lat}]`);
+        } catch (error) {
+          console.error(`❌ Failed immediate disaster ${index + 1}:`, error);
+        }
+      });
+    }
+  }, [disasterCounties.length, showDisasterCounties, map.current]);
 
   // Helper function to get weather icon for event type
   const getWeatherIcon = (eventType: string): string => {
@@ -966,6 +1001,11 @@ export default function SimpleMapboxMap() {
     // FORCE disaster county highlighting markers using actual county coordinates
     console.log(`🔍 FORCING disaster check: showDisasterCounties=${showDisasterCounties}, length=${disasterCounties.length}, map=${!!map.current}`);
     console.log(`🔍 DEBUG useEffect dependencies:`, {showDisasterCounties, disasterCountiesLength: disasterCounties.length, mapExists: !!map.current});
+    
+    // FORCE CHECK - Show first disaster data for debugging
+    if (disasterCounties.length > 0) {
+      console.log(`🔍 FORCE DEBUG: First disaster data:`, disasterCounties[0]);
+    }
     
     if (showDisasterCounties && disasterCounties.length > 0 && map.current) {
       console.log(`🚨 CREATING ${disasterCounties.length} disaster county indicators NOW!`);
