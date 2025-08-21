@@ -273,9 +273,10 @@ export default function SimpleMapboxMap() {
 
       const alertCount = alerts.length;
 
-      // Get the primary weather event for this state to show on marker
-      const primaryAlert = alerts[0];
-      const weatherIcon = getWeatherIcon(primaryAlert.event);
+      // Get unique weather types for this state
+      const uniqueWeatherTypes = [...new Set(alerts.map(alert => getWeatherIcon(alert.event)))];
+      const primaryWeatherIcon = uniqueWeatherTypes[0];
+      const hasMultipleTypes = uniqueWeatherTypes.length > 1;
       
       // Create enhanced marker element with weather icon
       const el = document.createElement('div');
@@ -296,12 +297,14 @@ export default function SimpleMapboxMap() {
           overflow: hidden;
         ">
           <img 
-            src="/attached_assets/${encodeURIComponent(weatherIcon)}" 
-            alt="${primaryAlert.event}"
+            src="/attached_assets/${encodeURIComponent(primaryWeatherIcon)}" 
+            alt="Primary weather event"
             style="width: 44px; height: 44px; object-fit: contain; border-radius: 50%; clip-path: circle(50% at center);"
-            onerror="console.log('Weather marker icon failed:', '${weatherIcon}', 'encoded:', encodeURIComponent('${weatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
+            onerror="console.log('Weather marker icon failed:', '${primaryWeatherIcon}', 'encoded:', encodeURIComponent('${primaryWeatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
           />
           <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; width: 100%; height: 100%; align-items: center; justify-content: center;">${alertCount}</div>
+          
+          <!-- Alert count badge - positioned outside the clipped area -->
           <div style="
             position: absolute;
             bottom: -4px;
@@ -318,7 +321,30 @@ export default function SimpleMapboxMap() {
             font-weight: bold;
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 10;
           ">${alertCount}</div>
+          
+          <!-- Multiple weather types indicator -->
+          ${hasMultipleTypes ? `
+          <div style="
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            background: #ea580c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+          ">+${uniqueWeatherTypes.length - 1}</div>
+          ` : ''}
         </div>
         <style>
           @keyframes pulse {
@@ -377,6 +403,24 @@ export default function SimpleMapboxMap() {
               <div style="width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 2s infinite;"></div>
               ${alertCount} Active Alert${alertCount !== 1 ? 's' : ''}
             </div>
+          </div>
+
+          <!-- Weather Types Summary -->
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding: 12px; background: rgba(255, 107, 53, 0.1); border-radius: 8px;">
+            ${uniqueWeatherTypes.map(icon => {
+              const alertsOfType = alerts.filter(alert => getWeatherIcon(alert.event) === icon);
+              const eventType = alertsOfType[0].event.split(' ')[0]; // Get first word like "Flood", "Hurricane"
+              return `
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.9); padding: 6px 10px; border-radius: 20px; border: 1px solid rgba(255, 107, 53, 0.3);">
+                <img 
+                  src="/attached_assets/${encodeURIComponent(icon)}" 
+                  alt="${eventType}"
+                  style="width: 20px; height: 20px; object-fit: contain;"
+                />
+                <span style="font-size: 12px; font-weight: 600; color: #374151;">${eventType} (${alertsOfType.length})</span>
+              </div>
+              `;
+            }).join('')}
           </div>
 
           <!-- Alert Cards Container -->
