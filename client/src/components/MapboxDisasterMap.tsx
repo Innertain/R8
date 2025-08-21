@@ -22,7 +22,10 @@ import {
 } from 'lucide-react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Set Mapbox access token
+// Set Mapbox access token - check if it exists
+if (!import.meta.env.VITE_MAPBOX_TOKEN) {
+  console.error('Missing VITE_MAPBOX_TOKEN environment variable');
+}
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 interface DisasterMapProps {
@@ -116,21 +119,36 @@ const MapboxDisasterMap: React.FC<DisasterMapProps> = ({ className }) => {
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
-      center: [-98.5795, 39.8283], // Center of US
-      zoom: 4,
-      projection: 'mercator'
-    });
+    // Check if Mapbox token is available
+    if (!import.meta.env.VITE_MAPBOX_TOKEN) {
+      console.error('Mapbox token not found. Please add VITE_MAPBOX_TOKEN to your environment variables.');
+      return;
+    }
 
-    map.current.on('load', () => {
-      setMapLoaded(true);
-      loadDisasterData();
-    });
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
+        center: [-98.5795, 39.8283], // Center of US
+        zoom: 4,
+        projection: 'mercator'
+      });
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.current.on('load', () => {
+        setMapLoaded(true);
+        loadDisasterData();
+      });
+
+      map.current.on('error', (e) => {
+        console.error('Mapbox error:', e);
+      });
+
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    } catch (error) {
+      console.error('Failed to initialize Mapbox map:', error);
+    }
 
     return () => {
       if (map.current) {
@@ -598,10 +616,35 @@ const MapboxDisasterMap: React.FC<DisasterMapProps> = ({ className }) => {
     );
   };
 
+  // Show error state if no Mapbox token
+  if (!import.meta.env.VITE_MAPBOX_TOKEN) {
+    return (
+      <div className={`relative w-full h-full flex items-center justify-center bg-gray-900 ${className}`}>
+        <div className="text-center text-white">
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold mb-2">Mapbox Token Required</h3>
+          <p className="text-gray-300 max-w-md">
+            The interactive disaster map requires a Mapbox access token. 
+            Please add your VITE_MAPBOX_TOKEN to the environment variables.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`relative w-full h-full ${className}`}>
       {/* Map Container */}
       <div ref={mapContainer} className="w-full h-full" />
+      
+      {!mapLoaded && (
+        <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
+          <div className="text-center text-white">
+            <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p>Loading disaster map...</p>
+          </div>
+        </div>
+      )}
       
       {/* Layer Controls Panel */}
       <Card className="absolute top-4 left-4 w-80 bg-white/95 backdrop-blur-sm shadow-lg z-10">
