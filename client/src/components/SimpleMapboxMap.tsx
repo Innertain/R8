@@ -174,7 +174,7 @@ export default function SimpleMapboxMap() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch wildfire incidents
+  // Fetch wildfire incidents with geocoding
   const { data: wildfireResponse } = useQuery<{success: boolean, incidents: WildfireIncident[]}>({
     queryKey: ['/api/wildfire-incidents'],
     refetchInterval: 2 * 60 * 1000,
@@ -182,6 +182,67 @@ export default function SimpleMapboxMap() {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Helper function to extract and geocode location from wildfire titles
+  const extractLocationFromTitle = (title: string): string | null => {
+    // Common patterns in wildfire incident titles
+    const patterns = [
+      /(?:Fire|Incident)\s+(?:near|in|at|by)\s+([^,\-\(]+)/i,
+      /(?:near|in|at|by)\s+([A-Za-z\s]+?)(?:\s*,\s*[A-Z]{2}|\s*$)/i,
+      /([A-Za-z\s]+?)\s+(?:Fire|Incident)/i
+    ];
+    
+    for (const pattern of patterns) {
+      const match = title.match(pattern);
+      if (match && match[1]) {
+        const location = match[1].trim();
+        // Filter out common non-location words
+        if (!['Complex', 'County', 'National', 'Forest', 'Prescribed', 'Wildfire'].includes(location)) {
+          return location;
+        }
+      }
+    }
+    return null;
+  };
+
+  // Enhanced geocoding with caching and fallback
+  const geocodeLocationCached = async (locationString: string, state: string): Promise<[number, number] | null> => {
+    const cacheKey = `${locationString}, ${state}`;
+    
+    try {
+      // Try with full location first
+      let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cacheKey)}&countrycodes=us&limit=1`);
+      let data = await response.json();
+      
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          console.log(`✓ Geocoded "${cacheKey}" to [${lon}, ${lat}]`);
+          return [lon, lat];
+        }
+      }
+      
+      // Fallback: Try just the location name + state
+      const fallbackQuery = `${locationString} ${state}`;
+      response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}&countrycodes=us&limit=1`);
+      data = await response.json();
+      
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          console.log(`✓ Geocoded "${fallbackQuery}" to [${lon}, ${lat}]`);
+          return [lon, lat];
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.log('Geocoding failed for:', cacheKey);
+      return null;
+    }
+  };
 
   const alerts = alertsResponse?.alerts || [];
   const wildfires = wildfireResponse?.incidents || [];
@@ -605,20 +666,37 @@ export default function SimpleMapboxMap() {
 
     console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers`);
 
-    // Add wildfire incident markers with offset positioning to avoid overlapping weather markers
-    wildfires.forEach((incident, index) => {
-      const stateData = US_STATES[incident.state as keyof typeof US_STATES];
-      if (!stateData) return;
+    // Add wildfire incident markers with enhanced geocoding
+    const addWildfireMarkers = async () => {
+      for (const [index, incident] of wildfires.entries()) {
+        const stateData = US_STATES[incident.state as keyof typeof US_STATES];
+        if (!stateData) continue;
 
-      // Offset wildfire markers to avoid overlapping with weather markers
-      const baseCoords = stateData.coords;
-      const offsetDistance = 0.3; // degrees
-      const angle = (index * 60) * (Math.PI / 180); // Spread multiple wildfires in circle
-      const lng = baseCoords[0] + (offsetDistance * Math.cos(angle));
-      const lat = baseCoords[1] + (offsetDistance * Math.sin(angle));
+        let lng, lat;
+        
+        // Try to extract and geocode specific location from title
+        const extractedLocation = extractLocationFromTitle(incident.title);
+        let coordinates: [number, number] | null = null;
+        
+        if (extractedLocation) {
+          coordinates = await geocodeLocationCached(extractedLocation, incident.state);
+        }
+        
+        if (coordinates) {
+          [lng, lat] = coordinates;
+          console.log(`📍 Wildfire "${incident.title}" geocoded to ${extractedLocation}: [${lng}, ${lat}]`);
+        } else {
+          // Fallback with offset positioning to avoid overlapping weather markers
+          const baseCoords = stateData.coords;
+          const offsetDistance = 0.3; // degrees
+          const angle = (index * 60) * (Math.PI / 180); // Spread multiple wildfires in circle
+          lng = baseCoords[0] + (offsetDistance * Math.cos(angle));
+          lat = baseCoords[1] + (offsetDistance * Math.sin(angle));
+          console.log(`📍 Wildfire "${incident.title}" using offset coords: [${lng}, ${lat}]`);
+        }
       
-      // Create wildfire marker element
-      const el = document.createElement('div');
+        // Create wildfire marker element
+        const el = document.createElement('div');
       el.innerHTML = `
         <div style="
           background: linear-gradient(135deg, #dc2626, #b91c1c);
@@ -802,10 +880,15 @@ export default function SimpleMapboxMap() {
         .setPopup(popup)
         .addTo(map.current!);
 
-      markersRef.current.push(marker);
-    });
+        markersRef.current.push(marker);
+      }
+      console.log(`✓ Added ${wildfires.length} wildfire incident markers with enhanced geocoding`);
+    };
 
-    console.log(`✓ Added ${wildfires.length} wildfire incident markers`);
+    // Execute the async wildfire marker addition
+    if (wildfires.length > 0) {
+      addWildfireMarkers();
+    }
   }, [statesWithAlerts, wildfires]);
 
   return (
