@@ -297,7 +297,7 @@ export default function SimpleMapboxMap() {
           <img 
             src="/attached_assets/${encodeURIComponent(weatherIcon)}" 
             alt="${primaryAlert.event}"
-            style="width: 32px; height: 32px; object-fit: contain;"
+            style="width: 44px; height: 44px; object-fit: contain;"
             onerror="console.log('Weather marker icon failed:', '${weatherIcon}', 'encoded:', encodeURIComponent('${weatherIcon}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
           />
           <div style="display: none; color: #ff6b35; font-size: 18px; font-weight: bold; width: 100%; height: 100%; align-items: center; justify-content: center;">${alertCount}</div>
@@ -356,11 +356,11 @@ export default function SimpleMapboxMap() {
           <!-- Enhanced Header with State Info -->
           <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 16px; margin: -10px -10px 16px -10px; border-radius: 12px 12px 0 0; position: relative;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 64px; height: 64px; background: rgba(255, 255, 255, 0.95); border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255, 107, 53, 0.6); padding: 8px; box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3); position: relative;">
+              <div style="width: 72px; height: 72px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255, 107, 53, 0.6); padding: 4px; box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3); position: relative;">
                 <img 
                   src="/attached_assets/${encodeURIComponent(STATE_ICONS[stateCode as keyof typeof STATE_ICONS])}" 
                   alt="${stateData.name} State Silhouette" 
-                  style="width: 48px; height: 48px; object-fit: contain; opacity: 1;"
+                  style="width: 64px; height: 64px; object-fit: contain; opacity: 1;"
                   onload="console.log('State icon loaded for ${stateCode}:', '${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}');"
                   onerror="console.log('Failed to load state icon for ${stateCode}:', '${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}', 'encoded:', encodeURIComponent('${STATE_ICONS[stateCode as keyof typeof STATE_ICONS]}')); this.style.display='none'; this.nextElementSibling.style.display='flex'"
                 />
@@ -395,11 +395,11 @@ export default function SimpleMapboxMap() {
               " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.12)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(0, 0, 0, 0.08)'">
                 
                 <!-- Weather Event Icon -->
-                <div style="position: absolute; top: 16px; right: 16px; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3); border: 2px solid rgba(255, 107, 53, 0.2);">
+                <div style="position: absolute; top: 16px; right: 16px; width: 56px; height: 56px; background: rgba(255, 255, 255, 0.95); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3); border: 2px solid rgba(255, 107, 53, 0.2);">
                   <img 
                     src="/attached_assets/${encodeURIComponent(getWeatherIcon(alert.event))}" 
                     alt="${alert.event} Weather Icon" 
-                    style="width: 32px; height: 32px; object-fit: contain; opacity: 1;"
+                    style="width: 48px; height: 48px; object-fit: contain; opacity: 1;"
                     onload="console.log('Weather alert icon loaded for ${alert.event}:', '${getWeatherIcon(alert.event)}');"
                     onerror="console.log('Failed to load weather alert icon for ${alert.event}:', '${getWeatherIcon(alert.event)}', 'encoded:', encodeURIComponent('${getWeatherIcon(alert.event)}')); this.style.display='none'; this.nextElementSibling.style.display='block'"
                   />
