@@ -203,6 +203,16 @@ export default function SimpleMapboxMap() {
   });
 
   console.log('🔍 Extreme Weather Response:', extremeWeatherResponse);
+  
+  // Extract first few events for debugging
+  if (extremeWeatherResponse?.events?.length > 0) {
+    console.log('🔍 First 3 disasters:', extremeWeatherResponse.events.slice(0, 3).map(e => ({
+      id: e.id,
+      eventType: e.eventType,
+      state: e.state,
+      hasCoords: !!(e.coordinates && e.coordinates.latitude && e.coordinates.longitude)
+    })));
+  }
 
   // Helper function to extract and geocode location from wildfire titles
   const extractLocationFromTitle = (title: string): string | null => {
@@ -953,15 +963,20 @@ export default function SimpleMapboxMap() {
       addWildfireMarkers();
     }
     
-    // Add disaster county highlighting markers using actual county coordinates
+    // FORCE disaster county highlighting markers using actual county coordinates
+    console.log(`🔍 FORCING disaster check: showDisasterCounties=${showDisasterCounties}, length=${disasterCounties.length}, map=${!!map.current}`);
+    console.log(`🔍 DEBUG useEffect dependencies:`, {showDisasterCounties, disasterCountiesLength: disasterCounties.length, mapExists: !!map.current});
+    
     if (showDisasterCounties && disasterCounties.length > 0) {
-      console.log(`🚨 Adding ${disasterCounties.length} disaster county indicators`);
+      console.log(`🚨 CREATING ${disasterCounties.length} disaster county indicators NOW!`);
       
       // Show up to 25 events as requested (more than 15)
       const eventsToShow = Math.min(disasterCounties.length, 25);
-      console.log(`🚨 Processing ${eventsToShow} disaster events for map display`);
+      console.log(`🚨 PROCESSING ${eventsToShow} disaster events for map display - STARTING LOOP`);
       
       disasterCounties.slice(0, eventsToShow).forEach((event, index) => {
+        console.log(`🚨 STARTING disaster ${index + 1}: ${event.eventType} in ${event.state}`);
+        
         // Use actual coordinates from the event if available, otherwise fallback to state center
         let lng, lat;
         
@@ -996,27 +1011,11 @@ export default function SimpleMapboxMap() {
           position: relative;
           z-index: 250;
           box-shadow: 0 4px 16px rgba(220, 38, 38, 0.7), 0 0 0 8px rgba(251, 191, 36, 0.3);
-          animation: disaster-glow 2s infinite;
+          animation: none;
         `;
         
-        // Add CSS animation for disaster areas
-        if (!document.querySelector('#disaster-glow-style')) {
-          const style = document.createElement('style');
-          style.id = 'disaster-glow-style';
-          style.textContent = `
-            @keyframes disaster-glow {
-              0%, 100% { 
-                transform: scale(1);
-                box-shadow: 0 4px 16px rgba(220, 38, 38, 0.7), 0 0 0 8px rgba(251, 191, 36, 0.3);
-              }
-              50% { 
-                transform: scale(1.2);
-                box-shadow: 0 6px 24px rgba(220, 38, 38, 0.9), 0 0 0 12px rgba(251, 191, 36, 0.5);
-              }
-            }
-          `;
-          document.head.appendChild(style);
-        }
+        // Skip CSS injection completely to avoid React errors
+        // Use inline styles instead
         
         // Parse county names for display
         const countyNames = typeof event.county === 'string' 
@@ -1061,13 +1060,17 @@ export default function SimpleMapboxMap() {
         `);
         
         try {
-          const countyMarker = new mapboxgl.Marker(countyEl)
-            .setLngLat([lng, lat])
-            .setPopup(countyPopup)
-            .addTo(map.current!);
-          
-          markersRef.current.push(countyMarker);
-          console.log(`✅ DISASTER ${index + 1} added successfully to map at [${lng}, ${lat}]`);
+          if (map.current) {
+            const countyMarker = new mapboxgl.Marker(countyEl)
+              .setLngLat([lng, lat])
+              .setPopup(countyPopup)
+              .addTo(map.current);
+            
+            markersRef.current.push(countyMarker);
+            console.log(`✅ DISASTER ${index + 1}: ${event.eventType} in ${event.state} added at [${lng}, ${lat}]`);
+          } else {
+            console.log(`❌ Map not ready for disaster ${index + 1}`);
+          }
         } catch (error) {
           console.error(`❌ Failed to add disaster marker ${index + 1}:`, error);
         }
@@ -1079,11 +1082,13 @@ export default function SimpleMapboxMap() {
 
   // Debug: Log disaster data availability
   React.useEffect(() => {
-    console.log(`🔍 DEBUG: disasterCounties length: ${disasterCounties.length}`);
-    console.log(`🔍 DEBUG: showDisasterCounties: ${showDisasterCounties}`);
+    console.log(`🔍 DISASTER DEBUG: disasterCounties length: ${disasterCounties.length}`);
+    console.log(`🔍 DISASTER DEBUG: showDisasterCounties: ${showDisasterCounties}`);
+    console.log(`🔍 DISASTER DEBUG: map.current exists: ${!!map.current}`);
     if (disasterCounties.length > 0) {
-      console.log(`🔍 DEBUG: First disaster county:`, disasterCounties[0]);
-      console.log(`🔍 DEBUG: States available in US_STATES:`, Object.keys(US_STATES).slice(0, 5));
+      console.log(`🔍 DISASTER DEBUG: First disaster:`, disasterCounties[0]);
+      console.log(`🔍 DISASTER DEBUG: Texas state coords:`, US_STATES['TX']);
+      console.log(`🔍 DISASTER DEBUG: North Carolina state coords:`, US_STATES['NC']);
     }
   }, [disasterCounties, showDisasterCounties]);
 
