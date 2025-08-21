@@ -1,447 +1,349 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { AlertTriangle, MapPin, Layers } from 'lucide-react';
 import L from 'leaflet';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { 
-  CloudRain, 
-  Zap, 
-  Wind, 
-  Snowflake, 
-  Sun, 
-  AlertTriangle,
-  Layers,
-  X,
-  MapPin,
-  Activity
-} from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
-// Fix Leaflet icon paths
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// US States coordinates
+const US_STATES = {
+  'AL': { name: 'Alabama', coords: [-86.79113, 32.377716] },
+  'AK': { name: 'Alaska', coords: [-152.404419, 61.370716] },
+  'AZ': { name: 'Arizona', coords: [-111.431221, 33.729759] },
+  'AR': { name: 'Arkansas', coords: [-92.373123, 34.969704] },
+  'CA': { name: 'California', coords: [-119.681564, 36.116203] },
+  'CO': { name: 'Colorado', coords: [-105.311104, 39.059811] },
+  'CT': { name: 'Connecticut', coords: [-72.755371, 41.767] },
+  'DE': { name: 'Delaware', coords: [-75.507141, 39.318523] },
+  'DC': { name: 'District of Columbia', coords: [-77.026817, 38.907192] },
+  'FL': { name: 'Florida', coords: [-82.057549, 27.766279] },
+  'GA': { name: 'Georgia', coords: [-83.643074, 33.76] },
+  'HI': { name: 'Hawaii', coords: [-155.665857, 19.741755] },
+  'ID': { name: 'Idaho', coords: [-114.478828, 44.240459] },
+  'IL': { name: 'Illinois', coords: [-88.986137, 40.349457] },
+  'IN': { name: 'Indiana', coords: [-86.147685, 40.790443] },
+  'IA': { name: 'Iowa', coords: [-93.620866, 42.590794] },
+  'KS': { name: 'Kansas', coords: [-96.726486, 38.572954] },
+  'KY': { name: 'Kentucky', coords: [-84.670067, 37.839333] },
+  'LA': { name: 'Louisiana', coords: [-91.467086, 30.391830] },
+  'ME': { name: 'Maine', coords: [-69.765261, 44.323535] },
+  'MD': { name: 'Maryland', coords: [-76.501157, 39.045755] },
+  'MA': { name: 'Massachusetts', coords: [-71.530106, 42.230171] },
+  'MI': { name: 'Michigan', coords: [-84.536095, 44.314844] },
+  'MN': { name: 'Minnesota', coords: [-93.094636, 45.919827] },
+  'MS': { name: 'Mississippi', coords: [-89.207229, 32.320] },
+  'MO': { name: 'Missouri', coords: [-92.189283, 38.572954] },
+  'MT': { name: 'Montana', coords: [-110.454353, 47.052767] },
+  'NE': { name: 'Nebraska', coords: [-99.901813, 41.12537] },
+  'NV': { name: 'Nevada', coords: [-117.055374, 38.313515] },
+  'NH': { name: 'New Hampshire', coords: [-71.563896, 43.452492] },
+  'NJ': { name: 'New Jersey', coords: [-74.756138, 40.221741] },
+  'NM': { name: 'New Mexico', coords: [-106.248482, 34.307144] },
+  'NY': { name: 'New York', coords: [-74.948051, 42.165726] },
+  'NC': { name: 'North Carolina', coords: [-79.806419, 35.759573] },
+  'ND': { name: 'North Dakota', coords: [-99.784012, 47.528912] },
+  'OH': { name: 'Ohio', coords: [-82.764915, 40.269789] },
+  'OK': { name: 'Oklahoma', coords: [-96.921387, 35.482309] },
+  'OR': { name: 'Oregon', coords: [-122.070938, 43.804133] },
+  'PA': { name: 'Pennsylvania', coords: [-77.209755, 40.269789] },
+  'RI': { name: 'Rhode Island', coords: [-71.51178, 41.82355] },
+  'SC': { name: 'South Carolina', coords: [-80.945007, 33.836082] },
+  'SD': { name: 'South Dakota', coords: [-99.901813, 44.299782] },
+  'TN': { name: 'Tennessee', coords: [-86.784, 35.860119] },
+  'TX': { name: 'Texas', coords: [-97.563461, 31.054487] },
+  'UT': { name: 'Utah', coords: [-111.892622, 39.419220] },
+  'VT': { name: 'Vermont', coords: [-72.580536, 44.26639] },
+  'VA': { name: 'Virginia', coords: [-78.169968, 37.54] },
+  'WA': { name: 'Washington', coords: [-121.490494, 47.042418] },
+  'WV': { name: 'West Virginia', coords: [-80.954570, 38.349497] },
+  'WI': { name: 'Wisconsin', coords: [-89.616508, 44.268543] },
+  'WY': { name: 'Wyoming', coords: [-107.30249, 43.075968] }
+} as const;
 
 interface WeatherAlert {
   id: string;
   title: string;
   description: string;
+  location: string;
   severity: string;
   event: string;
-  areaDesc: string;
   urgency: string;
-  certainty: string;
-  effective: string;
+  sent: string;
   expires: string;
+  senderName: string;
+  category: string;
 }
 
-interface LeafletWeatherMapProps {
-  className?: string;
-}
-
-const LeafletWeatherMap: React.FC<LeafletWeatherMapProps> = ({ className }) => {
+export function LeafletWeatherMap() {
+  const mapRef = useRef<L.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<L.Map | null>(null);
-  const markersLayer = useRef<L.LayerGroup | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+  const [weatherLayer, setWeatherLayer] = useState<string>('none');
+  const weatherLayerRef = useRef<L.TileLayer | null>(null);
+
+  // Get weather alerts
+  const { data: response, isLoading, error } = useQuery({
+    queryKey: ['/api/weather-alerts-rss'],
+    refetchInterval: 2 * 60 * 60 * 1000,
+  });
+
+  const rawAlerts = (response as any)?.alerts || [];
   
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [weatherAlerts, setWeatherAlerts] = useState<WeatherAlert[]>([]);
-  const [selectedAlert, setSelectedAlert] = useState<WeatherAlert | null>(null);
-  const [showWeatherLayer, setShowWeatherLayer] = useState(true);
-  const [loading, setLoading] = useState(true);
+  // Filter warnings and watches only
+  const alerts = rawAlerts.filter((alert: WeatherAlert) => {
+    const title = alert.title?.toLowerCase() || '';
+    const event = alert.event?.toLowerCase() || '';
+    const combined = `${title} ${event}`;
+    
+    if (combined.includes('advisory')) return false;
+    if (combined.includes('statement')) return false;
+    if (combined.includes('outlook')) return false;
+    
+    return combined.includes('warning') || combined.includes('watch');
+  });
 
-  // Weather event type mapping to colors
-  const getWeatherColor = (eventType: string, severity: string) => {
-    const sev = severity.toLowerCase();
-    if (sev.includes('extreme')) return '#8B0000'; // Dark red
-    if (sev.includes('severe')) return '#DC2626'; // Red
-    if (sev.includes('moderate')) return '#F59E0B'; // Amber
-    if (sev.includes('minor')) return '#3B82F6'; // Blue
-    return '#6B7280'; // Gray
-  };
+  // Group alerts by state
+  const statesWithAlerts = alerts.reduce((acc: Record<string, WeatherAlert[]>, alert: WeatherAlert) => {
+    const stateMatch = alert.location?.match(/\b([A-Z]{2})\b/);
+    const titleStateMatch = alert.title?.match(/\b([A-Z]{2})\b/);
+    const descriptionStateMatch = alert.description?.match(/\b([A-Z]{2})\b/);
+    
+    let state = stateMatch ? stateMatch[1] : null;
+    if (!state && titleStateMatch) state = titleStateMatch[1];
+    if (!state && descriptionStateMatch) state = descriptionStateMatch[1];
 
-  const getWeatherIcon = (eventType: string) => {
-    const type = eventType.toLowerCase();
-    if (type.includes('tornado')) return '🌪️';
-    if (type.includes('severe thunderstorm') || type.includes('storm')) return '⛈️';
-    if (type.includes('flood') || type.includes('flash flood')) return '🌊';
-    if (type.includes('winter') || type.includes('snow') || type.includes('ice')) return '❄️';
-    if (type.includes('wind') || type.includes('gale')) return '💨';
-    if (type.includes('heat') || type.includes('fire')) return '🔥';
-    return '⚠️';
-  };
+    if (state && US_STATES[state as keyof typeof US_STATES]) {
+      if (!acc[state]) acc[state] = [];
+      acc[state].push(alert);
+    }
+    return acc;
+  }, {});
 
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (!mapContainer.current || mapRef.current) return;
 
-    console.log('Initializing Leaflet map...');
+    // Create map
+    const map = L.map(mapContainer.current).setView([39.0902, -95.7129], 4);
 
-    try {
-      // Create Leaflet map
-      map.current = L.map(mapContainer.current).setView([39.8283, -98.5795], 4);
+    // Add dark tile layer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
 
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 18,
-      }).addTo(map.current);
-
-      // Create markers layer
-      markersLayer.current = L.layerGroup().addTo(map.current);
-
-      console.log('Leaflet map created successfully!');
-      setMapLoaded(true);
-      setLoading(false);
-      loadWeatherData();
-
-    } catch (error) {
-      console.error('Failed to initialize map:', error);
-      setLoading(false);
-    }
+    mapRef.current = map;
+    
+    console.log('✓ Leaflet map initialized successfully');
 
     return () => {
-      if (map.current) {
-        map.current.remove();
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
       }
     };
   }, []);
 
-  // Load weather alert data
-  const loadWeatherData = async () => {
-    console.log('Loading weather data...');
-    try {
-      const response = await fetch('/api/weather-alerts');
-      const data = await response.json();
-      
-      console.log('Weather data received:', data.alerts?.length || 0, 'alerts');
-      
-      if (data.success && data.alerts) {
-        setWeatherAlerts(data.alerts);
-        addWeatherAlertsToMap(data.alerts);
-      } else {
-        console.log('No weather alerts found');
-      }
-    } catch (error) {
-      console.error('Error loading weather data:', error);
-    }
-  };
-
-  // Add weather alerts to map
-  const addWeatherAlertsToMap = (alerts: WeatherAlert[]) => {
-    if (!map.current || !markersLayer.current) return;
+  // Add/update alert markers
+  useEffect(() => {
+    if (!mapRef.current || Object.keys(statesWithAlerts).length === 0) return;
 
     // Clear existing markers
-    markersLayer.current.clearLayers();
+    markersRef.current.forEach(marker => mapRef.current?.removeLayer(marker));
+    markersRef.current = [];
 
-    console.log('Adding', alerts.length, 'weather alerts to map');
+    // Add new markers
+    Object.entries(statesWithAlerts).forEach(([stateCode, stateAlerts]) => {
+      const stateData = US_STATES[stateCode as keyof typeof US_STATES];
+      if (!stateData) return;
 
-    alerts.slice(0, 100).forEach((alert, index) => {
-      const coords = generateCoordinatesFromArea(alert.areaDesc);
-      const color = getWeatherColor(alert.event, alert.severity);
-      const emoji = getWeatherIcon(alert.event);
-
-      // Create custom icon
-      const customIcon = L.divIcon({
-        html: `<div style="
-          background-color: ${color}; 
-          width: 24px; 
-          height: 24px; 
-          border-radius: 50%; 
-          border: 2px solid white; 
-          display: flex; 
-          align-items: center; 
-          justify-content: center;
-          font-size: 12px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        ">${emoji}</div>`,
-        className: 'custom-weather-icon',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-      });
-
-      // Create marker
-      const marker = L.marker([coords[1], coords[0]], { icon: customIcon });
+      const alertCount = (stateAlerts as WeatherAlert[]).length;
       
-      // Add popup
-      marker.bindPopup(`
-        <div class="p-3 max-w-xs">
-          <div class="font-bold text-sm mb-1">${alert.event}</div>
-          <div class="text-xs text-gray-600 mb-2">${alert.areaDesc}</div>
-          <div class="text-xs mb-2">${alert.description.substring(0, 100)}...</div>
-          <div class="flex items-center gap-2">
-            <span class="inline-block px-2 py-1 text-xs rounded" style="background-color: ${color}20; color: ${color};">
-              ${alert.severity}
-            </span>
-            <span class="text-xs text-gray-500">${alert.urgency}</span>
-          </div>
-          <button onclick="window.showAlertDetails('${alert.id}')" class="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
-            View Details
-          </button>
-        </div>
-      `);
+      // Create custom marker icon
+      const markerHtml = `
+        <div style="
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(45deg, #ff6b35, #f7931e);
+          border: 3px solid #fff;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          color: white;
+          font-size: 14px;
+          box-shadow: 0 4px 12px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 107, 53, 0.3);
+          transform-origin: center center;
+          transition: transform 0.2s ease;
+        ">${alertCount}</div>
+      `;
 
-      // Add click handler
-      marker.on('click', () => {
-        setSelectedAlert(alert);
+      const customIcon = L.divIcon({
+        html: markerHtml,
+        className: 'custom-alert-marker',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
       });
 
-      markersLayer.current!.addLayer(marker);
+      // Create popup content
+      const popupContent = `
+        <div style="max-width: 300px; font-family: system-ui;">
+          <h4 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937; font-size: 16px;">
+            ${stateData.name} (${stateCode})
+          </h4>
+          <div style="margin-bottom: 12px; padding: 6px 12px; background: #ff6b35; color: white; border-radius: 4px; text-align: center; font-size: 14px; font-weight: 600;">
+            ${alertCount} Active Alert${alertCount !== 1 ? 's' : ''}
+          </div>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${(stateAlerts as WeatherAlert[]).slice(0, 4).map((alert: WeatherAlert) => `
+              <div style="margin-bottom: 8px; padding: 8px; border-left: 4px solid #ff6b35; background: #f9fafb; border-radius: 0 4px 4px 0;">
+                <div style="font-weight: 600; font-size: 13px; color: #374151; margin-bottom: 2px;">${alert.event}</div>
+                <div style="font-size: 12px; color: #6b7280;">${alert.severity} • ${alert.urgency}</div>
+              </div>
+            `).join('')}
+            ${alertCount > 4 ? `
+              <div style="text-align: center; color: #6b7280; font-size: 12px; padding: 4px;">
+                ... and ${alertCount - 4} more alerts
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      // Add marker to map
+      const marker = L.marker([stateData.coords[1], stateData.coords[0]], { icon: customIcon })
+        .addTo(mapRef.current!)
+        .bindPopup(popupContent);
+
+      // Add hover effects
+      marker.getElement()?.addEventListener('mouseenter', () => {
+        marker.getElement()!.style.transform = 'scale(1.1)';
+      });
+      
+      marker.getElement()?.addEventListener('mouseleave', () => {
+        marker.getElement()!.style.transform = 'scale(1)';
+      });
+
+      markersRef.current.push(marker);
     });
 
-    console.log('Weather alerts added to map successfully');
-  };
+    console.log(`✓ Added ${Object.keys(statesWithAlerts).length} alert markers to weather map`);
+  }, [statesWithAlerts]);
 
-  // Generate realistic coordinates from area description
-  const generateCoordinatesFromArea = (areaDesc: string): [number, number] => {
-    const areaCoords: Record<string, [number, number]> = {
-      'California': [-119.4179, 36.7783],
-      'Texas': [-99.9018, 31.9686],
-      'Florida': [-81.5158, 27.6648],
-      'New York': [-74.0060, 40.7128],
-      'Illinois': [-89.3985, 40.6331],
-      'Pennsylvania': [-77.1945, 40.2732],
-      'Ohio': [-82.7649, 40.3888],
-      'Georgia': [-83.2572, 32.1656],
-      'North Carolina': [-78.6569, 35.7596],
-      'Michigan': [-84.5555, 44.3467],
-      'New Jersey': [-74.7429, 40.0583],
-      'Virginia': [-78.6569, 37.4316],
-      'Washington': [-120.7401, 47.7511],
-      'Arizona': [-111.0937, 34.0489],
-      'Massachusetts': [-71.0942, 42.2373],
-      'Tennessee': [-86.7816, 35.7796],
-      'Indiana': [-86.1349, 40.2732],
-      'Maryland': [-76.5019, 39.0458],
-      'Missouri': [-91.8318, 38.5767],
-      'Wisconsin': [-89.6165, 43.7844]
-    };
+  // Toggle weather layers
+  const toggleWeatherLayer = (layerType: string) => {
+    if (!mapRef.current) return;
 
-    for (const [state, coords] of Object.entries(areaCoords)) {
-      if (areaDesc.includes(state)) {
-        return [
-          coords[0] + (Math.random() - 0.5) * 4,
-          coords[1] + (Math.random() - 0.5) * 2
-        ];
-      }
+    // Remove existing weather layer
+    if (weatherLayerRef.current) {
+      mapRef.current.removeLayer(weatherLayerRef.current);
+      weatherLayerRef.current = null;
     }
 
-    return [
-      -125 + Math.random() * 50,
-      25 + Math.random() * 25
-    ];
+    if (layerType === weatherLayer) {
+      // Toggle off if same layer
+      setWeatherLayer('none');
+      return;
+    }
+
+    // Add new weather layer
+    if (layerType === 'precipitation') {
+      weatherLayerRef.current = L.tileLayer('https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png', {
+        opacity: 0.6,
+        attribution: 'RainViewer'
+      }).addTo(mapRef.current);
+      
+      setWeatherLayer('precipitation');
+      console.log('✓ Added precipitation radar layer');
+    } else if (layerType === 'temperature') {
+      // Using OpenWeatherMap temperature tiles (you'd need an API key for production)
+      weatherLayerRef.current = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=demo', {
+        opacity: 0.6,
+        attribution: 'OpenWeatherMap'
+      }).addTo(mapRef.current);
+      
+      setWeatherLayer('temperature');
+      console.log('✓ Added temperature layer');
+    }
   };
 
-  // Toggle weather layer visibility
-  useEffect(() => {
-    if (!map.current || !markersLayer.current || !mapLoaded) return;
-
-    if (showWeatherLayer) {
-      map.current.addLayer(markersLayer.current);
-    } else {
-      map.current.removeLayer(markersLayer.current);
-    }
-  }, [showWeatherLayer, mapLoaded]);
-
-  const getSeverityBadge = (severity: string) => {
-    const colors = {
-      'Extreme': 'bg-red-800 text-white',
-      'Severe': 'bg-red-600 text-white',
-      'Moderate': 'bg-yellow-500 text-white',
-      'Minor': 'bg-blue-500 text-white'
-    };
-    
+  if (isLoading) {
     return (
-      <Badge className={`${colors[severity as keyof typeof colors] || 'bg-gray-500 text-white'} text-xs`}>
-        {severity}
-      </Badge>
+      <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p>Loading interactive weather map...</p>
+        </div>
+      </div>
     );
-  };
+  }
 
-  if (loading) {
+  if (error) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading interactive weather map...</p>
-          <p className="text-sm text-gray-500 mt-2">Using OpenStreetMap with Leaflet</p>
+      <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+        <div className="text-center p-8">
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-red-500 mb-2">Error Loading Weather Map</h3>
+          <p className="text-gray-300">{error?.toString() || 'Unable to load weather data'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`relative w-full h-full ${className}`}>
+    <div className="relative w-full h-full">
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full z-0" />
+      <div ref={mapContainer} className="w-full h-full" style={{ minHeight: '500px' }} />
       
-      {/* Layer Controls */}
-      <Card className="absolute top-4 left-4 w-72 bg-white/95 backdrop-blur-sm shadow-lg z-10">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Layers className="w-5 h-5" />
-            Weather Layers
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CloudRain className="w-4 h-4 text-blue-600" />
-              <div>
-                <div className="font-medium text-sm">Weather Alerts</div>
-                <div className="text-xs text-gray-500">
-                  {weatherAlerts.length} active alerts
-                </div>
-              </div>
+      {/* Alert Counter */}
+      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white z-[1000]">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-orange-500" />
+          <div>
+            <div className="font-bold text-sm">
+              {Object.keys(statesWithAlerts).length} States with Alerts
             </div>
-            <Switch
-              checked={showWeatherLayer}
-              onCheckedChange={setShowWeatherLayer}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats Panel */}
-      <Card className="absolute top-4 right-4 w-64 bg-white/95 backdrop-blur-sm shadow-lg z-10">
-        <CardContent className="pt-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Activity className="w-5 h-5 text-green-500" />
-            <span className="font-semibold">Live Weather Data</span>
-          </div>
-          
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Total Alerts:</span>
-              <span className="font-medium">{weatherAlerts.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Extreme:</span>
-              <span className="font-medium text-red-600">
-                {weatherAlerts.filter(a => a.severity === 'Extreme').length}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Severe:</span>
-              <span className="font-medium text-red-500">
-                {weatherAlerts.filter(a => a.severity === 'Severe').length}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Moderate:</span>
-              <span className="font-medium text-yellow-600">
-                {weatherAlerts.filter(a => a.severity === 'Moderate').length}
-              </span>
+            <div className="text-xs opacity-90">
+              Warnings & Watches Only
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Legend */}
-      <Card className="absolute bottom-4 right-4 w-56 bg-white/95 backdrop-blur-sm shadow-lg z-10">
-        <CardContent className="pt-4">
-          <div className="text-sm font-semibold mb-3">Weather Alert Icons</div>
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🌪️</span>
-              <span>Tornado Warning</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">⛈️</span>
-              <span>Severe Thunderstorm</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">🌊</span>
-              <span>Flood Warning</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">❄️</span>
-              <span>Winter Weather</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">💨</span>
-              <span>High Wind</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">🔥</span>
-              <span>Heat/Fire Warning</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Weather Layer Toggle */}
+      <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-1 text-white z-[1000]">
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => toggleWeatherLayer('precipitation')}
+            className={`flex items-center gap-2 px-3 py-2 hover:bg-white/20 rounded transition-colors text-sm ${
+              weatherLayer === 'precipitation' ? 'bg-white/20' : ''
+            }`}
+            title="Toggle precipitation radar"
+          >
+            <Layers className="w-4 h-4" />
+            Radar
+          </button>
+          <button
+            onClick={() => toggleWeatherLayer('temperature')}
+            className={`flex items-center gap-2 px-3 py-2 hover:bg-white/20 rounded transition-colors text-sm ${
+              weatherLayer === 'temperature' ? 'bg-white/20' : ''
+            }`}
+            title="Toggle temperature overlay"
+          >
+            <div className="w-4 h-4 bg-gradient-to-r from-blue-400 to-red-400 rounded" />
+            Temp
+          </button>
+        </div>
+      </div>
 
-      {/* Alert Detail Modal */}
-      {selectedAlert && (
-        <Card className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 bg-white shadow-2xl z-50 max-h-[80vh] overflow-y-auto">
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <span className="text-xl">{getWeatherIcon(selectedAlert.event)}</span>
-                  {selectedAlert.event}
-                </CardTitle>
-                <div className="flex items-center gap-2 mt-2">
-                  {getSeverityBadge(selectedAlert.severity)}
-                  <Badge variant="outline" className="text-xs">
-                    {selectedAlert.urgency}
-                  </Badge>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedAlert(null)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-1">Area</div>
-              <div className="text-sm text-gray-900">{selectedAlert.areaDesc}</div>
-            </div>
-            
-            <div>
-              <div className="text-sm font-medium text-gray-700 mb-1">Description</div>
-              <div className="text-sm text-gray-900 leading-relaxed">
-                {selectedAlert.description}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <div className="font-medium text-gray-700">Effective</div>
-                <div className="text-gray-900">
-                  {new Date(selectedAlert.effective).toLocaleString()}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium text-gray-700">Expires</div>
-                <div className="text-gray-900">
-                  {new Date(selectedAlert.expires).toLocaleString()}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button size="sm" variant="outline" className="flex-1">
-                <MapPin className="w-4 h-4 mr-1" />
-                Zoom to Location
-              </Button>
-              <Button size="sm" className="flex-1">
-                Get Updates
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Instructions */}
+      <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white text-sm z-[1000]">
+        Interactive weather map • Click markers for details • {alerts.length} alerts filtered • Toggle weather overlays
+      </div>
     </div>
   );
-};
+}
 
 export default LeafletWeatherMap;

@@ -5,11 +5,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Mapbox GL styles */
+/* Essential Mapbox GL styles for proper rendering */
 .mapboxgl-map {
   width: 100%;
   height: 100%;
   font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  position: relative;
+  background-color: rgb(40, 50, 60);
+}
+
+.mapboxgl-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mapboxgl-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .mapboxgl-ctrl-group:not(:empty) {

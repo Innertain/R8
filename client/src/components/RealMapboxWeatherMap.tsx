@@ -131,12 +131,15 @@ export function RealMapboxWeatherMap() {
     }
 
     try {
+      console.log('Creating Mapbox map with token:', !!import.meta.env.VITE_MAPBOX_TOKEN);
+      
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/dark-v11',
         center: [-95.7129, 37.0902],
         zoom: 4,
-        projection: { name: 'mercator' }
+        attributionControl: false,
+        logoPosition: 'bottom-left'
       });
 
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -144,41 +147,29 @@ export function RealMapboxWeatherMap() {
       map.current.on('load', () => {
         if (!map.current) return;
 
-        // Add free precipitation radar from RainViewer
-        map.current.addSource('rainviewer-radar', {
-          type: 'raster',
-          tiles: [
-            'https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png'
-          ],
-          tileSize: 256
-        });
+        // Add free precipitation radar from RainViewer 
+        try {
+          map.current.addSource('rainviewer-radar', {
+            type: 'raster',
+            tiles: [
+              'https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png'
+            ],
+            tileSize: 256
+          });
 
-        map.current.addLayer({
-          id: 'radar-layer',
-          type: 'raster',
-          source: 'rainviewer-radar',
-          paint: {
-            'raster-opacity': 0.7
-          }
-        });
-
-        // Add Open-Meteo temperature overlay (free, unlimited)
-        map.current.addSource('temperature-overlay', {
-          type: 'raster',
-          tiles: [
-            'https://maps.openweathermap.org/maps/2.0/weather/TA2/{z}/{x}/{y}?opacity=0.6&fill_bound=true'
-          ],
-          tileSize: 256
-        });
-
-        map.current.addLayer({
-          id: 'temperature-layer',
-          type: 'raster',  
-          source: 'temperature-overlay',
-          paint: {
-            'raster-opacity': 0.0
-          }
-        });
+          map.current.addLayer({
+            id: 'radar-layer',
+            type: 'raster',
+            source: 'rainviewer-radar',
+            paint: {
+              'raster-opacity': 0.7
+            }
+          });
+          
+          console.log('✓ Added precipitation radar layer');
+        } catch (error) {
+          console.warn('Could not add radar layer:', error);
+        }
 
         setInitialized(true);
         console.log('✓ Map with weather overlay loaded successfully');
@@ -278,7 +269,7 @@ export function RealMapboxWeatherMap() {
       const marker = new mapboxgl.Marker(markerEl)
         .setLngLat([stateData.coords[0], stateData.coords[1]])
         .setPopup(popup)
-        .addTo(map.current);
+        .addTo(map.current!);
 
       markersRef.current.push(marker);
     });
