@@ -349,12 +349,18 @@ export default function SimpleMapboxMap() {
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    // Add new markers
-    Object.entries(statesWithAlerts).forEach(([stateCode, alerts]) => {
+    // Add new markers with offset positioning to avoid wildfire overlap
+    Object.entries(statesWithAlerts).forEach(([stateCode, alerts], stateIndex) => {
       const stateData = US_STATES[stateCode as keyof typeof US_STATES];
       if (!stateData) return;
 
       const alertCount = alerts.length;
+      
+      // Offset weather alerts slightly from state center to avoid wildfire overlap
+      const weatherOffset = 0.15; // Small offset for weather alerts
+      const weatherAngle = (stateIndex * 45) * (Math.PI / 180); // Different angle than wildfires
+      const weatherLng = stateData.coords[0] + (weatherOffset * Math.cos(weatherAngle));
+      const weatherLat = stateData.coords[1] + (weatherOffset * Math.sin(weatherAngle));
 
       // Get unique weather types for this state
       const uniqueWeatherTypes = [...new Set(alerts.map(alert => getWeatherIcon(alert.event)))];
@@ -661,9 +667,9 @@ export default function SimpleMapboxMap() {
         </style>
       `);
 
-      // Add marker to map
+      // Add marker to map with offset coordinates
       const marker = new mapboxgl.Marker(el)
-        .setLngLat([stateData.coords[0], stateData.coords[1]])
+        .setLngLat([weatherLng, weatherLat])
         .setPopup(popup)
         .addTo(map.current!);
 
@@ -690,12 +696,17 @@ export default function SimpleMapboxMap() {
         
         if (coordinates) {
           [lng, lat] = coordinates;
+          // Add small offset even for geocoded locations to avoid exact overlap
+          const microOffset = 0.02; // Small offset to prevent exact overlap
+          const microAngle = (index * 45) * (Math.PI / 180);
+          lng += microOffset * Math.cos(microAngle);
+          lat += microOffset * Math.sin(microAngle);
           console.log(`📍 Wildfire "${incident.title}" geocoded to ${extractedLocation}: [${lng}, ${lat}]`);
         } else {
-          // Fallback with offset positioning to avoid overlapping weather markers
+          // Enhanced fallback with larger offset positioning to avoid overlapping weather markers
           const baseCoords = stateData.coords;
-          const offsetDistance = 0.3; // degrees
-          const angle = (index * 60) * (Math.PI / 180); // Spread multiple wildfires in circle
+          const offsetDistance = 0.5; // Increased from 0.3 to 0.5 degrees for better separation
+          const angle = (index * 72) * (Math.PI / 180); // Changed to 72 degrees (360/5) for better distribution
           lng = baseCoords[0] + (offsetDistance * Math.cos(angle));
           lat = baseCoords[1] + (offsetDistance * Math.sin(angle));
           console.log(`📍 Wildfire "${incident.title}" using offset coords: [${lng}, ${lat}]`);
