@@ -1186,21 +1186,43 @@ export default function SimpleMapboxMap() {
         else if (severity > 200) color = '#f97316'; // Orange for medium severity
         else if (severity > 50) color = '#eab308'; // Yellow-orange for low severity
         
-        // Create disaster marker element
+        // Create disaster marker element with enhanced visibility
         const el = document.createElement('div');
+        el.className = 'disaster-heat-marker';
         el.style.width = `${size}px`;
         el.style.height = `${size}px`;
         el.style.backgroundColor = color;
         el.style.borderRadius = '50%';
-        el.style.border = '3px solid white';
+        el.style.border = '4px solid white';
         el.style.cursor = 'pointer';
         el.style.display = 'flex';
         el.style.alignItems = 'center';
         el.style.justifyContent = 'center';
-        el.style.fontSize = `${size * 0.4}px`;
-        el.style.boxShadow = `0 0 ${size * 0.8}px ${color}66`;
+        el.style.fontSize = `${size * 0.5}px`;
+        el.style.fontWeight = 'bold';
+        el.style.boxShadow = `0 0 ${size}px ${color}88, 0 0 ${size * 2}px ${color}44`;
         el.style.position = 'relative';
-        el.style.zIndex = '600';
+        el.style.zIndex = '1000';
+        el.style.animation = `pulse-disaster 2s infinite`;
+        
+        // Add CSS animation for pulsing effect
+        if (!document.querySelector('#disaster-marker-styles')) {
+          const style = document.createElement('style');
+          style.id = 'disaster-marker-styles';
+          style.textContent = `
+            @keyframes pulse-disaster {
+              0% { transform: scale(1); opacity: 1; }
+              50% { transform: scale(1.1); opacity: 0.8; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            .disaster-heat-marker:hover {
+              transform: scale(1.2) !important;
+              z-index: 1001 !important;
+              transition: transform 0.2s ease !important;
+            }
+          `;
+          document.head.appendChild(style);
+        }
         
         // Add emoji based on severity and type
         if (severity > 500) {
@@ -1240,13 +1262,32 @@ export default function SimpleMapboxMap() {
         `);
         
         try {
+          // Validate coordinates before creating marker
+          const lng = disaster.coordinates.longitude;
+          const lat = disaster.coordinates.latitude;
+          
+          if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+            console.error(`❌ Invalid coordinates for disaster ${i+1}: [${lng}, ${lat}]`);
+            continue;
+          }
+          
           const marker = new mapboxgl.Marker(el)
-            .setLngLat([disaster.coordinates.longitude, disaster.coordinates.latitude])
+            .setLngLat([lng, lat])
             .setPopup(popup)
             .addTo(map.current!);
           
           markersRef.current.push(marker);
-          console.log(`✅ DISASTER MARKER ${i+1}: ${disaster.eventType} in ${disaster.state} at [${disaster.coordinates.longitude}, ${disaster.coordinates.latitude}] - severity: ${severity.toFixed(1)}`);
+          console.log(`✅ DISASTER MARKER ${i+1}: ${disaster.eventType} in ${disaster.state} at [${lng}, ${lat}] - severity: ${severity.toFixed(1)}`);
+          
+          // Pan map to show first few high-severity markers
+          if (i === 0 && severity > 500) {
+            map.current!.flyTo({
+              center: [lng, lat],
+              zoom: 6,
+              duration: 2000
+            });
+            console.log(`🎯 Flying to highest severity disaster: ${disaster.eventType} in ${disaster.state}`);
+          }
           
           // Small delay to prevent browser freeze
           await new Promise(resolve => setTimeout(resolve, 50));
