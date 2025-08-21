@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { AlertTriangle, MapPin, Layers } from 'lucide-react';
 
 // Initialize Mapbox - token should be available
@@ -131,21 +132,34 @@ export function RealMapboxWeatherMap() {
     }
 
     try {
-      console.log('Creating Mapbox map with token:', !!import.meta.env.VITE_MAPBOX_TOKEN);
+      console.log('Initializing Mapbox map...');
+      console.log('Token available:', !!mapboxgl.accessToken);
+      console.log('Container element:', !!mapContainer.current);
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/dark-v11',
         center: [-95.7129, 37.0902],
         zoom: 4,
-        attributionControl: false,
-        logoPosition: 'bottom-left'
+        attributionControl: true,
+        accessToken: mapboxgl.accessToken
       });
 
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      
+      // Force resize after a brief delay to ensure proper rendering
+      setTimeout(() => {
+        if (map.current) {
+          map.current.resize();
+          console.log('✓ Map resize triggered');
+        }
+      }, 100);
 
       map.current.on('load', () => {
         if (!map.current) return;
+        
+        console.log('✓ Mapbox map loaded successfully');
+        setInitialized(true);
 
         // Add weather overlays
         try {
@@ -192,12 +206,21 @@ export function RealMapboxWeatherMap() {
           console.warn('Could not add weather layers:', error);
         }
 
-        setInitialized(true);
-        console.log('✓ Map with weather overlay loaded successfully');
+        console.log('✓ Weather overlays added successfully');
       });
 
       map.current.on('error', (e) => {
-        console.error('Mapbox error:', e.error);
+        console.error('Mapbox error:', e);
+      });
+
+      map.current.on('styledata', () => {
+        console.log('✓ Map style loaded');
+      });
+
+      map.current.on('sourcedata', (e) => {
+        if (e.isSourceLoaded) {
+          console.log(`✓ Source loaded: ${e.sourceId}`);
+        }
       });
 
     } catch (error) {
@@ -348,7 +371,15 @@ export function RealMapboxWeatherMap() {
   return (
     <div className="relative w-full h-full">
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full" style={{ minHeight: '500px' }} />
+      <div 
+        ref={mapContainer} 
+        className="w-full h-full mapbox-container" 
+        style={{ 
+          minHeight: '500px', 
+          position: 'relative',
+          backgroundColor: '#1e293b'
+        }} 
+      />
       
       {/* Alert Counter */}
       <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white z-10">
