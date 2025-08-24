@@ -1632,42 +1632,91 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
     }
   });
 
-  // Wildfire Incidents RSS Feed endpoint
+  // Enhanced Wildfire Incidents endpoint with multi-source integration
   app.get('/api/wildfire-incidents', async (req, res) => {
     try {
-      console.log('Fetching wildfire incidents from InciWeb RSS feed...');
+      console.log('Fetching wildfire incidents from multiple sources...');
 
-      const response = await fetch('https://inciweb.wildfire.gov/incidents/rss.xml', {
-        headers: { 'User-Agent': 'DisasterApp/1.0 (wildfire-monitoring@example.com)' }
-      });
+      // Source 1: InciWeb RSS Feed (national federal wildfire incidents)
+      let inciwebIncidents: any[] = [];
+      try {
+        console.log('📡 Fetching from InciWeb RSS feed...');
+        const inciwebResponse = await fetch('https://inciweb.wildfire.gov/incidents/rss.xml', {
+          headers: { 'User-Agent': 'DisasterApp/1.0 (wildfire-monitoring@example.com)' }
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!inciwebResponse.ok) {
+          throw new Error(`InciWeb HTTP error! status: ${inciwebResponse.status}`);
+        }
+
+        const xmlText = await inciwebResponse.text();
+        inciwebIncidents = await parseInciWebFeed(xmlText);
+        console.log(`✓ InciWeb incidents found: ${inciwebIncidents.length}`);
+      } catch (inciwebError) {
+        console.error('InciWeb RSS feed error:', inciwebError);
       }
 
-      const xmlText = await response.text();
+      // Source 2: NASA FIRMS (satellite fire detection for Florida)
+      let firmsIncidents: any[] = [];
+      try {
+        console.log('🛰️ Fetching Florida fires from NASA FIRMS...');
+        firmsIncidents = await fetchNASAFirmsData();
+        console.log(`✓ NASA FIRMS Florida fires found: ${firmsIncidents.length}`);
+      } catch (firmsError) {
+        console.error('NASA FIRMS API error:', firmsError);
+      }
 
-      // Parse XML manually since we don't have DOMParser in Node.js
-      const parseXMLItem = (itemText: string) => {
-        const getTagContent = (tag: string): string => {
-          const regex = new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'is');
-          const match = itemText.match(regex);
-          return match ? match[1].trim() : '';
-        };
+      // Combine and deduplicate incidents
+      const allIncidents = [...inciwebIncidents, ...firmsIncidents];
+      const uniqueIncidents = deduplicateWildfireIncidents(allIncidents);
 
-        return {
-          title: getTagContent('title'),
-          description: getTagContent('description'),
-          link: getTagContent('link'),
-          pubDate: getTagContent('pubDate'),
-          guid: getTagContent('guid')
-        };
+      console.log(`✓ Total unique wildfire incidents: ${uniqueIncidents.length} (${inciwebIncidents.length} InciWeb + ${firmsIncidents.length} FIRMS)`);
+
+      res.json({
+        success: true,
+        incidents: uniqueIncidents,
+        sources: {
+          inciweb: inciwebIncidents.length,
+          nasaFirms: firmsIncidents.length,
+          total: uniqueIncidents.length
+        },
+        lastUpdated: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Error fetching wildfire incidents:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch wildfire incidents',
+        incidents: []
+      });
+    }
+  });
+
+  // Helper function to parse InciWeb RSS feed
+  async function parseInciWebFeed(xmlText: string): Promise<any[]> {
+
+    // Parse XML manually since we don't have DOMParser in Node.js
+    const parseXMLItem = (itemText: string) => {
+      const getTagContent = (tag: string): string => {
+        const regex = new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'is');
+        const match = itemText.match(regex);
+        return match ? match[1].trim() : '';
       };
 
-      // Extract items from XML
-      const itemMatches = xmlText.match(/<item[^>]*>(.*?)<\/item>/gis) || [];
+      return {
+        title: getTagContent('title'),
+        description: getTagContent('description'),
+        link: getTagContent('link'),
+        pubDate: getTagContent('pubDate'),
+        guid: getTagContent('guid')
+      };
+    };
 
-      const incidents = itemMatches.map((itemXml, index) => {
+    // Extract items from XML
+    const itemMatches = xmlText.match(/<item[^>]*>(.*?)<\/item>/gis) || [];
+
+    const incidents = itemMatches.map((itemXml, index) => {
         const item = parseXMLItem(itemXml);
 
         // Valid US state codes
@@ -1901,6 +1950,134 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
         success: false,
         error: 'Failed to fetch wildfire incidents',
         details: error.message || 'Unknown error'
+      });
+    }
+  });
+
+  // Florida-specific wildfire incidents from multiple sources
+  app.get('/api/florida-wildfires', async (req, res) => {
+    try {
+      console.log('🔥 Fetching Florida-specific wildfire data from multiple sources...');
+      
+      const floridaFires: any[] = [];
+      
+      // Source 1: Check existing InciWeb feed for Florida fires
+      try {
+        const inciwebResponse = await fetch('http://localhost:5000/api/wildfire-incidents');
+        if (inciwebResponse.ok) {
+          const inciwebData = await inciwebResponse.json();
+          const floridaInciwebFires = (inciwebData.incidents || []).filter((fire: any) => 
+            fire.state === 'FL' || fire.location?.toLowerCase().includes('florida')
+          );
+          floridaFires.push(...floridaInciwebFires.map((fire: any) => ({
+            ...fire,
+            source: 'InciWeb Federal'
+          })));
+          console.log(`📡 Found ${floridaInciwebFires.length} Florida fires from InciWeb`);
+        }
+      } catch (error) {
+        console.error('Error fetching InciWeb Florida data:', error);
+      }
+
+      // Source 2: NASA FIRMS satellite fire detection for Florida
+      try {
+        console.log('🛰️ Fetching NASA FIRMS satellite fire data for Florida...');
+        
+        // Florida bounding box coordinates
+        const floridaBounds = '-87.6349,24.5210,-80.0311,31.0009';
+        
+        // Try NASA FIRMS public API (no key needed for recent data)
+        const firmsResponse = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/nokey/VIIRS_SNPP_NRT/${floridaBounds}/1`, {
+          headers: { 'User-Agent': 'DisasterApp/1.0 (florida-fires@example.com)' },
+          timeout: 10000
+        });
+
+        if (firmsResponse.ok) {
+          const csvData = await firmsResponse.text();
+          const firmsLines = csvData.trim().split('\n');
+          
+          if (firmsLines.length > 1) {
+            const headers = firmsLines[0].split(',');
+            
+            for (let i = 1; i < Math.min(firmsLines.length, 21); i++) { // Limit to 20 fires
+              const values = firmsLines[i].split(',');
+              if (values.length >= headers.length) {
+                const fireData: any = {};
+                headers.forEach((header, index) => {
+                  fireData[header.trim()] = values[index]?.trim();
+                });
+
+                const confidence = parseFloat(fireData.confidence) || 0;
+                const brightness = parseFloat(fireData.bright_ti4) || parseFloat(fireData.brightness) || 0;
+                
+                // Only include high-confidence detections likely to be wildfires
+                if (confidence >= 50 && brightness > 280) {
+                  floridaFires.push({
+                    id: `nasa-viirs-${fireData.latitude}-${fireData.longitude}-${fireData.acq_date}`,
+                    title: `Active Fire Detection - Florida`,
+                    description: `Satellite-detected active fire. Confidence: ${confidence}%, Brightness: ${brightness}K. Detected by NASA VIIRS sensor on ${fireData.acq_date}.`,
+                    location: 'Florida',
+                    state: 'FL',
+                    coordinates: {
+                      latitude: parseFloat(fireData.latitude),
+                      longitude: parseFloat(fireData.longitude)
+                    },
+                    updated: `${fireData.acq_date}T${(fireData.acq_time || '0000').padStart(4, '0').slice(0,2)}:${(fireData.acq_time || '0000').padStart(4, '0').slice(2,4)}:00Z`,
+                    confidence: confidence,
+                    brightness: brightness,
+                    type: 'wildfire',
+                    severity: confidence > 75 ? 'high' : confidence > 60 ? 'medium' : 'low',
+                    source: 'NASA VIIRS Satellite',
+                    acres: null,
+                    containmentPercent: null,
+                    status: 'Active (Satellite Detected)'
+                  });
+                }
+              }
+            }
+            console.log(`🛰️ Found ${floridaFires.filter(f => f.source === 'NASA VIIRS Satellite').length} satellite-detected fires in Florida`);
+          }
+        } else {
+          console.log('NASA FIRMS API unavailable, continuing with other sources...');
+        }
+      } catch (firmsError) {
+        console.error('NASA FIRMS error:', firmsError);
+      }
+
+      // Remove duplicates based on proximity for satellite data
+      const uniqueFires = [];
+      const seenLocations = new Set();
+      
+      for (const fire of floridaFires) {
+        if (fire.coordinates) {
+          // Group fires within ~2 miles
+          const locationKey = `${Math.round(fire.coordinates.latitude * 50) / 50},${Math.round(fire.coordinates.longitude * 50) / 50}`;
+          if (seenLocations.has(locationKey)) continue;
+          seenLocations.add(locationKey);
+        }
+        uniqueFires.push(fire);
+      }
+
+      console.log(`🔥 Total unique Florida fires found: ${uniqueFires.length}`);
+
+      res.json({
+        success: true,
+        fires: uniqueFires,
+        totalCount: uniqueFires.length,
+        sources: {
+          inciweb: uniqueFires.filter(f => f.source === 'InciWeb Federal').length,
+          nasaViirs: uniqueFires.filter(f => f.source === 'NASA VIIRS Satellite').length
+        },
+        note: uniqueFires.length === 0 ? 'No active fires currently detected in Florida' : null,
+        lastUpdated: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Error fetching Florida wildfire data:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch Florida wildfire data',
+        fires: []
       });
     }
   });
