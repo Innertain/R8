@@ -64,6 +64,60 @@ export const shiftAssignments = pgTable("shift_assignments", {
   notes: text("notes"),
 });
 
+// Supply Sites System (matching WSS schema)
+// Counties lookup table
+export const counties = pgTable("counties", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 256 }).notNull().unique(),
+  state: varchar("state", { length: 2 }).notNull(), // State code
+});
+
+// Supply sites - main table matching WSS structure
+export const supplySites = pgTable("supply_sites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // PUBLIC INFO (visible to everyone)
+  name: varchar("name", { length: 256 }).notNull(),
+  address: varchar("address", { length: 512 }).notNull(),
+  city: varchar("city", { length: 256 }).notNull(),
+  state: varchar("state", { length: 2 }).notNull(),
+  countyId: varchar("county_id").references(() => counties.id),
+  website: text("website"),
+  facebook: text("facebook"),
+  peopleServedWeekly: integer("people_served_weekly"),
+  siteHours: text("site_hours"), // Free text field for hours
+  
+  // OPERATIONAL FLAGS (public)
+  acceptingDonations: boolean("accepting_donations").default(true).notNull(),
+  distributingSupplies: boolean("distributing_supplies").default(true).notNull(),
+  siteType: varchar("site_type", { length: 32 }).notNull().default("distribution_center"), // 'distribution_center' or 'supply_warehouse'
+  isPubliclyVisible: boolean("is_publicly_visible").default(true).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  inactiveReason: text("inactive_reason"),
+  
+  // PRIVATE INFO (authenticated users only)
+  primaryContactName: varchar("primary_contact_name", { length: 128 }),
+  primaryContactPhone: varchar("primary_contact_phone", { length: 32 }),
+  maxSupplyLoad: varchar("max_supply_load", { length: 64 }), // e.g., "Pickup Truck", "Van", etc.
+  receivingNotes: text("receiving_notes"), // Delivery instructions
+  
+  // R8-SPECIFIC FIELDS (for dual taxonomy support)
+  r8SiteType: varchar("r8_site_type", { length: 32 }), // 'pod', 'poc', 'community', 'other'
+  
+  // METADATA
+  createdAt: timestamp("created_at").defaultNow(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// Additional site managers (multiple contacts per site)
+export const siteManagers = pgTable("site_managers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  siteId: varchar("site_id").notNull().references(() => supplySites.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 128 }).notNull(),
+  phone: varchar("phone", { length: 32 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Create insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -85,6 +139,22 @@ export const insertShiftAssignmentSchema = createInsertSchema(shiftAssignments).
   assignedAt: true,
 });
 
+// Supply site insert schemas
+export const insertCountySchema = createInsertSchema(counties).omit({
+  id: true,
+});
+
+export const insertSupplySiteSchema = createInsertSchema(supplySites).omit({
+  id: true,
+  createdAt: true,
+  lastUpdated: true,
+});
+
+export const insertSiteManagerSchema = createInsertSchema(siteManagers).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -97,6 +167,16 @@ export type Availability = typeof volunteerAvailability.$inferSelect;
 
 export type InsertShiftAssignment = z.infer<typeof insertShiftAssignmentSchema>;
 export type ShiftAssignment = typeof shiftAssignments.$inferSelect;
+
+// Supply site types
+export type InsertCounty = z.infer<typeof insertCountySchema>;
+export type County = typeof counties.$inferSelect;
+
+export type InsertSupplySite = z.infer<typeof insertSupplySiteSchema>;
+export type SupplySite = typeof supplySites.$inferSelect;
+
+export type InsertSiteManager = z.infer<typeof insertSiteManagerSchema>;
+export type SiteManager = typeof siteManagers.$inferSelect;
 
 // Session storage table for authentication
 export const sessions = pgTable(
