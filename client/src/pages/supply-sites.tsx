@@ -233,7 +233,10 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
     r8SiteType: "",
     siteType: "",
     
-    // PUBLIC INFO
+    // PUBLIC/PRIVATE INFO CONTROL
+    siteInfoPublic: true, // Controls if site info is public or private
+    
+    // Site Info (PUBLIC by default)
     name: "",
     address: "",
     city: "",
@@ -262,6 +265,9 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
     isActive: true,
     inactiveReason: "",
   });
+
+  // Dev mode bypass for testing
+  const [devMode, setDevMode] = useState(false);
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -344,8 +350,9 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
   };
 
   const handleNextStep = () => {
-    if (step === 0 || step === 7) {
+    if (step === 0 || step === 7 || devMode) {
       // Welcome and Complete steps don't need validation
+      // Dev mode bypasses all validation
       setStep(Math.min(totalSteps - 1, step + 1));
     } else if (validateCurrentStep()) {
       setStep(Math.min(totalSteps - 1, step + 1));
@@ -369,7 +376,22 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
       <div className="bg-white dark:bg-gray-800 border-b sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold" data-testid="text-onboarding-title">Supply Site Onboarding</h3>
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-semibold" data-testid="text-onboarding-title">Supply Site Onboarding</h3>
+              
+              {/* Dev Mode Toggle */}
+              <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-900/20 rounded-lg border border-orange-300 dark:border-orange-700">
+                <Switch
+                  checked={devMode}
+                  onCheckedChange={setDevMode}
+                  data-testid="switch-dev-mode"
+                  className="scale-75"
+                />
+                <span className="text-xs font-medium text-orange-700 dark:text-orange-400">
+                  DEV MODE {devMode ? 'ON' : 'OFF'}
+                </span>
+              </div>
+            </div>
             <Button variant="ghost" onClick={onClose} data-testid="button-close-onboarding">
               Close
             </Button>
@@ -381,6 +403,11 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
             </div>
             <Progress value={progress} className="h-2" data-testid="progress-onboarding" />
           </div>
+          {devMode && (
+            <div className="mt-2 text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/10 px-3 py-1.5 rounded">
+              ⚡ Dev mode active - validation bypassed for testing
+            </div>
+          )}
         </div>
       </div>
 
@@ -589,21 +616,51 @@ function SiteTypeStep({ formData, updateFormData }: any) {
   );
 }
 
-// Step 3: Site Info (PUBLIC)
+// Step 3: Site Info (PUBLIC/PRIVATE)
 function SiteInfoStep({ formData, updateFormData, errors = {} }: any) {
   return (
     <Card data-testid="card-site-info-step">
       <CardHeader>
         <CardTitle className="text-2xl flex items-center">
           Site Information
-          <PrivacyBadge isPublic={true} />
+          <PrivacyBadge isPublic={formData.siteInfoPublic} />
         </CardTitle>
         <CardDescription>
-          This information will be visible on the public map to help people find your site
+          {formData.siteInfoPublic 
+            ? "This information will be visible on the public map to help people find your site"
+            : "This information will be kept private and only visible to authenticated users"}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
+          {/* Public/Private Toggle */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {formData.siteInfoPublic ? (
+                  <Globe className="h-5 w-5 text-blue-600" />
+                ) : (
+                  <Lock className="h-5 w-5 text-gray-600" />
+                )}
+                <div>
+                  <p className="font-medium">
+                    {formData.siteInfoPublic ? "Public Site Information" : "Private Site Information"}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {formData.siteInfoPublic 
+                      ? "Visible to everyone on the public map"
+                      : "Only visible to authenticated supply site coordinators"}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={formData.siteInfoPublic}
+                onCheckedChange={(checked) => updateFormData("siteInfoPublic", checked)}
+                data-testid="switch-site-info-public"
+              />
+            </div>
+          </div>
+
           <div>
             <Label htmlFor="site-name" className="text-base">Site Name *</Label>
             <Input
