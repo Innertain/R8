@@ -1937,22 +1937,8 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
       console.log(`✓ Wildfire incidents processed: ${incidents.length} incidents found`);
 
-      res.json({
-        success: true,
-        incidents,
-        count: incidents.length,
-        lastUpdated: new Date().toISOString(),
-        source: 'InciWeb Wildfire RSS'
-      });
-    } catch (error: any) {
-      console.error('Error fetching wildfire incidents:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch wildfire incidents',
-        details: error.message || 'Unknown error'
-      });
-    }
-  });
+      return incidents;
+  }
 
   // Florida-specific wildfire incidents from multiple sources
   app.get('/api/florida-wildfires', async (req, res) => {
