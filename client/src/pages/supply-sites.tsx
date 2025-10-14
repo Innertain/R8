@@ -1202,20 +1202,17 @@ export function ImpactTrackingSection() {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl p-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-3xl font-bold mb-2 flex items-center gap-3">
-              <BarChart3 className="h-8 w-8" />
-              Impact Tracking
-            </h2>
-            <p className="text-green-50 text-lg">
-              Track your last mile delivery impact - ensuring donations reach the right hands
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-4xl font-bold">1,247</div>
-            <div className="text-green-100 text-sm">Total Households Served</div>
-          </div>
+        <div>
+          <h2 className="text-3xl font-bold mb-2 flex items-center gap-3">
+            <BarChart3 className="h-8 w-8" />
+            Impact Tracking
+          </h2>
+          <p className="text-green-50 text-lg">
+            Track your last-mile delivery impact - ensuring donations reach the right hands
+          </p>
+          <p className="text-green-100 text-sm mt-3">
+            Use the forms below to log distribution data and collect stories. All data is stored privately with no personal identifiers.
+          </p>
         </div>
       </div>
 
