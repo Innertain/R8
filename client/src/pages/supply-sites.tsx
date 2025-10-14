@@ -62,9 +62,29 @@ const siteStatusSchema = z.object({
 export default function SupplySitesPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(0);
+  const [showImpactTracking, setShowImpactTracking] = useState(false);
 
   if (showOnboarding) {
     return <OnboardingWizard step={onboardingStep} setStep={setOnboardingStep} onClose={() => setShowOnboarding(false)} />;
+  }
+
+  if (showImpactTracking) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-6 py-8">
+          <Button
+            variant="ghost"
+            onClick={() => setShowImpactTracking(false)}
+            className="mb-6"
+            data-testid="button-back-from-impact"
+          >
+            <ChevronRight className="h-4 w-4 mr-2 rotate-180" />
+            Back to Supply Sites
+          </Button>
+          <ImpactTrackingSection />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -101,6 +121,15 @@ export default function SupplySitesPage() {
               >
                 <MapPin className="h-5 w-5 mr-2" />
                 Find Help Near You
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => setShowImpactTracking(true)}
+                className="bg-green-600 text-white hover:bg-green-700 text-lg px-8 py-6"
+                data-testid="button-track-impact"
+              >
+                <BarChart3 className="h-5 w-5 mr-2" />
+                Track Impact
               </Button>
             </div>
           </div>
