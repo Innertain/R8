@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Package, MapPin, Users, BookOpen, CheckCircle, ArrowRight, ChevronRight, Lock, Globe, Clock, Truck, Eye, EyeOff, UserPlus, X, AlertCircle } from "lucide-react";
+import { Package, MapPin, Users, BookOpen, CheckCircle, ArrowRight, ChevronRight, Lock, Globe, Clock, Truck, Eye, EyeOff, UserPlus, X, AlertCircle, BarChart3, Heart, MessageSquare, TrendingUp, Calendar, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1157,6 +1157,478 @@ function CompleteStep({ onClose, formData }: any) {
         <div className="flex gap-4">
           <Button onClick={onClose} className="flex-1" data-testid="button-done">
             Return to Home
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Impact Tracking Component - Track last mile delivery with trauma-informed story collection
+export function ImpactTrackingSection() {
+  const [activeTab, setActiveTab] = useState<'metrics' | 'stories'>('metrics');
+  const [showStoryForm, setShowStoryForm] = useState(false);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl p-8">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-3xl font-bold mb-2 flex items-center gap-3">
+              <BarChart3 className="h-8 w-8" />
+              Impact Tracking
+            </h2>
+            <p className="text-green-50 text-lg">
+              Track your last mile delivery impact - ensuring donations reach the right hands
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-4xl font-bold">1,247</div>
+            <div className="text-green-100 text-sm">Total Households Served</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b">
+        <button
+          onClick={() => setActiveTab('metrics')}
+          className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+            activeTab === 'metrics'
+              ? 'border-green-600 text-green-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+          data-testid="button-tab-metrics"
+        >
+          <TrendingUp className="h-4 w-4 inline mr-2" />
+          Distribution Metrics
+        </button>
+        <button
+          onClick={() => setActiveTab('stories')}
+          className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+            activeTab === 'stories'
+              ? 'border-green-600 text-green-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+          data-testid="button-tab-stories"
+        >
+          <Heart className="h-4 w-4 inline mr-2" />
+          Impact Stories
+        </button>
+      </div>
+
+      {/* Metrics Tab */}
+      {activeTab === 'metrics' && <MetricsLoggingForm />}
+
+      {/* Stories Tab */}
+      {activeTab === 'stories' && (
+        <div className="space-y-6">
+          {!showStoryForm ? (
+            <div className="text-center py-12">
+              <MessageSquare className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Share Impact Stories</h3>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                Stories help us understand the human impact of our work. We collect stories with trauma-informed practices - no personal information required.
+              </p>
+              <Button onClick={() => setShowStoryForm(true)} data-testid="button-add-story">
+                <Heart className="h-4 w-4 mr-2" />
+                Share a Story
+              </Button>
+            </div>
+          ) : (
+            <TraumaInformedStoryForm onCancel={() => setShowStoryForm(false)} />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Metrics Logging Form
+function MetricsLoggingForm() {
+  const [formData, setFormData] = useState({
+    recordDate: new Date().toISOString().split('T')[0],
+    periodType: 'daily',
+    householdsServed: '',
+    individualsServed: '',
+    itemsDistributed: '',
+    categoryBreakdown: {
+      food: '',
+      water: '',
+      clothing: '',
+      hygiene: '',
+      medical: '',
+      shelter: '',
+      other: '',
+    },
+    notes: '',
+  });
+
+  const updateFormData = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateCategoryBreakdown = (category: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      categoryBreakdown: { ...prev.categoryBreakdown, [category]: value }
+    }));
+  };
+
+  return (
+    <Card data-testid="card-metrics-form">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Calendar className="h-5 w-5" />
+          Log Distribution Metrics
+        </CardTitle>
+        <CardDescription>
+          Track aggregate data about your distributions - no personal information about recipients
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Privacy Notice */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="flex items-start gap-3">
+            <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">Privacy-First Tracking</p>
+              <p className="text-blue-700 dark:text-blue-300">
+                We only collect aggregate numbers - never names, addresses, or personal identifiers of people receiving assistance.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Date and Period */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="record-date">Date *</Label>
+            <Input
+              id="record-date"
+              type="date"
+              value={formData.recordDate}
+              onChange={(e) => updateFormData('recordDate', e.target.value)}
+              className="mt-2"
+              data-testid="input-record-date"
+            />
+          </div>
+          <div>
+            <Label htmlFor="period-type">Reporting Period *</Label>
+            <Select value={formData.periodType} onValueChange={(value) => updateFormData('periodType', value)}>
+              <SelectTrigger className="mt-2" data-testid="select-period-type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Aggregate Metrics */}
+        <div className="space-y-4">
+          <h4 className="font-semibold">Aggregate Metrics</h4>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="households-served">Households Served</Label>
+              <Input
+                id="households-served"
+                type="number"
+                min="0"
+                value={formData.householdsServed}
+                onChange={(e) => updateFormData('householdsServed', e.target.value)}
+                placeholder="e.g., 15"
+                className="mt-2"
+                data-testid="input-households-served"
+              />
+            </div>
+            <div>
+              <Label htmlFor="individuals-served">Individuals Served</Label>
+              <Input
+                id="individuals-served"
+                type="number"
+                min="0"
+                value={formData.individualsServed}
+                onChange={(e) => updateFormData('individualsServed', e.target.value)}
+                placeholder="e.g., 47"
+                className="mt-2"
+                data-testid="input-individuals-served"
+              />
+            </div>
+            <div>
+              <Label htmlFor="items-distributed">Total Items Distributed</Label>
+              <Input
+                id="items-distributed"
+                type="number"
+                min="0"
+                value={formData.itemsDistributed}
+                onChange={(e) => updateFormData('itemsDistributed', e.target.value)}
+                placeholder="e.g., 320"
+                className="mt-2"
+                data-testid="input-items-distributed"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Category Breakdown */}
+        <div className="space-y-4">
+          <h4 className="font-semibold">Category Breakdown (Optional)</h4>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="cat-food">Food Items</Label>
+              <Input
+                id="cat-food"
+                type="number"
+                min="0"
+                value={formData.categoryBreakdown.food}
+                onChange={(e) => updateCategoryBreakdown('food', e.target.value)}
+                className="mt-2"
+                data-testid="input-cat-food"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cat-water">Water (bottles/gallons)</Label>
+              <Input
+                id="cat-water"
+                type="number"
+                min="0"
+                value={formData.categoryBreakdown.water}
+                onChange={(e) => updateCategoryBreakdown('water', e.target.value)}
+                className="mt-2"
+                data-testid="input-cat-water"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cat-clothing">Clothing Items</Label>
+              <Input
+                id="cat-clothing"
+                type="number"
+                min="0"
+                value={formData.categoryBreakdown.clothing}
+                onChange={(e) => updateCategoryBreakdown('clothing', e.target.value)}
+                className="mt-2"
+                data-testid="input-cat-clothing"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cat-hygiene">Hygiene Products</Label>
+              <Input
+                id="cat-hygiene"
+                type="number"
+                min="0"
+                value={formData.categoryBreakdown.hygiene}
+                onChange={(e) => updateCategoryBreakdown('hygiene', e.target.value)}
+                className="mt-2"
+                data-testid="input-cat-hygiene"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cat-medical">Medical Supplies</Label>
+              <Input
+                id="cat-medical"
+                type="number"
+                min="0"
+                value={formData.categoryBreakdown.medical}
+                onChange={(e) => updateCategoryBreakdown('medical', e.target.value)}
+                className="mt-2"
+                data-testid="input-cat-medical"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cat-shelter">Shelter Supplies</Label>
+              <Input
+                id="cat-shelter"
+                type="number"
+                min="0"
+                value={formData.categoryBreakdown.shelter}
+                onChange={(e) => updateCategoryBreakdown('shelter', e.target.value)}
+                className="mt-2"
+                data-testid="input-cat-shelter"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div>
+          <Label htmlFor="metrics-notes">Internal Notes (Optional)</Label>
+          <Textarea
+            id="metrics-notes"
+            value={formData.notes}
+            onChange={(e) => updateFormData('notes', e.target.value)}
+            placeholder="Any additional context or observations..."
+            className="mt-2"
+            rows={3}
+            data-testid="textarea-metrics-notes"
+          />
+        </div>
+
+        <Button className="w-full" data-testid="button-save-metrics">
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Save Metrics
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Trauma-Informed Story Collection Form
+function TraumaInformedStoryForm({ onCancel }: { onCancel: () => void }) {
+  const [formData, setFormData] = useState({
+    story: '',
+    generalLocation: '',
+    householdSize: '',
+    consentGiven: false,
+    canSharePublicly: false,
+  });
+
+  const updateFormData = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <Card data-testid="card-story-form">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Heart className="h-5 w-5 text-rose-500" />
+          Share an Impact Story
+        </CardTitle>
+        <CardDescription>
+          Help us understand the human impact of our work through stories, shared with dignity and respect
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Trauma-Informed Guidelines */}
+        <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg border border-purple-200 dark:border-purple-800">
+          <h4 className="font-semibold mb-3 text-purple-900 dark:text-purple-100">
+            🤝 Trauma-Informed Best Practices
+          </h4>
+          <ul className="space-y-2 text-sm text-purple-800 dark:text-purple-200">
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>No personal information:</strong> Never collect names, addresses, phone numbers, or identifying details</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>Optional participation:</strong> Sharing a story is completely voluntary - no pressure</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>Dignity first:</strong> Focus on strength, resilience, and hope rather than trauma details</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>Privacy control:</strong> Stories are private by default and only shared with explicit consent</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span><strong>You decide:</strong> Recipients control what they share and how their story is used</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Story Field */}
+        <div>
+          <Label htmlFor="story" className="text-base">Story *</Label>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 mb-2">
+            Share how this assistance made a difference. Focus on impact, hope, and resilience.
+          </p>
+          <Textarea
+            id="story"
+            value={formData.story}
+            onChange={(e) => updateFormData('story', e.target.value)}
+            placeholder="Example: 'After the flood, we lost everything. This site provided us with food, clean water, and hope. The volunteers treated us with dignity and respect, which meant more than the supplies themselves. We're rebuilding now, one day at a time.'"
+            className="mt-2"
+            rows={6}
+            data-testid="textarea-story"
+          />
+        </div>
+
+        {/* Optional Context (No Identifiers) */}
+        <div className="space-y-4">
+          <h4 className="font-semibold">Optional Context (No Personal Information)</h4>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="general-location">General Area (Optional)</Label>
+              <Input
+                id="general-location"
+                value={formData.generalLocation}
+                onChange={(e) => updateFormData('generalLocation', e.target.value)}
+                placeholder="e.g., 'Rural Western NC' or 'Coastal Florida'"
+                className="mt-2"
+                data-testid="input-general-location"
+              />
+              <p className="text-xs text-gray-500 mt-1">Broad region only - never specific addresses</p>
+            </div>
+            <div>
+              <Label htmlFor="household-size">Household Size (Optional)</Label>
+              <Input
+                id="household-size"
+                type="number"
+                min="1"
+                value={formData.householdSize}
+                onChange={(e) => updateFormData('householdSize', e.target.value)}
+                placeholder="e.g., 4"
+                className="mt-2"
+                data-testid="input-household-size"
+              />
+              <p className="text-xs text-gray-500 mt-1">Just a number, no names</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Consent Section */}
+        <div className="space-y-4 border-t pt-6">
+          <h4 className="font-semibold">Consent & Privacy</h4>
+          
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <Switch
+                checked={formData.consentGiven}
+                onCheckedChange={(checked) => updateFormData('consentGiven', checked)}
+                data-testid="switch-consent-given"
+              />
+              <div className="flex-1">
+                <p className="font-medium">I consent to sharing this story *</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Required: This story can be used to demonstrate impact to our team and supporters
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <Switch
+                checked={formData.canSharePublicly}
+                onCheckedChange={(checked) => updateFormData('canSharePublicly', checked)}
+                data-testid="switch-can-share-publicly"
+              />
+              <div className="flex-1">
+                <p className="font-medium">This story can be shared publicly (Optional)</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  If checked, this story may appear on our website or social media (after review)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4">
+          <Button variant="outline" onClick={onCancel} className="flex-1" data-testid="button-cancel-story">
+            Cancel
+          </Button>
+          <Button 
+            className="flex-1" 
+            disabled={!formData.story || !formData.consentGiven}
+            data-testid="button-submit-story"
+          >
+            <Heart className="h-4 w-4 mr-2" />
+            Submit Story
           </Button>
         </div>
       </CardContent>
