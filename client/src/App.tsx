@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield, Wind, TreePine, BookOpen, CloudRain } from "lucide-react";
+import { Calendar, Home as HomeIcon, Menu, X, MapPin, BarChart3, Bell, Leaf, Mountain, ChevronDown, Shield, Wind, TreePine, BookOpen, CloudRain, Package } from "lucide-react";
 import { useState, useEffect } from "react";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
@@ -28,6 +28,7 @@ import AirQualityPage from "@/pages/air-quality";
 import NoaaClimatePage from "@/pages/noaa-climate";
 import DisasterEducationPage from "@/pages/disaster-education";
 import DisasterMapPage from "@/pages/disaster-map";
+import SupplySitesPage from "@/pages/supply-sites";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
@@ -98,7 +99,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                ['/map', '/stats', '/alerts', '/disaster-map', '/air-quality', '/noaa-climate', '/disaster-education'].includes(location)
+                ['/map', '/stats', '/alerts', '/disaster-map', '/air-quality', '/noaa-climate', '/disaster-education', '/supply-sites'].includes(location)
                   ? "bg-red-500 text-white shadow-md"
                   : "text-white hover:bg-red-500/20 hover:text-white"
               }`}>
@@ -184,6 +185,17 @@ function Navigation() {
                     <div className="transition-colors duration-200">
                       <div className="font-medium text-gray-900 group-hover:text-orange-700 transition-colors duration-200">Disaster Education</div>
                       <div className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors duration-200">Interactive learning center</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/supply-sites" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-indigo-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-indigo-600 group-hover:shadow-md group-hover:scale-110">
+                      <Package className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-indigo-700 transition-colors duration-200">Supply Site Network</div>
+                      <div className="text-sm text-gray-600 group-hover:text-indigo-600 transition-colors duration-200">Aid distribution sites</div>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -280,7 +292,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant={['/map', '/stats', '/alerts'].includes(location) ? "default" : "outline"}
+                variant={['/map', '/stats', '/alerts', '/supply-sites'].includes(location) ? "default" : "outline"}
                 size="sm"
                 className="flex items-center gap-2"
               >
@@ -539,6 +551,17 @@ function Navigation() {
                 Disaster Education
               </Button>
             </Link>
+            <Link href="/supply-sites">
+              <Button
+                variant={location === "/supply-sites" ? "default" : "outline"}
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start ml-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Package className="h-4 w-4" />
+                Supply Site Network
+              </Button>
+            </Link>
 
             {/* Regeneration Section */}
             <div className="text-xs font-medium text-stormy-light px-2 py-1 uppercase tracking-wide">
@@ -645,6 +668,7 @@ function Router() {
             <Route path="/air-quality" component={AirQualityPage} />
             <Route path="/noaa-climate" component={NoaaClimatePage} />
             <Route path="/disaster-education" component={DisasterEducationPage} />
+            <Route path="/supply-sites" component={SupplySitesPage} />
             <Route path="/bioregions" component={BioregionExplorerPage} />
             <Route path="/hawaii" component={HawaiiRegenerationPage} />
             <Route path="/appalachian" component={AppalachianRegenerationPage} />
