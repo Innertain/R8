@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Package, MapPin, Users, BookOpen, CheckCircle, ArrowRight, ChevronRight, Lock, Globe, Clock, Truck, Eye, EyeOff, UserPlus, X } from "lucide-react";
+import { Package, MapPin, Users, BookOpen, CheckCircle, ArrowRight, ChevronRight, Lock, Globe, Clock, Truck, Eye, EyeOff, UserPlus, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,55 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { z } from "zod";
+
+// Validation schemas matching WSS requirements
+const siteTypeSchema = z.object({
+  r8SiteType: z.string().min(1, "Please select a site type"),
+  siteType: z.string().min(1, "Site type is required"),
+});
+
+const siteInfoSchema = z.object({
+  name: z.string().min(3, "Site name must be at least 3 characters"),
+  address: z.string().min(5, "Please provide a valid street address"),
+  city: z.string().min(2, "City is required"),
+  state: z.string().length(2, "State must be 2 letters (e.g., NC)").toUpperCase(),
+  county: z.string().optional(),
+  website: z.string().url("Please provide a valid URL").optional().or(z.literal("")),
+  facebook: z.string().url("Please provide a valid URL").optional().or(z.literal("")),
+  peopleServedWeekly: z.string().optional(),
+});
+
+const phoneSchema = z.string().regex(
+  /^[\d\s\-\(\)\+]+$/,
+  "Please provide a valid phone number"
+).min(10, "Phone number must be at least 10 digits");
+
+const contactInfoSchema = z.object({
+  primaryContactName: z.string().min(2, "Contact name is required"),
+  primaryContactPhone: phoneSchema,
+  additionalManagers: z.array(z.object({
+    name: z.string().min(2, "Manager name is required"),
+    phone: phoneSchema,
+  })).optional(),
+});
+
+const hoursOperationsSchema = z.object({
+  siteHours: z.string().optional(),
+  acceptingDonations: z.boolean(),
+  distributingSupplies: z.boolean(),
+});
+
+const receivingLogisticsSchema = z.object({
+  maxSupplyLoad: z.string().optional(),
+  receivingNotes: z.string().optional(),
+});
+
+const siteStatusSchema = z.object({
+  isPubliclyVisible: z.boolean(),
+  isActive: z.boolean(),
+  inactiveReason: z.string().optional(),
+});
 
 export default function SupplySitesPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -214,18 +263,103 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
     inactiveReason: "",
   });
 
+  // Validation errors state
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
   const updateFormData = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear validation error for this field when user updates it
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  // Validate current step before allowing progression
+  const validateCurrentStep = (): boolean => {
+    setValidationErrors({});
+    
+    try {
+      switch(step) {
+        case 1: // Site Type
+          siteTypeSchema.parse({ r8SiteType: formData.r8SiteType, siteType: formData.siteType });
+          break;
+        case 2: // Site Info
+          siteInfoSchema.parse({
+            name: formData.name,
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            county: formData.county,
+            website: formData.website,
+            facebook: formData.facebook,
+            peopleServedWeekly: formData.peopleServedWeekly,
+          });
+          break;
+        case 3: // Contact Info
+          contactInfoSchema.parse({
+            primaryContactName: formData.primaryContactName,
+            primaryContactPhone: formData.primaryContactPhone,
+            additionalManagers: formData.additionalManagers,
+          });
+          break;
+        case 4: // Hours & Operations
+          hoursOperationsSchema.parse({
+            siteHours: formData.siteHours,
+            acceptingDonations: formData.acceptingDonations,
+            distributingSupplies: formData.distributingSupplies,
+          });
+          break;
+        case 5: // Receiving & Logistics
+          receivingLogisticsSchema.parse({
+            maxSupplyLoad: formData.maxSupplyLoad,
+            receivingNotes: formData.receivingNotes,
+          });
+          break;
+        case 6: // Site Status
+          siteStatusSchema.parse({
+            isPubliclyVisible: formData.isPubliclyVisible,
+            isActive: formData.isActive,
+            inactiveReason: formData.inactiveReason,
+          });
+          break;
+        default:
+          return true;
+      }
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach(err => {
+          const path = err.path.join('.');
+          errors[path] = err.message;
+        });
+        setValidationErrors(errors);
+      }
+      return false;
+    }
+  };
+
+  const handleNextStep = () => {
+    if (step === 0 || step === 7) {
+      // Welcome and Complete steps don't need validation
+      setStep(Math.min(totalSteps - 1, step + 1));
+    } else if (validateCurrentStep()) {
+      setStep(Math.min(totalSteps - 1, step + 1));
+    }
   };
 
   const steps = [
     { title: "Welcome", component: <WelcomeStep /> },
-    { title: "Site Type", component: <SiteTypeStep formData={formData} updateFormData={updateFormData} /> },
-    { title: "Site Info (Public)", component: <SiteInfoStep formData={formData} updateFormData={updateFormData} /> },
-    { title: "Contact Info (Private)", component: <ContactInfoStep formData={formData} updateFormData={updateFormData} /> },
-    { title: "Hours & Operations", component: <HoursOperationsStep formData={formData} updateFormData={updateFormData} /> },
-    { title: "Receiving & Logistics", component: <ReceivingLogisticsStep formData={formData} updateFormData={updateFormData} /> },
-    { title: "Site Status", component: <SiteStatusStep formData={formData} updateFormData={updateFormData} /> },
+    { title: "Site Type", component: <SiteTypeStep formData={formData} updateFormData={updateFormData} errors={validationErrors} /> },
+    { title: "Site Info (Public)", component: <SiteInfoStep formData={formData} updateFormData={updateFormData} errors={validationErrors} /> },
+    { title: "Contact Info (Private)", component: <ContactInfoStep formData={formData} updateFormData={updateFormData} errors={validationErrors} /> },
+    { title: "Hours & Operations", component: <HoursOperationsStep formData={formData} updateFormData={updateFormData} errors={validationErrors} /> },
+    { title: "Receiving & Logistics", component: <ReceivingLogisticsStep formData={formData} updateFormData={updateFormData} errors={validationErrors} /> },
+    { title: "Site Status", component: <SiteStatusStep formData={formData} updateFormData={updateFormData} errors={validationErrors} /> },
     { title: "Complete", component: <CompleteStep onClose={onClose} formData={formData} /> },
   ];
 
@@ -255,6 +389,23 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
         <div className="max-w-4xl mx-auto">
           {steps[step].component}
 
+          {/* Validation Errors Display */}
+          {Object.keys(validationErrors).length > 0 && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6" data-testid="validation-errors">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">Please fix the following errors:</h4>
+                  <ul className="space-y-1 text-sm text-red-800 dark:text-red-200">
+                    {Object.entries(validationErrors).map(([field, error]) => (
+                      <li key={field}>• {error}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex justify-between mt-12">
             <Button
@@ -266,7 +417,7 @@ function OnboardingWizard({ step, setStep, onClose }: { step: number; setStep: (
               Previous
             </Button>
             <Button
-              onClick={() => setStep(Math.min(totalSteps - 1, step + 1))}
+              onClick={handleNextStep}
               disabled={step === totalSteps - 1}
               data-testid="button-next-step"
             >
@@ -286,6 +437,17 @@ function PrivacyBadge({ isPublic }: { isPublic: boolean }) {
     <Badge variant={isPublic ? "default" : "secondary"} className="ml-2">
       {isPublic ? <><Globe className="h-3 w-3 mr-1" /> PUBLIC</> : <><Lock className="h-3 w-3 mr-1" /> PRIVATE</>}
     </Badge>
+  );
+}
+
+// Field Error Component
+function FieldError({ error }: { error?: string }) {
+  if (!error) return null;
+  return (
+    <p className="text-sm text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
+      <AlertCircle className="h-3 w-3" />
+      {error}
+    </p>
   );
 }
 
@@ -428,7 +590,7 @@ function SiteTypeStep({ formData, updateFormData }: any) {
 }
 
 // Step 3: Site Info (PUBLIC)
-function SiteInfoStep({ formData, updateFormData }: any) {
+function SiteInfoStep({ formData, updateFormData, errors = {} }: any) {
   return (
     <Card data-testid="card-site-info-step">
       <CardHeader>
@@ -449,9 +611,10 @@ function SiteInfoStep({ formData, updateFormData }: any) {
               value={formData.name}
               onChange={(e) => updateFormData("name", e.target.value)}
               placeholder="e.g., Community Relief Center"
-              className="mt-2"
+              className={`mt-2 ${errors.name ? 'border-red-500' : ''}`}
               data-testid="input-site-name"
             />
+            <FieldError error={errors.name} />
           </div>
 
           <div>
@@ -461,9 +624,10 @@ function SiteInfoStep({ formData, updateFormData }: any) {
               value={formData.address}
               onChange={(e) => updateFormData("address", e.target.value)}
               placeholder="123 Main Street"
-              className="mt-2"
+              className={`mt-2 ${errors.address ? 'border-red-500' : ''}`}
               data-testid="input-site-address"
             />
+            <FieldError error={errors.address} />
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
@@ -473,21 +637,23 @@ function SiteInfoStep({ formData, updateFormData }: any) {
                 id="site-city"
                 value={formData.city}
                 onChange={(e) => updateFormData("city", e.target.value)}
-                className="mt-2"
+                className={`mt-2 ${errors.city ? 'border-red-500' : ''}`}
                 data-testid="input-site-city"
               />
+              <FieldError error={errors.city} />
             </div>
             <div>
               <Label htmlFor="site-state" className="text-base">State *</Label>
               <Input
                 id="site-state"
                 value={formData.state}
-                onChange={(e) => updateFormData("state", e.target.value)}
+                onChange={(e) => updateFormData("state", e.target.value.toUpperCase())}
                 placeholder="NC"
                 maxLength={2}
-                className="mt-2"
+                className={`mt-2 ${errors.state ? 'border-red-500' : ''}`}
                 data-testid="input-site-state"
               />
+              <FieldError error={errors.state} />
             </div>
             <div>
               <Label htmlFor="site-county" className="text-base">County</Label>
