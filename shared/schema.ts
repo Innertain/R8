@@ -118,6 +118,63 @@ export const siteManagers = pgTable("site_managers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Impact tracking - last mile delivery metrics (aggregate data only, no personal info)
+export const siteImpactRecords = pgTable("site_impact_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  siteId: varchar("site_id").notNull().references(() => supplySites.id, { onDelete: "cascade" }),
+  
+  // Date period for this record
+  recordDate: timestamp("record_date").notNull(),
+  periodType: varchar("period_type", { length: 16 }).notNull().default("daily"), // 'daily', 'weekly', 'monthly'
+  
+  // Aggregate metrics (NO personal identifiers)
+  householdsServed: integer("households_served").default(0),
+  individualsServed: integer("individuals_served").default(0),
+  itemsDistributed: integer("items_distributed").default(0),
+  
+  // Category breakdown (optional)
+  categoryBreakdown: jsonb("category_breakdown").$type<{
+    food?: number;
+    water?: number;
+    clothing?: number;
+    hygiene?: number;
+    medical?: number;
+    shelter?: number;
+    other?: number;
+  }>(),
+  
+  // Notes (for internal tracking only)
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Trauma-informed story collection (completely anonymous, no personal identifiers)
+export const siteStories = pgTable("site_stories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  siteId: varchar("site_id").notNull().references(() => supplySites.id, { onDelete: "cascade" }),
+  
+  // Story content (optional, submitted by recipients if they choose to share)
+  story: text("story").notNull(),
+  
+  // Context (optional demographic info - AGGREGATE ONLY, no identifiers)
+  generalLocation: varchar("general_location", { length: 128 }), // e.g., "Rural North Carolina" (never specific address)
+  householdSize: integer("household_size"), // Just a number, no names
+  
+  // Story metadata
+  isPubliclyVisible: boolean("is_publicly_visible").default(false).notNull(), // Default private until reviewed
+  reviewStatus: varchar("review_status", { length: 32 }).default("pending").notNull(), // 'pending', 'approved', 'declined'
+  reviewedBy: varchar("reviewed_by", { length: 128 }),
+  reviewedAt: timestamp("reviewed_at"),
+  
+  // Consent tracking
+  consentGiven: boolean("consent_given").default(true).notNull(), // Must be true to submit
+  canSharePublicly: boolean("can_share_publicly").default(false).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Create insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -155,6 +212,19 @@ export const insertSiteManagerSchema = createInsertSchema(siteManagers).omit({
   createdAt: true,
 });
 
+export const insertImpactRecordSchema = createInsertSchema(siteImpactRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSiteStorySchema = createInsertSchema(siteStories).omit({
+  id: true,
+  createdAt: true,
+  reviewedBy: true,
+  reviewedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -177,6 +247,12 @@ export type SupplySite = typeof supplySites.$inferSelect;
 
 export type InsertSiteManager = z.infer<typeof insertSiteManagerSchema>;
 export type SiteManager = typeof siteManagers.$inferSelect;
+
+export type InsertImpactRecord = z.infer<typeof insertImpactRecordSchema>;
+export type ImpactRecord = typeof siteImpactRecords.$inferSelect;
+
+export type InsertSiteStory = z.infer<typeof insertSiteStorySchema>;
+export type SiteStory = typeof siteStories.$inferSelect;
 
 // Session storage table for authentication
 export const sessions = pgTable(
