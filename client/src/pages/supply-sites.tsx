@@ -182,21 +182,21 @@ export default function SupplySitesPage() {
 
         {/* Success Stories */}
         <div className="max-w-6xl mx-auto mb-20">
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-8 border-2 border-green-200 dark:border-green-800">
-            <div className="flex items-start gap-4">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 sm:p-8 border-2 border-green-200 dark:border-green-800">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
               <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <CheckCircle className="h-6 w-6 text-white" />
               </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-2" data-testid="text-success-heading">Proven Success in Western North Carolina</h3>
-                <p className="text-lg text-gray-700 dark:text-gray-300 mb-4" data-testid="text-success-description">
+              <div className="flex-1">
+                <h3 className="text-xl sm:text-2xl font-bold mb-2" data-testid="text-success-heading">Proven Success in Western North Carolina</h3>
+                <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mb-4" data-testid="text-success-description">
                   After Hurricane Helene, our supply site network coordinated <strong>hundreds of locations</strong> across WNC and Appalachia, 
                   helping thousands of families access critical supplies when they needed them most.
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  <Badge variant="secondary" className="text-sm" data-testid="badge-sites-active">200+ Sites Active</Badge>
-                  <Badge variant="secondary" className="text-sm" data-testid="badge-tons-distributed">1000+ Tons Distributed</Badge>
-                  <Badge variant="secondary" className="text-sm" data-testid="badge-volunteers">5000+ Volunteers</Badge>
+                <div className="flex flex-wrap gap-2 sm:gap-4">
+                  <Badge variant="secondary" className="text-xs sm:text-sm" data-testid="badge-sites-active">200+ Sites Active</Badge>
+                  <Badge variant="secondary" className="text-xs sm:text-sm" data-testid="badge-tons-distributed">1000+ Tons Distributed</Badge>
+                  <Badge variant="secondary" className="text-xs sm:text-sm" data-testid="badge-volunteers">5000+ Volunteers</Badge>
                 </div>
               </div>
             </div>
