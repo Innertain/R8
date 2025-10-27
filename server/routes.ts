@@ -29,31 +29,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Get base metadata
-      const metaUrl = `https://api.airtable.com/v0/meta/bases/${BASE_ID}/tables`;
-      const metaResponse = await fetch(metaUrl, {
-        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-      });
+      // Fetch sample records from V Shift Assignment and V Availability to see field names
+      const assignmentUrl = `https://api.airtable.com/v0/${BASE_ID}/V%20Shift%20Assignment?maxRecords=1`;
+      const availabilityUrl = `https://api.airtable.com/v0/${BASE_ID}/V%20Availability?maxRecords=1`;
 
-      if (metaResponse.ok) {
-        const metaData = await metaResponse.json();
-        res.json({
-          success: true,
-          baseId: BASE_ID,
-          tables: metaData.tables?.map((t: any) => ({
-            name: t.name,
-            id: t.id,
-            fields: t.fields?.map((f: any) => ({ name: f.name, type: f.type }))
-          })) || []
-        });
+      const [assignmentRes, availabilityRes] = await Promise.all([
+        fetch(assignmentUrl, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } }),
+        fetch(availabilityUrl, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } })
+      ]);
+
+      const results: any = { baseId: BASE_ID };
+
+      if (assignmentRes.ok) {
+        const assignmentData = await assignmentRes.json();
+        results.vShiftAssignment = {
+          fieldNames: assignmentData.records[0] ? Object.keys(assignmentData.records[0].fields) : [],
+          sampleRecord: assignmentData.records[0]?.fields || null
+        };
       } else {
-        const error = await metaResponse.text();
-        res.json({ 
-          success: false, 
-          error: `Base metadata error: ${metaResponse.status} - ${error}`,
-          baseId: BASE_ID
-        });
+        results.vShiftAssignment = { error: `${assignmentRes.status}: ${await assignmentRes.text()}` };
       }
+
+      if (availabilityRes.ok) {
+        const availabilityData = await availabilityRes.json();
+        results.vAvailability = {
+          fieldNames: availabilityData.records[0] ? Object.keys(availabilityData.records[0].fields) : [],
+          sampleRecord: availabilityData.records[0]?.fields || null
+        };
+      } else {
+        results.vAvailability = { error: `${availabilityRes.status}: ${await availabilityRes.text()}` };
+      }
+
+      res.json({ success: true, ...results });
     } catch (error: any) {
       res.json({ success: false, error: error.message });
     }
