@@ -436,17 +436,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (availabilityData.volunteerId !== 'demo-volunteer-123' && baseId && AIRTABLE_TOKEN) {
         console.log('💾 Creating availability in Airtable for volunteer:', availabilityData.volunteerId);
         
+        // Build fields object, only including Recurring Pattern if it has a value
+        const fields: any = {
+          'Volunteer': [availabilityData.volunteerId], // Link to volunteer record
+          'Start time': availabilityData.startTime.toISOString(),
+          'End Time': availabilityData.endTime.toISOString(),
+          'Is Recurring': availabilityData.isRecurring || false,
+          'Notes': availabilityData.notes || ''
+        };
+        
+        // Only add Recurring Pattern if it has a valid value (don't send empty string for dropdown fields)
+        if (availabilityData.recurringPattern && availabilityData.recurringPattern.trim()) {
+          fields['Recurring Pattern '] = availabilityData.recurringPattern;
+        }
+        
         const airtablePayload = {
-          records: [{
-            fields: {
-              'Volunteer': [availabilityData.volunteerId], // Link to volunteer record
-              'Start time': availabilityData.startTime.toISOString(),
-              'End Time': availabilityData.endTime.toISOString(),
-              'Is Recurring': availabilityData.isRecurring || false,
-              'Recurring Pattern ': availabilityData.recurringPattern || '',
-              'Notes': availabilityData.notes || ''
-            }
-          }]
+          records: [{ fields }]
         };
 
         try {
@@ -719,7 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             fields: {
               'Volunteer': [assignmentData.volunteerId],
               'Shift ID': [assignmentData.shiftId], // Array format for linked field
-              'Status': 'confirmed', // Set default status
+              'Status ': 'confirmed', // Note: field has trailing space in Airtable
               'Assigned Date': new Date().toISOString(),
               'Notes': assignmentData.notes || ''
             }
