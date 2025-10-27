@@ -696,7 +696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check for existing active assignments for this volunteer and shift
       console.log('🔍 Checking for existing active assignments...');
-      const existingAssignmentsResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment?filterByFormula=AND(SEARCH("${assignmentData.volunteerId}",ARRAYJOIN({Volunteer})),SEARCH("${assignmentData.shiftId}",ARRAYJOIN({Shift ID})),{Status}!="cancelled")`, {
+      const existingAssignmentsResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Shift%20Assignment?filterByFormula=AND(SEARCH("${assignmentData.volunteerId}",ARRAYJOIN({Volunteer})),SEARCH("${assignmentData.shiftId}",ARRAYJOIN({Shift ID})),{Status }!="cancelled")`, {
         headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
       });
 
@@ -801,8 +801,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         body: JSON.stringify({
           fields: {
-            Status: updateData.status,
-            Notes: updateData.notes,
+            'Status ': updateData.status, // Note: field has trailing space in Airtable
+            'Notes': updateData.notes,
             'Assigned Date': new Date().toISOString()
           }
         })
@@ -819,7 +819,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: result.id,
         volunteerId: result.fields.Volunteer?.[0],
         shiftId: result.fields['Shift ID']?.[0],
-        status: result.fields.Status || updateData.status,
+        status: result.fields['Status '] || updateData.status, // Note: field has trailing space in Airtable
         assignedDate: new Date(result.createdTime),
         notes: result.fields.Notes
       };
