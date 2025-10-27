@@ -724,7 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             fields: {
               'Volunteer': [assignmentData.volunteerId],
               'Shift ID': [assignmentData.shiftId], // Array format for linked field
-              'Status ': 'confirmed', // Note: field has trailing space in Airtable
+              'Status ': 'Confirmed', // Note: field has trailing space in Airtable, value must match dropdown options (capital C)
               'Assigned Date': new Date().toISOString(),
               'Notes': assignmentData.notes || ''
             }
