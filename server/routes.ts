@@ -421,9 +421,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const availabilityData = insertAvailabilitySchema.parse(requestData);
+      
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+
+      // Try to save to Airtable first (skip for demo user)
+      if (availabilityData.volunteerId !== 'demo-volunteer-123' && baseId && AIRTABLE_TOKEN) {
+        console.log('💾 Creating availability in Airtable for volunteer:', availabilityData.volunteerId);
+        
+        const airtablePayload = {
+          records: [{
+            fields: {
+              'Volunteer': [availabilityData.volunteerId], // Link to volunteer record
+              'Start time': availabilityData.startTime.toISOString(),
+              'End Time': availabilityData.endTime.toISOString(),
+              'Is Recurring': availabilityData.isRecurring || false,
+              'Recurring Pattern ': availabilityData.recurringPattern || '',
+              'Notes': availabilityData.notes || ''
+            }
+          }]
+        };
+
+        try {
+          const airtableResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Availability`, {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${AIRTABLE_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(airtablePayload)
+          });
+
+          if (airtableResponse.ok) {
+            const airtableData = await airtableResponse.json();
+            const record = airtableData.records[0];
+            
+            const availability = {
+              id: record.id,
+              volunteerId: availabilityData.volunteerId,
+              startTime: new Date(record.fields['Start time']),
+              endTime: new Date(record.fields['End Time']),
+              isRecurring: record.fields['Is Recurring'] || false,
+              recurringPattern: record.fields['Recurring Pattern '] || '',
+              notes: record.fields['Notes'] || '',
+              createdAt: new Date(record.createdTime)
+            };
+
+            console.log('✅ Availability created in Airtable:', availability.id);
+            return res.json(availability);
+          } else {
+            const errorText = await airtableResponse.text();
+            console.log('⚠️ Airtable creation failed, falling back to storage:', errorText);
+          }
+        } catch (airtableError: any) {
+          console.log('⚠️ Airtable request error, falling back to storage:', airtableError.message);
+        }
+      }
+
+      // Fallback to storage for demo users or failed Airtable requests
+      console.log('Creating availability in local storage as fallback');
       const availability = await storage.createAvailability(availabilityData);
       res.json(availability);
     } catch (error: any) {
+      console.error('Error creating availability:', error);
       res.status(400).json({ error: error.message });
     }
   });
@@ -438,7 +498,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Start time and end time are required' });
       }
 
-      // Find the availability record by ID
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+
+      // Try to update in Airtable first if it's a real Airtable record (starts with 'rec')
+      if (id.startsWith('rec') && baseId && AIRTABLE_TOKEN) {
+        console.log('📝 Updating availability in Airtable:', id);
+        
+        const updatePayload = {
+          fields: {
+            'Start time': new Date(startTime).toISOString(),
+            'End Time': new Date(endTime).toISOString()
+          }
+        };
+
+        try {
+          const airtableResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Availability/${id}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${AIRTABLE_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatePayload)
+          });
+
+          if (airtableResponse.ok) {
+            const updatedRecord = await airtableResponse.json();
+            const availability = {
+              id: updatedRecord.id,
+              volunteerId: updatedRecord.fields['Volunteer']?.[0] || '',
+              startTime: new Date(updatedRecord.fields['Start time']),
+              endTime: new Date(updatedRecord.fields['End Time']),
+              isRecurring: updatedRecord.fields['Is Recurring'] || false,
+              recurringPattern: updatedRecord.fields['Recurring Pattern '] || '',
+              notes: updatedRecord.fields['Notes'] || '',
+              createdAt: new Date(updatedRecord.createdTime)
+            };
+
+            console.log('✅ Availability updated in Airtable');
+            return res.json(availability);
+          } else {
+            const errorText = await airtableResponse.text();
+            console.log('⚠️ Airtable update failed, falling back to storage:', errorText);
+          }
+        } catch (airtableError: any) {
+          console.log('⚠️ Airtable request error, falling back to storage:', airtableError.message);
+        }
+      }
+
+      // Fallback to storage for non-Airtable records or failed requests
       const availability = await storage.getAvailabilityById(id);
 
       if (!availability) {
@@ -463,6 +571,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/availability/:id", async (req, res) => {
     try {
       const { id } = req.params;
+      const baseId = process.env.VITE_BASE_ID?.replace(/\.$/, '');
+      const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+
+      // Try to delete from Airtable first if it's a real Airtable record (starts with 'rec')
+      if (id.startsWith('rec') && baseId && AIRTABLE_TOKEN) {
+        console.log('🗑️ Deleting availability from Airtable:', id);
+        
+        try {
+          const airtableResponse = await fetch(`https://api.airtable.com/v0/${baseId}/V%20Availability/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${AIRTABLE_TOKEN}`
+            }
+          });
+
+          if (airtableResponse.ok) {
+            console.log('✅ Availability deleted from Airtable');
+            return res.json({ success: true });
+          } else {
+            const errorText = await airtableResponse.text();
+            console.log('⚠️ Airtable deletion failed, falling back to storage:', errorText);
+          }
+        } catch (airtableError: any) {
+          console.log('⚠️ Airtable request error, falling back to storage:', airtableError.message);
+        }
+      }
+
+      // Fallback to storage for non-Airtable records or failed requests
       await storage.deleteAvailability(id);
       res.json({ success: true });
     } catch (error: any) {
@@ -594,9 +730,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           body: JSON.stringify(assignmentPayload)
         });
 
-        console.log('Airtable response status:', airtableResponse.status);
+        console.log('📡 Airtable response status:', airtableResponse.status);
         const responseText = await airtableResponse.text();
-        console.log('Airtable response body:', responseText);
+        console.log('📡 Airtable response body:', responseText);
 
         if (airtableResponse.ok) {
           const airtableData = JSON.parse(responseText);
@@ -611,17 +747,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             notes: record.fields['Notes'] || ''
           };
 
-          console.log('✅ Assignment created in Airtable:', assignment);
+          console.log('✅ SUCCESS: Assignment created in Airtable with ID:', assignment.id);
+          console.log('📊 Check your Airtable "V Shift Assignment" table to see this record!');
           return res.json(assignment);
         } else {
-          console.log('❌ Airtable creation failed, falling back to storage');
+          console.log('⚠️ WARNING: Airtable creation failed - this assignment will ONLY be saved in temporary memory!');
+          console.log('⚠️ Response:', responseText);
         }
       } else {
-        console.log('Using demo volunteer, skipping Airtable');
+        console.log('💡 Using demo volunteer - skipping Airtable write (demo data only stored in memory)');
       }
 
       // Fallback to storage for demo users or failed Airtable requests
-      console.log('Creating assignment in local storage as fallback');
+      console.log('💾 FALLBACK: Creating assignment in local storage (TEMPORARY - will be lost on restart!)');
       const assignment = await storage.createShiftAssignment(assignmentData);
       res.json(assignment);
     } catch (error: any) {
