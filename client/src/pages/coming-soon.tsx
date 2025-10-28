@@ -3,7 +3,8 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Loader2, Phone, Shield, Users, Globe, ArrowRight, Leaf, Mountain, Waves, Eye, Heart, TrendingUp, Zap, Search, Database, Satellite, Network, TreePine, AlertTriangle, MapPin } from 'lucide-react';
+import { Loader2, Phone, Shield, Users, Globe, ArrowRight, Leaf, Mountain, Waves, Eye, Heart, TrendingUp, Zap, Search, Database, Satellite, Network, TreePine, AlertTriangle, MapPin, Wind, CloudRain } from 'lucide-react';
+import { Link } from 'wouter';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
@@ -106,6 +107,29 @@ export default function ComingSoonPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
+      {/* Emergency Hurricane Alert Banner */}
+      <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white py-3 px-4 sticky top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Wind className="w-5 h-5 flex-shrink-0 animate-pulse" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm sm:text-base font-semibold truncate">
+                <span className="hidden sm:inline">ACTIVE CRISIS: </span>Hurricane Melissa (Category 5) - Jamaica Emergency Response
+              </p>
+            </div>
+          </div>
+          <Link href="/hurricane-melissa">
+            <Button 
+              size="sm" 
+              className="bg-white text-red-600 hover:bg-gray-100 font-semibold whitespace-nowrap"
+              data-testid="button-hurricane-response"
+            >
+              View Crisis Map →
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       {/* Hero Section with R8 Branding */}
       <div className="relative min-h-screen overflow-hidden">
         {/* Extended Background to Prevent Gaps */}
@@ -226,6 +250,133 @@ export default function ComingSoonPage() {
         </div>
       </div>
       
+      {/* Hurricane Melissa Emergency Section */}
+      <section className="relative py-20 bg-gradient-to-b from-red-900/30 to-slate-900">
+        <div className="max-w-6xl mx-auto px-4 lg:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-3 bg-red-600/20 border border-red-500 rounded-full px-6 py-2 mb-6">
+              <CloudRain className="w-5 h-5 text-red-400 animate-pulse" />
+              <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">Active Emergency Response</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Hurricane Melissa - Jamaica Crisis Response
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Category 5 hurricane making landfall in Jamaica (October 27-28, 2025). 
+              Critical infrastructure mapping and emergency coordination platform now live.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-red-500/30">
+              <div className="text-center">
+                <div className="text-3xl mb-2">🏥</div>
+                <div className="text-2xl font-bold text-red-400 mb-1">Real-time</div>
+                <h3 className="text-sm font-medium text-gray-300">Hospital Locations</h3>
+                <p className="text-xs text-gray-500 mt-1">From OpenStreetMap</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-orange-500/30">
+              <div className="text-center">
+                <div className="text-3xl mb-2">🏫</div>
+                <div className="text-2xl font-bold text-orange-400 mb-1">Active</div>
+                <h3 className="text-sm font-medium text-gray-300">Emergency Shelters</h3>
+                <p className="text-xs text-gray-500 mt-1">Schools, churches, centers</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
+              <div className="text-center">
+                <div className="text-3xl mb-2">✈️</div>
+                <div className="text-2xl font-bold text-purple-400 mb-1">165,000+</div>
+                <h3 className="text-sm font-medium text-gray-300">People at Risk</h3>
+                <p className="text-xs text-gray-500 mt-1">8 affected parishes</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-cyan-500/30">
+              <div className="text-center">
+                <div className="text-3xl mb-2">🚢</div>
+                <div className="text-2xl font-bold text-cyan-400 mb-1">48-72h</div>
+                <h3 className="text-sm font-medium text-gray-300">WFP Response Time</h3>
+                <p className="text-xs text-gray-500 mt-1">Caribbean Hub logistics</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-700/90 backdrop-blur-sm rounded-2xl p-8 border border-slate-600/50">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-blue-400" />
+                  Infrastructure Mapping
+                </h3>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Real-time hospital and clinic locations across all parishes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Emergency shelter mapping (schools, churches, community centers)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Airports, helipads, ports and harbors for logistics</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Major road networks for evacuation and aid delivery</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <Network className="w-5 h-5 text-purple-400" />
+                  Response Partners
+                </h3>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">•</span>
+                    <span><strong>ODPEM</strong> - Jamaica disaster management coordination</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">•</span>
+                    <span><strong>CDEMA</strong> - Caribbean emergency management agency</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">•</span>
+                    <span><strong>Jamaica Red Cross</strong> - Emergency aid deployment</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">•</span>
+                    <span><strong>WFP Caribbean Hub</strong> - Food and logistics support</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center pt-6 border-t border-slate-600">
+              <Link href="/hurricane-melissa">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold text-lg px-8 py-6 shadow-xl"
+                  data-testid="button-access-crisis-map"
+                >
+                  <MapPin className="w-5 h-5 mr-2" />
+                  Access Crisis Infrastructure Map
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <p className="text-sm text-gray-400 mt-4">
+                No login required - Public emergency access for humanitarian coordination
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       
       {/* Mission Section - Completely Separate from Hero */}
