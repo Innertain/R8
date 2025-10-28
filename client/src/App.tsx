@@ -658,6 +658,7 @@ function Router() {
   useAnalytics();
   
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [location] = useLocation();
 
   useEffect(() => {
     const checkAccess = () => {
@@ -670,6 +671,9 @@ function Router() {
     window.addEventListener('storage', checkAccess);
     return () => window.removeEventListener('storage', checkAccess);
   }, []);
+
+  const isPublicRoute = ['/privacy-policy', '/terms-of-service', '/hurricane-melissa'].includes(location);
+  const showNavigation = hasAccess && !isPublicRoute;
 
   // Show loading while checking access
   if (hasAccess === null) {
@@ -684,45 +688,55 @@ function Router() {
   }
 
   return (
-    <div className="flex-1">
-      <Switch>
-        {/* Public routes */}
-        <Route path="/privacy-policy" component={PrivacyPolicyPage} />
-        <Route path="/terms-of-service" component={TermsOfServicePage} />
-        <Route path="/hurricane-melissa" component={HurricaneMelissaPage} />
+    <>
+      {showNavigation && (
+        <>
+          <StateSVGDefs />
+          <Navigation />
+        </>
+      )}
+      
+      <div className="flex-1">
+        <Switch>
+          {/* Public routes */}
+          <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+          <Route path="/terms-of-service" component={TermsOfServicePage} />
+          <Route path="/hurricane-melissa" component={HurricaneMelissaPage} />
 
-        {/* Protected routes */}
-        {hasAccess ? (
-          <>
-            <Route path="/" component={Home} />
-            <Route path="/volunteer" component={VolunteerPortal} />
-            <Route path="/map" component={InteractiveMap} />
-            <Route path="/stats" component={StatsDashboard} />
-            <Route path="/alerts" component={AlertsPage} />
-            <Route path="/disaster-map" component={DisasterMapPage} />
-            <Route path="/air-quality" component={AirQualityPage} />
-            <Route path="/noaa-climate" component={NoaaClimatePage} />
-            <Route path="/disaster-education" component={DisasterEducationPage} />
-            <Route path="/supply-sites" component={SupplySitesPage} />
-            <Route path="/bioregions" component={BioregionExplorerPage} />
-            <Route path="/hawaii" component={HawaiiRegenerationPage} />
-            <Route path="/appalachian" component={AppalachianRegenerationPage} />
-            <Route path="/cascadia" component={CascadiaRegenerationPage} />
-            <Route path="/airtable-test" component={AirtableTestPage} />
-            <Route component={NotFound} />
-          </>
-        ) : (
-          // Redirect to Coming Soon if no access
-          <Route path="*" component={ComingSoonPage} />
-        )}
-      </Switch>
-    </div>
+          {/* Protected routes */}
+          {hasAccess ? (
+            <>
+              <Route path="/" component={Home} />
+              <Route path="/volunteer" component={VolunteerPortal} />
+              <Route path="/map" component={InteractiveMap} />
+              <Route path="/stats" component={StatsDashboard} />
+              <Route path="/alerts" component={AlertsPage} />
+              <Route path="/disaster-map" component={DisasterMapPage} />
+              <Route path="/air-quality" component={AirQualityPage} />
+              <Route path="/noaa-climate" component={NoaaClimatePage} />
+              <Route path="/disaster-education" component={DisasterEducationPage} />
+              <Route path="/supply-sites" component={SupplySitesPage} />
+              <Route path="/bioregions" component={BioregionExplorerPage} />
+              <Route path="/hawaii" component={HawaiiRegenerationPage} />
+              <Route path="/appalachian" component={AppalachianRegenerationPage} />
+              <Route path="/cascadia" component={CascadiaRegenerationPage} />
+              <Route path="/airtable-test" component={AirtableTestPage} />
+              <Route component={NotFound} />
+            </>
+          ) : (
+            // Redirect to Coming Soon if no access
+            <Route path="*" component={ComingSoonPage} />
+          )}
+        </Switch>
+      </div>
+      
+      {showNavigation && <Footer />}
+    </>
   );
 }
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   // Initialize Google Analytics when app loads
   useEffect(() => {
@@ -734,62 +748,12 @@ function App() {
     }
   }, []);
 
-  // Check for platform access on app load
-  useEffect(() => {
-    const checkAccess = () => {
-      const accessGranted = sessionStorage.getItem('platformAccess');
-      setHasAccess(accessGranted === 'granted');
-    };
-
-    checkAccess();
-
-    // Listen for storage changes (e.g., when access is granted in another tab)
-    window.addEventListener('storage', checkAccess);
-    return () => window.removeEventListener('storage', checkAccess);
-  }, []);
-
-  // Show loading while checking access
-  if (hasAccess === null) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading platform...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show coming soon page if no access
-  if (!hasAccess) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <div className="min-h-screen flex flex-col bg-gradient-to-br from-stormy-dark via-stormy-medium to-stormy-dark">
-            <ComingSoonPage />
-            <Toaster />
-          </div>
-        </TooltipProvider>
-      </QueryClientProvider>
-    );
-  }
-
-  // Render the app if access is granted
+  // Always render the Router - it handles access checks internally
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-stormy-dark via-stormy-medium to-stormy-dark">
-          <StateSVGDefs />
-          <Navigation />
-          {/* Global filter indicator is only shown if a filter is active */}
-          {/* {globalStateFilter && (
-            <GlobalFilterIndicator
-              stateFilter={globalStateFilter}
-              onClearFilter={clearGlobalFilter}
-            />
-          )} */}
           <Router />
-          <Footer />
           <Toaster />
         </div>
       </TooltipProvider>
