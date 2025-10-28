@@ -94,7 +94,7 @@ export default function HurricaneMelissaPage() {
                   <CardDescription>Real-time crisis information for Hurricane Melissa response</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-3 gap-4">
+                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="p-4 bg-red-50 rounded-lg border border-red-200">
                       <div className="text-2xl font-bold text-red-700">2.8M+</div>
                       <div className="text-sm text-red-600">People Affected</div>
@@ -104,11 +104,6 @@ export default function HurricaneMelissaPage() {
                       <div className="text-2xl font-bold text-blue-700">Cat 5</div>
                       <div className="text-sm text-blue-600">Hurricane Category</div>
                       <div className="text-xs text-gray-600 mt-1">Strongest since 1851</div>
-                    </div>
-                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                      <div className="text-2xl font-bold text-green-700">48-72hrs</div>
-                      <div className="text-sm text-green-600">WFP Hub Response Time</div>
-                      <div className="text-xs text-gray-600 mt-1">Barbados to Jamaica</div>
                     </div>
                   </div>
 

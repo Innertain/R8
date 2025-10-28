@@ -267,7 +267,7 @@ export default function ComingSoonPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-red-500/30">
               <div className="text-center">
                 <div className="text-3xl mb-2">🏥</div>
@@ -289,18 +289,9 @@ export default function ComingSoonPage() {
             <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
               <div className="text-center">
                 <div className="text-3xl mb-2">✈️</div>
-                <div className="text-2xl font-bold text-purple-400 mb-1">165,000+</div>
-                <h3 className="text-sm font-medium text-gray-300">People at Risk</h3>
-                <p className="text-xs text-gray-500 mt-1">8 affected parishes</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-cyan-500/30">
-              <div className="text-center">
-                <div className="text-3xl mb-2">🚢</div>
-                <div className="text-2xl font-bold text-cyan-400 mb-1">48-72h</div>
-                <h3 className="text-sm font-medium text-gray-300">WFP Response Time</h3>
-                <p className="text-xs text-gray-500 mt-1">Caribbean Hub logistics</p>
+                <div className="text-2xl font-bold text-purple-400 mb-1">2.8M+</div>
+                <h3 className="text-sm font-medium text-gray-300">People Affected</h3>
+                <p className="text-xs text-gray-500 mt-1">Entire country impacted</p>
               </div>
             </div>
           </div>
