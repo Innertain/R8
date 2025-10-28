@@ -238,6 +238,9 @@ export default function JamaicaInfrastructureMap() {
       map.current.on('click', 'hospitals-layer', (e: any) => {
         if (e.features && e.features.length > 0) {
           const feature = e.features[0];
+          const coords = feature.geometry.coordinates;
+          const lat = coords[1].toFixed(6);
+          const lon = coords[0].toFixed(6);
           new mapboxgl.Popup()
             .setLngLat(e.lngLat)
             .setHTML(`
@@ -250,6 +253,9 @@ export default function JamaicaInfrastructureMap() {
                 </div>
                 <p class="text-sm font-medium">${feature.properties.name || 'Unknown'}</p>
                 ${feature.properties.amenity ? `<p class="text-xs text-gray-600">Type: ${feature.properties.amenity}</p>` : ''}
+                <div class="mt-2 pt-2 border-t border-gray-200">
+                  <p class="text-xs text-gray-500 font-mono">📍 ${lat}, ${lon}</p>
+                </div>
               </div>
             `)
             .addTo(map.current!);
@@ -286,6 +292,9 @@ export default function JamaicaInfrastructureMap() {
       map.current.on('click', 'shelters-layer', (e: any) => {
         if (e.features && e.features.length > 0) {
           const feature = e.features[0];
+          const coords = feature.geometry.coordinates;
+          const lat = coords[1].toFixed(6);
+          const lon = coords[0].toFixed(6);
           new mapboxgl.Popup()
             .setLngLat(e.lngLat)
             .setHTML(`
@@ -298,6 +307,9 @@ export default function JamaicaInfrastructureMap() {
                 </div>
                 <p class="text-sm font-medium">${feature.properties.name || 'Community Center'}</p>
                 ${feature.properties.amenity ? `<p class="text-xs text-gray-600">Type: ${feature.properties.amenity}</p>` : ''}
+                <div class="mt-2 pt-2 border-t border-gray-200">
+                  <p class="text-xs text-gray-500 font-mono">📍 ${lat}, ${lon}</p>
+                </div>
               </div>
             `)
             .addTo(map.current!);
@@ -334,6 +346,9 @@ export default function JamaicaInfrastructureMap() {
       map.current.on('click', 'airports-layer', (e: any) => {
         if (e.features && e.features.length > 0) {
           const feature = e.features[0];
+          const coords = feature.geometry.coordinates;
+          const lat = coords[1].toFixed(6);
+          const lon = coords[0].toFixed(6);
           new mapboxgl.Popup()
             .setLngLat(e.lngLat)
             .setHTML(`
@@ -346,6 +361,9 @@ export default function JamaicaInfrastructureMap() {
                 </div>
                 <p class="text-sm font-medium">${feature.properties.name || 'Aviation Facility'}</p>
                 ${feature.properties.aeroway ? `<p class="text-xs text-gray-600">Type: ${feature.properties.aeroway}</p>` : ''}
+                <div class="mt-2 pt-2 border-t border-gray-200">
+                  <p class="text-xs text-gray-500 font-mono">📍 ${lat}, ${lon}</p>
+                </div>
               </div>
             `)
             .addTo(map.current!);
@@ -382,6 +400,9 @@ export default function JamaicaInfrastructureMap() {
       map.current.on('click', 'ports-layer', (e: any) => {
         if (e.features && e.features.length > 0) {
           const feature = e.features[0];
+          const coords = feature.geometry.coordinates;
+          const lat = coords[1].toFixed(6);
+          const lon = coords[0].toFixed(6);
           new mapboxgl.Popup()
             .setLngLat(e.lngLat)
             .setHTML(`
@@ -393,6 +414,9 @@ export default function JamaicaInfrastructureMap() {
                   <strong class="text-cyan-700">Port/Harbor</strong>
                 </div>
                 <p class="text-sm font-medium">${feature.properties.name || 'Maritime Facility'}</p>
+                <div class="mt-2 pt-2 border-t border-gray-200">
+                  <p class="text-xs text-gray-500 font-mono">📍 ${lat}, ${lon}</p>
+                </div>
               </div>
             `)
             .addTo(map.current!);
