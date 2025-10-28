@@ -74,7 +74,7 @@ export default function HurricaneMelissaPage() {
             </TabsTrigger>
             <TabsTrigger value="inventory" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              Commodity Inventory
+              Aid Distribution
             </TabsTrigger>
             <TabsTrigger value="logistics" className="flex items-center gap-2">
               <TruckIcon className="h-4 w-4" />
@@ -173,7 +173,7 @@ export default function HurricaneMelissaPage() {
                       </div>
                       <div className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                        <span className="text-gray-700"><strong>Track Inventory:</strong> Real-time commodity tracking (food, water, medical supplies)</span>
+                        <span className="text-gray-700"><strong>Track Inventory:</strong> Real-time aid distribution tracking (food, water, medical supplies)</span>
                       </div>
                       <div className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
@@ -221,13 +221,13 @@ export default function HurricaneMelissaPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Active Supply Sites - Hurricane Melissa Response</CardTitle>
-                  <CardDescription>Real-time commodity inventory across Jamaica distribution network</CardDescription>
+                  <CardDescription>Real-time aid distribution tracking across Jamaica network</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-12 text-gray-500">
                     <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                    <p className="font-medium mb-2">Inventory System Loading...</p>
-                    <p className="text-sm">WSS-style commodity tracking for registered sites</p>
+                    <p className="font-medium mb-2">Aid Distribution System Loading...</p>
+                    <p className="text-sm">WSS-style aid tracking for registered sites</p>
                     <p className="text-xs text-gray-400 mt-4">Register your site above to access this system</p>
                   </div>
                 </CardContent>
