@@ -29,6 +29,7 @@ import NoaaClimatePage from "@/pages/noaa-climate";
 import DisasterEducationPage from "@/pages/disaster-education";
 import DisasterMapPage from "@/pages/disaster-map";
 import SupplySitesPage from "@/pages/supply-sites";
+import HurricaneMelissaPage from "@/pages/hurricane-melissa";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
 import { StateSVGDefs } from "@/components/StateIcon";
@@ -99,7 +100,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                ['/map', '/stats', '/alerts', '/disaster-map', '/air-quality', '/noaa-climate', '/disaster-education', '/supply-sites'].includes(location)
+                ['/map', '/stats', '/alerts', '/disaster-map', '/air-quality', '/noaa-climate', '/disaster-education', '/supply-sites', '/hurricane-melissa'].includes(location)
                   ? "bg-red-500 text-white shadow-md"
                   : "text-white hover:bg-red-500/20 hover:text-white"
               }`}>
@@ -111,6 +112,17 @@ function Navigation() {
             <DropdownMenuContent align="end" className="w-72 bg-white/95 backdrop-blur-sm border border-gray-200 shadow-xl rounded-xl p-2">
               <div className="p-2">
                 <div className="text-sm font-semibold text-gray-900 mb-3 px-2">Emergency Response</div>
+                <DropdownMenuItem asChild>
+                  <Link href="/hurricane-melissa" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-red-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-red-700 group-hover:shadow-md group-hover:scale-110">
+                      <CloudRain className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-red-700 transition-colors duration-200">🚨 Hurricane Melissa</div>
+                      <div className="text-sm text-gray-600 group-hover:text-red-600 transition-colors duration-200">Jamaica Crisis Response</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/map" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-red-50 hover:shadow-lg hover:scale-[1.02] group">
                     <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-red-600 group-hover:shadow-md group-hover:scale-110">
@@ -292,7 +304,7 @@ function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant={['/map', '/stats', '/alerts', '/supply-sites'].includes(location) ? "default" : "outline"}
+                variant={['/map', '/stats', '/alerts', '/supply-sites', '/hurricane-melissa'].includes(location) ? "default" : "outline"}
                 size="sm"
                 className="flex items-center gap-2"
               >
@@ -305,6 +317,17 @@ function Navigation() {
               <div className="text-xs font-semibold text-gray-500 px-3 py-2 uppercase tracking-wider border-b border-gray-100 mb-1">
                 Emergency Response
               </div>
+              <DropdownMenuItem asChild>
+                <Link href="/hurricane-melissa" className="flex items-center gap-3 w-full p-3 rounded-lg transition-all duration-200 hover:bg-red-50 hover:shadow-md hover:scale-[1.02] group">
+                  <div className="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200">
+                    <CloudRain className="h-4 w-4 text-red-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900 group-hover:text-red-700">🚨 Hurricane Melissa</div>
+                    <div className="text-xs text-gray-500 group-hover:text-red-600">Jamaica Crisis Response</div>
+                  </div>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/map" className="flex items-center gap-3 w-full p-3 rounded-lg transition-all duration-200 hover:bg-red-50 hover:shadow-md hover:scale-[1.02] group">
                   <div className="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200">
@@ -485,6 +508,17 @@ function Navigation() {
             <div className="text-xs font-medium text-stormy-light px-2 py-1 uppercase tracking-wide">
               Disaster Response
             </div>
+            <Link href="/hurricane-melissa">
+              <Button
+                variant={location === "/hurricane-melissa" ? "default" : "outline"}
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start ml-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <CloudRain className="h-4 w-4" />
+                🚨 Hurricane Melissa
+              </Button>
+            </Link>
             <Link href="/map">
               <Button
                 variant={location === "/map" ? "default" : "outline"}
@@ -669,6 +703,7 @@ function Router() {
             <Route path="/noaa-climate" component={NoaaClimatePage} />
             <Route path="/disaster-education" component={DisasterEducationPage} />
             <Route path="/supply-sites" component={SupplySitesPage} />
+            <Route path="/hurricane-melissa" component={HurricaneMelissaPage} />
             <Route path="/bioregions" component={BioregionExplorerPage} />
             <Route path="/hawaii" component={HawaiiRegenerationPage} />
             <Route path="/appalachian" component={AppalachianRegenerationPage} />
