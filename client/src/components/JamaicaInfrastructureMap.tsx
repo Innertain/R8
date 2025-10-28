@@ -22,7 +22,7 @@ interface LayerToggleProps {
     ports: boolean;
     roads: boolean;
   };
-  toggleLayer: (layer: keyof typeof layers) => void;
+  toggleLayer: (layer: 'hospitals' | 'shelters' | 'airports' | 'ports' | 'roads') => void;
   counts: {
     hospitals: number;
     shelters: number;
@@ -32,15 +32,29 @@ interface LayerToggleProps {
 }
 
 function LayerControls({ layers, toggleLayer, counts }: LayerToggleProps) {
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+
   return (
-    <Card className="absolute top-4 right-4 z-10 p-4 bg-white/95 backdrop-blur-sm shadow-xl max-w-xs">
-      <div className="flex items-center justify-between mb-3">
+    <Card className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-sm shadow-xl max-w-xs">
+      <div 
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
         <h3 className="font-semibold text-gray-900 flex items-center gap-2">
           <Layers className="h-4 w-4" />
           Infrastructure Layers
         </h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0"
+        >
+          {isCollapsed ? <Layers className="h-4 w-4" /> : <X className="h-4 w-4" />}
+        </Button>
       </div>
-      <div className="space-y-2">
+      {!isCollapsed && (
+        <div className="p-4 pt-0">
+          <div className="space-y-2">
         <button
           onClick={() => toggleLayer('hospitals')}
           className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${
@@ -132,13 +146,15 @@ function LayerControls({ layers, toggleLayer, counts }: LayerToggleProps) {
             </span>
           </div>
         </button>
-      </div>
-      <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
-        <div className="flex items-center gap-2">
-          <Activity className="h-3 w-3" />
-          <span>Data from OpenStreetMap</span>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
+            <div className="flex items-center gap-2">
+              <Activity className="h-3 w-3" />
+              <span>Data from OpenStreetMap</span>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </Card>
   );
 }
@@ -192,7 +208,7 @@ export default function JamaicaInfrastructureMap() {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
       center: JAMAICA_CENTER,
       zoom: JAMAICA_ZOOM,
       attributionControl: true
