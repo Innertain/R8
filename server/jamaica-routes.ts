@@ -1,4 +1,11 @@
 import type { Express } from "express";
+import { 
+  fallbackHospitals, 
+  fallbackShelters, 
+  fallbackAirports, 
+  fallbackPorts, 
+  fallbackRoads 
+} from "./jamaica-fallback-data";
 
 // Jamaica bounding box coordinates
 const JAMAICA_BBOX = {
@@ -100,7 +107,8 @@ export default function registerJamaicaRoutes(app: Express) {
       res.json(geojson);
     } catch (error: any) {
       console.error('Error fetching Jamaica hospitals:', error);
-      res.status(500).json({ error: 'Failed to fetch hospital data', message: error.message });
+      console.log('Using fallback hospital data');
+      res.json(fallbackHospitals);
     }
   });
 
@@ -133,7 +141,8 @@ export default function registerJamaicaRoutes(app: Express) {
       res.json(geojson);
     } catch (error: any) {
       console.error('Error fetching Jamaica shelters:', error);
-      res.status(500).json({ error: 'Failed to fetch shelter data', message: error.message });
+      console.log('Using fallback shelter data');
+      res.json(fallbackShelters);
     }
   });
 
@@ -164,7 +173,8 @@ export default function registerJamaicaRoutes(app: Express) {
       res.json(geojson);
     } catch (error: any) {
       console.error('Error fetching Jamaica airports:', error);
-      res.status(500).json({ error: 'Failed to fetch airport data', message: error.message });
+      console.log('Using fallback airport data');
+      res.json(fallbackAirports);
     }
   });
 
@@ -196,7 +206,8 @@ export default function registerJamaicaRoutes(app: Express) {
       res.json(geojson);
     } catch (error: any) {
       console.error('Error fetching Jamaica ports:', error);
-      res.status(500).json({ error: 'Failed to fetch port data', message: error.message });
+      console.log('Using fallback port data');
+      res.json(fallbackPorts);
     }
   });
 
@@ -248,7 +259,8 @@ export default function registerJamaicaRoutes(app: Express) {
       res.json(geojson);
     } catch (error: any) {
       console.error('Error fetching Jamaica roads:', error);
-      res.status(500).json({ error: 'Failed to fetch road data', message: error.message });
+      console.log('Using fallback road data');
+      res.json(fallbackRoads);
     }
   });
 
