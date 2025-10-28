@@ -11,6 +11,7 @@ import { getBioregionSpecies, getApiUsageStats } from "./inaturalist";
 import speciesRoutes from "./routes/species";
 import noaaRoutes from "./noaa-routes";
 import extremeWeatherRoutes from "./extreme-weather-routes";
+import jamaicaRoutes from "./jamaica-routes";
 import { airQualityService } from "./services/airQualityService";
 import { airQualityStations, airQualityReadings } from "@shared/schema";
 
@@ -4315,6 +4316,9 @@ app.get('/api/airtable-table/:tableName', async (req, res) => {
 
   // Include extreme weather routes
   app.use('/api', extremeWeatherRoutes);
+
+  // Include Jamaica infrastructure routes
+  jamaicaRoutes(app);
 
   // Include Wikipedia routes
   const wikipediaRoutes = (await import('./routes/wikipedia')).default;

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CloudRain, MapPin, Package, TruckIcon, AlertTriangle } from "lucide-react";
+import JamaicaInfrastructureMap from "@/components/JamaicaInfrastructureMap";
 
 export default function HurricaneMelissaPage() {
   return (
@@ -114,19 +115,9 @@ export default function HurricaneMelissaPage() {
           </TabsContent>
 
           <TabsContent value="infrastructure">
-            <Card>
-              <CardHeader>
-                <CardTitle>Jamaica Critical Infrastructure</CardTitle>
-                <CardDescription>Hospitals, shelters, roads, ports, airports from HDX/OpenStreetMap</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12 text-gray-500">
-                  <MapPin className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <p className="font-medium mb-2">Infrastructure Map Loading...</p>
-                  <p className="text-sm">Integrating HDX humanitarian datasets</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="h-[calc(100vh-280px)]">
+              <JamaicaInfrastructureMap />
+            </div>
           </TabsContent>
 
           <TabsContent value="inventory">
