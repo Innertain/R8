@@ -689,6 +689,7 @@ function Router() {
         {/* Public routes */}
         <Route path="/privacy-policy" component={PrivacyPolicyPage} />
         <Route path="/terms-of-service" component={TermsOfServicePage} />
+        <Route path="/hurricane-melissa" component={HurricaneMelissaPage} />
 
         {/* Protected routes */}
         {hasAccess ? (
@@ -703,7 +704,6 @@ function Router() {
             <Route path="/noaa-climate" component={NoaaClimatePage} />
             <Route path="/disaster-education" component={DisasterEducationPage} />
             <Route path="/supply-sites" component={SupplySitesPage} />
-            <Route path="/hurricane-melissa" component={HurricaneMelissaPage} />
             <Route path="/bioregions" component={BioregionExplorerPage} />
             <Route path="/hawaii" component={HawaiiRegenerationPage} />
             <Route path="/appalachian" component={AppalachianRegenerationPage} />
