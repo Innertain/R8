@@ -24,6 +24,7 @@ import { apiRequest } from '@/lib/queryClient';
 
 import VolunteerCalendar from '@/components/VolunteerCalendar';
 import ShiftCard from '@/components/ShiftCard';
+import r8Logo from "@/assets/r8-logo.png";
 
 
 
@@ -1653,7 +1654,7 @@ export default function VolunteerPortal() {
           <div className="flex items-center justify-center space-x-2 text-gray-600">
             <span className="text-sm">Powered by</span>
             <img 
-              src="/src/assets/r8-logo.png"
+              src={r8Logo}
               alt="R8 Logo" 
               className="w-8 h-8"
             />

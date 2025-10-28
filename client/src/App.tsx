@@ -37,6 +37,7 @@ import { Footer } from "@/components/Footer";
 import { GlobalFilterIndicator } from "@/components/GlobalFilterIndicator";
 import ComingSoonPage from "@/pages/coming-soon";
 import AirtableTestPage from "@/pages/airtable-test";
+import r8Logo from "@/assets/r8-logo.png";
 
 function Navigation() {
   const [location] = useLocation();
@@ -55,7 +56,7 @@ function Navigation() {
           }}
         >
           <img
-            src="/src/assets/r8-logo.png"
+            src={r8Logo}
             alt="R8 Logo"
             className="w-10 h-10"
           />

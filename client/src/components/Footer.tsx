@@ -1,5 +1,6 @@
 
 import { Link } from "wouter";
+import r8Logo from "@/assets/r8-logo.png";
 
 export function Footer() {
   return (
@@ -21,7 +22,7 @@ export function Footer() {
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <img 
-                src="/src/assets/r8-logo.png"
+                src={r8Logo}
                 alt="R8 Logo" 
                 className="w-6 h-6 mr-2"
               />

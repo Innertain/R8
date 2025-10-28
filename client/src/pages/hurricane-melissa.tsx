@@ -4,6 +4,7 @@ import { CloudRain, MapPin, Package, TruckIcon, AlertTriangle, PlusCircle, Build
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import JamaicaInfrastructureMap from "@/components/JamaicaInfrastructureMap";
+import r8Logo from "@/assets/r8-logo.png";
 
 export default function HurricaneMelissaPage() {
   return (
@@ -23,7 +24,7 @@ export default function HurricaneMelissaPage() {
           </Link>
           <div className="flex items-center gap-3">
             <img
-              src="/src/assets/r8-logo.png"
+              src={r8Logo}
               alt="R8 Logo"
               className="w-8 h-8"
             />
