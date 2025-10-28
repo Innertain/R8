@@ -54,7 +54,7 @@ export default function HurricaneMelissaPage() {
             <AlertTriangle className="h-5 w-5 flex-shrink-0" />
             <p className="text-sm font-medium">
               <span className="font-bold">ACTIVE DISASTER:</span> Category 5 hurricane making landfall in Jamaica (Oct 27-28, 2025). 
-              Strongest storm to hit the island since record-keeping began in 1851. 165,000+ people at risk across 8 parishes.
+              Strongest storm to hit the island since record-keeping began in 1851. Entire country at risk - all 14 parishes under hurricane warnings.
             </p>
           </div>
         </div>
@@ -96,9 +96,9 @@ export default function HurricaneMelissaPage() {
                 <CardContent>
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                      <div className="text-2xl font-bold text-red-700">165,000+</div>
-                      <div className="text-sm text-red-600">People at Risk</div>
-                      <div className="text-xs text-gray-600 mt-1">Across 8 parishes</div>
+                      <div className="text-2xl font-bold text-red-700">2.8M+</div>
+                      <div className="text-sm text-red-600">People Affected</div>
+                      <div className="text-xs text-gray-600 mt-1">Entire country impacted</div>
                     </div>
                     <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="text-2xl font-bold text-blue-700">Cat 5</div>
