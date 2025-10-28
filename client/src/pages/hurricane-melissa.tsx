@@ -63,28 +63,35 @@ export default function HurricaneMelissaPage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Crisis Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="infrastructure" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Infrastructure Map
-            </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Aid Distribution
-            </TabsTrigger>
-            <TabsTrigger value="logistics" className="flex items-center gap-2">
-              <TruckIcon className="h-4 w-4" />
-              Transportation
-            </TabsTrigger>
-            <TabsTrigger value="assessment" className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Damage Reports
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto mb-8">
+            <TabsList className="inline-flex w-auto min-w-full md:grid md:w-full md:grid-cols-5">
+              <TabsTrigger value="dashboard" className="flex items-center gap-2 whitespace-nowrap">
+                <MapPin className="h-4 w-4" />
+                <span className="hidden sm:inline">Crisis Dashboard</span>
+                <span className="sm:hidden">Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger value="infrastructure" className="flex items-center gap-2 whitespace-nowrap">
+                <MapPin className="h-4 w-4" />
+                <span className="hidden sm:inline">Infrastructure Map</span>
+                <span className="sm:hidden">Map</span>
+              </TabsTrigger>
+              <TabsTrigger value="inventory" className="flex items-center gap-2 whitespace-nowrap">
+                <Package className="h-4 w-4" />
+                <span className="hidden sm:inline">Aid Distribution</span>
+                <span className="sm:hidden">Aid</span>
+              </TabsTrigger>
+              <TabsTrigger value="logistics" className="flex items-center gap-2 whitespace-nowrap">
+                <TruckIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">Transportation</span>
+                <span className="sm:hidden">Transport</span>
+              </TabsTrigger>
+              <TabsTrigger value="assessment" className="flex items-center gap-2 whitespace-nowrap">
+                <AlertTriangle className="h-4 w-4" />
+                <span className="hidden sm:inline">Damage Reports</span>
+                <span className="sm:hidden">Damage</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="dashboard">
             <div className="grid gap-6">
