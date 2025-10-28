@@ -189,7 +189,7 @@ export default function HurricaneMelissaPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-3">
-                    <Link href="/supply-sites">
+                    <Link href="/supply-sites?onboard=true">
                       <Button 
                         size="lg" 
                         className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold shadow-lg"
