@@ -236,7 +236,14 @@ export default function HurricaneMelissaPage() {
           </TabsContent>
 
           <TabsContent value="logistics">
-            <Card>
+            <Card className="relative overflow-hidden">
+              <div className="absolute inset-0 backdrop-blur-sm bg-white/50 z-10 flex items-center justify-center">
+                <div className="text-center p-8 bg-white/90 rounded-lg shadow-lg border-2 border-blue-200">
+                  <TruckIcon className="h-16 w-16 mx-auto mb-4 text-blue-400" />
+                  <p className="text-2xl font-bold text-blue-900 mb-2">In Development</p>
+                  <p className="text-sm text-blue-700">Transportation & logistics module coming soon</p>
+                </div>
+              </div>
               <CardHeader>
                 <CardTitle>Transportation & Logistics</CardTitle>
                 <CardDescription>Vehicle dispatch, route planning, convoy status</CardDescription>
@@ -252,7 +259,14 @@ export default function HurricaneMelissaPage() {
           </TabsContent>
 
           <TabsContent value="assessment">
-            <Card>
+            <Card className="relative overflow-hidden">
+              <div className="absolute inset-0 backdrop-blur-sm bg-white/50 z-10 flex items-center justify-center">
+                <div className="text-center p-8 bg-white/90 rounded-lg shadow-lg border-2 border-amber-200">
+                  <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-amber-400" />
+                  <p className="text-2xl font-bold text-amber-900 mb-2">In Development</p>
+                  <p className="text-sm text-amber-700">Damage assessment module coming soon</p>
+                </div>
+              </div>
               <CardHeader>
                 <CardTitle>Damage Assessment</CardTitle>
                 <CardDescription>Geotagged photos and reports from field teams</CardDescription>
