@@ -517,7 +517,37 @@ function WelcomeStep() {
           Thank you for joining our mutual aid network. This setup will get your site ready to serve your community.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
+        {/* Aid Arena & R4 Partnership Notice */}
+        <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-6 rounded-xl border-2 border-orange-200 dark:border-orange-800">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/40 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Package className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-orange-900 dark:text-orange-100 mb-2">
+                Part of the Aid Arena Network
+              </h3>
+              <p className="text-orange-800 dark:text-orange-200 mb-4">
+                R8 is a proud partner of <strong>Aid Arena</strong>, connecting grassroots disaster response organizations 
+                across the United States and Caribbean. Your supply site will be integrated into the broader mutual aid ecosystem.
+              </p>
+              <div className="bg-white/60 dark:bg-black/20 rounded-lg p-4 border border-orange-300 dark:border-orange-700">
+                <p className="text-sm text-orange-900 dark:text-orange-100 font-semibold mb-2">
+                  🔗 R4 Onboarding Portal
+                </p>
+                <p className="text-sm text-orange-800 dark:text-orange-200 mb-3">
+                  For additional resources and advanced coordination tools, you can also complete onboarding through R4 
+                  (Regional Response & Resilience Registry). The R4 link will be provided upon completion of this wizard.
+                </p>
+                <div className="text-xs text-orange-700 dark:text-orange-300 bg-orange-100/50 dark:bg-orange-900/20 px-3 py-2 rounded">
+                  <strong>Note:</strong> R8 and R4 databases sync automatically. You only need to register once.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <p className="text-gray-700 dark:text-gray-300">
           In the next few steps, you'll provide information about your site and operations:
         </p>
@@ -536,7 +566,7 @@ function WelcomeStep() {
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-            <span>Connect to the R8 volunteer network</span>
+            <span>Connect to the Aid Arena and R8 volunteer network</span>
           </li>
         </ul>
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
