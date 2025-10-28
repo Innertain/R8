@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CloudRain, MapPin, Package, TruckIcon, AlertTriangle, PlusCircle, Building2, FileText } from "lucide-react";
+import { CloudRain, MapPin, Package, TruckIcon, AlertTriangle, PlusCircle, Building2, FileText, ArrowLeft, Home } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import JamaicaInfrastructureMap from "@/components/JamaicaInfrastructureMap";
@@ -8,6 +8,30 @@ import JamaicaInfrastructureMap from "@/components/JamaicaInfrastructureMap";
 export default function HurricaneMelissaPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      {/* Top Navigation Bar */}
+      <div className="bg-slate-900 border-b border-slate-700">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/">
+            <Button 
+              variant="ghost" 
+              className="text-white hover:bg-white/10 gap-2"
+              data-testid="button-back-to-r8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to R8
+            </Button>
+          </Link>
+          <div className="flex items-center gap-3">
+            <img
+              src="/src/assets/r8-logo.png"
+              alt="R8 Logo"
+              className="w-8 h-8"
+            />
+            <span className="text-white font-semibold text-sm">R8 Disaster Relief Platform</span>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white shadow-xl">
         <div className="container mx-auto px-4 py-8">
