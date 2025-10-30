@@ -5,6 +5,50 @@ const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period if present
 const TABLE_NAME = 'Shifts'; // Common alternatives: 'shifts', 'Volunteer Shifts', 'VolunteerShifts'
 
+// Geocoding cache to avoid repeated requests
+const geocodeCache: { [address: string]: { lat: number; lng: number } | null } = {};
+
+// Free geocoding function using Nominatim (OpenStreetMap)
+async function geocodeAddress(address: string, city: string, state: string): Promise<{ lat: number; lng: number } | null> {
+  const fullAddress = `${address}, ${city}, ${state}`;
+  
+  // Check cache first
+  if (geocodeCache[fullAddress] !== undefined) {
+    return geocodeCache[fullAddress];
+  }
+  
+  try {
+    // Use Nominatim (free, no API key required)
+    const query = encodeURIComponent(fullAddress);
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'R8-Supply-Sites-Map/1.0' // Required by Nominatim
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.length > 0) {
+        const result = {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon)
+        };
+        geocodeCache[fullAddress] = result;
+        // Add small delay to respect Nominatim's usage policy (max 1 request/second)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return result;
+      }
+    }
+  } catch (error) {
+    console.log(`Geocoding failed for: ${fullAddress}`, error);
+  }
+  
+  geocodeCache[fullAddress] = null;
+  return null;
+}
+
 // Types for public supply sites map
 export interface PublicSupplySite {
   id: string;
@@ -277,66 +321,79 @@ export async function fetchPublicSupplySitesFromAirtable(
     }
 
     // Process sites and filter for public ones
-    const publicSites: PublicSupplySite[] = siteData.records
-      .filter((record: any) => {
-        const fields = record.fields;
-        // Only include sites that are explicitly marked as public (your field is "Public Visibility")
-        const isPublic = fields['Public Visibility'] === true;
-        // Check if status is not explicitly marked as closed/inactive
-        const status = (fields['Status'] || '').toLowerCase();
-        const isActive = !status.includes('closed') && !status.includes('inactive');
-        
-        console.log(`Site "${fields['Site Name'] || 'Unknown'}": public=${isPublic}, status="${fields['Status']}", active=${isActive}`);
-        return isPublic && isActive;
-      })
-      .map((record: any) => {
-        const fields = record.fields;
-        const now = new Date();
-        
-        // Calculate inventory recency
-        const lastUpdate = inventoryBySite[record.id];
-        let daysSinceUpdate = 9999;
-        let inventoryRecency: 'green' | 'yellow' | 'red' | 'gray' = 'gray';
-        
-        if (lastUpdate) {
-          daysSinceUpdate = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
-          if (daysSinceUpdate <= greenThresholdDays) {
-            inventoryRecency = 'green';
-          } else if (daysSinceUpdate <= yellowThresholdDays) {
-            inventoryRecency = 'yellow';
-          } else {
-            inventoryRecency = 'red';
-          }
-        }
+    const filteredSites = siteData.records.filter((record: any) => {
+      const fields = record.fields;
+      // Only include sites that are explicitly marked as public (your field is "Public Visibility")
+      const isPublic = fields['Public Visibility'] === true;
+      // Check if status is not explicitly marked as closed/inactive
+      const status = (fields['Status'] || '').toLowerCase();
+      const isActive = !status.includes('closed') && !status.includes('inactive');
+      
+      return isPublic && isActive;
+    });
 
-        // Extract site type from Site Category array
-        const siteCategory = Array.isArray(fields['Site Category']) ? fields['Site Category'].join(', ') : (fields['Site Category'] || 'Distribution Center');
-        
-        // Check for coordinates in various possible field names
-        const lat = fields.Latitude || fields.lat || fields.Lat || fields['Latitude'] || null;
-        const lng = fields.Longitude || fields.lng || fields.lon || fields.Lng || fields['Longitude'] || null;
-        
-        if (!lat || !lng) {
-          console.log(`  ⚠️  Site "${fields['Site Name']}" has no coordinates (lat=${lat}, lng=${lng})`);
+    console.log(`✓ Filtered to ${filteredSites.length} public active sites`);
+    console.log(`⏳ Geocoding addresses (this may take ~${filteredSites.length} seconds)...`);
+
+    // Geocode sites and map to our format
+    const publicSites: PublicSupplySite[] = [];
+    
+    for (const record of filteredSites) {
+      const fields = record.fields;
+      const now = new Date();
+      
+      // Calculate inventory recency
+      const lastUpdate = inventoryBySite[record.id];
+      let daysSinceUpdate = 9999;
+      let inventoryRecency: 'green' | 'yellow' | 'red' | 'gray' = 'gray';
+      
+      if (lastUpdate) {
+        daysSinceUpdate = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysSinceUpdate <= greenThresholdDays) {
+          inventoryRecency = 'green';
+        } else if (daysSinceUpdate <= yellowThresholdDays) {
+          inventoryRecency = 'yellow';
+        } else {
+          inventoryRecency = 'red';
         }
-        
-        return {
-          id: record.id,
-          name: fields['Site Name'] || 'Unnamed Site',
-          address: fields['Street Address'] || '',
-          city: fields.City || '',
-          state: fields.State || '',
-          latitude: lat ? parseFloat(lat) : undefined,
-          longitude: lng ? parseFloat(lng) : undefined,
-          siteHours: fields['Hours'] || fields['Site Hours'] || fields['Operating Hours'],
-          acceptingDonations: (fields['Status'] || '').toLowerCase().includes('accepting'),
-          distributingSupplies: (fields['Status'] || '').toLowerCase().includes('distributing') || (fields['Status'] || '').toLowerCase().includes('accepting'),
-          siteType: siteCategory,
-          lastInventoryUpdate: lastUpdate ? lastUpdate.toISOString() : undefined,
-          inventoryRecency,
-          daysSinceUpdate
-        };
+      }
+
+      // Extract site type from Site Category array
+      const siteCategory = Array.isArray(fields['Site Category']) ? fields['Site Category'].join(', ') : (fields['Site Category'] || 'Distribution Center');
+      
+      // Check for coordinates in Airtable first
+      let lat = fields.Latitude || fields.lat || fields.Lat || fields['Latitude'] || null;
+      let lng = fields.Longitude || fields.lng || fields.lon || fields.Lng || fields['Longitude'] || null;
+      
+      // If no coordinates, geocode the address
+      if ((!lat || !lng) && fields['Street Address'] && fields.City && fields.State) {
+        const coords = await geocodeAddress(fields['Street Address'], fields.City, fields.State);
+        if (coords) {
+          lat = coords.lat;
+          lng = coords.lng;
+          console.log(`  ✓ Geocoded "${fields['Site Name']}" -> ${lat}, ${lng}`);
+        } else {
+          console.log(`  ✗ Failed to geocode "${fields['Site Name']}"`);
+        }
+      }
+      
+      publicSites.push({
+        id: record.id,
+        name: fields['Site Name'] || 'Unnamed Site',
+        address: fields['Street Address'] || '',
+        city: fields.City || '',
+        state: fields.State || '',
+        latitude: lat ? parseFloat(lat) : undefined,
+        longitude: lng ? parseFloat(lng) : undefined,
+        siteHours: fields['Hours'] || fields['Site Hours'] || fields['Operating Hours'],
+        acceptingDonations: (fields['Status'] || '').toLowerCase().includes('accepting'),
+        distributingSupplies: (fields['Status'] || '').toLowerCase().includes('distributing') || (fields['Status'] || '').toLowerCase().includes('accepting'),
+        siteType: siteCategory,
+        lastInventoryUpdate: lastUpdate ? lastUpdate.toISOString() : undefined,
+        inventoryRecency,
+        daysSinceUpdate
       });
+    }
 
     console.log(`✓ Returning ${publicSites.length} public supply sites`);
     return publicSites;
