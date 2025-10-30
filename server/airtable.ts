@@ -8,6 +8,35 @@ const TABLE_NAME = 'Shifts'; // Common alternatives: 'shifts', 'Volunteer Shifts
 // Geocoding cache to avoid repeated requests
 const geocodeCache: { [address: string]: { lat: number; lng: number } | null } = {};
 
+// Helper function to fetch all records from Airtable with pagination
+async function fetchAllAirtableRecords(url: string, token: string): Promise<any[]> {
+  let allRecords: any[] = [];
+  let offset: string | undefined = undefined;
+  
+  do {
+    const paginatedUrl: string = offset ? `${url}?offset=${offset}` : url;
+    const response: Response = await fetch(paginatedUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch from Airtable: ${response.status}`);
+    }
+    
+    const data: any = await response.json();
+    allRecords = allRecords.concat(data.records || []);
+    offset = data.offset; // Will be undefined when no more pages
+    
+    if (offset) {
+      console.log(`  ↳ Fetched ${data.records.length} records, fetching next page...`);
+    }
+  } while (offset);
+  
+  return allRecords;
+}
+
 // Free geocoding function using Nominatim (OpenStreetMap)
 async function geocodeAddress(address: string, city: string, state: string): Promise<{ lat: number; lng: number } | null> {
   const fullAddress = `${address}, ${city}, ${state}`;
@@ -238,21 +267,6 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
   }
 
   throw new Error('No accessible table found. Please check your Airtable base has a table named "Shifts" or provide the correct table name.');
-
-  const data = await response.json();
-
-  // Convert Airtable format to our application format
-  return data.records.map((record: any) => ({
-    id: record.id,
-    activityName: record.fields.activityName || record.fields['Activity Name'] || 'Unknown Activity',
-    dateTime: record.fields.dateTime || record.fields['Date Time'] || 'TBD',
-    location: record.fields.location || record.fields['Location'] || 'TBD',
-    volunteersNeeded: record.fields.volunteersNeeded || record.fields['Volunteers Needed'] || 0,
-    volunteersSignedUp: record.fields.volunteersSignedUp || record.fields['Volunteers Signed Up'] || 0,
-    status: record.fields.status || record.fields['Status'] || 'active',
-    category: record.fields.category || record.fields['Category'] || 'general',
-    icon: record.fields.icon || record.fields['Icon'] || 'users'
-  }));
 }
 
 export async function fetchPublicSupplySitesFromAirtable(
@@ -264,46 +278,30 @@ export async function fetchPublicSupplySitesFromAirtable(
   }
 
   try {
-    // Fetch Site records
+    // Fetch ALL Site records with pagination
     const siteUrl = `https://api.airtable.com/v0/${BASE_ID}/Site`;
-    console.log(`Fetching public supply sites from: ${siteUrl}`);
+    console.log(`Fetching all supply sites from: ${siteUrl}`);
     
-    const siteResponse = await fetch(siteUrl, {
-      headers: {
-        Authorization: `Bearer ${AIRTABLE_TOKEN}`
-      }
-    });
-
-    if (!siteResponse.ok) {
-      throw new Error(`Failed to fetch sites: ${siteResponse.status}`);
-    }
-
-    const siteData = await siteResponse.json();
-    console.log(`✓ Fetched ${siteData.records?.length || 0} supply sites`);
+    const allSiteRecords = await fetchAllAirtableRecords(siteUrl, AIRTABLE_TOKEN);
+    console.log(`✓ Fetched ${allSiteRecords.length} supply sites (all pages)`);
     
     // Debug: Log first record's fields to see what's available
-    if (siteData.records.length > 0) {
-      console.log('First site record fields:', Object.keys(siteData.records[0].fields));
-      console.log('First site sample data:', JSON.stringify(siteData.records[0].fields, null, 2));
+    if (allSiteRecords.length > 0) {
+      console.log('First site record fields:', Object.keys(allSiteRecords[0].fields));
+      console.log('First site sample data:', JSON.stringify(allSiteRecords[0].fields, null, 2));
     }
 
-    // Fetch Site Inventory records to determine last update times
+    // Fetch ALL Site Inventory records with pagination to determine last update times
     const inventoryUrl = `https://api.airtable.com/v0/${BASE_ID}/Site%20Inventory`;
-    console.log(`Fetching inventory data from: ${inventoryUrl}`);
+    console.log(`Fetching all inventory data from: ${inventoryUrl}`);
     
-    const inventoryResponse = await fetch(inventoryUrl, {
-      headers: {
-        Authorization: `Bearer ${AIRTABLE_TOKEN}`
-      }
-    });
-
     let inventoryBySite: { [siteId: string]: Date } = {};
-    if (inventoryResponse.ok) {
-      const inventoryData = await inventoryResponse.json();
-      console.log(`✓ Fetched ${inventoryData.records?.length || 0} inventory records`);
+    try {
+      const allInventoryRecords = await fetchAllAirtableRecords(inventoryUrl, AIRTABLE_TOKEN);
+      console.log(`✓ Fetched ${allInventoryRecords.length} inventory records (all pages)`);
       
       // Build lookup of most recent inventory update per site
-      inventoryData.records.forEach((record: any) => {
+      allInventoryRecords.forEach((record: any) => {
         const siteIds = record.fields.Site || record.fields['Site (from Site)'] || [];
         const updatedDate = record.fields['Last Modified'] || record.fields.createdTime;
         
@@ -316,15 +314,15 @@ export async function fetchPublicSupplySitesFromAirtable(
           });
         }
       });
-    } else {
+    } catch (err) {
       console.log('Could not fetch inventory data, will show all sites as gray');
     }
 
     // Process sites and filter for public ones
-    const filteredSites = siteData.records.filter((record: any) => {
+    const filteredSites = allSiteRecords.filter((record: any) => {
       const fields = record.fields;
-      // Only include sites that are explicitly marked as public (your field is "Public Visibility")
-      const isPublic = fields['Public Visibility'] === true;
+      // Include all sites UNLESS explicitly marked as private (opt-out, not opt-in)
+      const isPublic = fields['Public Visibility'] !== false;
       // Check if status is not explicitly marked as closed/inactive
       const status = (fields['Status'] || '').toLowerCase();
       const isActive = !status.includes('closed') && !status.includes('inactive');
