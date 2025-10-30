@@ -150,92 +150,26 @@ export default function HurricaneMelissaPage() {
           </TabsContent>
 
           <TabsContent value="inventory">
-            <div className="space-y-6">
-              {/* Supply Site Onboarding Call-to-Action */}
-              <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                      <Building2 className="h-6 w-6 text-orange-600" />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-orange-900">Register New Supply Distribution Site</CardTitle>
-                      <CardDescription className="text-orange-700">
-                        Emergency responders: Add your POD, warehouse, or community distribution center to the network
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-white/60 rounded-lg p-4 mb-4">
-                    <h3 className="font-semibold text-gray-900 mb-3">Why Register Your Site?</h3>
-                    <div className="grid md:grid-cols-2 gap-3 text-sm">
-                      <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                        <span className="text-gray-700"><strong>Coordinate Aid:</strong> Connect with WFP, CDEMA, and local partners for resource distribution</span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                        <span className="text-gray-700"><strong>Track Inventory:</strong> Real-time aid distribution tracking (food, water, medical supplies)</span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                        <span className="text-gray-700"><strong>Request Support:</strong> Signal needs and receive targeted deliveries</span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                        <span className="text-gray-700"><strong>Privacy Controls:</strong> Choose what information to share publicly vs. authenticated partners</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    <Link href="/supply-sites?onboard=true">
-                      <Button 
-                        size="lg" 
-                        className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold shadow-lg"
-                        data-testid="button-onboard-supply-site"
-                      >
-                        <PlusCircle className="w-5 h-5 mr-2" />
-                        Register Supply Site for Hurricane Response
-                      </Button>
-                    </Link>
-                    <Button 
-                      variant="outline" 
-                      size="lg"
-                      className="border-orange-300 text-orange-700 hover:bg-orange-50"
-                      data-testid="button-learn-more"
-                    >
-                      <FileText className="w-5 h-5 mr-2" />
-                      Learn About WSS Network
-                    </Button>
-                  </div>
-
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-sm text-blue-800">
-                      <strong>Fast-Track Registration:</strong> During this emergency, supply sites can join the R8 network immediately. 
-                      Our onboarding wizard takes 5-10 minutes and matches the WSS (WNC Supply Sites) database schema for seamless coordination.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Existing Inventory System */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Active Supply Sites - Hurricane Melissa Response</CardTitle>
-                  <CardDescription>Real-time aid distribution tracking across Jamaica network</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12 text-gray-500">
-                    <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                    <p className="font-medium mb-2">Aid Distribution System Loading...</p>
-                    <p className="text-sm">WSS-style aid tracking for registered sites</p>
-                    <p className="text-xs text-gray-400 mt-4">Register your site above to access this system</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="relative overflow-hidden">
+              <div className="absolute inset-0 backdrop-blur-sm bg-white/50 z-10 flex items-center justify-center">
+                <div className="text-center p-8 bg-white/90 rounded-lg shadow-lg border-2 border-orange-200">
+                  <Package className="h-16 w-16 mx-auto mb-4 text-orange-400" />
+                  <p className="text-2xl font-bold text-orange-900 mb-2">In Development - Available Upon Request</p>
+                  <p className="text-sm text-orange-700">Aid distribution tracking module coming soon</p>
+                </div>
+              </div>
+              <CardHeader>
+                <CardTitle>Aid Distribution</CardTitle>
+                <CardDescription>Supply site registration and inventory tracking</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12 text-gray-500">
+                  <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <p className="font-medium mb-2">Aid Distribution System</p>
+                  <p className="text-sm">Supply tracking and coordination</p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="logistics">
