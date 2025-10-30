@@ -107,8 +107,8 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         return data.records.map((record: any) => {
           const fields = record.fields;
           
-          // Extract activity name from Name or Name (from Activity)
-          const activityName = fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
+          // Extract activity name from Activity, Name (from Activity), or Name
+          const activityName = fields['Activity']?.[0] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
           
           // Extract location from Site Name (from Location)
           const location = fields['Site Name (from Location )']?.[0] || 'TBD';
