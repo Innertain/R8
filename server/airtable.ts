@@ -5,6 +5,24 @@ const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period if present
 const TABLE_NAME = 'Shifts'; // Common alternatives: 'shifts', 'Volunteer Shifts', 'VolunteerShifts'
 
+// Types for public supply sites map
+export interface PublicSupplySite {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  latitude?: number;
+  longitude?: number;
+  siteHours?: string;
+  acceptingDonations: boolean;
+  distributingSupplies: boolean;
+  siteType: string;
+  lastInventoryUpdate?: string;
+  inventoryRecency: 'green' | 'yellow' | 'red' | 'gray';
+  daysSinceUpdate: number;
+}
+
 // Cache for mutual aid partners to avoid repeated API calls
 let partnersCache: { [key: string]: { name: string; logo?: string } } | null = null;
 let cacheExpiry: number = 0;
@@ -191,4 +209,119 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
     category: record.fields.category || record.fields['Category'] || 'general',
     icon: record.fields.icon || record.fields['Icon'] || 'users'
   }));
+}
+
+export async function fetchPublicSupplySitesFromAirtable(
+  greenThresholdDays: number = 7,
+  yellowThresholdDays: number = 30
+): Promise<PublicSupplySite[]> {
+  if (!AIRTABLE_TOKEN || !BASE_ID) {
+    throw new Error('Missing Airtable credentials');
+  }
+
+  try {
+    // Fetch Site records
+    const siteUrl = `https://api.airtable.com/v0/${BASE_ID}/Site`;
+    console.log(`Fetching public supply sites from: ${siteUrl}`);
+    
+    const siteResponse = await fetch(siteUrl, {
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`
+      }
+    });
+
+    if (!siteResponse.ok) {
+      throw new Error(`Failed to fetch sites: ${siteResponse.status}`);
+    }
+
+    const siteData = await siteResponse.json();
+    console.log(`✓ Fetched ${siteData.records?.length || 0} supply sites`);
+
+    // Fetch Site Inventory records to determine last update times
+    const inventoryUrl = `https://api.airtable.com/v0/${BASE_ID}/Site%20Inventory`;
+    console.log(`Fetching inventory data from: ${inventoryUrl}`);
+    
+    const inventoryResponse = await fetch(inventoryUrl, {
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`
+      }
+    });
+
+    let inventoryBySite: { [siteId: string]: Date } = {};
+    if (inventoryResponse.ok) {
+      const inventoryData = await inventoryResponse.json();
+      console.log(`✓ Fetched ${inventoryData.records?.length || 0} inventory records`);
+      
+      // Build lookup of most recent inventory update per site
+      inventoryData.records.forEach((record: any) => {
+        const siteIds = record.fields.Site || record.fields['Site (from Site)'] || [];
+        const updatedDate = record.fields['Last Modified'] || record.fields.createdTime;
+        
+        if (siteIds.length > 0 && updatedDate) {
+          const updateTime = new Date(updatedDate);
+          siteIds.forEach((siteId: string) => {
+            if (!inventoryBySite[siteId] || updateTime > inventoryBySite[siteId]) {
+              inventoryBySite[siteId] = updateTime;
+            }
+          });
+        }
+      });
+    } else {
+      console.log('Could not fetch inventory data, will show all sites as gray');
+    }
+
+    // Process sites and filter for public ones
+    const publicSites: PublicSupplySite[] = siteData.records
+      .filter((record: any) => {
+        const fields = record.fields;
+        // Only include sites that are explicitly marked as public
+        const isPublic = fields['Public'] === true || fields['Is Public'] === true || fields['isPubliclyVisible'] === true;
+        const isActive = fields['Active'] !== false && fields['Is Active'] !== false && fields['isActive'] !== false;
+        return isPublic && isActive;
+      })
+      .map((record: any) => {
+        const fields = record.fields;
+        const now = new Date();
+        
+        // Calculate inventory recency
+        const lastUpdate = inventoryBySite[record.id];
+        let daysSinceUpdate = 9999;
+        let inventoryRecency: 'green' | 'yellow' | 'red' | 'gray' = 'gray';
+        
+        if (lastUpdate) {
+          daysSinceUpdate = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysSinceUpdate <= greenThresholdDays) {
+            inventoryRecency = 'green';
+          } else if (daysSinceUpdate <= yellowThresholdDays) {
+            inventoryRecency = 'yellow';
+          } else {
+            inventoryRecency = 'red';
+          }
+        }
+
+        return {
+          id: record.id,
+          name: fields.Name || fields['Site Name'] || 'Unnamed Site',
+          address: fields.Address || fields['Street Address'] || '',
+          city: fields.City || '',
+          state: fields.State || '',
+          latitude: fields.Latitude || fields.lat,
+          longitude: fields.Longitude || fields.lng || fields.lon,
+          siteHours: fields['Site Hours'] || fields['Hours'] || fields['Operating Hours'],
+          acceptingDonations: fields['Accepting Donations'] !== false,
+          distributingSupplies: fields['Distributing Supplies'] !== false,
+          siteType: fields['Site Type'] || fields.Type || 'Distribution Center',
+          lastInventoryUpdate: lastUpdate ? lastUpdate.toISOString() : undefined,
+          inventoryRecency,
+          daysSinceUpdate
+        };
+      });
+
+    console.log(`✓ Returning ${publicSites.length} public supply sites`);
+    return publicSites;
+
+  } catch (error) {
+    console.error('Error fetching public supply sites:', error);
+    throw error;
+  }
 }

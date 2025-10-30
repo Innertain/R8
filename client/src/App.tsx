@@ -29,6 +29,7 @@ import NoaaClimatePage from "@/pages/noaa-climate";
 import DisasterEducationPage from "@/pages/disaster-education";
 import DisasterMapPage from "@/pages/disaster-map";
 import SupplySitesPage from "@/pages/supply-sites";
+import SupplySitesMapPage from "@/pages/supply-sites-map";
 import HurricaneMelissaPage from "@/pages/hurricane-melissa";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
@@ -673,7 +674,7 @@ function Router() {
     return () => window.removeEventListener('storage', checkAccess);
   }, []);
 
-  const isPublicRoute = ['/privacy-policy', '/terms-of-service', '/hurricane-melissa'].includes(location);
+  const isPublicRoute = ['/privacy-policy', '/terms-of-service', '/hurricane-melissa', '/supply-sites-map'].includes(location);
   const showNavigation = hasAccess && !isPublicRoute;
 
   // Show loading while checking access
@@ -703,6 +704,7 @@ function Router() {
           <Route path="/privacy-policy" component={PrivacyPolicyPage} />
           <Route path="/terms-of-service" component={TermsOfServicePage} />
           <Route path="/hurricane-melissa" component={HurricaneMelissaPage} />
+          <Route path="/supply-sites-map" component={SupplySitesMapPage} />
 
           {/* Protected routes */}
           {hasAccess ? (

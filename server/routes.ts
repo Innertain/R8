@@ -6,7 +6,7 @@ import { db } from "./db";
 import { alertRules, alertDeliveries, userNotificationSettings, insertAlertRuleSchema, insertNotificationSettingsSchema } from "@shared/schema";
 import { eq, desc, and, gte } from "drizzle-orm";
 import { alertEngine, type EmergencyEvent } from "./alerting/alertEngine";
-import { fetchShiftsFromAirtableServer } from "./airtable";
+import { fetchShiftsFromAirtableServer, fetchPublicSupplySitesFromAirtable } from "./airtable";
 import { getBioregionSpecies, getApiUsageStats } from "./inaturalist";
 import speciesRoutes from "./routes/species";
 import noaaRoutes from "./noaa-routes";
@@ -143,6 +143,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       ];
       res.json(mockShifts);
+    }
+  });
+
+  // API route to fetch public supply sites from Airtable with inventory recency heat map
+  app.get("/api/supply-sites/public", async (req, res) => {
+    console.log('API route /api/supply-sites/public called');
+    try {
+      // Get threshold parameters from query or use defaults
+      const greenThreshold = parseInt(req.query.greenThreshold as string) || 7;
+      const yellowThreshold = parseInt(req.query.yellowThreshold as string) || 30;
+      
+      console.log(`Fetching public supply sites with thresholds: green=${greenThreshold}, yellow=${yellowThreshold}`);
+      const sites = await fetchPublicSupplySitesFromAirtable(greenThreshold, yellowThreshold);
+      console.log(`Successfully fetched ${sites.length} public supply sites`);
+      res.json(sites);
+    } catch (error) {
+      console.error('Error fetching public supply sites:', error);
+      res.status(500).json({ error: 'Failed to fetch public supply sites', message: (error as Error).message });
     }
   });
 
