@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -628,6 +628,25 @@ export default function VolunteerPortal() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Auto-login if already authenticated from main site
+  useEffect(() => {
+    const platformAccess = sessionStorage.getItem('platformAccess');
+    const accessUserStr = sessionStorage.getItem('accessUser');
+    
+    if (platformAccess === 'granted' && accessUserStr && !currentVolunteer) {
+      try {
+        const accessUser = JSON.parse(accessUserStr);
+        // Extract phone number from the authenticated user
+        if (accessUser.phoneNumber) {
+          // Automatically trigger login with the authenticated phone number
+          loginMutation.mutate(accessUser.phoneNumber);
+        }
+      } catch (error) {
+        console.error('Failed to parse access user:', error);
+      }
+    }
+  }, []);
 
   // Cancel assignment mutation
   const cancelAssignmentMutation = useMutation({
