@@ -107,8 +107,8 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         return data.records.map((record: any) => {
           const fields = record.fields;
           
-          // Extract activity name from Activity, Name (from Activity), or Name
-          const activityName = fields['Activity']?.[0] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
+          // Extract activity name - note the trailing space in "Activity "
+          const activityName = fields['Activity '] || fields['Activity'] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
           
           // Extract location from Site Name (from Location)
           const location = fields['Site Name (from Location )']?.[0] || 'TBD';
@@ -145,13 +145,17 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           else if (activityLower.includes('clean')) category = 'environment';
           else if (activityLower.includes('deliver')) category = 'logistics';
           
+          // Extract volunteer counts with fallback for trailing space
+          const maxVolunteers = Number(fields['Max Volunteers '] || fields['Max Volunteers'] || 0);
+          const remainingSpots = Number(fields['Remaining Spots '] || fields['Remaining Spots'] || 0);
+          
           return {
             id: record.id,
             activityName,
             dateTime,
             location,
-            volunteersNeeded: 0, // Will add this mapping when you provide the field
-            volunteersSignedUp: 0, // Will add this mapping when you provide the field  
+            volunteersNeeded: maxVolunteers,
+            volunteersSignedUp: Math.max(0, maxVolunteers - remainingSpots),
             status: 'active',
             category,
             icon,
