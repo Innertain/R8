@@ -243,7 +243,7 @@ export default function HurricaneMelissaPage() {
               <div className="absolute inset-0 backdrop-blur-sm bg-white/50 z-10 flex items-center justify-center">
                 <div className="text-center p-8 bg-white/90 rounded-lg shadow-lg border-2 border-blue-200">
                   <TruckIcon className="h-16 w-16 mx-auto mb-4 text-blue-400" />
-                  <p className="text-2xl font-bold text-blue-900 mb-2">In Development</p>
+                  <p className="text-2xl font-bold text-blue-900 mb-2">In Development - Available Upon Request</p>
                   <p className="text-sm text-blue-700">Transportation & logistics module coming soon</p>
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function HurricaneMelissaPage() {
               <div className="absolute inset-0 backdrop-blur-sm bg-white/50 z-10 flex items-center justify-center">
                 <div className="text-center p-8 bg-white/90 rounded-lg shadow-lg border-2 border-amber-200">
                   <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-amber-400" />
-                  <p className="text-2xl font-bold text-amber-900 mb-2">In Development</p>
+                  <p className="text-2xl font-bold text-amber-900 mb-2">In Development - Available Upon Request</p>
                   <p className="text-sm text-amber-700">Damage assessment module coming soon</p>
                 </div>
               </div>
