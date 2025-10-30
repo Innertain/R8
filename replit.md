@@ -6,6 +6,11 @@ This project is a full-stack volunteer management application designed to stream
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Contact Information
+- **Contact Form**: https://form.jotform.com/250033214947047 (JotForm)
+  - Use this form for all "Contact Us" / "Email Us" buttons throughout the platform
+  - Purpose: Platform access requests, general inquiries, support requests
+
 ## System Architecture
 ### UI/UX Decisions
 The platform features a clean, professional design with a focus on readability and accessibility, utilizing a soft color scheme and improved contrast. Interactive UI elements incorporate subtle hover effects for clear visual feedback. The design is fully mobile-optimized with comprehensive responsive layouts, including mobile-first grid breakpoints, balanced mobile spacing, and moderate negative margin overlapping for smooth section transitions. Navigation uses icon-based tabs with responsive layouts.

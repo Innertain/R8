@@ -236,7 +236,7 @@ export default function ComingSoonPage() {
                       variant="outline" 
                       size="sm" 
                       className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
-                      onClick={() => window.open('mailto:access@regenerative8.org?subject=Platform Access Request', '_blank')}
+                      onClick={() => window.open('https://form.jotform.com/250033214947047', '_blank')}
                     >
                       <Globe className="w-4 h-4 mr-2" />
                       Email Us
