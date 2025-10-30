@@ -236,6 +236,12 @@ export async function fetchPublicSupplySitesFromAirtable(
 
     const siteData = await siteResponse.json();
     console.log(`✓ Fetched ${siteData.records?.length || 0} supply sites`);
+    
+    // Debug: Log first record's fields to see what's available
+    if (siteData.records.length > 0) {
+      console.log('First site record fields:', Object.keys(siteData.records[0].fields));
+      console.log('First site sample data:', JSON.stringify(siteData.records[0].fields, null, 2));
+    }
 
     // Fetch Site Inventory records to determine last update times
     const inventoryUrl = `https://api.airtable.com/v0/${BASE_ID}/Site%20Inventory`;
@@ -274,9 +280,13 @@ export async function fetchPublicSupplySitesFromAirtable(
     const publicSites: PublicSupplySite[] = siteData.records
       .filter((record: any) => {
         const fields = record.fields;
-        // Only include sites that are explicitly marked as public
-        const isPublic = fields['Public'] === true || fields['Is Public'] === true || fields['isPubliclyVisible'] === true;
-        const isActive = fields['Active'] !== false && fields['Is Active'] !== false && fields['isActive'] !== false;
+        // Only include sites that are explicitly marked as public (your field is "Public Visibility")
+        const isPublic = fields['Public Visibility'] === true;
+        // Check if status is not explicitly marked as closed/inactive
+        const status = (fields['Status'] || '').toLowerCase();
+        const isActive = !status.includes('closed') && !status.includes('inactive');
+        
+        console.log(`Site "${fields['Site Name'] || 'Unknown'}": public=${isPublic}, status="${fields['Status']}", active=${isActive}`);
         return isPublic && isActive;
       })
       .map((record: any) => {
@@ -299,18 +309,29 @@ export async function fetchPublicSupplySitesFromAirtable(
           }
         }
 
+        // Extract site type from Site Category array
+        const siteCategory = Array.isArray(fields['Site Category']) ? fields['Site Category'].join(', ') : (fields['Site Category'] || 'Distribution Center');
+        
+        // Check for coordinates in various possible field names
+        const lat = fields.Latitude || fields.lat || fields.Lat || fields['Latitude'] || null;
+        const lng = fields.Longitude || fields.lng || fields.lon || fields.Lng || fields['Longitude'] || null;
+        
+        if (!lat || !lng) {
+          console.log(`  ⚠️  Site "${fields['Site Name']}" has no coordinates (lat=${lat}, lng=${lng})`);
+        }
+        
         return {
           id: record.id,
-          name: fields.Name || fields['Site Name'] || 'Unnamed Site',
-          address: fields.Address || fields['Street Address'] || '',
+          name: fields['Site Name'] || 'Unnamed Site',
+          address: fields['Street Address'] || '',
           city: fields.City || '',
           state: fields.State || '',
-          latitude: fields.Latitude || fields.lat,
-          longitude: fields.Longitude || fields.lng || fields.lon,
-          siteHours: fields['Site Hours'] || fields['Hours'] || fields['Operating Hours'],
-          acceptingDonations: fields['Accepting Donations'] !== false,
-          distributingSupplies: fields['Distributing Supplies'] !== false,
-          siteType: fields['Site Type'] || fields.Type || 'Distribution Center',
+          latitude: lat ? parseFloat(lat) : undefined,
+          longitude: lng ? parseFloat(lng) : undefined,
+          siteHours: fields['Hours'] || fields['Site Hours'] || fields['Operating Hours'],
+          acceptingDonations: (fields['Status'] || '').toLowerCase().includes('accepting'),
+          distributingSupplies: (fields['Status'] || '').toLowerCase().includes('distributing') || (fields['Status'] || '').toLowerCase().includes('accepting'),
+          siteType: siteCategory,
           lastInventoryUpdate: lastUpdate ? lastUpdate.toISOString() : undefined,
           inventoryRecency,
           daysSinceUpdate
