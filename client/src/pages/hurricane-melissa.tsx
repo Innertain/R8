@@ -129,14 +129,15 @@ export default function HurricaneMelissaPage() {
                   </div>
 
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="font-semibold text-blue-900 mb-2">Key Response Partners</h3>
+                    <h3 className="font-semibold text-blue-900 mb-2">Official Response Organizations</h3>
                     <div className="text-sm text-blue-800 space-y-1">
                       <div>• <span className="font-medium">ODPEM</span> - Office of Disaster Preparedness & Emergency Management (Jamaica)</div>
                       <div>• <span className="font-medium">CDEMA</span> - Caribbean Disaster Emergency Management Agency</div>
-                      <div>• <span className="font-medium">Jamaica Red Cross</span> - 250 shelter kits pre-positioned</div>
+                      <div>• <span className="font-medium">Jamaica Red Cross</span> - Emergency aid deployment</div>
                       <div>• <span className="font-medium">WFP Caribbean Hub</span> - Regional logistics support (Barbados)</div>
                       <div>• <span className="font-medium">JDF DART</span> - Jamaica Defence Force Disaster Assistance Response Team</div>
                     </div>
+                    <p className="text-xs text-blue-700 italic mt-3">R8 is a community volunteer tool, not affiliated with these organizations</p>
                   </div>
                 </CardContent>
               </Card>
