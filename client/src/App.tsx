@@ -709,6 +709,7 @@ function Router() {
             <>
               <Route path="/" component={Home} />
               <Route path="/volunteer" component={VolunteerPortal} />
+              <Route path="/volunteer-portal" component={VolunteerPortal} />
               <Route path="/map" component={InteractiveMap} />
               <Route path="/stats" component={StatsDashboard} />
               <Route path="/alerts" component={AlertsPage} />
