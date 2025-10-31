@@ -372,44 +372,113 @@ export default function ComingSoonPage() {
         </div>
       </section>
 
-      {/* Food Resources Map - Work in Progress */}
-      <section className="relative py-12 lg:py-16 bg-gradient-to-b from-slate-800 to-slate-900">
-        <div className="relative z-10 max-w-4xl mx-auto px-4 lg:px-6">
-          <div className="bg-gradient-to-br from-emerald-900/40 to-green-900/40 backdrop-blur-sm rounded-2xl p-8 border border-emerald-500/30 shadow-2xl">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="p-3 bg-emerald-500/20 rounded-xl">
-                <MapPin className="w-8 h-8 text-emerald-400" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-2xl font-bold text-white">Food Resources Map</h3>
-                  <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-semibold rounded-full border border-emerald-500/30">
-                    BETA
-                  </span>
-                </div>
-                <p className="text-emerald-100 text-lg">
-                  Interactive map of food hubs and supply distribution centers
-                </p>
-              </div>
+      {/* Food Resources Map Section */}
+      <section className="relative py-20 bg-gradient-to-b from-emerald-900/20 to-slate-900">
+        <div className="max-w-6xl mx-auto px-4 lg:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-3 bg-emerald-600/20 border border-emerald-500 rounded-full px-6 py-2 mb-6">
+              <MapPin className="w-5 h-5 text-emerald-400" />
+              <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wide">Community Resource • Beta</span>
             </div>
-            
-            <div className="space-y-4 mb-6">
-              <p className="text-gray-200 leading-relaxed">
-                Created in partnership with <strong className="text-white">Buncombe County HHS</strong> and <strong className="text-white">WNC Food Coalition</strong>, this map helps residents find food resources during the SNAP funding gap.
-              </p>
-              <p className="text-gray-300 text-sm">
-                <strong className="text-emerald-300">Currently serving:</strong> Western North Carolina and surrounding areas
-              </p>
-              <p className="text-gray-300 text-sm italic">
-                Interested in this technology for your region? We can expand to support other communities - contact us to discuss possibilities.
-              </p>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Food Resources Map
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Interactive satellite map of food hubs and supply distribution centers serving Western North Carolina 
+              and surrounding areas during the SNAP funding gap.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-emerald-500/30">
+              <div className="text-center">
+                <div className="text-3xl mb-2">🗺️</div>
+                <div className="text-2xl font-bold text-emerald-400 mb-1">391</div>
+                <h3 className="text-sm font-medium text-gray-300">Food Hubs</h3>
+                <p className="text-xs text-gray-500 mt-1">Across WNC region</p>
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/supply-sites-map" className="flex-1">
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
+              <div className="text-center">
+                <div className="text-3xl mb-2">🛰️</div>
+                <div className="text-2xl font-bold text-green-400 mb-1">Satellite</div>
+                <h3 className="text-sm font-medium text-gray-300">Imagery View</h3>
+                <p className="text-xs text-gray-500 mt-1">Esri World Imagery</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 border border-yellow-500/30">
+              <div className="text-center">
+                <div className="text-3xl mb-2">⏱️</div>
+                <div className="text-2xl font-bold text-yellow-400 mb-1">Live</div>
+                <h3 className="text-sm font-medium text-gray-300">Inventory Status</h3>
+                <p className="text-xs text-gray-500 mt-1">Color-coded updates</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-700/90 backdrop-blur-sm rounded-2xl p-8 border border-slate-600/50">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-emerald-400" />
+                  What's On The Map
+                </h3>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Food hubs and distribution centers across Western North Carolina</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Real-time inventory status (green/yellow/red indicators)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Site details: hours, type, accepting/distributing status</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">✓</span>
+                    <span>Embeddable for partner organizations</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-green-400" />
+                  Coordinated By
+                </h3>
+                <ul className="space-y-3 text-gray-300 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">•</span>
+                    <span><strong>R4 Reach</strong> - Regional coordination</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">•</span>
+                    <span><strong>Valley Hope Foundation</strong> - Community support</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">•</span>
+                    <span><strong>WNC supply Sites</strong> - Network coordination</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-1">•</span>
+                    <span><strong>Mutual aid partners</strong> - Grassroots networks</span>
+                  </li>
+                  <li className="text-xs text-gray-500 italic mt-3">
+                    R8 is a community volunteer tool supporting these coordination efforts
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center pt-6 border-t border-slate-600">
+              <Link href="/supply-sites-map">
                 <Button 
                   size="lg" 
-                  className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold shadow-lg"
+                  className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold text-lg px-8 py-6 shadow-xl"
                   data-testid="button-food-resources-map"
                 >
                   <MapPin className="w-5 h-5 mr-2" />
@@ -417,26 +486,13 @@ export default function ComingSoonPage() {
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
-              <a 
-                href="https://form.jotform.com/250033214947047" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex-1"
-              >
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="w-full border-emerald-400/50 text-emerald-300 hover:bg-emerald-500/10 font-semibold"
-                  data-testid="button-contact-expansion"
-                >
-                  Contact Us About Expansion
-                </Button>
-              </a>
+              <p className="text-sm text-gray-400 mt-4">
+                Community mapping resource - No login required
+              </p>
+              <p className="text-xs text-gray-500 mt-2 italic">
+                Interested in expanding this technology to your region? <a href="https://form.jotform.com/250033214947047" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 underline">Contact us</a> to discuss possibilities.
+              </p>
             </div>
-            
-            <p className="text-xs text-emerald-200/60 mt-4 text-center">
-              No login required • Public resource for the community
-            </p>
           </div>
         </div>
       </section>
