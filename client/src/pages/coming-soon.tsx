@@ -489,7 +489,16 @@ export default function ComingSoonPage() {
               <p className="text-sm text-gray-400 mt-4">
                 Community mapping resource - No login required
               </p>
-              <p className="text-xs text-gray-500 mt-2 italic">
+              <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                <p className="text-sm text-yellow-200">
+                  <strong>Note:</strong> This map shows only food hubs that have signed up with our network. 
+                  It is not all-inclusive of food resources in the region.
+                </p>
+                <p className="text-xs text-yellow-300/80 mt-2">
+                  Is your food hub or distribution center not listed? <a href="https://form.jotform.com/250033214947047" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 underline font-medium">Contact us to join the network</a>
+                </p>
+              </div>
+              <p className="text-xs text-gray-500 mt-3 italic">
                 Interested in expanding this technology to your region? <a href="https://form.jotform.com/250033214947047" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 underline">Contact us</a> to discuss possibilities.
               </p>
             </div>
