@@ -1,12 +1,41 @@
 // Server-side Airtable API integration
 import { type AirtableShift } from '../client/src/lib/api';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = process.env.VITE_BASE_ID?.replace(/\.$/, ''); // Remove trailing period if present
 const TABLE_NAME = 'Shifts'; // Common alternatives: 'shifts', 'Volunteer Shifts', 'VolunteerShifts'
 
-// Geocoding cache to avoid repeated requests
+// Persistent geocoding cache (saved to disk to survive restarts)
+const GEOCODE_CACHE_FILE = path.join(process.cwd(), 'geocode-cache.json');
 const geocodeCache: { [address: string]: { lat: number; lng: number } | null } = {};
+
+// Load geocoding cache from disk on startup
+function loadGeocodeCache() {
+  try {
+    if (fs.existsSync(GEOCODE_CACHE_FILE)) {
+      const data = fs.readFileSync(GEOCODE_CACHE_FILE, 'utf-8');
+      const loadedCache = JSON.parse(data);
+      Object.assign(geocodeCache, loadedCache);
+      console.log(`✓ Loaded ${Object.keys(loadedCache).length} cached geocodes from disk`);
+    }
+  } catch (error) {
+    console.log('Could not load geocode cache, starting fresh');
+  }
+}
+
+// Save geocoding cache to disk
+function saveGeocodeCache() {
+  try {
+    fs.writeFileSync(GEOCODE_CACHE_FILE, JSON.stringify(geocodeCache, null, 2));
+  } catch (error) {
+    console.log('Could not save geocode cache:', error);
+  }
+}
+
+// Load cache on module initialization (also called from fetchPublicSupplySitesFromAirtable as backup)
+loadGeocodeCache();
 
 // Helper function to fetch all records from Airtable with pagination
 async function fetchAllAirtableRecords(url: string, token: string): Promise<any[]> {
@@ -41,7 +70,7 @@ async function fetchAllAirtableRecords(url: string, token: string): Promise<any[
 async function geocodeAddress(address: string, city: string, state: string): Promise<{ lat: number; lng: number } | null> {
   const fullAddress = `${address}, ${city}, ${state}`;
   
-  // Check cache first
+  // Check cache first (returns immediately if already cached)
   if (geocodeCache[fullAddress] !== undefined) {
     return geocodeCache[fullAddress];
   }
@@ -65,6 +94,7 @@ async function geocodeAddress(address: string, city: string, state: string): Pro
           lng: parseFloat(data[0].lon)
         };
         geocodeCache[fullAddress] = result;
+        saveGeocodeCache(); // Persist to disk
         // Add small delay to respect Nominatim's usage policy (max 1 request/second)
         await new Promise(resolve => setTimeout(resolve, 1000));
         return result;
@@ -75,6 +105,7 @@ async function geocodeAddress(address: string, city: string, state: string): Pro
   }
   
   geocodeCache[fullAddress] = null;
+  saveGeocodeCache(); // Persist failed attempts too (avoid retrying known failures)
   return null;
 }
 
@@ -276,6 +307,15 @@ export async function fetchPublicSupplySitesFromAirtable(
   if (!AIRTABLE_TOKEN || !BASE_ID) {
     throw new Error('Missing Airtable credentials');
   }
+
+  // Load cache if not already loaded (backup for module-level load)
+  if (Object.keys(geocodeCache).length === 0) {
+    loadGeocodeCache();
+  }
+  
+  // Log cache status for debugging
+  const cacheSize = Object.keys(geocodeCache).length;
+  console.log(`📍 Geocoding cache status: ${cacheSize} addresses cached`);
 
   try {
     // Fetch ALL Site records with pagination
