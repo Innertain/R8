@@ -343,17 +343,33 @@ export async function fetchPublicSupplySitesFromAirtable(
       // Debug: Log first inventory record to see available fields
       if (allInventoryRecords.length > 0) {
         console.log('First inventory record fields:', Object.keys(allInventoryRecords[0].fields));
-        console.log('First inventory sample data:', JSON.stringify(allInventoryRecords[0].fields, null, 2));
-        console.log('Inventory record createdTime:', allInventoryRecords[0].createdTime);
+        const updateTs = allInventoryRecords[0].fields['Update Timestamp'];
+        if (updateTs) {
+          const parsed = new Date(updateTs);
+          console.log(`Update Timestamp: ${updateTs} -> ${parsed.toISOString()} (${Math.floor((Date.now() - parsed.getTime()) / (1000 * 60 * 60 * 24))} days ago)`);
+        }
       }
       
       // Build lookup of most recent inventory update per site
       allInventoryRecords.forEach((record: any) => {
         const siteIds = record.fields.Site || record.fields['Site (from Site)'] || [];
-        const updatedDate = record.fields['Last Modified'] || record.fields.createdTime;
+        // Use Update Timestamp (Unix ms) if available, fallback to Last Modified, then createdTime
+        const updateTimestamp = record.fields['Update Timestamp'];
+        const lastModified = record.fields['Last Modified'];
+        const createdTime = record.createdTime;
         
-        if (siteIds.length > 0 && updatedDate) {
-          const updateTime = new Date(updatedDate);
+        let updateTime: Date | null = null;
+        
+        if (updateTimestamp && typeof updateTimestamp === 'number') {
+          // Update Timestamp is Unix timestamp in milliseconds
+          updateTime = new Date(updateTimestamp);
+        } else if (lastModified) {
+          updateTime = new Date(lastModified);
+        } else if (createdTime) {
+          updateTime = new Date(createdTime);
+        }
+        
+        if (siteIds.length > 0 && updateTime) {
           siteIds.forEach((siteId: string) => {
             if (!inventoryBySite[siteId] || updateTime > inventoryBySite[siteId]) {
               inventoryBySite[siteId] = updateTime;
