@@ -340,15 +340,7 @@ export async function fetchPublicSupplySitesFromAirtable(
       const allInventoryRecords = await fetchAllAirtableRecords(inventoryUrl, AIRTABLE_TOKEN);
       console.log(`✓ Fetched ${allInventoryRecords.length} inventory records (all pages)`);
       
-      // Debug: Log first inventory record to see available fields
-      if (allInventoryRecords.length > 0) {
-        console.log('First inventory record fields:', Object.keys(allInventoryRecords[0].fields));
-        const updateTs = allInventoryRecords[0].fields['Update Timestamp'];
-        if (updateTs) {
-          const parsed = new Date(updateTs);
-          console.log(`Update Timestamp: ${updateTs} -> ${parsed.toISOString()} (${Math.floor((Date.now() - parsed.getTime()) / (1000 * 60 * 60 * 24))} days ago)`);
-        }
-      }
+      // Successfully fetched inventory records - timestamps will be used for recency calculation
       
       // Build lookup of most recent inventory update per site
       allInventoryRecords.forEach((record: any) => {
