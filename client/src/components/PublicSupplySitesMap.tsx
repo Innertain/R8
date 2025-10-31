@@ -107,6 +107,18 @@ export default function PublicSupplySitesMap({
       maxZoom: 18,
     }).addTo(map.current);
 
+    // Add labels overlay (roads, boundaries, cities, counties)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '',
+      maxZoom: 18,
+    }).addTo(map.current);
+    
+    // Add transportation overlay (major roads and highways)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '',
+      maxZoom: 18,
+    }).addTo(map.current);
+
     return () => {
       map.current?.remove();
       map.current = null;
