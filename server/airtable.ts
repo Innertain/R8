@@ -340,6 +340,13 @@ export async function fetchPublicSupplySitesFromAirtable(
       const allInventoryRecords = await fetchAllAirtableRecords(inventoryUrl, AIRTABLE_TOKEN);
       console.log(`✓ Fetched ${allInventoryRecords.length} inventory records (all pages)`);
       
+      // Debug: Log first inventory record to see available fields
+      if (allInventoryRecords.length > 0) {
+        console.log('First inventory record fields:', Object.keys(allInventoryRecords[0].fields));
+        console.log('First inventory sample data:', JSON.stringify(allInventoryRecords[0].fields, null, 2));
+        console.log('Inventory record createdTime:', allInventoryRecords[0].createdTime);
+      }
+      
       // Build lookup of most recent inventory update per site
       allInventoryRecords.forEach((record: any) => {
         const siteIds = record.fields.Site || record.fields['Site (from Site)'] || [];
