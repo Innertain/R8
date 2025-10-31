@@ -37,6 +37,84 @@ function saveGeocodeCache() {
 // Load cache on module initialization (also called from fetchPublicSupplySitesFromAirtable as backup)
 loadGeocodeCache();
 
+// Background geocoding queue
+const geocodingQueue: Array<{ address: string; city: string; state: string }> = [];
+let isProcessingQueue = false;
+
+// Background worker that processes geocoding queue
+async function processGeocodingQueue() {
+  if (isProcessingQueue || geocodingQueue.length === 0) return;
+  
+  isProcessingQueue = true;
+  console.log(`📍 Starting background geocoding of ${geocodingQueue.length} addresses...`);
+  
+  while (geocodingQueue.length > 0) {
+    const { address, city, state } = geocodingQueue.shift()!;
+    const fullAddress = `${address}, ${city}, ${state}`;
+    
+    // Skip if already cached (might have been added while queue was processing)
+    if (geocodeCache[fullAddress] !== undefined) {
+      continue;
+    }
+    
+    try {
+      const query = encodeURIComponent(fullAddress);
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'R8-Supply-Sites-Map/1.0'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          const result = {
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon)
+          };
+          geocodeCache[fullAddress] = result;
+          saveGeocodeCache();
+          console.log(`  ✓ Background geocoded: ${fullAddress} -> ${result.lat}, ${result.lng}`);
+        } else {
+          geocodeCache[fullAddress] = null; // Mark as failed
+          saveGeocodeCache();
+          console.log(`  ✗ No results for: ${fullAddress}`);
+        }
+      }
+      
+      // Respect Nominatim rate limit (max 1 req/sec)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+    } catch (error) {
+      console.log(`  ✗ Error geocoding ${fullAddress}:`, error);
+      geocodeCache[fullAddress] = null; // Mark as failed to avoid retrying
+      saveGeocodeCache();
+    }
+  }
+  
+  isProcessingQueue = false;
+  console.log(`✓ Background geocoding complete. Cache now has ${Object.keys(geocodeCache).length} addresses.`);
+}
+
+// Helper to queue an address for background geocoding
+function queueAddressForGeocoding(address: string, city: string, state: string) {
+  const fullAddress = `${address}, ${city}, ${state}`;
+  
+  // Only queue if not already cached and not already in queue
+  if (geocodeCache[fullAddress] === undefined && 
+      !geocodingQueue.some(item => `${item.address}, ${item.city}, ${item.state}` === fullAddress)) {
+    geocodingQueue.push({ address, city, state });
+    
+    // Start processing if not already running
+    if (!isProcessingQueue) {
+      // Use setImmediate to avoid blocking the response
+      setImmediate(() => processGeocodingQueue());
+    }
+  }
+}
+
 // Helper function to fetch all records from Airtable with pagination
 async function fetchAllAirtableRecords(url: string, token: string): Promise<any[]> {
   let allRecords: any[] = [];
@@ -386,10 +464,11 @@ export async function fetchPublicSupplySitesFromAirtable(
     });
 
     console.log(`✓ Filtered to ${filteredSites.length} public active sites`);
-    console.log(`⏳ Geocoding addresses (this may take ~${filteredSites.length} seconds)...`);
 
-    // Geocode sites and map to our format
+    // Process sites and check geocoding cache
     const publicSites: PublicSupplySite[] = [];
+    let cachedCount = 0;
+    let queuedCount = 0;
     
     for (const record of filteredSites) {
       const fields = record.fields;
@@ -418,15 +497,23 @@ export async function fetchPublicSupplySitesFromAirtable(
       let lat = fields.Latitude || fields.lat || fields.Lat || fields['Latitude'] || null;
       let lng = fields.Longitude || fields.lng || fields.lon || fields.Lng || fields['Longitude'] || null;
       
-      // If no coordinates, geocode the address
+      // If no coordinates in Airtable, check cache (synchronous lookup)
       if ((!lat || !lng) && fields['Street Address'] && fields.City && fields.State) {
-        const coords = await geocodeAddress(fields['Street Address'], fields.City, fields.State);
-        if (coords) {
-          lat = coords.lat;
-          lng = coords.lng;
-          console.log(`  ✓ Geocoded "${fields['Site Name']}" -> ${lat}, ${lng}`);
+        const fullAddress = `${fields['Street Address']}, ${fields.City}, ${fields.State}`;
+        const cached = geocodeCache[fullAddress];
+        
+        if (cached !== undefined) {
+          // Found in cache
+          if (cached) {
+            lat = cached.lat;
+            lng = cached.lng;
+            cachedCount++;
+          }
+          // If cached === null, it means geocoding failed before, skip it
         } else {
-          console.log(`  ✗ Failed to geocode "${fields['Site Name']}"`);
+          // Not in cache - queue for background processing
+          queueAddressForGeocoding(fields['Street Address'], fields.City, fields.State);
+          queuedCount++;
         }
       }
       
@@ -448,7 +535,7 @@ export async function fetchPublicSupplySitesFromAirtable(
       });
     }
 
-    console.log(`✓ Returning ${publicSites.length} public supply sites`);
+    console.log(`✓ Returning ${publicSites.length} public supply sites (${cachedCount} from cache, ${queuedCount} queued for background geocoding)`);
     return publicSites;
 
   } catch (error) {
