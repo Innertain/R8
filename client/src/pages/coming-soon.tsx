@@ -372,6 +372,74 @@ export default function ComingSoonPage() {
         </div>
       </section>
 
+      {/* Food Resources Map - Work in Progress */}
+      <section className="relative py-12 lg:py-16 bg-gradient-to-b from-slate-800 to-slate-900">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 lg:px-6">
+          <div className="bg-gradient-to-br from-emerald-900/40 to-green-900/40 backdrop-blur-sm rounded-2xl p-8 border border-emerald-500/30 shadow-2xl">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="p-3 bg-emerald-500/20 rounded-xl">
+                <MapPin className="w-8 h-8 text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="text-2xl font-bold text-white">Food Resources Map</h3>
+                  <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-semibold rounded-full border border-emerald-500/30">
+                    BETA
+                  </span>
+                </div>
+                <p className="text-emerald-100 text-lg">
+                  Interactive map of food hubs and supply distribution centers
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-4 mb-6">
+              <p className="text-gray-200 leading-relaxed">
+                Created in partnership with <strong className="text-white">Buncombe County HHS</strong> and <strong className="text-white">WNC Food Coalition</strong>, this map helps residents find food resources during the SNAP funding gap.
+              </p>
+              <p className="text-gray-300 text-sm">
+                <strong className="text-emerald-300">Currently serving:</strong> Western North Carolina and surrounding areas
+              </p>
+              <p className="text-gray-300 text-sm italic">
+                Interested in this technology for your region? We can expand to support other communities - contact us to discuss possibilities.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/supply-sites-map" className="flex-1">
+                <Button 
+                  size="lg" 
+                  className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold shadow-lg"
+                  data-testid="button-food-resources-map"
+                >
+                  <MapPin className="w-5 h-5 mr-2" />
+                  View Food Resources Map
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <a 
+                href="https://form.jotform.com/250033214947047" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="w-full border-emerald-400/50 text-emerald-300 hover:bg-emerald-500/10 font-semibold"
+                  data-testid="button-contact-expansion"
+                >
+                  Contact Us About Expansion
+                </Button>
+              </a>
+            </div>
+            
+            <p className="text-xs text-emerald-200/60 mt-4 text-center">
+              No login required • Public resource for the community
+            </p>
+          </div>
+        </div>
+      </section>
       
       {/* Mission Section - Completely Separate from Hero */}
       <section className="relative py-16 lg:py-24 bg-gradient-to-b from-slate-900 to-slate-800">
