@@ -107,6 +107,29 @@ export default function ComingSoonPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stormy-dark to-stormy-primary/20">
+      {/* WNC Food Resources Banner */}
+      <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-600 text-white py-3 px-4 sticky top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <MapPin className="w-5 h-5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm sm:text-base font-semibold truncate">
+                <span className="hidden sm:inline">WNC Food Resources: </span>Food hub map for Hurricane Helene recovery & SNAP gap support
+              </p>
+            </div>
+          </div>
+          <Link href="/supply-sites-map">
+            <Button 
+              size="sm" 
+              className="bg-white text-emerald-600 hover:bg-gray-100 font-semibold whitespace-nowrap"
+              data-testid="button-food-map-banner"
+            >
+              View Food Map →
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       {/* Emergency Hurricane Alert Banner */}
       <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white py-3 px-4 sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
