@@ -213,6 +213,17 @@ function Navigation() {
                     </div>
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/supply-sites-map" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-emerald-50 hover:shadow-lg hover:scale-[1.02] group">
+                    <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:bg-emerald-600 group-hover:shadow-md group-hover:scale-110">
+                      <MapPin className="h-5 w-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </div>
+                    <div className="transition-colors duration-200">
+                      <div className="font-medium text-gray-900 group-hover:text-emerald-700 transition-colors duration-200">Food Resources Map</div>
+                      <div className="text-sm text-gray-600 group-hover:text-emerald-600 transition-colors duration-200">WNC food hub locations</div>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -393,6 +404,17 @@ function Navigation() {
                   <div>
                     <div className="font-medium text-gray-900 group-hover:text-purple-700">Disaster Education</div>
                     <div className="text-xs text-gray-500 group-hover:text-purple-600">Interactive learning center</div>
+                  </div>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/supply-sites-map" className="flex items-center gap-3 w-full p-3 rounded-lg transition-all duration-200 hover:bg-emerald-50 hover:shadow-md hover:scale-[1.02] group">
+                  <div className="p-2 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors duration-200">
+                    <MapPin className="h-4 w-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900 group-hover:text-emerald-700">Food Resources Map</div>
+                    <div className="text-xs text-gray-500 group-hover:text-emerald-600">WNC food hub locations</div>
                   </div>
                 </Link>
               </DropdownMenuItem>
@@ -596,6 +618,17 @@ function Navigation() {
               >
                 <Package className="h-4 w-4" />
                 Supply Site Network
+              </Button>
+            </Link>
+            <Link href="/supply-sites-map">
+              <Button
+                variant={location === "/supply-sites-map" ? "default" : "outline"}
+                size="sm"
+                className="w-full flex items-center gap-2 justify-start ml-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <MapPin className="h-4 w-4" />
+                Food Resources Map
               </Button>
             </Link>
 
