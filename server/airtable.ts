@@ -369,6 +369,24 @@ export async function fetchPublicSupplySitesFromAirtable(
           });
         }
       });
+      
+      // Diagnostic logging: Show inventory update statistics
+      console.log(`\n📊 Inventory Update Statistics:`);
+      console.log(`   Sites with inventory records: ${Object.keys(inventoryBySite).length}`);
+      
+      // Show most recent updates
+      const sortedUpdates = Object.entries(inventoryBySite)
+        .sort((a, b) => b[1].getTime() - a[1].getTime())
+        .slice(0, 10);
+      
+      if (sortedUpdates.length > 0) {
+        console.log(`   Most recent inventory updates:`);
+        sortedUpdates.forEach(([siteId, date]) => {
+          const daysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+          console.log(`      ${siteId}: ${date.toISOString()} (${daysAgo} days ago)`);
+        });
+      }
+      
     } catch (err) {
       console.log('Could not fetch inventory data, will show all sites as gray');
     }
@@ -447,6 +465,20 @@ export async function fetchPublicSupplySitesFromAirtable(
         daysSinceUpdate
       });
     }
+
+    // Show color distribution
+    const colorCounts = {
+      green: publicSites.filter(s => s.inventoryRecency === 'green').length,
+      yellow: publicSites.filter(s => s.inventoryRecency === 'yellow').length,
+      red: publicSites.filter(s => s.inventoryRecency === 'red').length,
+      gray: publicSites.filter(s => s.inventoryRecency === 'gray').length
+    };
+    
+    console.log(`\n🎨 Color Distribution:`);
+    console.log(`   Green (≤${greenThresholdDays} days): ${colorCounts.green} sites`);
+    console.log(`   Yellow (${greenThresholdDays+1}-${yellowThresholdDays} days): ${colorCounts.yellow} sites`);
+    console.log(`   Red (>${yellowThresholdDays} days): ${colorCounts.red} sites`);
+    console.log(`   Gray (no inventory): ${colorCounts.gray} sites\n`);
 
     console.log(`✓ Returning ${publicSites.length} public supply sites`);
     return publicSites;
