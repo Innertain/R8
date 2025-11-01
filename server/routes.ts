@@ -890,15 +890,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }, {});
           }
 
-          const assignments = volunteerAssignments.map((record: any) => ({
-            id: record.id,
-            volunteerId: volunteerId,
-            shiftId: record.fields['Shift ID'] || '',
-            shiftName: record.fields['Shift Name'] || record.fields['Name (from Shift Name)']?.[0] || shiftsData[record.fields['Shift ID']] || '',
-            status: record.fields['Status ']?.trim() || 'confirmed',
-            assignedDate: new Date(record.fields['Assigned Date'] || record.createdTime),
-            notes: record.fields['Notes'] || ''
-          }));
+          const assignments = volunteerAssignments.map((record: any) => {
+            const shiftId = record.fields['Shift ID'] || record.fields['Shift']?.[0] || '';
+            console.log(`📋 Assignment ${record.id}:`, {
+              'Shift ID field': record.fields['Shift ID'],
+              'Shift field': record.fields['Shift'],
+              'Final shiftId': shiftId,
+              'All field names': Object.keys(record.fields)
+            });
+            
+            return {
+              id: record.id,
+              volunteerId: volunteerId,
+              shiftId: shiftId,
+              shiftName: record.fields['Shift Name'] || record.fields['Name (from Shift Name)']?.[0] || shiftsData[shiftId] || '',
+              status: record.fields['Status ']?.trim() || 'confirmed',
+              assignedDate: new Date(record.fields['Assigned Date'] || record.createdTime),
+              notes: record.fields['Notes'] || ''
+            };
+          });
 
           return res.json(assignments);
         }
