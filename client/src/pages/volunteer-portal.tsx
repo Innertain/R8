@@ -629,8 +629,22 @@ export default function VolunteerPortal() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Auto-login if already authenticated from main site
+  // Auto-login if already authenticated
   useEffect(() => {
+    // Check localStorage first for persistent login
+    const savedVolunteerStr = localStorage.getItem('currentVolunteer');
+    if (savedVolunteerStr && !currentVolunteer) {
+      try {
+        const savedVolunteer = JSON.parse(savedVolunteerStr);
+        setCurrentVolunteer(savedVolunteer);
+        return;
+      } catch (error) {
+        console.error('Failed to parse saved volunteer:', error);
+        localStorage.removeItem('currentVolunteer');
+      }
+    }
+    
+    // Fall back to sessionStorage for main site authentication
     const platformAccess = sessionStorage.getItem('platformAccess');
     const accessUserStr = sessionStorage.getItem('accessUser');
     
@@ -762,6 +776,8 @@ export default function VolunteerPortal() {
     }),
     onSuccess: (volunteer) => {
       setCurrentVolunteer(volunteer);
+      // Save to localStorage for persistent login
+      localStorage.setItem('currentVolunteer', JSON.stringify(volunteer));
       toast({
         title: "Welcome back!",
         description: `Hello ${volunteer.name}, you can now manage your availability.`,
@@ -785,6 +801,8 @@ export default function VolunteerPortal() {
     },
     onSuccess: (volunteer) => {
       setCurrentVolunteer(volunteer);
+      // Save to localStorage for persistent login
+      localStorage.setItem('currentVolunteer', JSON.stringify(volunteer));
       setShowRegister(false);
       setRegisterForm({
         name: '',
@@ -834,6 +852,8 @@ export default function VolunteerPortal() {
     setCurrentVolunteer(null);
     setPhoneNumber('');
     setShowRegister(false);
+    // Clear localStorage
+    localStorage.removeItem('currentVolunteer');
     toast({
       title: "Logged Out",
       description: "You have been logged out successfully.",
