@@ -582,7 +582,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
 
       return {
         id: `shift-${assignment.id}`,
-        title: '', // Remove text from calendar display
+        title: shiftToUse.activityName || 'Volunteer Shift', // Display shift name on calendar
         start: shiftDate,
         end: endDate,
         resource: { 
