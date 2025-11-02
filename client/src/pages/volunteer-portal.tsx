@@ -21,6 +21,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { formatTimeRangeWithTimezone } from '@/lib/dateUtils';
 
 import VolunteerCalendar from '@/components/VolunteerCalendar';
 import ShiftCard from '@/components/ShiftCard';
@@ -1016,7 +1017,7 @@ export default function VolunteerPortal() {
             )}
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-600">{shift.dateTime}</p>
+            <p className="text-sm text-gray-600">{formatTimeRangeWithTimezone(shift.startTime, shift.endTime)}</p>
             <p className="text-sm text-gray-600">{shift.location}</p>
           </div>
         </div>
