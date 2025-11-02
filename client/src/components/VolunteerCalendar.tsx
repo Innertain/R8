@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Calendar as CalendarIcon, Clock, User, UserPlus, CheckCircle, XCircle, MapPin, ExternalLink, Trash2, Link, Smartphone, RefreshCw, ArrowLeftRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { formatTimeOnly } from '@/lib/dateUtils';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 
@@ -97,7 +98,14 @@ const CustomEventWrapper = ({ event, children }: { event: any; children: React.R
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-3 w-3" />
-              <span>{format(event.start, 'MMM d, h:mm a')} - {format(event.end, 'h:mm a')}</span>
+              <span>
+                {format(event.start, 'MMM d, h:mm a')} - {format(event.end, 'h:mm a')}
+                {shift?.startTime && (
+                  <span className="text-xs text-gray-500 ml-1">
+                    ({formatTimeOnly(shift.startTime).split(' ').pop()})
+                  </span>
+                )}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Badge className={`text-xs px-2 py-1 ${

@@ -3,7 +3,9 @@
 export interface AirtableShift {
   id: string;
   activityName: string;
-  dateTime: string;
+  dateTime: string; // Deprecated - kept for backward compatibility
+  startTime: string | null; // ISO datetime string with timezone
+  endTime: string | null; // ISO datetime string with timezone
   location: string;
   volunteersNeeded: number;
   volunteersSignedUp: number;
@@ -37,11 +39,14 @@ export async function fetchShiftsFromAirtable(): Promise<AirtableShift[]> {
 
 // Mock data for development/fallback
 function getMockShifts(): AirtableShift[] {
+  const now = new Date();
   return [
     {
       id: '1',
       activityName: "Deliver Food",
       dateTime: "Monday, Dec 18 • 10:00 AM - 2:00 PM",
+      startTime: new Date(now.getFullYear(), 11, 18, 10, 0).toISOString(),
+      endTime: new Date(now.getFullYear(), 11, 18, 14, 0).toISOString(),
       location: "Downtown Community Center",
       volunteersNeeded: 12,
       volunteersSignedUp: 8,
@@ -53,6 +58,8 @@ function getMockShifts(): AirtableShift[] {
       id: '2',
       activityName: "Community Cleanup",
       dateTime: "Saturday, Dec 23 • 9:00 AM - 1:00 PM",
+      startTime: new Date(now.getFullYear(), 11, 23, 9, 0).toISOString(),
+      endTime: new Date(now.getFullYear(), 11, 23, 13, 0).toISOString(),
       location: "Riverside Park",
       volunteersNeeded: 20,
       volunteersSignedUp: 15,
@@ -64,6 +71,8 @@ function getMockShifts(): AirtableShift[] {
       id: '3',
       activityName: "Reading Tutor",
       dateTime: "Tuesday, Dec 19 • 3:00 PM - 5:00 PM",
+      startTime: new Date(now.getFullYear(), 11, 19, 15, 0).toISOString(),
+      endTime: new Date(now.getFullYear(), 11, 19, 17, 0).toISOString(),
       location: "Lincoln Elementary School",
       volunteersNeeded: 8,
       volunteersSignedUp: 3,
@@ -75,6 +84,8 @@ function getMockShifts(): AirtableShift[] {
       id: '4',
       activityName: "Gift Wrapping",
       dateTime: "Friday, Dec 22 • 6:00 PM - 9:00 PM",
+      startTime: new Date(now.getFullYear(), 11, 22, 18, 0).toISOString(),
+      endTime: new Date(now.getFullYear(), 11, 22, 21, 0).toISOString(),
       location: "Community Mall",
       volunteersNeeded: 6,
       volunteersSignedUp: 6,
@@ -86,6 +97,8 @@ function getMockShifts(): AirtableShift[] {
       id: '5',
       activityName: "Tech Support",
       dateTime: "Thursday, Dec 21 • 7:00 PM - 9:00 PM",
+      startTime: new Date(now.getFullYear(), 11, 21, 19, 0).toISOString(),
+      endTime: new Date(now.getFullYear(), 11, 21, 21, 0).toISOString(),
       location: "Remote (Online)",
       volunteersNeeded: 5,
       volunteersSignedUp: 2,
@@ -97,6 +110,8 @@ function getMockShifts(): AirtableShift[] {
       id: '6',
       activityName: "Senior Care",
       dateTime: "Sunday, Dec 24 • 1:00 PM - 4:00 PM",
+      startTime: new Date(now.getFullYear(), 11, 24, 13, 0).toISOString(),
+      endTime: new Date(now.getFullYear(), 11, 24, 16, 0).toISOString(),
       location: "Sunset Senior Center",
       volunteersNeeded: 15,
       volunteersSignedUp: 9,

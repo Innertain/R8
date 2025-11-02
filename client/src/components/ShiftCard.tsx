@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { type AirtableShift } from "@/lib/api";
+import { formatTimeRangeWithTimezone } from "@/lib/dateUtils";
 
 interface ShiftCardProps {
   shift: AirtableShift;
@@ -142,7 +143,7 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
       {/* Date & Time */}
       <div className="flex items-center mb-3 text-gray-600 shift-card-content">
         <Calendar className="w-4 h-4 mr-3 text-gray-400" />
-        <span className="text-sm">{shift.dateTime}</span>
+        <span className="text-sm">{formatTimeRangeWithTimezone(shift.startTime, shift.endTime)}</span>
       </div>
 
       {/* Location */}

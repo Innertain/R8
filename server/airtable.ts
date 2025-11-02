@@ -317,20 +317,10 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           const hostId = fields['Host']?.[0] || null; // Linked record ID
           const hostData = hostId && hostsLookup[hostId] ? hostsLookup[hostId] : null;
           
-          // Format date/time from Start Time and End Time
-          let dateTime = 'TBD';
-          if (fields['Start Time'] && fields['End Time']) {
-            const startDate = new Date(fields['Start Time']);
-            const endDate = new Date(fields['End Time']);
-            const formatOptions: Intl.DateTimeFormatOptions = { 
-              weekday: 'long', 
-              month: 'short', 
-              day: 'numeric' 
-            };
-            const startTime = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-            const endTime = endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-            dateTime = `${startDate.toLocaleDateString('en-US', formatOptions)} • ${startTime} - ${endTime}`;
-          }
+          // Keep ISO datetime strings to preserve timezone information
+          // Frontend will handle formatting with timezone display
+          const startTime = fields['Start Time'] || null;
+          const endTime = fields['End Time'] || null;
           
           // Determine icon based on activity name
           let icon = 'users';
@@ -352,7 +342,9 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           return {
             id: record.id,
             activityName,
-            dateTime,
+            dateTime: '', // Deprecated - kept for backward compatibility
+            startTime,
+            endTime,
             location,
             volunteersNeeded: maxVolunteers,
             volunteersSignedUp: Math.max(0, maxVolunteers - remainingSpots),
