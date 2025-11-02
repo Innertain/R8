@@ -121,8 +121,8 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Volunteer Profile</h2>
-          <p className="text-gray-800">Manage your personal information and preferences</p>
+          <h2 className="text-2xl font-bold text-white">Volunteer Profile</h2>
+          <p className="text-white/90">Manage your personal information and preferences</p>
         </div>
         <Button
           onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
