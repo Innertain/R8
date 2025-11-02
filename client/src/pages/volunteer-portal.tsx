@@ -1368,7 +1368,7 @@ export default function VolunteerPortal() {
           </div>
         </div>
 
-        <Tabs defaultValue="dashboard" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 h-auto">
             <TabsTrigger 
               value="dashboard" 
@@ -1427,7 +1427,7 @@ export default function VolunteerPortal() {
                       You haven't signed up for any volunteer shifts yet. 
                       Check the main shifts page to find opportunities!
                     </p>
-                    <Button onClick={() => window.location.href = '/'} className="btn-hover-effect">
+                    <Button onClick={() => setActiveTab('browse')} className="btn-hover-effect">
                       Browse Available Shifts
                     </Button>
                   </div>
