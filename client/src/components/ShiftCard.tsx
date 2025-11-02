@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart, Clock } from "lucide-react";
+import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart, Clock, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -173,10 +173,15 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
                 )}
               </div>
             )}
-            {shift.siteHours && (
+            {shift.sitePhone && (
               <div className="text-xs text-gray-500 mt-1">
-                <Clock className="w-3 h-3 inline mr-1" />
-                Hours: {shift.siteHours}
+                <Phone className="w-3 h-3 inline mr-1" />
+                {shift.sitePhone}
+              </div>
+            )}
+            {shift.siteStatus && (
+              <div className="text-xs text-gray-500 mt-1">
+                Status: {shift.siteStatus}
               </div>
             )}
           </div>

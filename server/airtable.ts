@@ -255,43 +255,60 @@ async function fetchMutualAidPartners(): Promise<{ [key: string]: { name: string
   return {};
 }
 
-// Fetch Site data for location details
+// Fetch Site data for location details with pagination
 async function fetchSiteDetails(): Promise<Record<string, any>> {
   if (!AIRTABLE_TOKEN || !BASE_ID) {
     return {};
   }
 
   try {
-    const siteUrl = `https://api.airtable.com/v0/${BASE_ID}/Site`;
-    console.log(`Fetching Site table for location details: ${siteUrl}`);
+    const siteLookup: Record<string, any> = {};
+    let offset: string | undefined = undefined;
+    let pageCount = 0;
+    let firstRecordLogged = false;
     
-    const response = await fetch(siteUrl, {
-      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const siteLookup: Record<string, any> = {};
+    do {
+      const siteUrl = `https://api.airtable.com/v0/${BASE_ID}/Site${offset ? `?offset=${offset}` : ''}`;
+      if (pageCount === 0) {
+        console.log(`Fetching Site table for location details: ${siteUrl}`);
+      }
       
-      data.records?.forEach((record: any) => {
-        siteLookup[record.id] = {
-          id: record.id,
-          name: record.fields['Site Name'] || '',
-          address: record.fields['Street Address'] || '',
-          city: record.fields['City'] || '',
-          state: record.fields['State'] || '',
-          siteHours: record.fields['Site Hours'] || '',
-          primaryContactName: record.fields['Primary Contact Name'] || '',
-          primaryContactPhone: record.fields['Primary Contact Phone'] || ''
-        };
+      const response = await fetch(siteUrl, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
       });
-      
-      console.log(`✓ Fetched ${Object.keys(siteLookup).length} site records for location mapping`);
-      return siteLookup;
-    } else {
-      console.log('Could not fetch Site table:', response.status);
-      return {};
-    }
+
+      if (response.ok) {
+        const data = await response.json();
+        pageCount++;
+        
+        // Log first site record to see available fields
+        if (data.records && data.records.length > 0 && !firstRecordLogged) {
+          console.log('📍 First site record fields:', Object.keys(data.records[0].fields));
+          console.log('📍 First site sample data:', JSON.stringify(data.records[0].fields, null, 2));
+          firstRecordLogged = true;
+        }
+        
+        data.records?.forEach((record: any) => {
+          siteLookup[record.id] = {
+            id: record.id,
+            name: record.fields['Site Name'] || '',
+            address: record.fields['Street Address'] || '',
+            city: record.fields['City'] || '',
+            state: record.fields['State'] || '',
+            phone: record.fields['Phone'] || '',
+            status: record.fields['Status'] || ''
+          };
+        });
+        
+        offset = data.offset; // Continue pagination if there's more data
+      } else {
+        console.log('Could not fetch Site table:', response.status);
+        break;
+      }
+    } while (offset);
+    
+    console.log(`✓ Fetched ${Object.keys(siteLookup).length} site records from ${pageCount} page(s) for location mapping`);
+    return siteLookup;
   } catch (error) {
     console.log('Error fetching Site table:', error);
     return {};
@@ -348,11 +365,11 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         // Successfully connected to Airtable with proper field mapping
 
         // Convert Airtable format to our application format using your actual field names
-        return data.records.map((record: any) => {
+        return data.records.map((record: any, index: number) => {
           const fields = record.fields;
           
           // Debug: log all field names for first record
-          if (data.records.indexOf(record) === 0) {
+          if (index === 0) {
             console.log('📝 First shift record fields:', Object.keys(fields));
             console.log('📝 First shift sample data:', JSON.stringify(fields, null, 2));
           }
@@ -364,6 +381,11 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           const locationId = fields['Location ']?.[0] || null; // Linked record ID
           const siteData = locationId && sitesLookup[locationId] ? sitesLookup[locationId] : null;
           const location = siteData?.name || fields['Site Name (from Location )']?.[0] || 'TBD';
+          
+          // Debug: Log site data lookup for first shift
+          if (index === 0) {
+            console.log(`🔍 First shift location lookup: locationId="${locationId}", siteData=`, siteData);
+          }
           
           // Extract host information from Host field (linked to Mutual Aid Partners)
           const hostId = fields['Host']?.[0] || null; // Linked record ID
@@ -406,9 +428,8 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
             siteAddress: siteData?.address || '',
             siteCity: siteData?.city || '',
             siteState: siteData?.state || '',
-            siteHours: siteData?.siteHours || '',
-            siteContactName: siteData?.primaryContactName || '',
-            siteContactPhone: siteData?.primaryContactPhone || '',
+            sitePhone: siteData?.phone || '',
+            siteStatus: siteData?.status || '',
             volunteersNeeded: maxVolunteers,
             volunteersSignedUp: Math.max(0, maxVolunteers - remainingSpots),
             status: 'active',

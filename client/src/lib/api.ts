@@ -12,9 +12,8 @@ export interface AirtableShift {
   siteAddress?: string;
   siteCity?: string;
   siteState?: string;
-  siteHours?: string;
-  siteContactName?: string;
-  siteContactPhone?: string;
+  sitePhone?: string;
+  siteStatus?: string;
   volunteersNeeded: number;
   volunteersSignedUp: number;
   status: "active" | "urgent" | "remote" | "full";

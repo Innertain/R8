@@ -1455,10 +1455,15 @@ export default function VolunteerPortal() {
                                               Get Directions
                                             </a>
                                           )}
-                                          {matchedShift.siteHours && (
+                                          {matchedShift.sitePhone && (
                                             <div className="mt-1">
-                                              <Clock className="w-3 h-3 inline mr-1" />
-                                              Hours: {matchedShift.siteHours}
+                                              <Phone className="w-3 h-3 inline mr-1" />
+                                              {matchedShift.sitePhone}
+                                            </div>
+                                          )}
+                                          {matchedShift.siteStatus && (
+                                            <div className="mt-1">
+                                              Status: {matchedShift.siteStatus}
                                             </div>
                                           )}
                                         </div>

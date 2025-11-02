@@ -892,8 +892,11 @@ Location: ${shift?.location || 'Location TBD'}`;
                         }
                       }
                       tooltipText += `\nTime: ${format(event.start, 'MMM d, h:mm a')} - ${format(event.end, 'h:mm a')}`;
-                      if (shift?.siteHours) {
-                        tooltipText += `\nHours: ${shift.siteHours}`;
+                      if (shift?.sitePhone) {
+                        tooltipText += `\nPhone: ${shift.sitePhone}`;
+                      }
+                      if (shift?.siteStatus) {
+                        tooltipText += `\nSite Status: ${shift.siteStatus}`;
                       }
                       tooltipText += `\nStatus: ${status}`;
                       if (event.resource.notes) {
