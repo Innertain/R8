@@ -772,7 +772,7 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
               selectable
               resizable
               views={['month', 'week', 'day']}
-              defaultView="week"
+              defaultView="month"
               step={60}
               timeslots={1}
               showAllEvents={true}
