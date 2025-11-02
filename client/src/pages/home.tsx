@@ -669,7 +669,7 @@ function Footer() {
               />
             </div>
             <p className="text-white/80 text-sm mb-2">
-              Our fiscal sponsor is <span className="font-semibold text-white">4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
+              Our fiscal sponsor is <span className="font-semibold text-white">R4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
             </p>
             <a 
               href="https://r4reach.org" 
