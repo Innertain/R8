@@ -1137,10 +1137,10 @@ export default function VolunteerPortal() {
   if (currentVolunteer) {
     return (
       <div className="container mx-auto p-4 space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-6 p-6 bg-gradient-to-r from-slate-900 to-slate-800 rounded-lg shadow-lg">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Volunteer Portal</h1>
-            <p className="text-gray-500 text-lg">Welcome back, {currentVolunteer.name}</p>
+            <h1 className="text-3xl font-bold text-white">Volunteer Portal</h1>
+            <p className="text-gray-300 text-lg">Welcome back, {currentVolunteer.name}</p>
           </div>
           <div className="flex items-center gap-4">
             {/* Notification Settings */}
