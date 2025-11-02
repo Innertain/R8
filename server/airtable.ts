@@ -364,7 +364,9 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
     console.log(`Trying table name: "${tableName}" at: ${url}`);
 
     try {
-      const response = await fetch(url, {
+      // Request with all fields explicitly to ensure Host is included
+      const urlWithFields = `${url}?fields%5B%5D=Host&fields%5B%5D=Name&fields%5B%5D=Location%20&fields%5B%5D=Activity%20&fields%5B%5D=Start%20Time&fields%5B%5D=End%20Time&fields%5B%5D=Max%20Volunteers%20&fields%5B%5D=Remaining%20Spots%20&fields%5B%5D=Timezone`;
+      const response = await fetch(urlWithFields, {
         headers: {
           Authorization: `Bearer ${AIRTABLE_TOKEN}`
         }
