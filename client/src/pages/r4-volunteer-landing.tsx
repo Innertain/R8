@@ -23,10 +23,13 @@ export default function R4VolunteerLanding() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check if already logged in
+  // Check if already logged in - only on mount
   useEffect(() => {
     const r4Access = sessionStorage.getItem('r4VolunteerAccess');
-    if (r4Access === 'granted') {
+    const hasChecked = sessionStorage.getItem('r4LoginChecked');
+    
+    if (r4Access === 'granted' && !hasChecked) {
+      sessionStorage.setItem('r4LoginChecked', 'true');
       window.location.href = '/volunteer';
     }
   }, []);
@@ -63,11 +66,12 @@ export default function R4VolunteerLanding() {
         sessionStorage.setItem('r4VolunteerAccess', 'granted');
         sessionStorage.setItem('r4Volunteer', JSON.stringify(volunteer));
         sessionStorage.setItem('accessContext', 'r4_volunteer');
+        sessionStorage.setItem('r4LoginChecked', 'true');
 
         // Redirect to volunteer portal after a short delay
         setTimeout(() => {
-          window.location.href = '/volunteer';
-        }, 2000);
+          window.location.replace('/volunteer');
+        }, 1500);
       } else {
         setMessage('Phone number not found. Please sign up using the forms below or contact us for assistance.');
       }

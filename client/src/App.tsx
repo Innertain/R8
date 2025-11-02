@@ -57,6 +57,7 @@ function Navigation() {
             sessionStorage.removeItem('r4VolunteerAccess');
             sessionStorage.removeItem('r4Volunteer');
             sessionStorage.removeItem('accessContext');
+            sessionStorage.removeItem('r4LoginChecked');
             window.location.href = '/';
           }}
         >
