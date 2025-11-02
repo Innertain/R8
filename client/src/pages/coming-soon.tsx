@@ -14,6 +14,7 @@ import valleyHopeLogo from "@assets/Valley+Hope+Foundation+Logo_1762123470544.we
 import r4ReachLogo from "@assets/R4_1762123457917.png";
 import wncSupplySitesLogo from "@assets/wnc supply sites logo_1762123463930.png";
 import aidArenaLogo from "@assets/aid arena_1762123482019.png";
+import makershipLogo from "@assets/Makership+Work+and+Wander+Logo+Vertical+Black+Transparent_1762123992652.png";
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 
@@ -540,16 +541,23 @@ export default function ComingSoonPage() {
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
-                <div className="text-sm sm:text-base lg:text-xl font-bold text-purple-400 mb-1 leading-tight">Regional Networks</div>
-                <p className="text-xs text-gray-400 leading-tight">Local mutual aid groups</p>
-              </div>
+              <a 
+                href="https://www.makership.net/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
+                data-testid="link-makership"
+              >
+                <img src={makershipLogo} alt="Makership" className="w-16 h-16 object-contain mb-2 invert" />
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-yellow-400 mb-1 leading-tight hover:text-yellow-300 transition-colors">Makership</div>
+                <p className="text-xs text-gray-400 leading-tight">Work & wander community</p>
+              </a>
             </div>
             
             <div className="text-center">
-              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center">
-                <div className="text-sm sm:text-base lg:text-xl font-bold text-orange-400 mb-1 leading-tight">Community Partners</div>
-                <p className="text-xs text-gray-400 leading-tight">Grassroots organizations</p>
+              <div className="bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center">
+                <div className="text-sm sm:text-base lg:text-xl font-bold text-purple-400 mb-1 leading-tight">Regional Networks</div>
+                <p className="text-xs text-gray-400 leading-tight">Local mutual aid groups</p>
               </div>
             </div>
           </div>
@@ -560,7 +568,8 @@ export default function ComingSoonPage() {
               <a href="https://www.valleyhopefoundation.org/" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors">Valley Hope Foundation</a>,{' '}
               <a href="https://r4reach.org/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors">R4 Reach</a>,{' '}
               <a href="https://www.wnc-supply-sites.com/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 transition-colors">WNC Supply Sites</a>,{' '}
-              <a href="https://conversacorps.org/aid_arena/" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 transition-colors">Aid Arena</a>, and the many other mutual aid partners who make this collaborative platform possible. 
+              <a href="https://conversacorps.org/aid_arena/" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 transition-colors">Aid Arena</a>,{' '}
+              <a href="https://www.makership.net/" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 transition-colors">Makership</a>, and the many other mutual aid partners who make this collaborative platform possible. 
               Together, we're building stronger, more resilient communities.
             </p>
           </div>
