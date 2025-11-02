@@ -7,6 +7,7 @@ import { Loader2, Phone, Shield, Users, Globe, ArrowRight, Leaf, Mountain, Waves
 import { Link } from 'wouter';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
+import r4Logo from "@/assets/r4-logo.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
 import appalachianLandscape from "@assets/Appalachian _1754183249913.png";
 import { AnimatedCounter } from '@/components/ui/animated-counter';
@@ -1166,7 +1167,14 @@ export default function ComingSoonPage() {
             {/* Fiscal Sponsor */}
             <div className="text-center lg:text-left">
               <h3 className="text-white font-semibold text-lg mb-4">Fiscal Sponsor</h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
+                <div className="flex items-center justify-center lg:justify-start">
+                  <img 
+                    src={r4Logo}
+                    alt="R4 Reach Logo" 
+                    className="w-16 h-16"
+                  />
+                </div>
                 <p className="text-white/80 text-sm">
                   Our fiscal sponsor is <span className="font-medium">R4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
                 </p>
