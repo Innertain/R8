@@ -744,13 +744,25 @@
 /* Tooltip styles */
 .calendar-tooltip {
   background: white;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  padding: 14px;
   font-size: 14px;
-  max-width: 280px;
-  z-index: 1000;
+  max-width: 300px;
+  z-index: 10000;
+  line-height: 1.5;
+}
+
+/* Make calendar events easier to hover */
+.rbc-event {
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.rbc-event:hover {
+  transform: scale(1.02);
+  z-index: 100;
 }
 
 .rbc-time-view .rbc-time-header {

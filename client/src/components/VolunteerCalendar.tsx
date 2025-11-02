@@ -160,11 +160,12 @@ const CustomEventWrapper = ({ event, children }: { event: any; children: React.R
       {children}
       {showTooltip && (
         <div 
-          className="fixed z-50 pointer-events-none"
+          className="fixed z-[9999] pointer-events-none"
           style={{
             left: tooltipPosition.x,
             top: tooltipPosition.y,
-            transform: 'translateX(-50%) translateY(-100%)'
+            transform: 'translateX(-50%) translateY(-100%)',
+            marginTop: '-8px'
           }}
         >
           {getTooltipContent()}
