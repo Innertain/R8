@@ -412,12 +412,18 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           // Use lookup fields if available, otherwise fall back to hostsLookup
           const hostData = hostId && hostsLookup[hostId] ? hostsLookup[hostId] : null;
           
-          // Debug: Log host data lookup for first shift
-          if (index === 0) {
-            console.log(`🏢 First shift host lookup: hostId="${hostId}", hostName="${hostName}", hostLogo="${hostLogo}"`);
-            console.log(`🏢 Host lookup data from Partners table:`, hostData);
-            console.log(`🏢 Available hosts in lookup:`, Object.keys(hostsLookup).slice(0, 5));
-          }
+          // Debug: Log host data for every record
+          console.log(`🏢 Shift "${activityName}" host data:`, {
+            hostId,
+            hostName,
+            hostLogo,
+            hasHostData: !!hostData,
+            finalHost: (hostId || hostName) ? {
+              id: hostId,
+              name: hostName || hostData?.name || 'Unknown Organization',
+              logo: hostLogo || hostData?.logo || null
+            } : null
+          });
           
           // Keep ISO datetime strings to preserve timezone information
           // Frontend will handle formatting with timezone display
