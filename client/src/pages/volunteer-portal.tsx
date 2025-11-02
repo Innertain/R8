@@ -1018,6 +1018,32 @@ export default function VolunteerPortal() {
           </div>
           <div className="space-y-1">
             <p className="text-sm text-gray-800">{formatTimeRangeInTimezone(shift.startTime, shift.endTime, shift.timezone)}</p>
+            
+            {/* Host Information */}
+            {shift.host && (
+              <div className="flex items-center gap-2 my-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-lg">
+                <div className="w-8 h-8 flex items-center justify-center bg-white rounded-md shadow-sm border border-gray-200">
+                  {shift.host.logo ? (
+                    <img 
+                      src={shift.host.logo} 
+                      alt={`${shift.host.name} logo`}
+                      className="w-6 h-6 object-contain"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">
+                        {shift.host.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide">Hosted by</div>
+                  <div className="font-semibold text-gray-800">{shift.host.name}</div>
+                </div>
+              </div>
+            )}
+            
             <div className="text-sm text-gray-800">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
