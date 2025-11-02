@@ -1872,11 +1872,11 @@ export default function VolunteerPortal() {
               className="w-32 h-32 object-contain"
             />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900">Volunteer Portal</h1>
-          <p className="text-xl text-gray-700 font-medium">
+          <h1 className="text-4xl font-bold text-white">Volunteer Portal</h1>
+          <p className="text-xl text-white font-medium">
             Reach · Resilience · Relief · Recovery
           </p>
-          <p className="text-base text-gray-600 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base text-gray-100 max-w-xl mx-auto leading-relaxed">
             Manage your volunteer shifts, set your availability, and join our community making a difference in disaster relief and recovery efforts.
           </p>
         </div>
@@ -1936,9 +1936,9 @@ export default function VolunteerPortal() {
 
         {/* New Volunteer Section */}
         <div className="text-center space-y-4">
-          <div className="border-t border-gray-300 pt-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-3">New Volunteer?</h2>
-            <p className="text-base text-gray-700 mb-6 max-w-xl mx-auto">
+          <div className="border-t border-gray-400 pt-6">
+            <h2 className="text-2xl font-semibold text-white mb-3">New Volunteer?</h2>
+            <p className="text-base text-gray-100 mb-6 max-w-xl mx-auto">
               Join R4 Reach and make a difference in your community. Choose how you'd like to get involved:
             </p>
             
@@ -2009,12 +2009,12 @@ export default function VolunteerPortal() {
           </div>
         </div>
 
-        <div className="text-center border-t border-gray-300 pt-4">
-          <p className="text-base text-gray-600">
+        <div className="text-center border-t border-gray-400 pt-4">
+          <p className="text-base text-gray-100">
             Can't access with phone number?{' '}
             <Button 
               variant="link" 
-              className="p-0 h-auto font-semibold text-blue-600 text-base"
+              className="p-0 h-auto font-semibold text-blue-300 hover:text-blue-200 text-base"
               onClick={() => setShowRegister(true)}
             >
               Contact support
