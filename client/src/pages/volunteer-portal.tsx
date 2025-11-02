@@ -122,7 +122,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Volunteer Profile</h2>
-          <p className="text-gray-600">Manage your personal information and preferences</p>
+          <p className="text-gray-800">Manage your personal information and preferences</p>
         </div>
         <Button
           onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
@@ -229,7 +229,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
                     <Badge key={skill} variant="secondary">{skill}</Badge>
                   ))}
                   {(!volunteer.skills || volunteer.skills.length === 0) && (
-                    <p className="text-sm text-gray-500">No skills listed</p>
+                    <p className="text-sm text-gray-700">No skills listed</p>
                   )}
                 </div>
               )}
@@ -261,7 +261,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
                     <Badge key={interest} variant="outline">{interest}</Badge>
                   ))}
                   {(!volunteer.interests || volunteer.interests.length === 0) && (
-                    <p className="text-sm text-gray-500">No interests listed</p>
+                    <p className="text-sm text-gray-700">No interests listed</p>
                   )}
                 </div>
               )}
@@ -384,7 +384,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
                     <Badge key={type} className="bg-blue-100 text-blue-900 border border-blue-300">{type}</Badge>
                   ))}
                   {(!volunteer.preferredShiftTypes || volunteer.preferredShiftTypes.length === 0) && (
-                    <p className="text-sm text-gray-500">No preferences set</p>
+                    <p className="text-sm text-gray-700">No preferences set</p>
                   )}
                 </div>
               )}
@@ -501,7 +501,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
                       <UserCheck className="h-4 w-4 text-green-600" />
                       <div>
                         <div className="font-medium">Active Volunteer</div>
-                        <div className="text-xs text-gray-500">Ready to take on shifts and receive notifications</div>
+                        <div className="text-xs text-gray-700">Ready to take on shifts and receive notifications</div>
                       </div>
                     </Label>
                   </div>
@@ -516,7 +516,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
                       <Pause className="h-4 w-4 text-yellow-600" />
                       <div>
                         <div className="font-medium">Taking a Break</div>
-                        <div className="text-xs text-gray-500">Keep my profile but don't assign new shifts</div>
+                        <div className="text-xs text-gray-700">Keep my profile but don't assign new shifts</div>
                       </div>
                     </Label>
                   </div>
@@ -531,7 +531,7 @@ function VolunteerProfile({ volunteer }: { volunteer: any }) {
                 <div className="space-y-2">
                   <div>
                     <div className="font-medium text-red-700">Remove My Data</div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-800">
                       Permanently delete your volunteer account and all associated data. This action cannot be undone.
                     </p>
                   </div>
@@ -1017,14 +1017,14 @@ export default function VolunteerPortal() {
             )}
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-600">{formatTimeRangeInTimezone(shift.startTime, shift.endTime, shift.timezone)}</p>
-            <div className="text-sm text-gray-600">
+            <p className="text-sm text-gray-800">{formatTimeRangeInTimezone(shift.startTime, shift.endTime, shift.timezone)}</p>
+            <div className="text-sm text-gray-800">
               <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <div className="font-medium text-gray-700">{shift.location}</div>
                   {(shift.siteAddress || shift.siteCity || shift.siteState) && (
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-700 mt-1">
                       {shift.siteAddress && <div>{shift.siteAddress}</div>}
                       {(shift.siteCity || shift.siteState) && (
                         <div>{shift.siteCity}{shift.siteCity && shift.siteState && ', '}{shift.siteState}</div>
@@ -1062,7 +1062,7 @@ export default function VolunteerPortal() {
         </div>
         
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-800">
             {shift.volunteersSignedUp} / {shift.volunteersNeeded} volunteers
           </span>
           <div className="w-20 bg-gray-200 rounded-full h-2 flex-shrink-0">
@@ -1185,7 +1185,7 @@ export default function VolunteerPortal() {
             {/* Notification Settings */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative text-gray-500 hover:text-gray-700 settings-hover-effect">
+                <Button variant="ghost" size="sm" className="relative text-gray-700 hover:text-gray-700 settings-hover-effect">
                   <Bell className="w-5 h-5" />
                 </Button>
               </DialogTrigger>
@@ -1415,15 +1415,15 @@ export default function VolunteerPortal() {
                 {assignmentsLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="text-center">
-                      <Clock className="h-8 w-8 animate-spin mx-auto mb-2 text-gray-400" />
-                      <p className="text-gray-500">Loading your shifts...</p>
+                      <Clock className="h-8 w-8 animate-spin mx-auto mb-2 text-gray-600" />
+                      <p className="text-gray-700">Loading your shifts...</p>
                     </div>
                   </div>
                 ) : assignments.filter((a: any) => a.status !== 'cancelled').length === 0 ? (
                   <div className="text-center py-8">
-                    <CalendarDays className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <CalendarDays className="h-12 w-12 mx-auto mb-4 text-gray-600" />
                     <h3 className="text-lg font-medium mb-2">No shifts assigned yet</h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="text-gray-700 mb-4">
                       You haven't signed up for any volunteer shifts yet. 
                       Check the main shifts page to find opportunities!
                     </p>
@@ -1471,12 +1471,12 @@ export default function VolunteerPortal() {
                                     </Badge>
                                   </div>
                                   
-                                  <div className="space-y-1 text-sm text-gray-600">
+                                  <div className="space-y-1 text-sm text-gray-800">
                                     <p><strong>Date:</strong> {assignment.startTime && assignment.endTime ? formatTimeRangeInTimezone(assignment.startTime, assignment.endTime, assignment.timezone) : 'To be determined'}</p>
                                     <div>
                                       <strong>Location:</strong> {assignment.location || matchedShift?.location || 'Local area'}
                                       {matchedShift && (matchedShift.siteAddress || matchedShift.siteCity || matchedShift.siteState) && (
-                                        <div className="mt-1 ml-4 text-xs text-gray-500">
+                                        <div className="mt-1 ml-4 text-xs text-gray-700">
                                           {matchedShift.siteAddress && <div>{matchedShift.siteAddress}</div>}
                                           {(matchedShift.siteCity || matchedShift.siteState) && (
                                             <div>{matchedShift.siteCity}{matchedShift.siteCity && matchedShift.siteState && ', '}{matchedShift.siteState}</div>
@@ -1616,7 +1616,7 @@ export default function VolunteerPortal() {
       <div className="space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Volunteer Portal</h1>
-          <p className="text-gray-600">Set your availability and manage your volunteer schedule</p>
+          <p className="text-gray-800">Set your availability and manage your volunteer schedule</p>
         </div>
 
         <Card className="card-hover-effect">
@@ -1669,7 +1669,7 @@ export default function VolunteerPortal() {
         </Card>
 
         <div className="text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-800">
             New volunteer?{' '}
             <Button 
               variant="link" 
@@ -1764,7 +1764,7 @@ export default function VolunteerPortal() {
       {/* Footer */}
       <footer className="bg-gray-50 border-t border-gray-200 py-6 mt-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center space-x-2 text-gray-600">
+          <div className="flex items-center justify-center space-x-2 text-gray-800">
             <span className="text-sm">Powered by</span>
             <img 
               src={r8Logo}
