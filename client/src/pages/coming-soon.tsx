@@ -273,6 +273,28 @@ export default function ComingSoonPage() {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-6 pt-6 border-t border-slate-600">
+                <div className="text-center space-y-3">
+                  <div className="flex items-center justify-center gap-2">
+                    <img src={r4Logo} alt="R4 Reach" className="w-6 h-6" />
+                    <h4 className="text-lg font-semibold text-white">R4 Reach Volunteers</h4>
+                  </div>
+                  <p className="text-gray-300 text-sm">
+                    Already a registered R4 volunteer? Access your volunteer portal
+                  </p>
+                  <Link href="/r4-volunteer">
+                    <Button 
+                      className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold"
+                      data-testid="button-r4-volunteer-portal"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      R4 Volunteer Portal
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </div>
 
             </div>
