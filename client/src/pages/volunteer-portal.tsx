@@ -2197,15 +2197,21 @@ export default function VolunteerPortal() {
       {/* Footer */}
       <footer className="bg-gray-50 border-t border-gray-200 py-6 mt-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center space-x-2 text-gray-800">
+          <a 
+            href="/coming-soon" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center space-x-2 text-gray-800 hover:text-emerald-600 transition-colors group"
+          >
             <span className="text-sm">Powered by</span>
             <img 
               src={r8Logo}
               alt="R8 Logo" 
-              className="w-8 h-8"
+              className="w-8 h-8 group-hover:scale-110 transition-transform"
             />
-            <span className="text-sm font-medium">R8</span>
-          </div>
+            <span className="text-sm font-medium group-hover:text-emerald-600">R8</span>
+            <ExternalLink className="w-4 h-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </a>
         </div>
       </footer>
       
