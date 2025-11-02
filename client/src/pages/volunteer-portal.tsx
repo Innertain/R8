@@ -1861,26 +1861,39 @@ export default function VolunteerPortal() {
 
   // Login/Register screen
   return (
-    <div className="container mx-auto p-4 max-w-md">
-      <div className="space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Volunteer Portal</h1>
-          <p className="text-gray-800">Set your availability and manage your volunteer schedule</p>
+    <div className="container mx-auto p-4 max-w-2xl">
+      <div className="space-y-8">
+        {/* R4 Reach Branding Header */}
+        <div className="text-center space-y-4">
+          <div className="flex justify-center mb-4">
+            <img 
+              src={r4Logo} 
+              alt="R4 Reach - Reach, Resilience, Relief, Recovery" 
+              className="w-32 h-32 object-contain"
+            />
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900">Volunteer Portal</h1>
+          <p className="text-xl text-gray-700 font-medium">
+            Reach · Resilience · Relief · Recovery
+          </p>
+          <p className="text-base text-gray-600 max-w-xl mx-auto leading-relaxed">
+            Manage your volunteer shifts, set your availability, and join our community making a difference in disaster relief and recovery efforts.
+          </p>
         </div>
 
-        <Card className="card-hover-effect">
+        <Card className="card-hover-effect shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <LogIn className="h-5 w-5 activity-icon" />
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <LogIn className="h-6 w-6 activity-icon" />
               Volunteer Access
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base text-gray-600">
               Enter your phone number to access your volunteer dashboard
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-base font-medium text-gray-900">Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -1888,21 +1901,24 @@ export default function VolunteerPortal() {
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                className="text-base h-12"
+                data-testid="input-phone"
               />
             </div>
             
             {/* Demo account only */}
-            <div className="bg-blue-50 p-3 rounded-lg space-y-2">
-              <p className="text-sm text-blue-800 font-medium">Demo Account Available:</p>
+            <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg space-y-2">
+              <p className="text-base text-blue-900 font-semibold">Demo Account Available:</p>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={() => setPhoneNumber("555-DEMO")}
-                className="text-xs justify-start btn-hover-effect"
+                className="text-sm justify-start btn-hover-effect bg-white"
+                data-testid="button-demo-account"
               >
                 🎭 Demo: 555-DEMO - Test Account
               </Button>
-              <p className="text-xs text-blue-600 mt-2">
+              <p className="text-sm text-blue-700 mt-2">
                 Use the demo account to explore volunteer portal features
               </p>
             </div>
@@ -1910,22 +1926,98 @@ export default function VolunteerPortal() {
             <Button 
               onClick={handleLogin} 
               disabled={loginMutation.isPending}
-              className="w-full btn-hover-effect"
+              className="w-full btn-hover-effect h-12 text-base font-medium"
+              data-testid="button-access-portal"
             >
               {loginMutation.isPending ? 'Checking...' : 'Access Portal'}
             </Button>
           </CardContent>
         </Card>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-800">
-            New volunteer?{' '}
+        {/* New Volunteer Section */}
+        <div className="text-center space-y-4">
+          <div className="border-t border-gray-300 pt-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-3">New Volunteer?</h2>
+            <p className="text-base text-gray-700 mb-6 max-w-xl mx-auto">
+              Join R4 Reach and make a difference in your community. Choose how you'd like to get involved:
+            </p>
+            
+            <div className="grid gap-3 max-w-lg mx-auto">
+              <a
+                href="https://form.jotform.com/243318098770059"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+                data-testid="link-volunteer-signup-login"
+              >
+                <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <UserPlus className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className="font-semibold text-base text-gray-900">Volunteer Sign Up</h3>
+                      <p className="text-sm text-gray-600">Register to help with relief efforts</p>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-gray-400" />
+                  </CardContent>
+                </Card>
+              </a>
+
+              <a
+                href="https://form.jotform.com/243316609742054"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+                data-testid="link-driver-signup-login"
+              >
+                <Card className="border-2 border-green-200 hover:border-green-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Truck className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className="font-semibold text-base text-gray-900">Driver Sign Up</h3>
+                      <p className="text-sm text-gray-600">Help transport supplies</p>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-gray-400" />
+                  </CardContent>
+                </Card>
+              </a>
+
+              <a
+                href="https://form.jotform.com/243364430721046"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+                data-testid="link-org-signup-login"
+              >
+                <Card className="border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Building2 className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className="font-semibold text-base text-gray-900">Organization Sign Up</h3>
+                      <p className="text-sm text-gray-600">Partner with R4 Reach</p>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-gray-400" />
+                  </CardContent>
+                </Card>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center border-t border-gray-300 pt-4">
+          <p className="text-base text-gray-600">
+            Can't access with phone number?{' '}
             <Button 
               variant="link" 
-              className="p-0 h-auto font-semibold"
+              className="p-0 h-auto font-semibold text-blue-600 text-base"
               onClick={() => setShowRegister(true)}
             >
-              Register here
+              Contact support
             </Button>
           </p>
         </div>
