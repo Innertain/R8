@@ -10,6 +10,10 @@ import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
 import r4Logo from "@/assets/r4-logo.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
 import appalachianLandscape from "@assets/Appalachian _1754183249913.png";
+import valleyHopeLogo from "@assets/Valley+Hope+Foundation+Logo_1762123470544.webp";
+import r4ReachLogo from "@assets/R4_1762123457917.png";
+import wncSupplySitesLogo from "@assets/wnc supply sites logo_1762123463930.png";
+import aidArenaLogo from "@assets/aid arena_1762123482019.png";
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 
@@ -484,8 +488,10 @@ export default function ComingSoonPage() {
                 href="https://www.valleyhopefoundation.org/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
+                data-testid="link-valley-hope"
               >
+                <img src={valleyHopeLogo} alt="Valley Hope Foundation" className="w-16 h-16 object-contain mb-2" />
                 <div className="text-sm sm:text-base lg:text-xl font-bold text-emerald-400 mb-1 leading-tight hover:text-emerald-300 transition-colors">Valley Hope Foundation</div>
                 <p className="text-xs text-gray-400 leading-tight">Community resilience partner</p>
               </a>
@@ -496,8 +502,10 @@ export default function ComingSoonPage() {
                 href="https://r4reach.org/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
+                data-testid="link-r4-reach"
               >
+                <img src={r4ReachLogo} alt="R4 Reach" className="w-16 h-16 object-contain mb-2" />
                 <div className="text-sm sm:text-base lg:text-xl font-bold text-blue-400 mb-1 leading-tight hover:text-blue-300 transition-colors">R4 Reach</div>
                 <p className="text-xs text-gray-400 leading-tight">Resource coordination network</p>
               </a>
@@ -508,8 +516,10 @@ export default function ComingSoonPage() {
                 href="https://www.wnc-supply-sites.com/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
+                data-testid="link-wnc-supply-sites"
               >
+                <img src={wncSupplySitesLogo} alt="WNC Supply Sites" className="w-16 h-16 object-contain mb-2" />
                 <div className="text-sm sm:text-base lg:text-xl font-bold text-cyan-400 mb-1 leading-tight hover:text-cyan-300 transition-colors">WNC Supply Sites</div>
                 <p className="text-xs text-gray-400 leading-tight">Western NC disaster relief</p>
               </a>
@@ -520,8 +530,10 @@ export default function ComingSoonPage() {
                 href="https://conversacorps.org/aid_arena/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[80px] flex flex-col justify-center hover:bg-slate-600/50 transition-colors"
+                className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
+                data-testid="link-aid-arena"
               >
+                <img src={aidArenaLogo} alt="Aid Arena" className="w-16 h-16 object-contain mb-2" />
                 <div className="text-sm sm:text-base lg:text-xl font-bold text-red-400 mb-1 leading-tight hover:text-red-300 transition-colors">Aid Arena</div>
                 <p className="text-xs text-gray-400 leading-tight">Crisis response coordination platform</p>
               </a>
