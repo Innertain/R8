@@ -535,7 +535,7 @@ export default function ComingSoonPage() {
                 className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
                 data-testid="link-aid-arena"
               >
-                <img src={aidArenaLogo} alt="Aid Arena" className="w-16 h-16 object-contain mb-2" />
+                <img src={aidArenaLogo} alt="Aid Arena" className="w-20 h-20 object-contain mb-2" />
                 <div className="text-sm sm:text-base lg:text-xl font-bold text-red-400 mb-1 leading-tight hover:text-red-300 transition-colors">Aid Arena</div>
                 <p className="text-xs text-gray-400 leading-tight">Crisis response coordination platform</p>
               </a>
@@ -563,7 +563,7 @@ export default function ComingSoonPage() {
                 className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
                 data-testid="link-thaumazo"
               >
-                <img src={thaumazoLogo} alt="Thaumazo" className="w-16 h-16 object-contain mb-2 invert" />
+                <img src={thaumazoLogo} alt="Thaumazo" className="w-20 h-20 object-contain mb-2 invert" />
                 <div className="text-sm sm:text-base lg:text-xl font-bold text-indigo-400 mb-1 leading-tight hover:text-indigo-300 transition-colors">Thaumazo</div>
                 <p className="text-xs text-gray-400 leading-tight">Innovation & collaboration</p>
               </a>
