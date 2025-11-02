@@ -281,17 +281,17 @@ async function fetchSiteDetails(): Promise<Record<string, any>> {
     let firstRecordLogged = false;
     
     do {
-      const siteUrl = `https://api.airtable.com/v0/${BASE_ID}/Site${offset ? `?offset=${offset}` : ''}`;
+      const siteUrl: string = `https://api.airtable.com/v0/${BASE_ID}/Site${offset ? `?offset=${offset}` : ''}`;
       if (pageCount === 0) {
         console.log(`Fetching Site table for location details: ${siteUrl}`);
       }
       
-      const response = await fetch(siteUrl, {
+      const response: Response = await fetch(siteUrl, {
         headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: any = await response.json();
         pageCount++;
         
         // Log first site record to see available fields
