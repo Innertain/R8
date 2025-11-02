@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle, Smartphone, ChevronDown, ChevronUp, Home, ExternalLink, Truck, Building2 } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle, Smartphone, ChevronDown, ChevronUp, Home, ExternalLink, Truck, Building2, Search } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -1874,10 +1874,10 @@ export default function VolunteerPortal() {
           </div>
           <h1 className="text-4xl font-bold text-white">Volunteer Portal</h1>
           <p className="text-xl text-white font-medium">
-            Reach · Resilience · Relief · Recovery
+            Disaster Relief · Community Resilience · Regeneration
           </p>
           <p className="text-base text-gray-100 max-w-xl mx-auto leading-relaxed">
-            Manage your volunteer shifts, set your availability, and join our community making a difference in disaster relief and recovery efforts.
+            Manage your volunteer shifts, set your availability, and join our community working together for disaster relief, community resilience, and regeneration.
           </p>
         </div>
 
@@ -2006,6 +2006,98 @@ export default function VolunteerPortal() {
                 </Card>
               </a>
             </div>
+          </div>
+        </div>
+
+        {/* Quick Navigation Section */}
+        <div className="text-center space-y-4">
+          <div className="border-t border-gray-400 pt-6">
+            <h2 className="text-2xl font-semibold text-white mb-3">Already a Volunteer?</h2>
+            <p className="text-base text-gray-100 mb-6 max-w-xl mx-auto">
+              Quick access to your volunteer dashboard:
+            </p>
+            
+            <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto">
+              <button
+                onClick={() => {
+                  setPhoneNumber("555-DEMO");
+                  handleLogin();
+                  setTimeout(() => setActiveTab('my-shifts'), 100);
+                }}
+                className="block"
+                data-testid="button-nav-myshifts"
+              >
+                <Card className="border-2 border-orange-200 hover:border-orange-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <CardContent className="p-4 flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Calendar className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <h3 className="font-semibold text-sm text-gray-900">My Shifts</h3>
+                  </CardContent>
+                </Card>
+              </button>
+
+              <button
+                onClick={() => {
+                  setPhoneNumber("555-DEMO");
+                  handleLogin();
+                  setTimeout(() => setActiveTab('browse'), 100);
+                }}
+                className="block"
+                data-testid="button-nav-browse"
+              >
+                <Card className="border-2 border-teal-200 hover:border-teal-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <CardContent className="p-4 flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+                      <Search className="w-5 h-5 text-teal-600" />
+                    </div>
+                    <h3 className="font-semibold text-sm text-gray-900">Browse</h3>
+                  </CardContent>
+                </Card>
+              </button>
+
+              <button
+                onClick={() => {
+                  setPhoneNumber("555-DEMO");
+                  handleLogin();
+                  setTimeout(() => setActiveTab('calendar'), 100);
+                }}
+                className="block"
+                data-testid="button-nav-calendar"
+              >
+                <Card className="border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <CardContent className="p-4 flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <CalendarDays className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <h3 className="font-semibold text-sm text-gray-900">Calendar</h3>
+                  </CardContent>
+                </Card>
+              </button>
+
+              <button
+                onClick={() => {
+                  setPhoneNumber("555-DEMO");
+                  handleLogin();
+                  setTimeout(() => setActiveTab('profile'), 100);
+                }}
+                className="block"
+                data-testid="button-nav-profile"
+              >
+                <Card className="border-2 border-pink-200 hover:border-pink-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+                  <CardContent className="p-4 flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-pink-600" />
+                    </div>
+                    <h3 className="font-semibold text-sm text-gray-900">Profile</h3>
+                  </CardContent>
+                </Card>
+              </button>
+            </div>
+            
+            <p className="text-xs text-gray-300 mt-4">
+              Using demo account for quick access
+            </p>
           </div>
         </div>
 
