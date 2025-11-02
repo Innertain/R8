@@ -1473,6 +1473,32 @@ export default function VolunteerPortal() {
                                   
                                   <div className="space-y-1 text-sm text-gray-800">
                                     <p><strong>Date:</strong> {assignment.startTime && assignment.endTime ? formatTimeRangeInTimezone(assignment.startTime, assignment.endTime, assignment.timezone) : 'To be determined'}</p>
+                                    
+                                    {/* Host Information */}
+                                    {matchedShift?.host && (
+                                      <div className="flex items-center gap-2 my-2 p-2 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-lg">
+                                        <div className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm border border-gray-200">
+                                          {matchedShift.host.logo ? (
+                                            <img 
+                                              src={matchedShift.host.logo} 
+                                              alt={`${matchedShift.host.name} logo`}
+                                              className="w-5 h-5 object-contain"
+                                            />
+                                          ) : (
+                                            <div className="w-5 h-5 bg-gradient-to-br from-blue-500 to-purple-600 rounded flex items-center justify-center">
+                                              <span className="text-white text-xs font-bold">
+                                                {matchedShift.host.name.charAt(0).toUpperCase()}
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex-1">
+                                          <div className="text-xs text-gray-600">Hosted by</div>
+                                          <div className="font-semibold text-gray-800">{matchedShift.host.name}</div>
+                                        </div>
+                                      </div>
+                                    )}
+                                    
                                     <div>
                                       <strong>Location:</strong> {assignment.location || matchedShift?.location || 'Local area'}
                                       {matchedShift && (matchedShift.siteAddress || matchedShift.siteCity || matchedShift.siteState) && (
