@@ -364,9 +364,8 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
     console.log(`Trying table name: "${tableName}" at: ${url}`);
 
     try {
-      // Request with all fields explicitly to ensure Host is included
-      const urlWithFields = `${url}?fields%5B%5D=Host&fields%5B%5D=Name&fields%5B%5D=Location%20&fields%5B%5D=Activity%20&fields%5B%5D=Start%20Time&fields%5B%5D=End%20Time&fields%5B%5D=Max%20Volunteers%20&fields%5B%5D=Remaining%20Spots%20&fields%5B%5D=Timezone`;
-      const response = await fetch(urlWithFields, {
+      // Fetch without field filtering to get ALL fields including Host and lookup fields
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${AIRTABLE_TOKEN}`
         }
@@ -404,11 +403,16 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           
           // Extract host information from Host field (linked to Mutual Aid Partners)
           const hostId = fields['Host']?.[0] || null; // Linked record ID
+          const hostName = fields['Name (from Host)']?.[0] || null; // Lookup field for host name
+          const hostLogo = fields['Logo (from Host)']?.[0]?.url || null; // Lookup field for logo
+          
+          // Use lookup fields if available, otherwise fall back to hostsLookup
           const hostData = hostId && hostsLookup[hostId] ? hostsLookup[hostId] : null;
           
           // Debug: Log host data lookup for first shift
           if (index === 0) {
-            console.log(`🏢 First shift host lookup: hostId="${hostId}", hostData=`, hostData);
+            console.log(`🏢 First shift host lookup: hostId="${hostId}", hostName="${hostName}", hostLogo="${hostLogo}"`);
+            console.log(`🏢 Host lookup data from Partners table:`, hostData);
             console.log(`🏢 Available hosts in lookup:`, Object.keys(hostsLookup).slice(0, 5));
           }
           
@@ -456,10 +460,10 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
             status: 'active',
             category,
             icon,
-            host: hostData ? {
+            host: (hostId || hostName) ? {
               id: hostId,
-              name: hostData.name,
-              logo: hostData.logo
+              name: hostName || hostData?.name || 'Unknown Organization',
+              logo: hostLogo || hostData?.logo || null
             } : null
           };
         });
