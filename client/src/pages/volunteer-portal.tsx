@@ -1281,13 +1281,13 @@ export default function VolunteerPortal() {
             {/* User Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100">
+                <Button variant="ghost" className="relative flex items-center gap-2 p-2 rounded-lg hover:bg-slate-700 transition-colors">
                   <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
                     {currentVolunteer.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'V'}
                   </div>
                   <div className="text-left hidden sm:block">
-                    <p className="font-medium text-sm">{currentVolunteer.name}</p>
-                    <p className="text-xs text-gray-500">{currentVolunteer.phone || currentVolunteer.phoneNumber}</p>
+                    <p className="font-medium text-sm text-white">{currentVolunteer.name}</p>
+                    <p className="text-xs text-gray-300">{currentVolunteer.phone || currentVolunteer.phoneNumber}</p>
                   </div>
                 </Button>
               </DropdownMenuTrigger>
