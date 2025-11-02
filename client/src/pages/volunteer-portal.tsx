@@ -1018,7 +1018,46 @@ export default function VolunteerPortal() {
           </div>
           <div className="space-y-1">
             <p className="text-sm text-gray-600">{formatTimeRangeInTimezone(shift.startTime, shift.endTime, shift.timezone)}</p>
-            <p className="text-sm text-gray-600">{shift.location}</p>
+            <div className="text-sm text-gray-600">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-700">{shift.location}</div>
+                  {(shift.siteAddress || shift.siteCity || shift.siteState) && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {shift.siteAddress && <div>{shift.siteAddress}</div>}
+                      {(shift.siteCity || shift.siteState) && (
+                        <div>{shift.siteCity}{shift.siteCity && shift.siteState && ', '}{shift.siteState}</div>
+                      )}
+                      {(shift.siteAddress || shift.siteCity) && (
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                            `${shift.siteAddress || ''} ${shift.siteCity || ''} ${shift.siteState || ''}`.trim()
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 mt-1"
+                        >
+                          <MapPin className="w-3 h-3" />
+                          Get Directions
+                        </a>
+                      )}
+                      {shift.sitePhone && (
+                        <div className="mt-1">
+                          <Phone className="w-3 h-3 inline mr-1" />
+                          {shift.sitePhone}
+                        </div>
+                      )}
+                      {shift.siteStatus && (
+                        <div className="mt-1">
+                          Status: {shift.siteStatus}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         
