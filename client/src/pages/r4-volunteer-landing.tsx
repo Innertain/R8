@@ -206,9 +206,8 @@ export default function R4VolunteerLanding() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
                     <Button 
-                      variant="outline" 
                       size="sm" 
-                      className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
+                      className="bg-slate-700 text-white hover:bg-slate-600 border border-slate-600"
                       onClick={() => window.open('https://form.jotform.com/243318098770059', '_blank')}
                       data-testid="link-volunteer-signup"
                     >
@@ -216,9 +215,8 @@ export default function R4VolunteerLanding() {
                       Volunteer Signup
                     </Button>
                     <Button 
-                      variant="outline" 
                       size="sm" 
-                      className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
+                      className="bg-slate-700 text-white hover:bg-slate-600 border border-slate-600"
                       onClick={() => window.open('https://form.jotform.com/243316609742054', '_blank')}
                       data-testid="link-driver-signup"
                     >
@@ -226,9 +224,8 @@ export default function R4VolunteerLanding() {
                       Driver Signup
                     </Button>
                     <Button 
-                      variant="outline" 
                       size="sm" 
-                      className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white"
+                      className="bg-slate-700 text-white hover:bg-slate-600 border border-slate-600"
                       onClick={() => window.open('https://form.jotform.com/243364430721046', '_blank')}
                       data-testid="link-org-signup"
                     >
