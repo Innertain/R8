@@ -548,7 +548,7 @@ export default function ComingSoonPage() {
                 className="block bg-slate-700/50 rounded-lg p-3 sm:p-4 mb-3 min-h-[140px] flex flex-col justify-center items-center hover:bg-slate-600/50 transition-colors"
                 data-testid="link-makership"
               >
-                <img src={makershipLogo} alt="Makership" className="w-16 h-16 object-contain mb-2 invert" />
+                <img src={makershipLogo} alt="Makership" className="w-16 h-16 object-contain mb-2" />
                 <div className="text-sm sm:text-base lg:text-xl font-bold text-yellow-400 mb-1 leading-tight hover:text-yellow-300 transition-colors">Makership</div>
                 <p className="text-xs text-gray-400 leading-tight">Work & wander community</p>
               </a>
