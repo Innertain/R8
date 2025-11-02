@@ -21,7 +21,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { formatTimeRangeWithTimezone } from '@/lib/dateUtils';
+import { formatTimeRangeInTimezone } from '@/lib/dateUtils';
 
 import VolunteerCalendar from '@/components/VolunteerCalendar';
 import ShiftCard from '@/components/ShiftCard';
@@ -1017,7 +1017,7 @@ export default function VolunteerPortal() {
             )}
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-600">{formatTimeRangeWithTimezone(shift.startTime, shift.endTime)}</p>
+            <p className="text-sm text-gray-600">{formatTimeRangeInTimezone(shift.startTime, shift.endTime, shift.timezone)}</p>
             <p className="text-sm text-gray-600">{shift.location}</p>
           </div>
         </div>
@@ -1433,8 +1433,8 @@ export default function VolunteerPortal() {
                                   </div>
                                   
                                   <div className="space-y-1 text-sm text-gray-600">
-                                    <p><strong>Date:</strong> {matchedShift?.dateTime || 'To be determined'}</p>
-                                    <p><strong>Location:</strong> {matchedShift?.location || 'Local area'}</p>
+                                    <p><strong>Date:</strong> {assignment.startTime && assignment.endTime ? formatTimeRangeInTimezone(assignment.startTime, assignment.endTime, assignment.timezone) : 'To be determined'}</p>
+                                    <p><strong>Location:</strong> {assignment.location || matchedShift?.location || 'Local area'}</p>
                                     <p><strong>Assigned:</strong> {new Date(assignment.assignedDate || assignment.assignedAt).toLocaleDateString()}</p>
                                     {assignment.notes && (
                                       <p><strong>Notes:</strong> {assignment.notes}</p>

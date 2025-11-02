@@ -327,8 +327,9 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           // Frontend will handle formatting with timezone display
           const startTime = fields['Start Time'] || null;
           const endTime = fields['End Time'] || null;
+          const timezone = fields['Timezone'] || null; // e.g., "America/New_York", "America/Chicago"
           
-          console.log(`⏰ Shift "${activityName}": startTime=${startTime}, endTime=${endTime}`);
+          console.log(`⏰ Shift "${activityName}": startTime=${startTime}, endTime=${endTime}, timezone=${timezone}`);
           
           // Determine icon based on activity name
           let icon = 'users';
@@ -353,6 +354,7 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
             dateTime: '', // Deprecated - kept for backward compatibility
             startTime,
             endTime,
+            timezone,
             location,
             volunteersNeeded: maxVolunteers,
             volunteersSignedUp: Math.max(0, maxVolunteers - remainingSpots),

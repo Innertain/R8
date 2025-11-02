@@ -881,11 +881,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             headers: { Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}` }
           });
 
-          let shiftsData: Record<string, string> = {};
+          let shiftsData: Record<string, any> = {};
           if (shiftsResponse.ok) {
             const shifts = await shiftsResponse.json();
-            shiftsData = shifts.records.reduce((acc: Record<string, string>, shift: any) => {
-              acc[shift.id] = shift.fields?.Name?.[0] || shift.fields?.activityName || '';
+            shiftsData = shifts.records.reduce((acc: Record<string, any>, shift: any) => {
+              acc[shift.id] = {
+                name: shift.fields?.['Activity '] || shift.fields?.activityName || '',
+                startTime: shift.fields?.['Start Time'] || null,
+                endTime: shift.fields?.['End Time'] || null,
+                location: shift.fields?.['Site Name (from Location )']?.[0] || 'TBD',
+                timezone: shift.fields?.['Timezone'] || null
+              };
               return acc;
             }, {});
           }
@@ -895,13 +901,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const shiftIdRaw = record.fields['Shift ID'] || record.fields['Shift'] || [];
             const shiftId = Array.isArray(shiftIdRaw) ? shiftIdRaw[0] || '' : shiftIdRaw || '';
             
-            console.log(`📋 Assignment ${record.id}: shiftId=${shiftId}, Activity field:`, record.fields['Activity  (from Shift ID)']);
+            const shiftData = shiftsData[shiftId];
+            
+            console.log(`📋 Assignment ${record.id}: shiftId=${shiftId}, shift data:`, shiftData);
             
             return {
               id: record.id,
               volunteerId: volunteerId,
               shiftId: shiftId,
-              shiftName: record.fields['Activity  (from Shift ID)']?.[0] || record.fields['Shift Name'] || record.fields['Name (from Shift Name)']?.[0] || shiftsData[shiftId] || '',
+              shiftName: record.fields['Activity  (from Shift ID)']?.[0] || record.fields['Shift Name'] || record.fields['Name (from Shift Name)']?.[0] || shiftData?.name || '',
+              startTime: shiftData?.startTime || null,
+              endTime: shiftData?.endTime || null,
+              location: shiftData?.location || 'TBD',
+              timezone: shiftData?.timezone || null,
               status: record.fields['Status ']?.trim() || 'confirmed',
               assignedDate: new Date(record.fields['Assigned Date'] || record.createdTime),
               notes: record.fields['Notes'] || ''
