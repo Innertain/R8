@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle, Smartphone, ChevronDown, ChevronUp } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle, Smartphone, ChevronDown, ChevronUp, Home, ExternalLink, Truck, Building2 } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +26,7 @@ import { formatTimeRangeInTimezone } from '@/lib/dateUtils';
 import VolunteerCalendar from '@/components/VolunteerCalendar';
 import ShiftCard from '@/components/ShiftCard';
 import r8Logo from "@/assets/r8-logo.png";
+import r4Logo from "@/assets/r4-logo.png";
 
 
 
@@ -610,7 +611,7 @@ export default function VolunteerPortal() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [currentVolunteer, setCurrentVolunteer] = useState<any>(null);
   const [showRegister, setShowRegister] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('welcome');
   const [notificationSettings, setNotificationSettings] = useState({
     newShifts: true,
     shiftReminders: true,
@@ -1442,7 +1443,14 @@ export default function VolunteerPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsList className="grid w-full grid-cols-5 h-auto">
+            <TabsTrigger 
+              value="welcome" 
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 py-3 sm:py-2 min-h-[60px] sm:min-h-[40px] transition-all duration-200 hover:bg-blue-50 hover:scale-105 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+            >
+              <Home className="h-5 w-5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">Welcome</span>
+            </TabsTrigger>
             <TabsTrigger 
               value="dashboard" 
               className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 py-3 sm:py-2 min-h-[60px] sm:min-h-[40px] transition-all duration-200 hover:bg-blue-50 hover:scale-105 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
@@ -1472,6 +1480,111 @@ export default function VolunteerPortal() {
               <span className="text-xs sm:text-sm">Profile</span>
             </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="welcome" className="space-y-6">
+            <Card className="card-hover-effect">
+              <CardHeader className="text-center pb-4">
+                <div className="flex justify-center mb-6">
+                  <img 
+                    src={r4Logo} 
+                    alt="R4 Reach - Reach, Resilience, Relief, Recovery" 
+                    className="w-48 h-48 object-contain"
+                  />
+                </div>
+                <CardTitle className="text-3xl font-bold text-gray-900">Welcome to R4 Reach</CardTitle>
+                <CardDescription className="text-lg mt-2">
+                  Reach · Resilience · Relief · Recovery
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="text-center space-y-3 mb-8">
+                  <p className="text-gray-700 text-lg">
+                    Join our community of volunteers making a difference in disaster relief and recovery efforts.
+                  </p>
+                  <p className="text-gray-600">
+                    Choose how you'd like to get involved:
+                  </p>
+                </div>
+
+                <div className="grid gap-4 max-w-2xl mx-auto">
+                  <a
+                    href="https://form.jotform.com/243318098770059"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                    data-testid="link-volunteer-signup"
+                  >
+                    <Card className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all duration-200 cursor-pointer">
+                      <CardContent className="p-6 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <UserPlus className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-gray-900 mb-1">Volunteer Sign Up</h3>
+                          <p className="text-gray-600 text-sm">
+                            Register as a volunteer to help with relief efforts and community support
+                          </p>
+                        </div>
+                        <ExternalLink className="w-5 h-5 text-gray-400" />
+                      </CardContent>
+                    </Card>
+                  </a>
+
+                  <a
+                    href="https://form.jotform.com/243316609742054"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                    data-testid="link-driver-signup"
+                  >
+                    <Card className="border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all duration-200 cursor-pointer">
+                      <CardContent className="p-6 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Truck className="w-6 h-6 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-gray-900 mb-1">Driver Sign Up</h3>
+                          <p className="text-gray-600 text-sm">
+                            Help transport supplies and resources to those in need
+                          </p>
+                        </div>
+                        <ExternalLink className="w-5 h-5 text-gray-400" />
+                      </CardContent>
+                    </Card>
+                  </a>
+
+                  <a
+                    href="https://form.jotform.com/243364430721046"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                    data-testid="link-org-signup"
+                  >
+                    <Card className="border-2 border-purple-200 hover:border-purple-400 hover:shadow-lg transition-all duration-200 cursor-pointer">
+                      <CardContent className="p-6 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-6 h-6 text-purple-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-gray-900 mb-1">Mutual Aid Organization Sign Up</h3>
+                          <p className="text-gray-600 text-sm">
+                            Partner organizations using our resources for community support
+                          </p>
+                        </div>
+                        <ExternalLink className="w-5 h-5 text-gray-400" />
+                      </CardContent>
+                    </Card>
+                  </a>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+                  <p className="text-gray-600 text-sm">
+                    Already registered? Explore the tabs above to browse shifts, manage your assignments, and update your profile.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
           
           <TabsContent value="dashboard" className="space-y-6">
             <Card className="card-hover-effect">
