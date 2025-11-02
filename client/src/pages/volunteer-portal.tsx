@@ -1139,8 +1139,8 @@ export default function VolunteerPortal() {
       <div className="container mx-auto p-4 space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Volunteer Portal</h1>
-            <p className="text-gray-600">Welcome back, {currentVolunteer.name}</p>
+            <h1 className="text-3xl font-bold text-gray-900">Volunteer Portal</h1>
+            <p className="text-gray-500 text-lg">Welcome back, {currentVolunteer.name}</p>
           </div>
           <div className="flex items-center gap-4">
             {/* Notification Settings */}
