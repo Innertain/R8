@@ -1434,7 +1434,36 @@ export default function VolunteerPortal() {
                                   
                                   <div className="space-y-1 text-sm text-gray-600">
                                     <p><strong>Date:</strong> {assignment.startTime && assignment.endTime ? formatTimeRangeInTimezone(assignment.startTime, assignment.endTime, assignment.timezone) : 'To be determined'}</p>
-                                    <p><strong>Location:</strong> {assignment.location || matchedShift?.location || 'Local area'}</p>
+                                    <div>
+                                      <strong>Location:</strong> {assignment.location || matchedShift?.location || 'Local area'}
+                                      {matchedShift && (matchedShift.siteAddress || matchedShift.siteCity || matchedShift.siteState) && (
+                                        <div className="mt-1 ml-4 text-xs text-gray-500">
+                                          {matchedShift.siteAddress && <div>{matchedShift.siteAddress}</div>}
+                                          {(matchedShift.siteCity || matchedShift.siteState) && (
+                                            <div>{matchedShift.siteCity}{matchedShift.siteCity && matchedShift.siteState && ', '}{matchedShift.siteState}</div>
+                                          )}
+                                          {(matchedShift.siteAddress || matchedShift.siteCity) && (
+                                            <a
+                                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                                `${matchedShift.siteAddress || ''} ${matchedShift.siteCity || ''} ${matchedShift.siteState || ''}`.trim()
+                                              )}`}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 mt-1"
+                                            >
+                                              <MapPin className="w-3 h-3" />
+                                              Get Directions
+                                            </a>
+                                          )}
+                                          {matchedShift.siteHours && (
+                                            <div className="mt-1">
+                                              <Clock className="w-3 h-3 inline mr-1" />
+                                              Hours: {matchedShift.siteHours}
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
                                     <p><strong>Assigned:</strong> {new Date(assignment.assignedDate || assignment.assignedAt).toLocaleDateString()}</p>
                                     {assignment.notes && (
                                       <p><strong>Notes:</strong> {assignment.notes}</p>

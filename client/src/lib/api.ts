@@ -8,6 +8,13 @@ export interface AirtableShift {
   endTime: string | null; // ISO datetime string with timezone
   timezone: string | null; // IANA timezone (e.g., "America/New_York")
   location: string;
+  // Full site address details
+  siteAddress?: string;
+  siteCity?: string;
+  siteState?: string;
+  siteHours?: string;
+  siteContactName?: string;
+  siteContactPhone?: string;
   volunteersNeeded: number;
   volunteersSignedUp: number;
   status: "active" | "urgent" | "remote" | "full";

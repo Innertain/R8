@@ -255,6 +255,49 @@ async function fetchMutualAidPartners(): Promise<{ [key: string]: { name: string
   return {};
 }
 
+// Fetch Site data for location details
+async function fetchSiteDetails(): Promise<Record<string, any>> {
+  if (!AIRTABLE_TOKEN || !BASE_ID) {
+    return {};
+  }
+
+  try {
+    const siteUrl = `https://api.airtable.com/v0/${BASE_ID}/Site`;
+    console.log(`Fetching Site table for location details: ${siteUrl}`);
+    
+    const response = await fetch(siteUrl, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const siteLookup: Record<string, any> = {};
+      
+      data.records?.forEach((record: any) => {
+        siteLookup[record.id] = {
+          id: record.id,
+          name: record.fields['Site Name'] || '',
+          address: record.fields['Street Address'] || '',
+          city: record.fields['City'] || '',
+          state: record.fields['State'] || '',
+          siteHours: record.fields['Site Hours'] || '',
+          primaryContactName: record.fields['Primary Contact Name'] || '',
+          primaryContactPhone: record.fields['Primary Contact Phone'] || ''
+        };
+      });
+      
+      console.log(`✓ Fetched ${Object.keys(siteLookup).length} site records for location mapping`);
+      return siteLookup;
+    } else {
+      console.log('Could not fetch Site table:', response.status);
+      return {};
+    }
+  } catch (error) {
+    console.log('Error fetching Site table:', error);
+    return {};
+  }
+}
+
 export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> {
   if (!AIRTABLE_TOKEN || !BASE_ID) {
     throw new Error('Missing Airtable credentials');
@@ -279,8 +322,9 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
     console.log('Could not fetch table metadata:', metaError);
   }
 
-  // Fetch host data for lookup
+  // Fetch host data and site details for lookup
   const hostsLookup = await fetchMutualAidPartners();
+  const sitesLookup = await fetchSiteDetails();
 
   // Try multiple common table names including the ones found in your base
   const possibleTableNames = ['V Shifts', 'V Activities', 'Shifts', 'shifts', 'Volunteer Shifts', 'VolunteerShifts', 'Table 1'];
@@ -316,8 +360,10 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           // Extract activity name - note the trailing space in "Activity "
           const activityName = fields['Activity '] || fields['Activity'] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
           
-          // Extract location from Site Name (from Location)
-          const location = fields['Site Name (from Location )']?.[0] || 'TBD';
+          // Extract location ID and get full site details
+          const locationId = fields['Location ']?.[0] || null; // Linked record ID
+          const siteData = locationId && sitesLookup[locationId] ? sitesLookup[locationId] : null;
+          const location = siteData?.name || fields['Site Name (from Location )']?.[0] || 'TBD';
           
           // Extract host information from Host field (linked to Mutual Aid Partners)
           const hostId = fields['Host']?.[0] || null; // Linked record ID
@@ -356,6 +402,13 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
             endTime,
             timezone,
             location,
+            // Full site details for address display
+            siteAddress: siteData?.address || '',
+            siteCity: siteData?.city || '',
+            siteState: siteData?.state || '',
+            siteHours: siteData?.siteHours || '',
+            siteContactName: siteData?.primaryContactName || '',
+            siteContactPhone: siteData?.primaryContactPhone || '',
             volunteersNeeded: maxVolunteers,
             volunteersSignedUp: Math.max(0, maxVolunteers - remainingSpots),
             status: 'active',

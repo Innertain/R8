@@ -884,9 +884,18 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                       const shift = event.resource.shift;
                       const status = event.resource.status || 'Confirmed';
                       tooltipText = `${shift?.activityName || 'Volunteer Shift'}
-Location: ${shift?.location || 'Location TBD'}
-Time: ${format(event.start, 'MMM d, h:mm a')} - ${format(event.end, 'h:mm a')}
-Status: ${status}`;
+Location: ${shift?.location || 'Location TBD'}`;
+                      if (shift?.siteAddress || shift?.siteCity || shift?.siteState) {
+                        tooltipText += `\n${shift.siteAddress || ''}`;
+                        if (shift.siteCity || shift.siteState) {
+                          tooltipText += `\n${shift.siteCity || ''}${shift.siteCity && shift.siteState ? ', ' : ''}${shift.siteState || ''}`;
+                        }
+                      }
+                      tooltipText += `\nTime: ${format(event.start, 'MMM d, h:mm a')} - ${format(event.end, 'h:mm a')}`;
+                      if (shift?.siteHours) {
+                        tooltipText += `\nHours: ${shift.siteHours}`;
+                      }
+                      tooltipText += `\nStatus: ${status}`;
                       if (event.resource.notes) {
                         tooltipText += `\nNotes: ${event.resource.notes}`;
                       }

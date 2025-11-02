@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart } from "lucide-react";
+import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -147,9 +147,40 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
       </div>
 
       {/* Location */}
-      <div className="flex items-center mb-3 text-gray-600 shift-card-content">
-        <MapPin className="w-4 h-4 mr-3 text-gray-400" />
-        <span className="text-sm">{shift.location}</span>
+      <div className="mb-3 text-gray-600 shift-card-content">
+        <div className="flex items-start">
+          <MapPin className="w-4 h-4 mr-3 text-gray-400 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <div className="text-sm font-medium text-gray-700">{shift.location}</div>
+            {(shift.siteAddress || shift.siteCity || shift.siteState) && (
+              <div className="text-xs text-gray-500 mt-1">
+                {shift.siteAddress && <div>{shift.siteAddress}</div>}
+                {(shift.siteCity || shift.siteState) && (
+                  <div>{shift.siteCity}{shift.siteCity && shift.siteState && ', '}{shift.siteState}</div>
+                )}
+                {(shift.siteAddress || shift.siteCity) && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      `${shift.siteAddress || ''} ${shift.siteCity || ''} ${shift.siteState || ''}`.trim()
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 mt-1"
+                  >
+                    <MapPin className="w-3 h-3" />
+                    Get Directions
+                  </a>
+                )}
+              </div>
+            )}
+            {shift.siteHours && (
+              <div className="text-xs text-gray-500 mt-1">
+                <Clock className="w-3 h-3 inline mr-1" />
+                Hours: {shift.siteHours}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Host Information */}
