@@ -876,9 +876,39 @@ export default function VolunteerCalendar({ volunteerId, volunteerName }: Volunt
                 event: ({ event, ...props }: any) => {
                   // Filter out React Big Calendar specific props that shouldn't go to DOM
                   const { continuesAfter, continuesPrior, slotStart, slotEnd, isAllDay, ...domProps } = props;
+                  
+                  // Create a detailed tooltip text
+                  let tooltipText = event.title;
+                  if (event.resource) {
+                    if (event.resource.type === 'shift') {
+                      const shift = event.resource.shift;
+                      const status = event.resource.status || 'Confirmed';
+                      tooltipText = `${shift?.activityName || 'Volunteer Shift'}
+Location: ${shift?.location || 'Location TBD'}
+Time: ${format(event.start, 'MMM d, h:mm a')} - ${format(event.end, 'h:mm a')}
+Status: ${status}`;
+                      if (event.resource.notes) {
+                        tooltipText += `\nNotes: ${event.resource.notes}`;
+                      }
+                    } else {
+                      tooltipText = `Available Time
+${format(event.start, 'MMM d, h:mm a')} - ${format(event.end, 'h:mm a')}`;
+                      if (event.resource.notes) {
+                        tooltipText += `\nNotes: ${event.resource.notes}`;
+                      }
+                    }
+                  }
+                  
                   return (
                     <CustomEventWrapper event={event}>
-                      <div {...domProps} className="h-full w-full" />
+                      <div 
+                        {...domProps} 
+                        className="h-full w-full px-1 overflow-hidden" 
+                        title={tooltipText}
+                        style={{ fontSize: '11px', lineHeight: '1.2' }}
+                      >
+                        <strong>{event.title}</strong>
+                      </div>
                     </CustomEventWrapper>
                   );
                 },
