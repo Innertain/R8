@@ -1863,7 +1863,7 @@ export default function VolunteerPortal() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
               {/* Logo and Mission */}
-              <a href="/" className="text-center lg:text-left block hover:opacity-80 transition-opacity">
+              <a href="https://www.itsr8.com" target="_blank" rel="noopener noreferrer" className="text-center lg:text-left block hover:opacity-80 transition-opacity">
                 <div className="flex items-center justify-center lg:justify-start mb-4">
                   <img 
                     src={r8LogoWhite}
@@ -2299,7 +2299,7 @@ export default function VolunteerPortal() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
             {/* Logo and Mission */}
-            <a href="/" className="text-center lg:text-left block hover:opacity-80 transition-opacity">
+            <a href="https://www.itsr8.com" target="_blank" rel="noopener noreferrer" className="text-center lg:text-left block hover:opacity-80 transition-opacity">
               <div className="flex items-center justify-center lg:justify-start mb-4">
                 <img 
                   src={r8LogoWhite}
