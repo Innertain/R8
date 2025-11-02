@@ -1,4 +1,5 @@
-import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart, Clock, Phone } from "lucide-react";
+import { useState } from "react";
+import { Calendar, MapPin, Plus, Check, Utensils, Users, Book, Gift, Laptop, Heart, Clock, Phone, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -78,6 +79,14 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
   const isFull = shift.status === "full";
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  
+  // Truncate description to ~100 characters for mobile
+  const maxDescriptionLength = 100;
+  const shouldTruncate = shift.description && shift.description.length > maxDescriptionLength;
+  const displayDescription = shouldTruncate && !isDescriptionExpanded 
+    ? shift.description?.substring(0, maxDescriptionLength) + '...' 
+    : shift.description;
 
   // Create shift assignment mutation
   const signUpMutation = useMutation({
@@ -210,6 +219,34 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
             <div className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Hosted by</div>
             <div className="font-semibold text-gray-800">{shift.host.name}</div>
           </div>
+        </div>
+      )}
+
+      {/* Description */}
+      {shift.description && (
+        <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg shift-card-content">
+          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+            {displayDescription}
+          </p>
+          {shouldTruncate && (
+            <button
+              onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+              className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+              data-testid={`button-expand-description-${shift.id}`}
+            >
+              {isDescriptionExpanded ? (
+                <>
+                  <ChevronUp className="w-3 h-3" />
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-3 h-3" />
+                  Read More
+                </>
+              )}
+            </button>
+          )}
         </div>
       )}
 

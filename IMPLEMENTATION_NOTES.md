@@ -133,3 +133,54 @@ When adding a new field display from Airtable:
 - Use Airtable lookup fields instead of separate API calls (more efficient)
 - Cache Mutual Aid Partners table for 5 minutes to reduce API calls
 - Only fetch host data when shift has Host field populated
+
+---
+
+## Shift Description Field (Completed: Nov 2024)
+
+### Problem
+Display shift descriptions from Airtable on all shift cards with mobile-friendly truncation and expandable "Read More" functionality.
+
+### Implementation
+
+#### Backend Changes
+- Added `description` field extraction from Airtable V Shifts table
+- Handles both "Description" and "Description " (with trailing space) field names
+- Added to shift data structure returned to frontend
+
+**File**: `server/airtable.ts`
+```javascript
+const description = fields['Description '] || fields['Description'] || '';
+```
+
+#### Frontend Changes
+- Updated TypeScript type definition with optional `description` field
+- Added expandable description component to THREE locations:
+  1. Public Browse Shifts (`ShiftCard.tsx`)
+  2. Volunteer Portal Browse tab (`AuthenticatedShiftCard` component)
+  3. Volunteer Portal My Shifts tab (assignment cards)
+
+**Type Definition** (`client/src/lib/api.ts`):
+```typescript
+export interface AirtableShift {
+  description?: string;
+  // ... other fields
+}
+```
+
+**UI Pattern** (consistent across all locations):
+- Truncates description to 100 characters on mobile
+- Shows "Read More" / "Show Less" button for longer descriptions
+- Expandable/collapsable with smooth toggle
+- Preserves whitespace formatting with `whitespace-pre-wrap`
+- Styled in gray box for visual distinction
+
+**State Management**:
+- Individual cards: `useState(false)` for single expand state
+- List of assignments: `useState<{ [key: string]: boolean }>({})` for multiple expand states
+
+### Files Modified
+- `server/airtable.ts`: Extract description field
+- `client/src/lib/api.ts`: Add description to TypeScript type
+- `client/src/components/ShiftCard.tsx`: Add expandable description component
+- `client/src/pages/volunteer-portal.tsx`: Add description to Browse tab and My Shifts tab

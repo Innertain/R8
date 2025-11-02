@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle, Smartphone } from 'lucide-react';
+import { Phone, User, Calendar, UserPlus, LogIn, CheckCircle, Clock, XCircle, CalendarDays, Trash2, CalendarPlus, Settings, Save, Mail, MapPin, Heart, Briefcase, Bell, List, UserCheck, UserX, Pause, Shield, BellRing, MessageSquare, LogOut, Sparkles, Timer, AlertTriangle, Smartphone, ChevronDown, ChevronUp } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -879,6 +879,15 @@ export default function VolunteerPortal() {
 
   // Authenticated shift card with proper volunteer ID
   const AuthenticatedShiftCard = ({ shift, volunteerId }: { shift: any; volunteerId: string }) => {
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    
+    // Truncate description to ~100 characters for mobile
+    const maxDescriptionLength = 100;
+    const shouldTruncate = shift.description && shift.description.length > maxDescriptionLength;
+    const displayDescription = shouldTruncate && !isDescriptionExpanded 
+      ? shift.description.substring(0, maxDescriptionLength) + '...' 
+      : shift.description;
+    
     const { data: assignments = [] } = useQuery({
       queryKey: ['/api/assignments/volunteer', volunteerId],
       queryFn: () => fetch(`/api/assignments/volunteer/${volunteerId}`).then(res => res.json()),
@@ -1044,6 +1053,34 @@ export default function VolunteerPortal() {
               </div>
             )}
             
+            {/* Description */}
+            {shift.description && (
+              <div className="my-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {displayDescription}
+                </p>
+                {shouldTruncate && (
+                  <button
+                    onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                    className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                    data-testid={`button-expand-description-${shift.id}`}
+                  >
+                    {isDescriptionExpanded ? (
+                      <>
+                        <ChevronUp className="w-3 h-3" />
+                        Show Less
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-3 h-3" />
+                        Read More
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            )}
+            
             <div className="text-sm text-gray-800">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
@@ -1198,6 +1235,16 @@ export default function VolunteerPortal() {
     );
   };
 
+  // State for managing description expansion in My Shifts tab
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: string]: boolean }>({});
+  
+  const toggleDescription = (assignmentId: string) => {
+    setExpandedDescriptions(prev => ({
+      ...prev,
+      [assignmentId]: !prev[assignmentId]
+    }));
+  };
+  
   // If logged in, show the dashboard with tabs
   if (currentVolunteer) {
     return (
@@ -1524,6 +1571,43 @@ export default function VolunteerPortal() {
                                         </div>
                                       </div>
                                     )}
+                                    
+                                    {/* Description */}
+                                    {matchedShift?.description && (() => {
+                                      const maxDescriptionLength = 100;
+                                      const shouldTruncate = matchedShift.description.length > maxDescriptionLength;
+                                      const isExpanded = expandedDescriptions[assignment.id];
+                                      const displayDescription = shouldTruncate && !isExpanded 
+                                        ? matchedShift.description.substring(0, maxDescriptionLength) + '...' 
+                                        : matchedShift.description;
+                                      
+                                      return (
+                                        <div className="my-2 p-2 bg-gray-50 border border-gray-200 rounded-lg">
+                                          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                            {displayDescription}
+                                          </p>
+                                          {shouldTruncate && (
+                                            <button
+                                              onClick={() => toggleDescription(assignment.id)}
+                                              className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                                              data-testid={`button-expand-description-${assignment.id}`}
+                                            >
+                                              {isExpanded ? (
+                                                <>
+                                                  <ChevronUp className="w-3 h-3" />
+                                                  Show Less
+                                                </>
+                                              ) : (
+                                                <>
+                                                  <ChevronDown className="w-3 h-3" />
+                                                  Read More
+                                                </>
+                                              )}
+                                            </button>
+                                          )}
+                                        </div>
+                                      );
+                                    })()}
                                     
                                     <div>
                                       <strong>Location:</strong> {assignment.location || matchedShift?.location || 'Local area'}

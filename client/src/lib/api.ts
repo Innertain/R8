@@ -3,6 +3,7 @@
 export interface AirtableShift {
   id: string;
   activityName: string;
+  description?: string;
   dateTime: string; // Deprecated - kept for backward compatibility
   startTime: string | null; // ISO datetime string with timezone
   endTime: string | null; // ISO datetime string with timezone

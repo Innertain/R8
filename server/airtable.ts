@@ -385,6 +385,9 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           // Extract activity name - note the trailing space in "Activity "
           const activityName = fields['Activity '] || fields['Activity'] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
           
+          // Extract description field (may have trailing space)
+          const description = fields['Description '] || fields['Description'] || '';
+          
           // Extract location ID and get full site details from sitesLookup
           const locationId = fields['Location ']?.[0] || null; // Linked record ID
           const siteData = locationId && sitesLookup[locationId] ? sitesLookup[locationId] : null;
@@ -428,6 +431,7 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           return {
             id: record.id,
             activityName,
+            description,
             dateTime: '', // Deprecated - kept for backward compatibility
             startTime,
             endTime,
