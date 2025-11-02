@@ -96,6 +96,24 @@ const CustomEventWrapper = ({ event, children }: { event: any; children: React.R
               <MapPin className="h-3 w-3" />
               <span>{shift?.location || 'Location TBD'}</span>
             </div>
+            {shift?.host && (
+              <div className="flex items-center gap-2">
+                {shift.host.logo ? (
+                  <img 
+                    src={shift.host.logo} 
+                    alt={`${shift.host.name} logo`}
+                    className="h-3 w-3 object-contain"
+                  />
+                ) : (
+                  <div className="h-3 w-3 bg-blue-500 rounded-sm flex items-center justify-center">
+                    <span className="text-white text-[8px] font-bold">
+                      {shift.host.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <span className="text-xs">Hosted by {shift.host.name}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Clock className="h-3 w-3" />
               <span>

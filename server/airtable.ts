@@ -236,6 +236,12 @@ async function fetchMutualAidPartners(): Promise<{ [key: string]: { name: string
       const data = await response.json();
       console.log(`✓ Fetched ${data.records?.length || 0} mutual aid partners for host mapping`);
       
+      // Log first partner to verify data structure
+      if (data.records && data.records.length > 0) {
+        console.log('🏢 First partner record fields:', Object.keys(data.records[0].fields));
+        console.log('🏢 First partner sample data:', JSON.stringify(data.records[0].fields, null, 2));
+      }
+      
       // Create lookup map by record ID
       partnersCache = {};
       data.records.forEach((record: any) => {
@@ -243,6 +249,13 @@ async function fetchMutualAidPartners(): Promise<{ [key: string]: { name: string
           name: record.fields.Name || 'Unknown Partner',
           logo: record.fields.Logo?.[0]?.url || null
         };
+      });
+      
+      console.log(`📋 Created host lookup with ${Object.keys(partnersCache).length} organizations`);
+      // Log a few example host IDs and names for debugging
+      const sampleHosts = Object.entries(partnersCache).slice(0, 3);
+      sampleHosts.forEach(([id, data]) => {
+        console.log(`  - ${id}: ${data.name} (logo: ${data.logo ? 'YES' : 'NO'})`);
       });
       
       cacheExpiry = Date.now() + (5 * 60 * 1000); // Cache for 5 minutes
@@ -390,6 +403,12 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           // Extract host information from Host field (linked to Mutual Aid Partners)
           const hostId = fields['Host']?.[0] || null; // Linked record ID
           const hostData = hostId && hostsLookup[hostId] ? hostsLookup[hostId] : null;
+          
+          // Debug: Log host data lookup for first shift
+          if (index === 0) {
+            console.log(`🏢 First shift host lookup: hostId="${hostId}", hostData=`, hostData);
+            console.log(`🏢 Available hosts in lookup:`, Object.keys(hostsLookup).slice(0, 5));
+          }
           
           // Keep ISO datetime strings to preserve timezone information
           // Frontend will handle formatting with timezone display

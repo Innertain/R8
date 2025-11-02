@@ -190,25 +190,26 @@ export default function ShiftCard({ shift, showSignup = true }: ShiftCardProps) 
 
       {/* Host Information */}
       {shift.host && (
-        <div className="flex items-center mb-4 text-gray-600 shift-card-content">
-          <div className="w-4 h-4 mr-3 flex items-center justify-center">
+        <div className="flex items-center mb-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-lg shift-card-content">
+          <div className="w-8 h-8 mr-3 flex items-center justify-center bg-white rounded-md shadow-sm border border-gray-200">
             {shift.host.logo ? (
               <img 
                 src={shift.host.logo} 
                 alt={`${shift.host.name} logo`}
-                className="w-4 h-4 object-contain activity-icon transition-all duration-300"
+                className="w-6 h-6 object-contain activity-icon transition-all duration-300"
               />
             ) : (
-              <div className="w-4 h-4 bg-blue-500 rounded-sm flex items-center justify-center activity-icon transition-all duration-300">
-                <span className="text-white text-xs font-bold">
+              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded flex items-center justify-center activity-icon transition-all duration-300">
+                <span className="text-white text-sm font-bold">
                   {shift.host.name.charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
           </div>
-          <span className="text-sm">
-            Hosted by <span className="font-medium text-gray-700">{shift.host.name}</span>
-          </span>
+          <div className="flex-1">
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Hosted by</div>
+            <div className="font-semibold text-gray-800">{shift.host.name}</div>
+          </div>
         </div>
       )}
 
