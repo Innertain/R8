@@ -26,6 +26,7 @@ import {
   Satellite
 } from "lucide-react";
 import r8LogoWhite from "@assets/R8 LOGO_white400px_1753778033506.png";
+import r4Logo from "@/assets/r4-logo.png";
 import hawaiiLandscape from "@assets/Hawaii_1754183003386.png";
 import appalachianLandscape from "@assets/Appalachian _1754183249913.png";
 
@@ -628,27 +629,70 @@ function Footer() {
   return (
     <footer className="bg-stormy-dark border-t border-stormy-light/30 py-12">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <img 
-              src={r8LogoWhite}
-              alt="R8 Logo" 
-              className="w-10 h-10 mr-3"
-            />
-            <span className="text-2xl font-bold text-white">R8</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* R8 Branding */}
+          <div className="text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start mb-4">
+              <img 
+                src={r8LogoWhite}
+                alt="R8 Logo" 
+                className="w-10 h-10 mr-3"
+              />
+              <span className="text-2xl font-bold text-white">R8</span>
+            </div>
+            <p className="text-white/80 text-base mb-2">
+              <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
+            </p>
+            <p className="text-white/60 text-sm">
+              Empowering grassroots mutual aid with the best technology tools and network.
+            </p>
           </div>
-          <p className="text-white/80 text-lg mb-4">
-            <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
-          </p>
-          <p className="text-white/60 text-sm mb-6">
+
+          {/* Contact Links */}
+          <div className="text-center">
+            <h3 className="text-white font-semibold mb-4">Contact</h3>
+            <div className="space-y-2 text-sm text-white/70">
+              <Link href="/volunteer" className="block hover:text-blue-400 transition-colors">Contact R8 →</Link>
+              <a href="https://wnc-supply-sites.com" target="_blank" rel="noopener noreferrer" className="block hover:text-blue-400 transition-colors">Contact Supply Sites →</a>
+              <a href="https://r4reach.org" target="_blank" rel="noopener noreferrer" className="block hover:text-blue-400 transition-colors">Contact R4 →</a>
+            </div>
+          </div>
+
+          {/* Fiscal Sponsor */}
+          <div className="text-center md:text-right">
+            <h3 className="text-white font-semibold mb-4">Fiscal Sponsor</h3>
+            <div className="flex items-center justify-center md:justify-end mb-3">
+              <img 
+                src={r4Logo}
+                alt="R4 Reach Logo" 
+                className="w-16 h-16"
+              />
+            </div>
+            <p className="text-white/80 text-sm mb-2">
+              Our fiscal sponsor is <span className="font-semibold text-white">4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
+            </p>
+            <a 
+              href="https://r4reach.org" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+            >
+              Visit R4 Reach →
+            </a>
+          </div>
+        </div>
+
+        {/* Footer Bottom */}
+        <div className="border-t border-stormy-light/20 pt-6 text-center">
+          <p className="text-white/60 text-sm mb-4">
             Powered by: <span className="text-purple-300">Responsibility</span> • <span className="text-amber-300">Resources</span> • <span className="text-teal-300">Recovery</span> • <span className="text-emerald-300">Restoration</span> • <span className="text-indigo-300">Renewal</span>
           </p>
-          <div className="flex justify-center gap-8 text-sm text-white/60">
-            <Link href="/volunteer" className="hover:text-white transition-colors">Get Involved</Link>
-            <Link href="/map" className="hover:text-white transition-colors">Emergency Response</Link>
-            <Link href="/bioregions" className="hover:text-white transition-colors">Explore Bioregions</Link>
-            <Link href="/hawaii" className="hover:text-white transition-colors">Regeneration Projects</Link>
-          </div>
+          <p className="text-white/50 text-xs">
+            Based in Asheville, NC • Honolulu, HI
+          </p>
+          <p className="text-white/40 text-xs mt-2">
+            © 2025 R8. Empowering grassroots mutual aid with the best technology tools and network.
+          </p>
         </div>
       </div>
     </footer>
