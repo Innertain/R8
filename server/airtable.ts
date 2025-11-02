@@ -382,11 +382,14 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         return data.records.map((record: any, index: number) => {
           const fields = record.fields;
           
-          // Debug: log all field names for first record
-          if (index === 0) {
-            console.log('📝 First shift record fields:', Object.keys(fields));
-            console.log('📝 First shift sample data:', JSON.stringify(fields, null, 2));
-          }
+          // Debug: log all field names and check for Host field on ALL records
+          console.log(`📝 Record ${index + 1} (${record.id}):`, {
+            fields: Object.keys(fields),
+            hasHost: 'Host' in fields,
+            hasHostLookup: 'Name (from Host)' in fields,
+            hasLogoLookup: 'Logo (from Host)' in fields,
+            activityName: fields['Activity '] || fields['Activity']
+          });
           
           // Extract activity name - note the trailing space in "Activity "
           const activityName = fields['Activity '] || fields['Activity'] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
