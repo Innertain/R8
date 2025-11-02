@@ -307,6 +307,12 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         return data.records.map((record: any) => {
           const fields = record.fields;
           
+          // Debug: log all field names for first record
+          if (data.records.indexOf(record) === 0) {
+            console.log('📝 First shift record fields:', Object.keys(fields));
+            console.log('📝 First shift sample data:', JSON.stringify(fields, null, 2));
+          }
+          
           // Extract activity name - note the trailing space in "Activity "
           const activityName = fields['Activity '] || fields['Activity'] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
           
@@ -321,6 +327,8 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
           // Frontend will handle formatting with timezone display
           const startTime = fields['Start Time'] || null;
           const endTime = fields['End Time'] || null;
+          
+          console.log(`⏰ Shift "${activityName}": startTime=${startTime}, endTime=${endTime}`);
           
           // Determine icon based on activity name
           let icon = 'users';
