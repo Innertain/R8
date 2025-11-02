@@ -382,56 +382,31 @@ export async function fetchShiftsFromAirtableServer(): Promise<AirtableShift[]> 
         return data.records.map((record: any, index: number) => {
           const fields = record.fields;
           
-          // Debug: log all field names and check for Host field on ALL records
-          console.log(`📝 Record ${index + 1} (${record.id}):`, {
-            fields: Object.keys(fields),
-            hasHost: 'Host' in fields,
-            hasHostLookup: 'Name (from Host)' in fields,
-            hasLogoLookup: 'Logo (from Host)' in fields,
-            activityName: fields['Activity '] || fields['Activity']
-          });
-          
           // Extract activity name - note the trailing space in "Activity "
           const activityName = fields['Activity '] || fields['Activity'] || fields['Name (from Activity )']?.[0] || fields['Name']?.[0] || 'Unknown Activity';
           
-          // Extract location ID and get full site details
+          // Extract location ID and get full site details from sitesLookup
           const locationId = fields['Location ']?.[0] || null; // Linked record ID
           const siteData = locationId && sitesLookup[locationId] ? sitesLookup[locationId] : null;
           const location = siteData?.name || fields['Site Name (from Location )']?.[0] || 'TBD';
           
-          // Debug: Log site data lookup for first shift
-          if (index === 0) {
-            console.log(`🔍 First shift location lookup: locationId="${locationId}", siteData=`, siteData);
-          }
-          
           // Extract host information from Host field (linked to Mutual Aid Partners)
-          const hostId = fields['Host']?.[0] || null; // Linked record ID
-          const hostName = fields['Name (from Host)']?.[0] || null; // Lookup field for host name
-          const hostLogo = fields['Logo (from Host)']?.[0]?.url || null; // Lookup field for logo
+          // Uses lookup fields from Airtable for efficiency:
+          // - 'Host' field: linked record ID to Mutual Aid Partners table
+          // - 'Name (from Host)': lookup field for organization name
+          // - 'Logo (from Host)': lookup field for logo attachment URL
+          const hostId = fields['Host']?.[0] || null;
+          const hostName = fields['Name (from Host)']?.[0] || null;
+          const hostLogo = fields['Logo (from Host)']?.[0]?.url || null;
           
-          // Use lookup fields if available, otherwise fall back to hostsLookup
+          // Fallback to hostsLookup if lookup fields are missing
           const hostData = hostId && hostsLookup[hostId] ? hostsLookup[hostId] : null;
-          
-          // Debug: Log host data for every record
-          console.log(`🏢 Shift "${activityName}" host data:`, {
-            hostId,
-            hostName,
-            hostLogo,
-            hasHostData: !!hostData,
-            finalHost: (hostId || hostName) ? {
-              id: hostId,
-              name: hostName || hostData?.name || 'Unknown Organization',
-              logo: hostLogo || hostData?.logo || null
-            } : null
-          });
           
           // Keep ISO datetime strings to preserve timezone information
           // Frontend will handle formatting with timezone display
           const startTime = fields['Start Time'] || null;
           const endTime = fields['End Time'] || null;
-          const timezone = fields['Timezone'] || null; // e.g., "America/New_York", "America/Chicago"
-          
-          console.log(`⏰ Shift "${activityName}": startTime=${startTime}, endTime=${endTime}, timezone=${timezone}`);
+          const timezone = fields['Timezone'] || null;
           
           // Determine icon based on activity name
           let icon = 'users';
