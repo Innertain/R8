@@ -37,6 +37,7 @@ import { StateSVGDefs } from "@/components/StateIcon";
 import { Footer } from "@/components/Footer";
 import { GlobalFilterIndicator } from "@/components/GlobalFilterIndicator";
 import ComingSoonPage from "@/pages/coming-soon";
+import R4VolunteerLanding from "@/pages/r4-volunteer-landing";
 import AirtableTestPage from "@/pages/airtable-test";
 import r8Logo from "@/assets/r8-logo.png";
 
@@ -50,9 +51,12 @@ function Navigation() {
         <div 
           className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => {
-            // Clear access and force redirect to coming soon page
+            // Clear all access tokens and force redirect to coming soon page
             sessionStorage.removeItem('platformAccess');
             sessionStorage.removeItem('accessUser');
+            sessionStorage.removeItem('r4VolunteerAccess');
+            sessionStorage.removeItem('r4Volunteer');
+            sessionStorage.removeItem('accessContext');
             window.location.href = '/';
           }}
         >
@@ -693,12 +697,21 @@ function Router() {
   useAnalytics();
   
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [isR4Volunteer, setIsR4Volunteer] = useState(false);
   const [location] = useLocation();
 
   useEffect(() => {
     const checkAccess = () => {
-      const accessGranted = sessionStorage.getItem('platformAccess');
-      setHasAccess(accessGranted === 'granted');
+      const r8Access = sessionStorage.getItem('platformAccess');
+      const r4Access = sessionStorage.getItem('r4VolunteerAccess');
+      
+      // R4 volunteers are restricted - check for R4 access flag directly
+      const isR4 = r4Access === 'granted';
+      
+      // Only grant full access if R8 beta AND not R4 volunteer
+      setHasAccess(r8Access === 'granted' || isR4);
+      // Treat anyone with R4 access as restricted (can't be bypassed by clearing accessContext)
+      setIsR4Volunteer(isR4);
     };
 
     checkAccess();
@@ -707,8 +720,8 @@ function Router() {
     return () => window.removeEventListener('storage', checkAccess);
   }, []);
 
-  const isPublicRoute = ['/privacy-policy', '/terms-of-service', '/hurricane-melissa', '/supply-sites-map'].includes(location);
-  const showNavigation = hasAccess && !isPublicRoute;
+  const isPublicRoute = ['/privacy-policy', '/terms-of-service', '/hurricane-melissa', '/supply-sites-map', '/r4-volunteer'].includes(location);
+  const showNavigation = hasAccess && !isPublicRoute && !isR4Volunteer;
 
   // Show loading while checking access
   if (hasAccess === null) {
@@ -738,27 +751,46 @@ function Router() {
           <Route path="/terms-of-service" component={TermsOfServicePage} />
           <Route path="/hurricane-melissa" component={HurricaneMelissaPage} />
           <Route path="/supply-sites-map" component={SupplySitesMapPage} />
+          <Route path="/r4-volunteer" component={R4VolunteerLanding} />
 
           {/* Protected routes */}
           {hasAccess ? (
             <>
-              <Route path="/" component={Home} />
-              <Route path="/volunteer" component={VolunteerPortal} />
-              <Route path="/volunteer-portal" component={VolunteerPortal} />
-              <Route path="/map" component={InteractiveMap} />
-              <Route path="/stats" component={StatsDashboard} />
-              <Route path="/alerts" component={AlertsPage} />
-              <Route path="/disaster-map" component={DisasterMapPage} />
-              <Route path="/air-quality" component={AirQualityPage} />
-              <Route path="/noaa-climate" component={NoaaClimatePage} />
-              <Route path="/disaster-education" component={DisasterEducationPage} />
-              <Route path="/supply-sites" component={SupplySitesPage} />
-              <Route path="/bioregions" component={BioregionExplorerPage} />
-              <Route path="/hawaii" component={HawaiiRegenerationPage} />
-              <Route path="/appalachian" component={AppalachianRegenerationPage} />
-              <Route path="/cascadia" component={CascadiaRegenerationPage} />
-              <Route path="/airtable-test" component={AirtableTestPage} />
-              <Route component={NotFound} />
+              {/* R4 Volunteer routes - limited access */}
+              {isR4Volunteer ? (
+                <>
+                  <Route path="/volunteer" component={VolunteerPortal} />
+                  <Route path="/volunteer-portal" component={VolunteerPortal} />
+                  {/* Redirect any other route back to volunteer portal */}
+                  <Route path="*">
+                    {() => {
+                      window.location.href = '/volunteer';
+                      return null;
+                    }}
+                  </Route>
+                </>
+              ) : (
+                /* R8 Beta routes - full access */
+                <>
+                  <Route path="/" component={Home} />
+                  <Route path="/volunteer" component={VolunteerPortal} />
+                  <Route path="/volunteer-portal" component={VolunteerPortal} />
+                  <Route path="/map" component={InteractiveMap} />
+                  <Route path="/stats" component={StatsDashboard} />
+                  <Route path="/alerts" component={AlertsPage} />
+                  <Route path="/disaster-map" component={DisasterMapPage} />
+                  <Route path="/air-quality" component={AirQualityPage} />
+                  <Route path="/noaa-climate" component={NoaaClimatePage} />
+                  <Route path="/disaster-education" component={DisasterEducationPage} />
+                  <Route path="/supply-sites" component={SupplySitesPage} />
+                  <Route path="/bioregions" component={BioregionExplorerPage} />
+                  <Route path="/hawaii" component={HawaiiRegenerationPage} />
+                  <Route path="/appalachian" component={AppalachianRegenerationPage} />
+                  <Route path="/cascadia" component={CascadiaRegenerationPage} />
+                  <Route path="/airtable-test" component={AirtableTestPage} />
+                  <Route component={NotFound} />
+                </>
+              )}
             </>
           ) : (
             // Redirect to Coming Soon if no access

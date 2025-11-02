@@ -71,9 +71,10 @@ export default function ComingSoonPage() {
         setAccessGranted(true);
         setMessage('Access granted! You can now explore the platform.');
 
-        // Store access token in session
+        // Store access token in session with R8 beta context
         sessionStorage.setItem('platformAccess', 'granted');
         sessionStorage.setItem('accessUser', JSON.stringify(data.user));
+        sessionStorage.setItem('accessContext', 'r8_beta');
 
         // Redirect to main app after a short delay
         setTimeout(() => {
