@@ -129,7 +129,6 @@ export default function ComingSoonPage() {
           </Link>
         </div>
       </div>
-
       {/* Emergency Hurricane Alert Banner */}
       <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white py-3 px-4 sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
@@ -152,7 +151,6 @@ export default function ComingSoonPage() {
           </Link>
         </div>
       </div>
-
       {/* Hero Section with R8 Branding */}
       <div className="relative min-h-screen overflow-hidden">
         {/* Extended Background to Prevent Gaps */}
@@ -272,7 +270,6 @@ export default function ComingSoonPage() {
             </div>
         </div>
       </div>
-      
       {/* Hurricane Melissa Section */}
       <section className="relative py-20 bg-gradient-to-b from-blue-900/20 to-slate-900">
         <div className="max-w-6xl mx-auto px-4 lg:px-6">
@@ -394,7 +391,6 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-
       {/* Food Resources Map Section */}
       <section className="relative py-20 bg-gradient-to-b from-emerald-900/20 to-slate-900">
         <div className="max-w-6xl mx-auto px-4 lg:px-6">
@@ -528,7 +524,6 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-      
       {/* Mission Section - Completely Separate from Hero */}
       <section className="relative py-16 lg:py-24 bg-gradient-to-b from-slate-900 to-slate-800">
         {/* Content */}
@@ -561,7 +556,6 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-
       {/* Platform Impact Statistics - Separate Section with Clean Background */}
       <section className="relative py-16 lg:py-20 bg-gradient-to-b from-slate-800 to-slate-700">
         <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6">
@@ -1174,7 +1168,7 @@ export default function ComingSoonPage() {
               <h3 className="text-white font-semibold text-lg mb-4">Fiscal Sponsor</h3>
               <div className="space-y-2">
                 <p className="text-white/80 text-sm">
-                  Our fiscal sponsor is <span className="font-medium">4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
+                  Our fiscal sponsor is <span className="font-medium">R4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
                 </p>
                 <div>
                   <a 
