@@ -647,6 +647,23 @@ export default function VolunteerPortal() {
       }
     }
     
+    // Check for R4 volunteer access from /r4-volunteer landing page
+    const r4Access = sessionStorage.getItem('r4VolunteerAccess');
+    const r4VolunteerStr = sessionStorage.getItem('r4Volunteer');
+    
+    if (r4Access === 'granted' && r4VolunteerStr && !currentVolunteer) {
+      try {
+        const r4Volunteer = JSON.parse(r4VolunteerStr);
+        setCurrentVolunteer(r4Volunteer);
+        // Also save to localStorage for persistence
+        localStorage.setItem('currentVolunteer', r4VolunteerStr);
+        return;
+      } catch (error) {
+        console.error('Failed to parse R4 volunteer:', error);
+        sessionStorage.removeItem('r4Volunteer');
+      }
+    }
+    
     // Fall back to sessionStorage for main site authentication
     const platformAccess = sessionStorage.getItem('platformAccess');
     const accessUserStr = sessionStorage.getItem('accessUser');
