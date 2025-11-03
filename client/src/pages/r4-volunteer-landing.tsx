@@ -283,32 +283,103 @@ export default function R4VolunteerLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-12 bg-slate-900 border-t border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <img src={r4Logo} alt="R4 Reach" className="w-12 h-12" />
-              <div>
-                <p className="text-white font-semibold">R4 Reach Volunteer Portal</p>
-                <p className="text-gray-400 text-sm">Powered by R8 platform technology</p>
+      <footer className="bg-stormy-dark border-t border-stormy-light/30 py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+            {/* Logo and Mission */}
+            <a 
+              href="https://www.itsr8.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-center lg:text-left hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <div className="flex items-center justify-center lg:justify-start mb-4">
+                <img 
+                  src={r8LogoWhite}
+                  alt="R8 Logo" 
+                  className="w-10 h-10 mr-3"
+                />
+                <span className="text-2xl font-bold text-white">R8</span>
+              </div>
+              <p className="text-white/80 text-lg mb-4">
+                <span className="text-blue-400 font-semibold">Resilience</span> • <span className="text-red-400 font-semibold">Response</span> • <span className="text-green-400 font-semibold">Regeneration</span>
+              </p>
+              <p className="text-white/60 text-sm">
+                Empowering grassroots mutual aid with the best technology tools and network.
+              </p>
+            </a>
+
+            {/* Contact Links */}
+            <div className="text-center lg:text-left">
+              <h3 className="text-white font-semibold text-lg mb-4">Contact</h3>
+              <div className="space-y-3">
+                <div>
+                  <a 
+                    href="https://form.jotform.com/250033214947047" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 transition-colors text-sm block"
+                  >
+                    Contact R8 →
+                  </a>
+                </div>
+                <div>
+                  <a 
+                    href="https://form.jotform.com/243608573773062" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm block"
+                  >
+                    Contact Supply Sites →
+                  </a>
+                </div>
+                <div>
+                  <a 
+                    href="https://app.jotform.com/243556240110141/250086799464067" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-emerald-400 hover:text-emerald-300 transition-colors text-sm block"
+                  >
+                    Contact R4 →
+                  </a>
+                </div>
               </div>
             </div>
-            
-            <Link href="/coming-soon">
-              <Button variant="outline" className="border-slate-600 text-gray-300 hover:bg-slate-700 hover:text-white">
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Learn About R8 Platform
-              </Button>
-            </Link>
+
+            {/* Fiscal Sponsor */}
+            <div className="text-center lg:text-left">
+              <h3 className="text-white font-semibold text-lg mb-4">Fiscal Sponsor</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-center lg:justify-start">
+                  <img 
+                    src={r4Logo}
+                    alt="R4 Reach Logo" 
+                    className="w-16 h-16"
+                  />
+                </div>
+                <p className="text-white/80 text-sm">
+                  Our fiscal sponsor is <span className="font-medium">R4Reach</span> – Resilience Relief & Recovery Reach 501(c)3
+                </p>
+                <div>
+                  <a 
+                    href="https://r4reach.org/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-sm"
+                  >
+                    Visit R4 Reach →
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div className="mt-8 pt-8 border-t border-slate-700 text-center">
-            <p className="text-gray-400 text-sm">
-              A fiscally sponsored project of Valley Hope Foundation, a 501(c)(3) nonprofit
-            </p>
-            <p className="text-gray-500 text-xs mt-2">
-              &copy; 2025 R4 Reach. Empowering grassroots mutual aid with the best technology tools.
-            </p>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-white/20 pt-8 text-center">
+            <div className="text-sm text-white/60 space-y-2">
+              <div>Based in Asheville, NC • Honolulu, HI</div>
+              <div>&copy; 2025 R8. Empowering grassroots mutual aid with the best technology tools and network.</div>
+            </div>
           </div>
         </div>
       </footer>

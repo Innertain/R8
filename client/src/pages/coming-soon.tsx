@@ -933,7 +933,12 @@ export default function ComingSoonPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
             {/* Logo and Mission */}
-            <div className="text-center lg:text-left">
+            <a 
+              href="https://www.itsr8.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-center lg:text-left hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <div className="flex items-center justify-center lg:justify-start mb-4">
                 <img 
                   src={r8LogoWhite}
@@ -948,7 +953,7 @@ export default function ComingSoonPage() {
               <p className="text-white/60 text-sm">
                 Empowering grassroots mutual aid with the best technology tools and network.
               </p>
-            </div>
+            </a>
 
             {/* Contact Links */}
             <div className="text-center lg:text-left">
