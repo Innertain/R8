@@ -5,15 +5,23 @@ const router = Router();
 // Cache for NOAA climate reports
 let noaaReportsCache: any = null;
 let noaaReportsCacheTime: number = 0;
-const NOAA_REPORTS_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hour cache
+const NOAA_REPORTS_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hour cache (climate data doesn't change frequently)
 
 // NOAA Climate Data API endpoint for comprehensive historical data
 router.get("/noaa-climate-data", async (req, res) => {
   try {
-    // Force refresh for testing - skip cache temporarily
-    console.log('🔄 Forcing refresh of NOAA climate data for comprehensive historical analysis...');
+    // Check cache first to avoid re-fetching historical data
+    const now = Date.now();
+    if (noaaReportsCache && (now - noaaReportsCacheTime) < NOAA_REPORTS_CACHE_DURATION) {
+      console.log('✅ Serving NOAA climate data from cache (cached', Math.round((now - noaaReportsCacheTime) / 1000 / 60), 'minutes ago)');
+      return res.json({
+        ...noaaReportsCache,
+        cached: true,
+        cacheAge: Math.round((now - noaaReportsCacheTime) / 1000 / 60) + ' minutes'
+      });
+    }
 
-    console.log('🌡️ Fetching comprehensive NOAA climate data from official APIs...');
+    console.log('🌡️ Fetching fresh NOAA climate data from official APIs (cache miss or expired)...');
 
     // NOAA Climate Data Online API endpoints
     const currentYear = new Date().getFullYear();
