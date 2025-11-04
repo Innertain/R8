@@ -209,10 +209,18 @@ export interface PublicSupplySite {
 let partnersCache: { [key: string]: { name: string; logo?: string } } | null = null;
 let cacheExpiry: number = 0;
 
+// Supply sites cache with 5-minute TTL
+let supplySitesCache: PublicSupplySite[] | null = null;
+let supplySitesCacheExpiry: number = 0;
+let supplySitesCacheKey: string = '';
+
 // Clear cache function for development/debugging
 export function clearAirtableCache() {
   partnersCache = null;
   cacheExpiry = 0;
+  supplySitesCache = null;
+  supplySitesCacheExpiry = 0;
+  supplySitesCacheKey = '';
   console.log('🔄 Airtable cache cleared');
 }
 
@@ -475,6 +483,17 @@ export async function fetchPublicSupplySitesFromAirtable(
     throw new Error('Missing Airtable credentials');
   }
 
+  // Create cache key based on thresholds
+  const cacheKey = `${greenThresholdDays}-${yellowThresholdDays}`;
+  
+  // Return cached data if still valid (5 minutes)
+  if (supplySitesCache && Date.now() < supplySitesCacheExpiry && supplySitesCacheKey === cacheKey) {
+    console.log(`🗺️ Serving supply sites from cache (${supplySitesCache.length} sites)`);
+    return supplySitesCache;
+  }
+
+  console.log(`🗺️ Fetching fresh supply sites data (cache miss or expired)`);
+
   // Load cache if not already loaded (backup for module-level load)
   if (Object.keys(geocodeCache).length === 0) {
     loadGeocodeCache();
@@ -625,6 +644,12 @@ export async function fetchPublicSupplySitesFromAirtable(
     }
 
     console.log(`✓ Returning ${publicSites.length} public supply sites (${cachedCount} from cache, ${queuedCount} queued for background geocoding)`);
+    
+    // Cache the results for 5 minutes
+    supplySitesCache = publicSites;
+    supplySitesCacheExpiry = Date.now() + (5 * 60 * 1000);
+    supplySitesCacheKey = cacheKey;
+    
     return publicSites;
 
   } catch (error) {

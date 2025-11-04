@@ -803,5 +803,19 @@
   "350 Sunset Drive, Blowing Rock, NC": {
     "lat": 36.1327869,
     "lng": -81.6745083
+  },
+  "819 Martin Luther King Jr. Dr., Asheboro, NC": {
+    "lat": 35.708829,
+    "lng": -79.7998363
+  },
+  "930 S. Fayetteville St., Asheboro, NC": {
+    "lat": 35.694952,
+    "lng": -79.8155315
+  },
+  "831 East Prichard St., Asheboro, NC": null,
+  "4872 Old Edgar Road, Sophia, NC": null,
+  "345 N. Church St., Asheboro, NC": {
+    "lat": 35.7116027,
+    "lng": -79.8166613
   }
 }

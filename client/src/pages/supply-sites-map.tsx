@@ -1,10 +1,15 @@
 import { useLocation } from 'wouter';
 import PublicSupplySitesMap from '@/components/PublicSupplySitesMap';
 import { Button } from '@/components/ui/button';
-import { Home, ExternalLink } from 'lucide-react';
+import { Home, ExternalLink, Code, Check } from 'lucide-react';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SupplySitesMapPage() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [showEmbedCode, setShowEmbedCode] = useState(false);
+  const [copied, setCopied] = useState(false);
   
   // Check if we're in embed mode
   const isEmbed = new URLSearchParams(window.location.search).get('embed') === 'true';
@@ -14,15 +19,56 @@ export default function SupplySitesMapPage() {
   const greenThreshold = parseInt(params.get('green') || '7');
   const yellowThreshold = parseInt(params.get('yellow') || '30');
 
+  // Generate embed code
+  const embedUrl = `${window.location.origin}/supply-sites-map?embed=true`;
+  const embedCode = `<!-- WNC Food Resources Map by R8 -->
+<iframe 
+  src="${embedUrl}" 
+  width="100%" 
+  height="600" 
+  frameborder="0"
+  style="border: none; border-radius: 8px;"
+  title="WNC Food Resources Map"
+></iframe>
+<div style="text-align: center; margin-top: 8px; font-size: 12px; color: #666;">
+  Powered by <a href="https://www.itsr8.com" target="_blank" rel="noopener" style="color: #059669; text-decoration: none; font-weight: 600;">R8</a>
+</div>`;
+
+  const copyEmbedCode = () => {
+    navigator.clipboard.writeText(embedCode);
+    setCopied(true);
+    toast({
+      title: "Embed code copied!",
+      description: "Paste this code into your website to embed the map.",
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   if (isEmbed) {
-    // Embed mode - minimal UI, just the map
+    // Embed mode - minimal UI with R8 attribution
     return (
-      <div className="w-full h-screen">
-        <PublicSupplySitesMap 
-          greenThreshold={greenThreshold}
-          yellowThreshold={yellowThreshold}
-          embed={true}
-        />
+      <div className="w-full h-screen flex flex-col">
+        <div className="flex-1">
+          <PublicSupplySitesMap 
+            greenThreshold={greenThreshold}
+            yellowThreshold={yellowThreshold}
+            embed={true}
+          />
+        </div>
+        <div className="bg-white border-t border-gray-200 px-4 py-2 text-center">
+          <p className="text-xs text-gray-600">
+            Powered by{' '}
+            <a 
+              href="https://www.itsr8.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-emerald-600 hover:text-emerald-700 font-semibold no-underline hover:underline"
+              data-testid="link-r8-attribution"
+            >
+              R8
+            </a>
+          </p>
+        </div>
       </div>
     );
   }
@@ -70,7 +116,7 @@ export default function SupplySitesMapPage() {
               <strong>Note:</strong> This map shows only food hubs that have signed up with our network. It is not all-inclusive of food resources in Western North Carolina.
             </p>
             <p className="text-xs text-yellow-800 mt-2">
-              Is your food hub or distribution center not listed? <a href="https://form.jotform.com/250033214947047" target="_blank" rel="noopener noreferrer" className="text-emerald-700 hover:text-emerald-900 underline font-medium">Contact us to join the network</a>
+              Is your food hub or distribution center not listed? <a href="https://form.jotform.com/243608573773062" target="_blank" rel="noopener noreferrer" className="text-emerald-700 hover:text-emerald-900 underline font-medium" data-testid="link-join-network">Contact us to join the network</a>
             </p>
           </div>
         </div>
@@ -85,16 +131,68 @@ export default function SupplySitesMapPage() {
         />
       </div>
 
-      {/* Footer with embed instructions */}
-      <div className="bg-gray-100 border-t border-gray-300 p-3">
-        <div className="max-w-7xl mx-auto text-xs text-gray-600">
-          <div className="flex items-center justify-between">
-            <div>
-              <strong>For organizations:</strong> This map is embeddable. Add{' '}
-              <code className="bg-gray-200 px-1 py-0.5 rounded">?embed=true</code> to the URL to use in an iframe.
-            </div>
-            <div className="text-gray-500">
-              Data updates every 5 minutes
+      {/* Footer with embed code feature */}
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-300 p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              {!showEmbedCode ? (
+                <div className="flex items-center gap-3">
+                  <Button 
+                    onClick={() => setShowEmbedCode(true)}
+                    variant="outline"
+                    className="gap-2 bg-white hover:bg-emerald-50 border-emerald-600 text-emerald-700 hover:text-emerald-800"
+                    data-testid="button-show-embed"
+                  >
+                    <Code className="h-4 w-4" />
+                    Embed This Map
+                  </Button>
+                  <span className="text-xs text-gray-600">
+                    Add this map to your website • Data updates every 5 minutes
+                  </span>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-gray-900">Embed Code (includes R8 attribution)</p>
+                    <Button 
+                      onClick={() => setShowEmbedCode(false)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-600"
+                      data-testid="button-hide-embed"
+                    >
+                      Close
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-white border border-gray-300 rounded-lg p-3 font-mono text-xs overflow-x-auto">
+                      <pre className="whitespace-pre-wrap break-all">{embedCode}</pre>
+                    </div>
+                    <Button 
+                      onClick={copyEmbedCode}
+                      variant="default"
+                      className="gap-2 bg-emerald-600 hover:bg-emerald-700 shrink-0"
+                      data-testid="button-copy-embed"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="h-4 w-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Code className="h-4 w-4" />
+                          Copy Code
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    This embed code includes a "Powered by R8" attribution with a link to itsr8.com. Please keep this attribution when embedding.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
